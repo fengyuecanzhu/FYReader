@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## FYReader-master
 风月读书，一款免费、无广告的小说阅读软件。
 
@@ -23,3 +24,6 @@
 
 
 
+=======
+# FYReader-marster
+>>>>>>> 2c33f0b33a0411efd93a4810de5061a473835ff5
