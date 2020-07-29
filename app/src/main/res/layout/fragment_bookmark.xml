@@ -1,0 +1,21 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/rl_bookmark"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="xyz.fycz.myreader.ui.read.catalog.bookmark.BookMarkFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <ListView
+            android:id="@+id/lv_bookmark_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:fadeScrollbars="true"
+            android:fastScrollEnabled="true"
+            android:divider="@color/nothing"
+            android:overScrollMode="never"
+            android:fadingEdge="none"
+            android:listSelector="@color/nothing"/>
+
+</RelativeLayout>

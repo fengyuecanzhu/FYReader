@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--无法点击状态 灰色背景 圆角矩形-->
+    <item android:state_enabled="false"
+          android:drawable="@drawable/font_using_btn_bg"
+          android:color="@color/sys_font_using_btn">
+    </item>
+
+    <!--正常状态 蓝色背景 圆角矩形-->
+    <item android:drawable="@drawable/font_use_btn_bg"
+          android:color="@color/colorAccent">
+    </item>
+</selector>

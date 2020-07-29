@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/ll_book_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp" >
+
+        <ImageView
+            android:id="@+id/iv_book_img"
+            android:layout_width="64dp"
+            android:layout_height="88dp"
+            android:scaleType="fitXY"
+            app:srcCompat="@mipmap/no_image"/>
+
+        <LinearLayout android:id="@+id/ll_book_read"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="vertical">
+            <TextView
+                    android:id="@+id/tv_book_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:padding="4dp"
+                    android:text="bookname"
+                    android:textSize="16dp"
+                    android:textColor="@color/black"/>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="4dp"
+                        app:srcCompat="@mipmap/ic_book_author" />
+
+                <TextView
+                        android:id="@+id/tv_book_author"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:text="辰东"
+                        android:textSize="12dp"
+                        android:textColor="@color/title_black"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="4dp"
+                        app:srcCompat="@mipmap/ic_book_record" />
+
+                <TextView
+                        android:id="@+id/tv_book_history_chapter"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:text="第1章 xxxxxxxx"
+                        android:textSize="12dp"
+                        android:textColor="@color/title_black"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="4dp"
+                        app:srcCompat="@mipmap/ic_book_last" />
+
+                <TextView
+                        android:id="@+id/tv_book_newest_chapter"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:text="第999章 xxxxxxxx"
+                        android:textSize="12dp"
+                        android:textColor="@color/title_black"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <xyz.fycz.myreader.widget.BadgeView
+        android:id="@+id/tv_no_read_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_margin="5dp"
+        android:includeFontPadding="false"
+        android:layout_marginRight="10dp"/>
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"
+        style="?android:attr/progressBarStyleSmall"
+    />
+
+    <ImageView
+        android:id="@+id/iv_delete"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:visibility="gone"
+        app:srcCompat="@mipmap/delete"
+        android:layout_alignParentRight="true"
+      />
+    <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.5dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/sys_window_back" />
+
+
+</RelativeLayout>
