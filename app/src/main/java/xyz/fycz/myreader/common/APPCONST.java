@@ -10,10 +10,10 @@ import java.io.File;
 
 public class APPCONST {
 
-    public static String publicKey = "fyds1.0";//服务端公钥
+    public static String publicKey = "";//服务端公钥
     public static String privateKey;//app私钥
     public final static String s = "11940364935628058505";
-    public static final String KEY = "readerByFengyue";
+    public static final String KEY = "";
 
     public static final String ALARM_SCHEDULE_MSG = "alarm_schedule_msg";
 
