@@ -1,0 +1,100 @@
+<com.scwang.smartrefresh.layout.SmartRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+                                                   android:id="@+id/srl_content"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   android:background="@color/white"
+                                                   tools:context="xyz.fycz.myreader.ui.home.bookcase.BookcaseFragment">
+    <com.scwang.smartrefresh.header.MaterialHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:scrollbars="none">
+
+        <LinearLayout
+                android:id="@+id/ll_no_data_tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:visibility="gone">
+
+            <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    app:srcCompat="@mipmap/nonono"/>
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="当前无任何书籍，点击添加"
+                    android:textColor="@color/title_black"
+                    android:textSize="16sp"/>
+        </LinearLayout>
+
+        <xyz.fycz.myreader.custom.DragSortGridView
+                android:id="@+id/gv_book"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnWidth="100dp"
+                android:horizontalSpacing="10dp"
+                android:listSelector="@android:color/transparent"
+                android:numColumns="auto_fit"
+                android:scrollbars="none"
+                android:padding="10dp"
+                android:verticalSpacing="10dp">
+        </xyz.fycz.myreader.custom.DragSortGridView>
+
+        <RelativeLayout
+                android:id="@+id/rl_download_tip"
+                android:layout_width="match_parent"
+                android:layout_height="39dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/sys_dialog_setting_line"
+                android:visibility="gone">
+
+            <ProgressBar
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_alignParentTop="true"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:id="@+id/pb_download"
+                    android:max="100"
+                    />
+
+            <TextView
+                    android:id="@+id/tv_download_tip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textColor="@color/sys_dialog_setting_word_bright"
+                    android:text="正在初始化..."
+                    android:gravity="center_vertical|start"
+                    android:maxLines="1"
+                    android:textSize="14sp"
+                    android:paddingStart="15dp"/>
+
+            <TextView
+                    android:id="@+id/tv_stop_download"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="14sp"
+                    android:text="@string/stop_download_tip"
+                    android:layout_alignParentEnd="true"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="15dp"
+                    android:paddingStart="15dp"
+                    android:visibility="gone"
+            />
+        </RelativeLayout>
+
+    </RelativeLayout>
+</com.scwang.smartrefresh.layout.SmartRefreshLayout>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+    <item
+            android:id="@+id/action_edit"
+            android:icon="@drawable/ic_arrange"
+            android:title="@string/menu_bookcase_edit"
+            app:showAsAction="never"/>
+    <item
+            android:id="@+id/action_styleChange"
+            android:icon="@drawable/ic_view_quilt"
+            android:title="@string/menu_bookcase_style"
+            app:showAsAction="never"/>
+    <item
+            android:id="@+id/action_addLocalBook"
+            android:icon="@drawable/ic_add"
+            android:title="@string/menu_bookcase_add"
+            app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_backup"
+        android:icon="@drawable/ic_backup"
+        android:title="@string/menu_bookcase_backup"
+        app:showAsAction="never"/>
+    <!--<item
+            android:id="@+id/action_webBackup"
+            android:icon="@drawable/ic_backup"
+            android:title="@string/menu_bookcase_webBackup"
+            app:showAsAction="never"/>-->
+    <item
+            android:id="@+id/action_download_all"
+            android:icon="@drawable/ic_download_line"
+            android:title="@string/menu_bookcase_download_all"
+            app:showAsAction="never"
+            android:visible="false"/>
+    <item
+            android:id="@+id/action_update"
+            android:icon="@drawable/ic_update"
+            android:title="@string/menu_bookcase_update"
+            app:showAsAction="never"/>
+
+    <item
+            android:id="@+id/action_disclaimer"
+            android:icon="@drawable/ic_disclaimer"
+            android:title="@string/disclaimer"
+            app:showAsAction="never"/>
+
+</menu>

@@ -1,0 +1,76 @@
+<resources>
+    <string name="app_name">风月读书</string>
+    <string name="app_name_debug">风月读书.debug</string>
+
+    <string name="anti_hijacking_tips_home">风月读书切换至后台运行</string>
+    <string name="anti_hijacking_tips">风月读书切换至后台运行，当前风月读书所有，请注意！</string>
+
+    <string name="sys_file_provider">xyz.fycz.myreader.fileprovider</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="day">日间</string>
+    <string name="night">夜间</string>
+    <string name="chapter_list">目录</string>
+    <string name="book_mark_list">书签</string>
+    <string name="delete_all_book_mark">删除全部</string>
+
+    <string name="positive_sort">正序</string>
+    <string name="inverted_sort">倒序</string>
+
+    <string name="font_using">正在使用</string>
+    <string name="font_change">更换字体</string>
+    <string name="font_select">选择字体</string>
+    <string name="font_select_tip">"未找到本地字体，请将字体文件移至FYReader/font文件夹下(如果该文件夹不存在，请自行创建该文件夹或下载一个字体后自动创建文件夹)"</string>
+    <string name="font_example">月</string>
+    <string name="font_use">立即使用</string>
+    <string name="font_download">立即下载</string>
+
+    <string name="font">字体</string>
+
+    <string name="tip">提示</string>
+
+    <string name="download_no_add_tips">缓存书籍需要先加入书架，您确定要添加本书到书架吗？</string>
+
+    <string name="download_already_all_tips">所选章节已经全部缓存！</string>
+
+    <string name="disclaimer">免责声明</string>
+
+    <string name="statement">声明：小说数据全部从网络获取，软件不提供或保存任何小说，详情请参考免责声明：</string>
+    <string name="all_cathe_tip">"说明：本功能属于实验功能，书籍缓存的章节是从历史阅读章节到最新章节！\n\n存在的问题：\n1、书源为品书网的书籍因网站原因无法一键缓存！\n\n2、部分书籍缓存时会卡在99%的位置\n解决方案：点击停止按钮直接进入下一本书籍缓存/重新点击一键缓存！\n\n3、书籍缓存时进入阅读时章节加载可能变慢！\n\n确定要一键缓存？"</string>
+
+    <!--menu-->
+    <string name="menu_book_Top">移至顶部</string>
+    <string name="menu_book_download">缓存书籍</string>
+    <string name="menu_book_cache">导出缓存</string>
+    <string name="menu_book_delete">删除书籍</string>
+
+    <string name="menu_bookcase_edit">编辑书架</string>
+    <string name="menu_bookcase_style">切换布局</string>
+    <string name="menu_bookcase_add">添加本地</string>
+    <string name="menu_bookcase_update">检查更新</string>
+    <string name="menu_bookcase_download_all">一键缓存(实验)</string>
+    <string name="menu_bookcase_backup">备份/恢复</string>
+    <string name="menu_bookcase_webBackup">网络备份/恢复</string>
+
+    <string name="menu_backup_backup">备份</string>
+    <string name="menu_backup_restore">恢复</string>
+    <string name="menu_backup_webRestore">网络恢复</string>
+
+    <string name="change_source">换源</string>
+    <string name="end_page_tip">已经是最后一页了</string>
+
+    <string name="stop_download_tip">停止</string>
+    <string name="text_login">登录</string>
+    <string name="tv_register">新用户注册</string>
+    <string name="et_password_tip">请输入密码</string>
+    <string name="et_rp_password_tip">请再次输入密码</string>
+    <string name="et_rp_captcha">请输入验证码</string>
+    <string name="et_account_tip">请输入用户名</string>
+    <string name="text_register">注册</string>
+    <string name="text_agreement_tip">我已阅读并同意《</string>
+    <string name="link_agreement"><a href="https://shimo.im/docs/RgkDpd3D3Gp6t3rD">用户服务协议</a></string>
+    <string name="add_book_mark">添加书签</string>
+
+</resources>

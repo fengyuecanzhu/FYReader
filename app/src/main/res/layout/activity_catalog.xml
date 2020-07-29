@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:fitsSystemWindows="true"
+              android:orientation="vertical"
+              tools:context="xyz.fycz.myreader.ui.read.catalog.CatalogActivity">
+
+    <RelativeLayout
+            android:id="@+id/rl_common_title"
+            android:layout_width="match_parent"
+            android:layout_height="45dp">
+
+        <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:paddingTop="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dip"
+                app:srcCompat="@mipmap/larrow_black"/>
+
+        <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tl_tab_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                app:tabBackground="@color/nothing"
+                app:tabIndicatorColor="@color/sys_home_tab_select"
+                app:tabIndicatorHeight="1dp"
+                app:tabSelectedTextColor="@color/sys_home_tab_select"
+                app:tabTextColor="@color/sys_word_little"
+                app:tabTextAppearance="@style/TabLayoutTextStyle">
+        </com.google.android.material.tabs.TabLayout>
+
+        <ImageView
+                android:id="@+id/iv_search"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                app:srcCompat="@mipmap/search"
+                android:layout_alignParentEnd="true"/>
+
+        <EditText
+                android:layout_width="285dp"
+                android:hint="搜索..."
+                android:layout_height="match_parent"
+                android:id="@+id/et_search"
+                android:textColor="@color/black"
+                android:textColorHint="@color/little_black_white"
+                android:layout_centerInParent="true"
+                android:singleLine="true"
+                android:visibility="gone"/>
+
+        <ImageView
+                android:id="@+id/iv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                app:srcCompat="@mipmap/ic_cha_white"
+                android:layout_alignParentEnd="true"
+                android:visibility="gone"/>
+    </RelativeLayout>
+
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            app:srcCompat="@color/sys_line"/>
+
+    <androidx.viewpager.widget.ViewPager
+            android:id="@+id/vp_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+    </androidx.viewpager.widget.ViewPager>
+
+</LinearLayout>

@@ -1,0 +1,35 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/rl_catalog"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
+                tools:context="xyz.fycz.myreader.ui.read.catalog.CatalogFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <ListView
+            android:id="@+id/lv_chapter_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:fadeScrollbars="true"
+            android:fastScrollEnabled="true"
+            android:divider="@color/nothing"
+            android:overScrollMode="never"
+            android:fadingEdge="none"
+            android:listSelector="@color/nothing"/>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/change_sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="60dp"
+            android:clickable="true"
+            android:src="@mipmap/ic_order"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            app:borderWidth="0dp"
+            app:elevation="6dp"
+            app:pressedTranslationZ="12dp"
+            />
+</RelativeLayout>
