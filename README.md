@@ -1,5 +1,5 @@
-<<<<<<< HEAD
-## FYReader-master
+
+# FYReader-master
 风月读书，一款免费、无广告的小说阅读软件。
 
 主要功能：
@@ -11,13 +11,30 @@
     
     3、书架及设置可备份/恢复
     
-    4、支持联网下载字体、支持本地字体
+    4、支持联网下载字体、支持使用本地字体
     
     5、支持切换书架布局（列表模式、宫格模式）
     
     6、缓存可导出成txt文件
     
-    7、支持导入本地书籍，支持直接打开txt书籍文件
+    7、支持导入本地书籍，支持直接打开txt文件
     
-    8、支持将书架及设置同步至网络
+    8、支持注册登录将书架及设置同步至网络
     
+    9、支持添加书签
+    
+    10、支持自动翻页
+    
+    
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/1.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/2.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/3.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/4.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/5.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/6.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/7.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/8.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/9.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/10.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/11.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/12.png)
