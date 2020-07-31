@@ -63,43 +63,40 @@ public class UserService {
     }
 
     public static void register(final Map<String, String> userRegisterInfo, final ResultCallback resultCallback) {
-        MyApplication.getApplication().newThread(new Runnable() {
-            @Override
-            public void run() {
-                HttpURLConnection conn = null;
-                try {
-                    URL url = new URL(URLCONST.APP_WEB_URL + "reg");
-                    conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setDoInput(true);
-                    conn.setDoOutput(true);
-                    String params = "username=" + userRegisterInfo.get("username") + "&password=" +
-                            CyptoUtils.encode(APPCONST.KEY, userRegisterInfo.get("password")) + "&key=" +
-                            CyptoUtils.encode(APPCONST.KEY, APPCONST.publicKey)  + makeSignalParam();
-                    // 获取URLConnection对象对应的输出流
-                    PrintWriter out = new PrintWriter(conn.getOutputStream());
-                    // 发送请求参数
-                    out.print(params);
-                    // flush输出流的缓冲
-                    out.flush();
-                    BufferedReader bw = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
-                    StringBuilder sb = new StringBuilder();
-                    String line = bw.readLine();
-                    while (line != null) {
-                        sb.append(line);
-                        line = bw.readLine();
-                    }
-                    resultCallback.onFinish(sb.toString(), 1);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    resultCallback.onError(e);
-                } finally {
-                    if (conn != null) {
-                        conn.disconnect();
-                    }
+        MyApplication.getApplication().newThread(() -> {
+            HttpURLConnection conn = null;
+            try {
+                URL url = new URL(URLCONST.APP_WEB_URL + "reg");
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                String params = "username=" + userRegisterInfo.get("username") + "&password=" +
+                        CyptoUtils.encode(APPCONST.KEY, userRegisterInfo.get("password")) + "&key=" +
+                        CyptoUtils.encode(APPCONST.KEY, APPCONST.publicKey)  + makeSignalParam();
+                // 获取URLConnection对象对应的输出流
+                PrintWriter out = new PrintWriter(conn.getOutputStream());
+                // 发送请求参数
+                out.print(params);
+                // flush输出流的缓冲
+                out.flush();
+                BufferedReader bw = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+                StringBuilder sb = new StringBuilder();
+                String line = bw.readLine();
+                while (line != null) {
+                    sb.append(line);
+                    line = bw.readLine();
                 }
-
+                resultCallback.onFinish(sb.toString(), 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+                resultCallback.onError(e);
+            } finally {
+                if (conn != null) {
+                    conn.disconnect();
+                }
             }
+
         });
     }
 
@@ -122,13 +119,7 @@ public class UserService {
             e.printStackTrace();
             return false;
         } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            IOUtils.close(fos);
         }
     }
 
@@ -159,13 +150,7 @@ public class UserService {
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            IOUtils.close(br);
         }
         return null;
     }

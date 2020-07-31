@@ -41,6 +41,8 @@ public class Setting implements Serializable {
 
     private String localFontName;//本地字体名字
 
+    private boolean isAutoSyn;//是否自动同步书架
+
     private int settingVersion;//设置版本号
 
     public int getAutoScrollSpeed() {
@@ -161,6 +163,14 @@ public class Setting implements Serializable {
 
     public void setLocalFontName(String localFontName) {
         this.localFontName = localFontName;
+    }
+
+    public boolean isAutoSyn() {
+        return isAutoSyn;
+    }
+
+    public void setAutoSyn(boolean autoSyn) {
+        isAutoSyn = autoSyn;
     }
 
     public int getSettingVersion() {

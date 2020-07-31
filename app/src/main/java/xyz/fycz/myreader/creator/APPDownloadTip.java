@@ -14,6 +14,7 @@ import android.provider.Settings;
 import androidx.core.content.FileProvider;
 import android.view.View;
 import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.home.MainActivity;
@@ -42,10 +43,10 @@ public class APPDownloadTip {
     private MainActivity activity;
     private boolean isForceUpdate;
 
-    public APPDownloadTip(String url, BookcaseFragment mBookcaseFragment, MainActivity activity, boolean isForceUpdate) {
+    public APPDownloadTip(String url, BookcaseFragment mBookcaseFragment, BaseActivity activity, boolean isForceUpdate) {
         this.url = url;
         this.mBookcaseFragment = mBookcaseFragment;
-        this.activity = activity;
+        this.activity = (MainActivity) activity;
         this.isForceUpdate = isForceUpdate;
     }
 

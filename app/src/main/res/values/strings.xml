@@ -49,17 +49,24 @@
     <string name="menu_bookcase_edit">编辑书架</string>
     <string name="menu_bookcase_style">切换布局</string>
     <string name="menu_bookcase_add">添加本地</string>
-    <string name="menu_bookcase_update">检查更新</string>
+    <string name="menu_bookcase_syn">同步书架</string>
     <string name="menu_bookcase_download_all">一键缓存(实验)</string>
     <string name="menu_bookcase_backup">备份/恢复</string>
-    <string name="menu_bookcase_webBackup">网络备份/恢复</string>
+    <string name="menu_bookcase_about">关于软件</string>
 
     <string name="menu_backup_backup">备份</string>
     <string name="menu_backup_restore">恢复</string>
-    <string name="menu_backup_webRestore">网络恢复</string>
+
+    <string name="menu_backup_webBackup">从本地同步至网络</string>
+    <string name="menu_backup_webRestore">从网络同步至本地</string>
+    <string name="menu_backup_autoSyn">每日自动同步：</string>
 
     <string name="change_source">换源</string>
     <string name="end_page_tip">已经是最后一页了</string>
+
+    <string name="share">分享</string>
+    <string name="share_text">发现了一款非常好用的小说App「风月读书」，绿色健康、无广告，而且完全开源不收费，实在是太赞了! 推荐~：</string>
+
 
     <string name="stop_download_tip">停止</string>
     <string name="text_login">登录</string>
@@ -72,5 +79,11 @@
     <string name="text_agreement_tip">我已阅读并同意《</string>
     <string name="link_agreement"><a href="https://shimo.im/docs/RgkDpd3D3Gp6t3rD">用户服务协议</a></string>
     <string name="add_book_mark">添加书签</string>
+    <string name="share_app">分享软件</string>
+    <string name="update_log">更新日志</string>
+    <string name="git_hub">GitHub</string>
+    <string name="email">邮箱：fy@fycz.xyz</string>
+    <string name="this_github_url">https://github.com/fengyuecanzhu/FYReader</string>
+    <string name="update">检查更新</string>
 
 </resources>

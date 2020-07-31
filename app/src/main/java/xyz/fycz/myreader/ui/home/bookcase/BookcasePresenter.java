@@ -50,12 +50,11 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
+import xyz.fycz.myreader.ui.about.AboutActivity;
 import xyz.fycz.myreader.ui.home.MainActivity;
 import xyz.fycz.myreader.ui.search.SearchBookActivity;
-import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.SharedPreferencesUtils;
-import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.ui.user.LoginActivity;
+import xyz.fycz.myreader.util.*;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 
@@ -71,15 +70,17 @@ public class BookcasePresenter implements BasePresenter {
     private final ChapterService mChapterService;
     private final MainActivity mMainActivity;
     private boolean isBookcaseStyleChange;
-    private final Setting mSetting;
+    private Setting mSetting;
     private final List<Book> errorLoadingBooks = new ArrayList<>();
     private int finishLoadBookCount = 0;
     private final BackupAndRestore mBackupAndRestore;
     //    private int notifyId = 11;
     private ExecutorService es = Executors.newFixedThreadPool(1);//更新/下载线程池
+
     public ExecutorService getEs() {
         return es;
     }
+
     private String downloadingBook;
     private String downloadingChapter;
     private boolean isDownloadFinish;
@@ -90,11 +91,10 @@ public class BookcasePresenter implements BasePresenter {
             MyApplication.getmContext().getResources().getString(R.string.menu_backup_backup),
             MyApplication.getmContext().getResources().getString(R.string.menu_backup_restore),
     };
-    private final String[] webBackupMenu = {
-            MyApplication.getmContext().getResources().getString(R.string.menu_backup_backup),
-            MyApplication.getmContext().getResources().getString(R.string.menu_backup_restore),
-            MyApplication.getmContext().getResources().getString(R.string.menu_backup_webRestore)
-
+    private final String[] webSynMenu = {
+            MyApplication.getmContext().getString(R.string.menu_backup_webBackup),
+            MyApplication.getmContext().getString(R.string.menu_backup_webRestore),
+            MyApplication.getmContext().getString(R.string.menu_backup_autoSyn)
     };
     //    private ChapterService mChapterService;
     @SuppressLint("HandlerLeak")
@@ -138,12 +138,7 @@ public class BookcasePresenter implements BasePresenter {
                     mBookcaseFragment.getRlDownloadTip().setVisibility(View.VISIBLE);
                     break;
                 case 11:
-                    MyApplication.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            createMenu();
-                        }
-                    });
+                    MyApplication.runOnUiThread(() -> createMenu());
                     break;
                 case 12:
                     mBookcaseFragment.getTvStopDownload().setVisibility(View.GONE);
@@ -170,7 +165,9 @@ public class BookcasePresenter implements BasePresenter {
         if (mSetting.getBookcaseStyle() == null) {
             mSetting.setBookcaseStyle(BookcaseStyle.listMode);
         }
-        synBookcase();
+        if (mSetting.isAutoSyn() && UserService.isLogin()) {
+            synBookcaseToWeb(true);
+        }
         getData();
         //是否启用下拉刷新（默认启用）
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -206,10 +203,10 @@ public class BookcasePresenter implements BasePresenter {
 
         //停止按钮监听器
         mBookcaseFragment.getTvStopDownload().setOnClickListener(v -> {
-            if (downloadProcess == 99){
+            if (downloadProcess == 99) {
                 TextHelper.showText("开始缓存下一本书籍！");
                 isDownloadFinish = true;
-            }else {
+            } else {
                 isStopDownload = true;
             }
         });
@@ -306,7 +303,7 @@ public class BookcasePresenter implements BasePresenter {
             mHandler.sendMessage(mHandler.obtainMessage(3));
         }
         for (final Book book : mBooks) {
-            if ("本地书籍".equals(book.getType())){
+            if ("本地书籍".equals(book.getType())) {
                 mBookcaseAdapter.getIsLoading().put(book.getId(), false);
                 mHandler.sendMessage(mHandler.obtainMessage(1));
                 continue;
@@ -419,7 +416,7 @@ public class BookcasePresenter implements BasePresenter {
         pm.getMenuInflater().inflate(R.menu.menu_book, pm.getMenu());
         setIconEnable(pm.getMenu(), true);
         if (MyApplication.isApkInDebug(mMainActivity)) {
-            pm.getMenu().getItem(4).setVisible(true);
+            pm.getMenu().getItem(5).setVisible(true);
         }
         pm.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
@@ -441,10 +438,52 @@ public class BookcasePresenter implements BasePresenter {
                     return true;
                 case R.id.action_addLocalBook:
                     TextHelper.showText("请选择一个txt格式的书籍文件");
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("text/plain");
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    mMainActivity.startActivityForResult(intent, APPCONST.SELECT_FILE_CODE);
+                    Intent addIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                    addIntent.setType("text/plain");
+                    addIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                    mMainActivity.startActivityForResult(addIntent, APPCONST.SELECT_FILE_CODE);
+                    break;
+                case R.id.action_syn:
+                    if (!UserService.isLogin()){
+                        TextHelper.showText("请先登录！");
+                        Intent intent = new Intent(mMainActivity, LoginActivity.class);
+                        mMainActivity.startActivity(intent);
+                        return true;
+                    }
+                    if (mSetting.isAutoSyn()) {
+                        webSynMenu[2] = MyApplication.getmContext().getString(R.string.menu_backup_autoSyn) + "已开启";
+                    } else {
+                        webSynMenu[2] = MyApplication.getmContext().getString(R.string.menu_backup_autoSyn) + "已关闭";
+                    }
+                    new AlertDialog.Builder(mMainActivity)
+                            .setTitle(mMainActivity.getString(R.string.menu_bookcase_syn))
+                            .setAdapter(new ArrayAdapter<>(mMainActivity,
+                                            android.R.layout.simple_list_item_1, webSynMenu),
+                                    (dialog, which) -> {
+                                        switch (which) {
+                                            case 0:
+                                                synBookcaseToWeb(false);
+                                                break;
+                                            case 1:
+                                                webRestore();
+                                                break;
+                                            case 2:
+                                                String tip = "";
+                                                if (mSetting.isAutoSyn()) {
+                                                    mSetting.setAutoSyn(false);
+                                                    tip = "每日自动同步已关闭！";
+                                                } else {
+                                                    mSetting.setAutoSyn(true);
+                                                    tip = "每日自动同步已开启！";
+                                                }
+                                                SysManager.saveSetting(mSetting);
+                                                TextHelper.showText(tip);
+                                                break;
+                                        }
+                                    })
+                            .setNegativeButton(null, null)
+                            .setPositiveButton(null, null)
+                            .show();
                     break;
                 case R.id.action_download_all:
                     DialogCreator.createCommonDialog(mMainActivity, "一键缓存(实验)",
@@ -452,20 +491,11 @@ public class BookcasePresenter implements BasePresenter {
                             (dialog, which) -> downloadAll(), null);
 
                     return true;
-                case R.id.action_update:
-                    checkVersionByServer(mMainActivity, true, mBookcaseFragment);
-                    return true;
                 case R.id.action_backup:
-                    final String[] menu;
-                    if (UserService.isLogin()) {
-                        menu = webBackupMenu;
-                    } else {
-                        menu = backupMenu;
-                    }
                     AlertDialog bookDialog = new AlertDialog.Builder(mMainActivity)
                             .setTitle(mMainActivity.getResources().getString(R.string.menu_bookcase_backup))
                             .setAdapter(new ArrayAdapter<>(mMainActivity,
-                                            android.R.layout.simple_list_item_1, menu),
+                                            android.R.layout.simple_list_item_1, backupMenu),
                                     (dialog, which) -> {
                                         switch (which) {
                                             case 0:
@@ -474,9 +504,6 @@ public class BookcasePresenter implements BasePresenter {
                                             case 1:
                                                 mHandler.sendMessage(mHandler.obtainMessage(6));
                                                 break;
-                                            case 2:
-                                                webRestore();
-                                                break;
                                         }
                                     })
                             .setNegativeButton(null, null)
@@ -484,28 +511,9 @@ public class BookcasePresenter implements BasePresenter {
                             .create();
                     bookDialog.show();
                     return true;
-                case R.id.action_disclaimer:
-                    BufferedReader br = null;
-                    try {
-                        br = new BufferedReader(new InputStreamReader(mMainActivity.getAssets().open("disclaimer.fy")));
-                        StringBuilder disclaimer = new StringBuilder();
-                        String line = null;
-                        while ((line = br.readLine()) != null) {
-                            disclaimer.append(line);
-                            disclaimer.append("\r\n\n");
-                        }
-                        DialogCreator.createTipDialog(mMainActivity, "免责声明", disclaimer.toString());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (br != null) {
-                            try {
-                                br.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
+                case R.id.action_about:
+                    Intent aboutIntent = new Intent(mMainActivity, AboutActivity.class);
+                    mMainActivity.startActivity(aboutIntent);
                     return true;
             }
             return false;
@@ -538,20 +546,10 @@ public class BookcasePresenter implements BasePresenter {
         DialogCreator.createCommonDialog(mMainActivity, "确认备份吗?", "新备份会替换原有备份！", true,
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
-                    if (UserService.isLogin()) {
-                        MyApplication.getApplication().newThread(() -> {
-                            if (mBackupAndRestore.backup("localBackup") & UserService.webBackup()) {
-                                DialogCreator.createTipDialog(mMainActivity, "备份(本地和网络)成功，本地备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
-                            } else {
-                                DialogCreator.createTipDialog(mMainActivity, "未登录或未给予储存权限，备份失败！");
-                            }
-                        });
+                    if (mBackupAndRestore.backup("localBackup")) {
+                        DialogCreator.createTipDialog(mMainActivity, "备份成功，备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
                     } else {
-                        if (mBackupAndRestore.backup("localBackup")) {
-                            DialogCreator.createTipDialog(mMainActivity, "备份成功，备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
-                        } else {
-                            DialogCreator.createTipDialog(mMainActivity, "未给予储存权限，备份失败！");
-                        }
+                        DialogCreator.createTipDialog(mMainActivity, "未给予储存权限，备份失败！");
                     }
                 }, (dialogInterface, i) -> dialogInterface.dismiss());
     }
@@ -567,6 +565,7 @@ public class BookcasePresenter implements BasePresenter {
                         mHandler.sendMessage(mHandler.obtainMessage(7));
 //                            DialogCreator.createTipDialog(mMainActivity,
 //                                    "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");
+                        mSetting = SysManager.getSetting();
                         TextHelper.showText("书架恢复成功！");
                     } else {
                         DialogCreator.createTipDialog(mMainActivity, "未找到备份文件或未给予储存权限，恢复失败！");
@@ -579,7 +578,11 @@ public class BookcasePresenter implements BasePresenter {
      * 恢复
      */
     private void webRestore() {
-        DialogCreator.createCommonDialog(mMainActivity, "确认恢复吗?", "恢复书架会覆盖原有书架！", true,
+        if (!NetworkUtils.isNetWorkAvailable()){
+            TextHelper.showText("无网络连接！");
+            return;
+        }
+        DialogCreator.createCommonDialog(mMainActivity, "确认同步吗?", "将书架从网络同步至本地会覆盖原有书架！", true,
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
                     MyApplication.getApplication().newThread(() -> {
@@ -587,9 +590,10 @@ public class BookcasePresenter implements BasePresenter {
                             mHandler.sendMessage(mHandler.obtainMessage(7));
 //                                    DialogCreator.createTipDialog(mMainActivity,
 //                                            "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");、
-                            TextHelper.showText("书架恢复成功！");
+                            mSetting = SysManager.getSetting();
+                            TextHelper.showText("成功将书架从网络同步至本地！");
                         } else {
-                            DialogCreator.createTipDialog(mMainActivity, "未找到备份文件，恢复失败！");
+                            DialogCreator.createTipDialog(mMainActivity, "未找到同步文件，同步失败！");
                         }
                     });
                 }, (dialogInterface, i) -> dialogInterface.dismiss());
@@ -609,7 +613,7 @@ public class BookcasePresenter implements BasePresenter {
         MyApplication.getApplication().newThread(() -> {
             downloadFor:
             for (final Book book : mBooks) {
-                if (BookSource.pinshu.toString().equals(book.getSource()) || "本地书籍".equals(book.getType())){
+                if (BookSource.pinshu.toString().equals(book.getSource()) || "本地书籍".equals(book.getType())) {
                     continue;
                 }
                 isDownloadFinish = false;
@@ -637,17 +641,18 @@ public class BookcasePresenter implements BasePresenter {
 
     /**
      * 添加下载
+     *
      * @param book
      * @param mChapters
      * @param begin
      * @param end
      */
     public void addDownload(final Book book, final ArrayList<Chapter> mChapters, int begin, int end) {
-        if ("本地书籍".equals(book.getType())){
+        if ("本地书籍".equals(book.getType())) {
             TextHelper.showText("《" + book.getName() + "》是本地书籍，不能缓存");
             return;
         }
-        if (mChapters.size() == 0){
+        if (mChapters.size() == 0) {
             TextHelper.showText("《" + book.getName() + "》章节目录为空，缓存失败，请刷新后重试");
             return;
         }
@@ -669,13 +674,13 @@ public class BookcasePresenter implements BasePresenter {
                         downloadingChapter = chapter.getTitle();
                         downloadProcess = curCacheChapterNum[0] * 100 / needCacheChapterNum;
                         mChapterService.saveOrUpdateChapter(chapter, (String) o);
-                       // isDownloadFinish[0] = true;
+                        // isDownloadFinish[0] = true;
                         mHandler.sendMessage(mHandler.obtainMessage(8));
                     }
 
                     @Override
                     public void onError(Exception e) {
-                      //  isDownloadFinish[0] = true;
+                        //  isDownloadFinish[0] = true;
                         curCacheChapterNum[0]++;
                         downloadProcess = curCacheChapterNum[0] * 100 / needCacheChapterNum;
                         mHandler.sendMessage(mHandler.obtainMessage(8));
@@ -732,11 +737,12 @@ public class BookcasePresenter implements BasePresenter {
 
     /**
      * 添加本地书籍
+     *
      * @param path
      */
     public void addLocalBook(String path) {
         File file = new File(path);
-        if (!file.exists()){
+        if (!file.exists()) {
             return;
         }
         Book book = new Book();
@@ -751,7 +757,7 @@ public class BookcasePresenter implements BasePresenter {
 
         //判断书籍是否已经添加
         Book existsBook = mBookService.findBookByAuthorAndName(book.getName(), book.getAuthor());
-        if (book.equals(existsBook)){
+        if (book.equals(existsBook)) {
             TextHelper.showText("该书籍已存在，请勿重复添加！");
             return;
         }
@@ -763,36 +769,48 @@ public class BookcasePresenter implements BasePresenter {
     /**
      * 同步书架
      */
-    private void synBookcase(){
-        if (UserService.isLogin()){
-            Date nowTime = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
-            String nowTimeStr = sdf.format(nowTime);
-            SharedPreUtils spb = SharedPreUtils.getInstance();
-            String synTime = spb.getString("synTime");
-            if (!nowTimeStr.equals(synTime)) {
-                MyApplication.getApplication().newThread(() -> {
-                    if (UserService.webBackup()){
-                        spb.putString("synTime", nowTimeStr);
-                    }
-                });
+    private void synBookcaseToWeb(boolean isAutoSyn) {
+        if (!NetworkUtils.isNetWorkAvailable()){
+            if (!isAutoSyn) {
+                TextHelper.showText("无网络连接！");
             }
+           return;
+        }
+        Date nowTime = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
+        String nowTimeStr = sdf.format(nowTime);
+        SharedPreUtils spb = SharedPreUtils.getInstance();
+        String synTime = spb.getString("synTime");
+        if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
+            MyApplication.getApplication().newThread(() -> {
+                if (UserService.webBackup()) {
+                    spb.putString("synTime", nowTimeStr);
+                    if (!isAutoSyn) {
+                        DialogCreator.createTipDialog(mMainActivity, "成功将书架同步至网络！");
+                    }
+                } else {
+                    if (!isAutoSyn) {
+                        DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！");
+                    }
+                }
+            });
         }
     }
 
-   /*****************************************用于返回按钮判断*************************************/
+    /*****************************************用于返回按钮判断*************************************/
     /**
      * 判断是否处于编辑状态
+     *
      * @return
      */
-    public boolean ismEditState(){
+    public boolean ismEditState() {
         return mBookcaseAdapter.ismEditState();
     }
 
     /**
      * 取消编辑状态
      */
-    public void cancelEdit(){
+    public void cancelEdit() {
         editBookcase(false);
     }
     /*class NotificationService extends Service{

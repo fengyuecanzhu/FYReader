@@ -108,29 +108,7 @@ public class BookInfoPresenter implements BasePresenter {
                 createChangeSourceDia();
             }
         });
-        mBookInfoActivity.getTvDisclaimer().setOnClickListener(v -> {
-            BufferedReader br = null;
-            try {
-                br = new BufferedReader(new InputStreamReader(mBookInfoActivity.getAssets().open("disclaimer.fy")));
-                StringBuilder disclaimer = new StringBuilder();
-                String line = null;
-                while ((line = br.readLine()) != null) {
-                    disclaimer.append(line);
-                    disclaimer.append("\r\n\n");
-                }
-                DialogCreator.createTipDialog(mBookInfoActivity, "免责声明", disclaimer.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (br != null) {
-                    try {
-                        br.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
+        mBookInfoActivity.getTvDisclaimer().setOnClickListener(v -> DialogCreator.createAssetTipDialog(mBookInfoActivity, "免责声明", "disclaimer.fy"));
         if (isBookCollected()) {
             mBookInfoActivity.getBtnAddBookcase().setText("移除书籍");
             mBookInfoActivity.getBtnReadBook().setText("继续阅读");

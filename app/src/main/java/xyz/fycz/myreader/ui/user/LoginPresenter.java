@@ -53,12 +53,7 @@ public class LoginPresenter implements BasePresenter {
     public void start() {
         mHandler.sendMessage(mHandler.obtainMessage(2));
         mLoginActivity.getTvTitleText().setText("登录");
-        mLoginActivity.getLlTitleBack().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLoginActivity.finish();
-            }
-        });
+        mLoginActivity.getLlTitleBack().setOnClickListener(v -> mLoginActivity.finish());
         String username = UserService.readUsername();
         mLoginActivity.getUser().setText(username);
         mLoginActivity.getUser().requestFocus(username.length());

@@ -124,80 +124,65 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
                     viewHolder.tvNoReadNum.setVisibility(View.GONE);
                 }
             }
-            viewHolder.llBookRead.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(mContext, ReadActivity.class);
-                    intent.putExtra(APPCONST.BOOK, book);
-                    book.setNoReadNum(0);
-                    mBookService.updateEntity(book);
-                    mContext.startActivity(intent);
-                }
+            viewHolder.llBookRead.setOnClickListener(v -> {
+                Intent intent = new Intent(mContext, ReadActivity.class);
+                intent.putExtra(APPCONST.BOOK, book);
+                book.setNoReadNum(0);
+                mBookService.updateEntity(book);
+                mContext.startActivity(intent);
             });
-            viewHolder.ivBookImg.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(mContext, BookInfoActivity.class);
-                    intent.putExtra(APPCONST.BOOK, book);
-                    mContext.startActivity(intent);
-                }
+            viewHolder.ivBookImg.setOnClickListener(v -> {
+                Intent intent = new Intent(mContext, BookInfoActivity.class);
+                intent.putExtra(APPCONST.BOOK, book);
+                mContext.startActivity(intent);
             });
-            viewHolder.llBookRead.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if (!ismEditState()) {
-                        AlertDialog bookDialog = new AlertDialog.Builder(mContext)
-                                .setTitle(book.getName())
-                                .setAdapter(new ArrayAdapter<>(mContext,
-                                                android.R.layout.simple_list_item_1, menu),
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                switch (which) {
-                                                    case 0:
-                                                        book.setSortCode(0);
-                                                        mBookService.updateBook(book);
-                                                        mBookcasePresenter.init();
-                                                        TextHelper.showText("书籍《" + book.getName() + "》移至顶部成功！");
-                                                        break;
-                                                    case 1:
-                                                        downloadBook(book);
-                                                        break;
-                                                    case 2:
-                                                        MyApplication.getApplication().newThread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                try {
-                                                                    if (unionChapterCathe(book)) {
-                                                                        DialogCreator.createTipDialog(mContext,
-                                                                                "缓存导出成功，导出目录："
-                                                                                        + APPCONST.TXT_BOOK_DIR);
-                                                                    } else {
-                                                                        DialogCreator.createTipDialog(mContext,
-                                                                                "章节目录为空或未找到缓存文件，缓存导出失败！");
-                                                                    }
-                                                                } catch (IOException e) {
-                                                                    e.printStackTrace();
-                                                                    DialogCreator.createTipDialog(mContext,
-                                                                            "章节目录为空或未找到缓存文件，缓存导出失败！");
-                                                                }
-                                                            }
-                                                        });
-                                                        break;
-                                                    case 3:
-                                                        showDeleteBookDialog(book);
-                                                        break;
-                                                }
-                                            }
-                                        })
-                                .setNegativeButton(null, null)
-                                .setPositiveButton(null, null)
-                                .create();
-                        bookDialog.show();
-                        return true;
-                    }
-                    return false;
+            viewHolder.llBookRead.setOnLongClickListener(v -> {
+                if (!ismEditState()) {
+                    AlertDialog bookDialog = new AlertDialog.Builder(mContext)
+                            .setTitle(book.getName())
+                            .setAdapter(new ArrayAdapter<>(mContext,
+                                            android.R.layout.simple_list_item_1, menu),
+                                    (dialog, which) -> {
+                                        switch (which) {
+                                            case 0:
+                                                book.setSortCode(0);
+                                                mBookService.updateBook(book);
+                                                mBookcasePresenter.init();
+                                                TextHelper.showText("书籍《" + book.getName() + "》移至顶部成功！");
+                                                break;
+                                            case 1:
+                                                downloadBook(book);
+                                                break;
+                                            case 2:
+                                                MyApplication.getApplication().newThread(() -> {
+                                                    try {
+                                                        if (unionChapterCathe(book)) {
+                                                            DialogCreator.createTipDialog(mContext,
+                                                                    "缓存导出成功，导出目录："
+                                                                            + APPCONST.TXT_BOOK_DIR);
+                                                        } else {
+                                                            DialogCreator.createTipDialog(mContext,
+                                                                    "章节目录为空或未找到缓存文件，缓存导出失败！");
+                                                        }
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                        DialogCreator.createTipDialog(mContext,
+                                                                "章节目录为空或未找到缓存文件，缓存导出失败！");
+                                                    }
+                                                });
+                                                break;
+                                            case 3:
+                                                showDeleteBookDialog(book);
+                                                break;
+                                        }
+                                    })
+                            .setNegativeButton(null, null)
+                            .setPositiveButton(null, null)
+                            .create();
+                    bookDialog.show();
+                    return true;
                 }
+                return false;
             });
         }
     }
