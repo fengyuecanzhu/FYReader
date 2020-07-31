@@ -24,7 +24,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,6 +52,8 @@ import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.ui.home.MainActivity;
 import xyz.fycz.myreader.ui.search.SearchBookActivity;
+import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.SharedPreferencesUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.TextHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -166,6 +170,7 @@ public class BookcasePresenter implements BasePresenter {
         if (mSetting.getBookcaseStyle() == null) {
             mSetting.setBookcaseStyle(BookcaseStyle.listMode);
         }
+        synBookcase();
         getData();
         //是否启用下拉刷新（默认启用）
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -340,7 +345,6 @@ public class BookcasePresenter implements BasePresenter {
                 }
             }
         });
-
     }
 
     /**
@@ -462,20 +466,17 @@ public class BookcasePresenter implements BasePresenter {
                             .setTitle(mMainActivity.getResources().getString(R.string.menu_bookcase_backup))
                             .setAdapter(new ArrayAdapter<>(mMainActivity,
                                             android.R.layout.simple_list_item_1, menu),
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            switch (which) {
-                                                case 0:
-                                                    mHandler.sendMessage(mHandler.obtainMessage(5));
-                                                    break;
-                                                case 1:
-                                                    mHandler.sendMessage(mHandler.obtainMessage(6));
-                                                    break;
-                                                case 2:
-                                                    webRestore();
-                                                    break;
-                                            }
+                                    (dialog, which) -> {
+                                        switch (which) {
+                                            case 0:
+                                                mHandler.sendMessage(mHandler.obtainMessage(5));
+                                                break;
+                                            case 1:
+                                                mHandler.sendMessage(mHandler.obtainMessage(6));
+                                                break;
+                                            case 2:
+                                                webRestore();
+                                                break;
                                         }
                                     })
                             .setNegativeButton(null, null)
@@ -538,13 +539,13 @@ public class BookcasePresenter implements BasePresenter {
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
                     if (UserService.isLogin()) {
-                        new Thread(() -> {
+                        MyApplication.getApplication().newThread(() -> {
                             if (mBackupAndRestore.backup("localBackup") & UserService.webBackup()) {
                                 DialogCreator.createTipDialog(mMainActivity, "备份(本地和网络)成功，本地备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
                             } else {
                                 DialogCreator.createTipDialog(mMainActivity, "未登录或未给予储存权限，备份失败！");
                             }
-                        }).start();
+                        });
                     } else {
                         if (mBackupAndRestore.backup("localBackup")) {
                             DialogCreator.createTipDialog(mMainActivity, "备份成功，备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
@@ -581,7 +582,7 @@ public class BookcasePresenter implements BasePresenter {
         DialogCreator.createCommonDialog(mMainActivity, "确认恢复吗?", "恢复书架会覆盖原有书架！", true,
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
-                    new Thread(() -> {
+                    MyApplication.getApplication().newThread(() -> {
                         if (UserService.webRestore()) {
                             mHandler.sendMessage(mHandler.obtainMessage(7));
 //                                    DialogCreator.createTipDialog(mMainActivity,
@@ -590,7 +591,7 @@ public class BookcasePresenter implements BasePresenter {
                         } else {
                             DialogCreator.createTipDialog(mMainActivity, "未找到备份文件，恢复失败！");
                         }
-                    }).start();
+                    });
                 }, (dialogInterface, i) -> dialogInterface.dismiss());
     }
 
@@ -759,6 +760,25 @@ public class BookcasePresenter implements BasePresenter {
         init();
     }
 
+    /**
+     * 同步书架
+     */
+    private void synBookcase(){
+        if (UserService.isLogin()){
+            Date nowTime = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
+            String nowTimeStr = sdf.format(nowTime);
+            SharedPreUtils spb = SharedPreUtils.getInstance();
+            String synTime = spb.getString("synTime");
+            if (!nowTimeStr.equals(synTime)) {
+                MyApplication.getApplication().newThread(() -> {
+                    if (UserService.webBackup()){
+                        spb.putString("synTime", nowTimeStr);
+                    }
+                });
+            }
+        }
+    }
 
    /*****************************************用于返回按钮判断*************************************/
     /**

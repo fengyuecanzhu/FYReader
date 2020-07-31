@@ -1121,6 +1121,9 @@ public class ReadPresenter implements BasePresenter {
      */
     public void onDestroy() {
         mReadActivity.unregisterReceiver(mReceiver);
+        if (autoPage) {
+            autoPageStop();
+        }
         for (int i = 0; i < 8; i++) {
             mHandler.removeMessages(i + 1);
         }
