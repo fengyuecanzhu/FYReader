@@ -3,6 +3,7 @@ package xyz.fycz.myreader.application;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -239,57 +240,59 @@ public class MyApplication extends Application {
             }
         });
     }*/
-    public static void checkVersionByServer(final MainActivity activity, final boolean isManualCheck,
+    public static void checkVersionByServer(final BaseActivity activity, final boolean isManualCheck,
                                             final BookcaseFragment mBookcaseFragment) {
-        MyApplication.getApplication().newThread(new Runnable() {
-            @Override
-            public void run() {
-                Document doc = null;
-                try {
-                    String url = "https://shimo.im/docs/cqkgjPRRydYYhQKt/read";
-                    if (isApkInDebug(getmContext())){
-                        url = "https://shimo.im/docs/zfzpda7MUGskOC9v/read";
-                    }
-                    doc = Jsoup.connect(url).get();
-                    String content = doc.getElementsByClass("ql-editor").text();
-                    if (StringHelper.isEmpty(content)){
-                        TextHelper.showText("检查更新失败！");
-                        return;
-                    }
-                    String[] contents = content.split(";");
-                    int newestVersion = 0;
-                    String updateContent = "";
-                    String downloadLink = null;
-                    boolean isForceUpdate = false;
-                    StringBuilder s = new StringBuilder();
-                    newestVersion = Integer.parseInt(contents[0].substring(contents[0].indexOf(":") + 1));
-                    isForceUpdate = Boolean.parseBoolean(contents[1].substring(contents[1].indexOf(":") + 1));
-                    downloadLink = contents[2].substring(contents[2].indexOf(":") + 1);
-                    updateContent = contents[3].substring(contents[3].indexOf(":") + 1);
-                    SharedPreUtils spu = SharedPreUtils.getInstance();
-                    spu.putString("lanzousKeyStart", contents[4].substring(contents[4].indexOf(":") + 1));
-                    String[] updateContents = updateContent.split("/");
-                    for (String string : updateContents) {
-                        s.append(string);
-                        s.append("\n");
-                    }
-                    int versionCode = getVersionCode();
-                    if (newestVersion > versionCode) {
-                        MyApplication m = new MyApplication();
-                        Setting setting = SysManager.getSetting();
-                        if (isManualCheck || setting.getNewestVersionCode() < newestVersion || isForceUpdate) {
-                            setting.setNewestVersionCode(newestVersion);
-                            SysManager.saveSetting(setting);
-                            m.updateApp(activity, downloadLink, newestVersion, s.toString(), isForceUpdate,
-                                    mBookcaseFragment);
-                        }
-                    } else if (isManualCheck) {
-                        TextHelper.showText("已经是最新版本！");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    TextHelper.showText("无网络连接！");
+        MyApplication.getApplication().newThread(() -> {
+            Document doc = null;
+            try {
+                String url = "https://shimo.im/docs/cqkgjPRRydYYhQKt/read";
+                if (isApkInDebug(getmContext())){
+                    url = "https://shimo.im/docs/zfzpda7MUGskOC9v/read";
                 }
+                doc = Jsoup.connect(url).get();
+                String content = doc.getElementsByClass("ql-editor").text();
+                if (StringHelper.isEmpty(content)){
+                    TextHelper.showText("检查更新失败！");
+                    return;
+                }
+                String[] contents = content.split(";");
+                int newestVersion = 0;
+                String updateContent = "";
+                String downloadLink = null;
+                boolean isForceUpdate = false;
+                StringBuilder s = new StringBuilder();
+                newestVersion = Integer.parseInt(contents[0].substring(contents[0].indexOf(":") + 1));
+                isForceUpdate = Boolean.parseBoolean(contents[1].substring(contents[1].indexOf(":") + 1));
+                downloadLink = contents[2].substring(contents[2].indexOf(":") + 1).trim();
+                updateContent = contents[3].substring(contents[3].indexOf(":") + 1);
+                SharedPreUtils spu = SharedPreUtils.getInstance();
+                spu.putString("lanzousKeyStart", contents[4].substring(contents[4].indexOf(":") + 1));
+                if (!StringHelper.isEmpty(downloadLink)){
+                    spu.putString("downloadLink", downloadLink);
+                }else {
+                    spu.putString("downloadLink", URLCONST.APP_DIR_UR);
+                }
+                String[] updateContents = updateContent.split("/");
+                for (String string : updateContents) {
+                    s.append(string);
+                    s.append("\n");
+                }
+                int versionCode = getVersionCode();
+                if (newestVersion > versionCode) {
+                    MyApplication m = new MyApplication();
+                    Setting setting = SysManager.getSetting();
+                    if (isManualCheck || setting.getNewestVersionCode() < newestVersion || isForceUpdate) {
+                        setting.setNewestVersionCode(newestVersion);
+                        SysManager.saveSetting(setting);
+                        m.updateApp(activity, downloadLink, newestVersion, s.toString(), isForceUpdate,
+                                mBookcaseFragment);
+                    }
+                } else if (isManualCheck) {
+                    TextHelper.showText("已经是最新版本！");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                TextHelper.showText("无网络连接！");
             }
         });
     }
@@ -300,7 +303,7 @@ public class MyApplication extends Application {
      * @param activity
      * @param versionCode
      */
-    public void updateApp(final MainActivity activity, final String url, final int versionCode, String message,
+    public void updateApp(final BaseActivity activity, final String url, final int versionCode, String message,
                           final boolean isForceUpdate, final BookcaseFragment mBookcaseFragment) {
         //String version = (versionCode / 100 % 10) + "." + (versionCode / 10 % 10) + "." + (versionCode % 10);
         String cancelTitle;
@@ -309,6 +312,12 @@ public class MyApplication extends Application {
         }else {
             cancelTitle = "忽略此版本";
         }
+        if (mBookcaseFragment == null){
+            DialogCreator.createCommonDialog(activity, "发现新版本：", message, true,  "取消", "立即更新", null,
+            (dialog, which) -> goDownload(activity, url));
+            return;
+        }
+
         DialogCreator.createThreeButtonDialog(activity, "发现新版本：", message, !isForceUpdate, cancelTitle, "直接下载",
                 "浏览器下载", (dialog, which) -> {
                     if (isForceUpdate) {
@@ -329,18 +338,22 @@ public class MyApplication extends Application {
                         downloadTip.downloadApp();
                     }
                 }, (dialog, which) -> {
-                    String downloadLink = url;
-                    if (url == null || "".equals(url)) {
-                        downloadLink = URLCONST.APP_DIR_UR;
-                    }
-                    Intent intent = new Intent();
-                    intent.setAction(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(downloadLink));
-                    activity.startActivity(intent);
+                    goDownload(activity, url);
                     if (isForceUpdate) {
                         activity.finish();
                     }
                 });
+    }
+
+    private void goDownload(Activity activity, String url){
+        String downloadLink = url;
+        if (url == null || "".equals(url)) {
+            downloadLink = URLCONST.APP_DIR_UR;
+        }
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(downloadLink));
+        activity.startActivity(intent);
     }
 
     /**

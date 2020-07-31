@@ -94,6 +94,7 @@
         <activity android:name=".ui.user.RegisterActivity">
         </activity>
         <activity android:name=".ui.read.catalog.CatalogActivity">
+        </activity><activity android:name=".ui.about.AboutActivity">
         </activity>
     </application>
 

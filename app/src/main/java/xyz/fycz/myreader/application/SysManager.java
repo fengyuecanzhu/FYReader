@@ -62,6 +62,7 @@ public class SysManager {
         setting.setBookcaseStyle(BookcaseStyle.listMode);
         setting.setNewestVersionCode(getVersionCode());
         setting.setLocalFontName("");
+        setting.setAutoSyn(false);
         setting.setSettingVersion(APPCONST.SETTING_VERSION);
         return setting;
     }

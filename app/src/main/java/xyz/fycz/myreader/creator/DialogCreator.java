@@ -31,7 +31,12 @@ import xyz.fycz.myreader.enums.ReadStyle;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.util.BrightUtil;
+import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.StringHelper;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import static xyz.fycz.myreader.enums.ReadStyle.blueDeep;
 import static xyz.fycz.myreader.enums.ReadStyle.breen;
@@ -701,7 +706,7 @@ public class DialogCreator {
                     }
                 });
     }
-    public static void createTipDialog(Context mContext, String title,String message){
+    public static void createTipDialog(Context mContext, String title, String message){
         DialogCreator.createCommonDialog(mContext, title,
                 message, true, "知道了", new DialogInterface.OnClickListener() {
                     @Override
@@ -709,6 +714,30 @@ public class DialogCreator {
                         dialog.dismiss();
                     }
                 });
+    }
+
+    /**
+     * 从assets文件夹之中读取文件并显示提示框
+     * @param mContext
+     * @param title
+     * @param assetName
+     */
+    public static void createAssetTipDialog(Context mContext, String title, String assetName){
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(mContext.getAssets().open(assetName)));
+            StringBuilder assetText = new StringBuilder();
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                assetText.append(line);
+                assetText.append("\r\n");
+            }
+            DialogCreator.createTipDialog(mContext, title, assetText.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            IOUtils.close(br);
+        }
     }
 
     public interface OnClickPositiveListener {

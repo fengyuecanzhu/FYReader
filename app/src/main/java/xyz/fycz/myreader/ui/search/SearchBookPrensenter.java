@@ -117,12 +117,7 @@ public class SearchBookPrensenter implements BasePresenter {
         //换一批点击事件
         mSearchBookActivity.getRenewByText().setOnClickListener(new RenewSuggestionBook());
         //返回
-        mSearchBookActivity.getLlTitleBack().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mSearchBookActivity.finish();
-            }
-        });
+        mSearchBookActivity.getLlTitleBack().setOnClickListener(view -> mSearchBookActivity.finish());
         //搜索框改变事件
         mSearchBookActivity.getEtSearchKey().addTextChangedListener(new TextWatcher() {
 
