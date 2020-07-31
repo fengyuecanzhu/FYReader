@@ -1,4 +1,3 @@
-
 # FYReader-master
 风月读书，一款免费、无广告的小说阅读软件。
 
@@ -25,16 +24,17 @@
     
     10、支持自动翻页
     
-    
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/1.png)
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/2.png)
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/3.png)
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/4.png)
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/5.png)
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/6.png)
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/7.png)
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/8.png)
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/9.png)
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/10.png)
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/11.png)
-![Image](https://github.com/fengyuecanzhu/FYReader-marster/imgs/12.png)
+demo下载：https://fycz.lanzoui.com/il7HPezefjc
+
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/1.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/2.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/3.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/4.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/5.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/6.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/7.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/8.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/9.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/10.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/11.png)
+![Image](https://github.com/fengyuecanzhu/FYReader-master/blob/FYReader-master/img/12.png)
