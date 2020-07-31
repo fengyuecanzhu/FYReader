@@ -5,6 +5,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import java.io.*;
 import java.util.ArrayList;
@@ -119,20 +120,7 @@ public class BackupAndRestore {
             e.printStackTrace();
             return false;
         } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (ois != null) {
-                try {
-                    ois.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            IOUtils.close(br, ois);
         }
     }
 }
