@@ -538,14 +538,11 @@ public class BookcasePresenter implements BasePresenter {
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
                     if (UserService.isLogin()) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mBackupAndRestore.backup("localBackup") & UserService.webBackup()) {
-                                    DialogCreator.createTipDialog(mMainActivity, "备份(本地和网络)成功，本地备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
-                                } else {
-                                    DialogCreator.createTipDialog(mMainActivity, "未登录或未给予储存权限，备份失败！");
-                                }
+                        new Thread(() -> {
+                            if (mBackupAndRestore.backup("localBackup") & UserService.webBackup()) {
+                                DialogCreator.createTipDialog(mMainActivity, "备份(本地和网络)成功，本地备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
+                            } else {
+                                DialogCreator.createTipDialog(mMainActivity, "未登录或未给予储存权限，备份失败！");
                             }
                         }).start();
                     } else {
@@ -615,13 +612,10 @@ public class BookcasePresenter implements BasePresenter {
                     continue;
                 }
                 isDownloadFinish = false;
-                Thread downloadThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ArrayList<Chapter> chapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
-                        addDownload(book, chapters,
-                                book.getHisttoryChapterNum(), chapters.size());
-                    }
+                Thread downloadThread = new Thread(() -> {
+                    ArrayList<Chapter> chapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
+                    addDownload(book, chapters,
+                            book.getHisttoryChapterNum(), chapters.size());
                 });
                 es.submit(downloadThread);
                 do {
