@@ -522,8 +522,10 @@ public class DragSortGridView extends FrameLayout {
         }
         this.adapter = adapter;
         mGridView.setAdapter(adapter);
-        adapter.registerDataSetObserver(observer);
-        mChildCount = adapter.getCount();
+        if (adapter != null) {
+            adapter.registerDataSetObserver(observer);
+            mChildCount = adapter.getCount();
+        }
     }
 
     public int getNumColumns() {

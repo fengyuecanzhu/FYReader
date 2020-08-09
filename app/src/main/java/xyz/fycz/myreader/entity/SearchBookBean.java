@@ -9,6 +9,7 @@ import java.util.Objects;
 public class SearchBookBean {
     private String name;//书名
     private String author;//作者
+    private int sourceCount;//书源数量
 
     public SearchBookBean() {
     }
@@ -32,6 +33,14 @@ public class SearchBookBean {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public int getSourceCount() {
+        return sourceCount;
+    }
+
+    public void setSourceCount(int sourceCount) {
+        this.sourceCount = sourceCount;
     }
 
     @Override

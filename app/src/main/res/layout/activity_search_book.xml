@@ -151,15 +151,23 @@
             <com.scwang.smartrefresh.header.MaterialHeader
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
-            <ListView
+            <!--<ListView
                     android:id="@+id/lv_search_books_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fadingEdge="none"
                     android:overScrollMode="never"
                     android:scrollbars="none">
-
-            </ListView>
+            </ListView>-->
+            <xyz.fycz.myreader.custom.DragSortGridView
+                    android:id="@+id/gv_search_books_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:listSelector="@android:color/transparent"
+                    android:numColumns="auto_fit"
+                    android:scrollbars="none"
+                    android:padding="5dp">
+            </xyz.fycz.myreader.custom.DragSortGridView>
         </com.scwang.smartrefresh.layout.SmartRefreshLayout>
     </LinearLayout>
 

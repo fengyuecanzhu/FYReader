@@ -13,6 +13,7 @@ import xyz.fycz.myreader.base.BaseActivity;
 import butterknife.ButterKnife;
 import butterknife.BindView;
 import me.gujun.android.taggroup.TagGroup;
+import xyz.fycz.myreader.custom.DragSortGridView;
 
 public class SearchBookActivity extends BaseActivity {
 
@@ -29,8 +30,10 @@ public class SearchBookActivity extends BaseActivity {
 
     @BindView(R.id.ll_refresh_suggest_books)
     LinearLayout llRefreshSuggestBooks;
-    @BindView(R.id.lv_search_books_list)
-    ListView lvSearchBooksList;
+    /*@BindView(R.id.lv_search_books_list)
+    ListView lvSearchBooksList;*/
+    @BindView(R.id.gv_search_books_list)
+    DragSortGridView gvSearchBooksList;
     @BindView(R.id.ll_suggest_books_view)
     LinearLayout llSuggestBooksView;
     @BindView(R.id.pb_loading)
@@ -98,8 +101,12 @@ public class SearchBookActivity extends BaseActivity {
         return llRefreshSuggestBooks;
     }
 
-    public ListView getLvSearchBooksList() {
-        return lvSearchBooksList;
+//    public ListView getLvSearchBooksList() {
+//        return lvSearchBooksList;
+//    }
+
+    public DragSortGridView getGvSearchBooksList() {
+        return gvSearchBooksList;
     }
 
     public LinearLayout getLlSuggestBooksView() {

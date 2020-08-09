@@ -1,11 +1,12 @@
-<com.scwang.smartrefresh.layout.SmartRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-                                                   android:id="@+id/srl_content"
-                                                   android:layout_width="match_parent"
-                                                   android:layout_height="match_parent"
-                                                   android:background="@color/white"
-                                                   tools:context="xyz.fycz.myreader.ui.home.bookcase.BookcaseFragment">
+<com.scwang.smartrefresh.layout.SmartRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/srl_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        tools:context="xyz.fycz.myreader.ui.home.bookcase.BookcaseFragment">
     <com.scwang.smartrefresh.header.MaterialHeader
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
@@ -68,7 +69,7 @@
                     style="?android:attr/progressBarStyleHorizontal"
                     android:id="@+id/pb_download"
                     android:max="100"
-                    />
+            />
 
             <TextView
                     android:id="@+id/tv_download_tip"

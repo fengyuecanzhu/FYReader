@@ -560,6 +560,7 @@ public class ReadPresenter implements BasePresenter {
                             preLoad(pos - 1 + i);
                         }
                         mBook.setHistoryChapterId(mChapters.get(pos).getTitle());
+                        mHandler.sendMessage(mHandler.obtainMessage(4));
                         MyApplication.getApplication().newThread(() -> {
                             if (mPageLoader.getPageStatus() == PageLoader.STATUS_LOADING) {
                                 if (!NetworkUtils.isNetWorkAvailable()) {
