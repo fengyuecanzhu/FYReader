@@ -804,7 +804,10 @@ public class BookcasePresenter implements BasePresenter {
      * @return
      */
     public boolean ismEditState() {
-        return mBookcaseAdapter.ismEditState();
+        if (mBookcaseAdapter != null) {
+            return mBookcaseAdapter.ismEditState();
+        }
+        return false;
     }
 
     /**

@@ -3,6 +3,7 @@ package xyz.fycz.myreader.ui.search;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
@@ -49,13 +50,13 @@ public class SearchBookPrensenter implements BasePresenter {
     private String searchKey;//搜索关键字
     private ArrayList<SearchBookBean> mBooksBean = new ArrayList<>();
     private ConcurrentMultiValueMap<SearchBookBean, Book> mBooks = new ConcurrentMultiValueMap<>();
+    private ArrayList<Book> mAdapterBooks = new ArrayList<>();
     private ArrayList<SearchHistory> mSearchHistories = new ArrayList<>();
     private ArrayList<String> mSuggestions = new ArrayList<>();
 
     private SearchHistoryService mSearchHistoryService;
 
     private SearchHistoryAdapter mSearchHistoryAdapter;
-
 
     private int curThreadCount;
 
@@ -102,15 +103,12 @@ public class SearchBookPrensenter implements BasePresenter {
         mSearchBookActivity.getTvTitleText().setText("搜索");
         mSearchBookActivity.etSearchKey.requestFocus();//get the focus
         //enter事件
-        mSearchBookActivity.getEtSearchKey().setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if (i == EditorInfo.IME_ACTION_UNSPECIFIED) {
-                    mHandler.sendMessage(mHandler.obtainMessage(1));
-                    return (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER);
-                }
-                return false;
+        mSearchBookActivity.getEtSearchKey().setOnEditorActionListener((textView, i, keyEvent) -> {
+            if (i == EditorInfo.IME_ACTION_UNSPECIFIED) {
+                mHandler.sendMessage(mHandler.obtainMessage(1));
+                return (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER);
             }
+            return false;
         });
         //换一批点击事件
         mSearchBookActivity.getRenewByImage().setOnClickListener(new RenewSuggestionBook());
@@ -142,66 +140,43 @@ public class SearchBookPrensenter implements BasePresenter {
 
         });
         //进入书籍详情页
-        mSearchBookActivity.getLvSearchBooksList().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(mSearchBookActivity, BookInfoActivity.class);
-                intent.putExtra(APPCONST.SEARCH_BOOK_BEAN, new ArrayList<>(mBooks.getValues(mBooksBean.get(i))));
-                mSearchBookActivity.startActivity(intent);
-            }
+        mSearchBookActivity.getGvSearchBooksList().setOnItemClickListener((adapterView, view, i, l) -> {
+            Intent intent = new Intent(mSearchBookActivity, BookInfoActivity.class);
+            intent.putExtra(APPCONST.SEARCH_BOOK_BEAN, new ArrayList<>(mBooks.getValues(mBooksBean.get(i))));
+            mSearchBookActivity.startActivity(intent);
         });
         //搜索按钮点击事件
-        mSearchBookActivity.getTvSearchConform().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mHandler.sendMessage(mHandler.obtainMessage(1));
-            }
-        });
+        mSearchBookActivity.getTvSearchConform().setOnClickListener(view -> mHandler.sendMessage(mHandler.obtainMessage(1)));
         //suggestion搜索事件
-        mSearchBookActivity.getTgSuggestBook().setOnTagClickListener(new TagGroup.OnTagClickListener() {
-            @Override
-            public void onTagClick(String tag) {
-                mSearchBookActivity.getEtSearchKey().setText(tag);
-                mSearchBookActivity.getEtSearchKey().setSelection(tag.length());
-                mHandler.sendMessage(mHandler.obtainMessage(1));
-            }
+        mSearchBookActivity.getTgSuggestBook().setOnTagClickListener(tag -> {
+            mSearchBookActivity.getEtSearchKey().setText(tag);
+            mSearchBookActivity.getEtSearchKey().setSelection(tag.length());
+            mHandler.sendMessage(mHandler.obtainMessage(1));
         });
         //历史记录搜索事件
-        mSearchBookActivity.getLvHistoryList().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mSearchBookActivity.getEtSearchKey().setText(mSearchHistories.get(position).getContent());
-                mSearchBookActivity.getEtSearchKey().setSelection(mSearchHistories.get(position).getContent().length());
-                mHandler.sendMessage(mHandler.obtainMessage(1));
-            }
+        mSearchBookActivity.getLvHistoryList().setOnItemClickListener((parent, view, position, id) -> {
+            mSearchBookActivity.getEtSearchKey().setText(mSearchHistories.get(position).getContent());
+            mSearchBookActivity.getEtSearchKey().setSelection(mSearchHistories.get(position).getContent().length());
+            mHandler.sendMessage(mHandler.obtainMessage(1));
         });
         //清空历史记录
-        mSearchBookActivity.getLlClearHistory().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSearchHistoryService.clearHistory();
-                initHistoryList();
-            }
+        mSearchBookActivity.getLlClearHistory().setOnClickListener(v -> {
+            mSearchHistoryService.clearHistory();
+            initHistoryList();
         });
         //清除单个历史记录
-        mSearchBookActivity.getLvHistoryList().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mSearchHistories.get(position) != null) {
-                    mSearchHistoryService.deleteHistory(mSearchHistories.get(position));
-                    initHistoryList();
-                }
-                return true;
+        mSearchBookActivity.getLvHistoryList().setOnItemLongClickListener((parent, view, position, id) -> {
+            if (mSearchHistories.get(position) != null) {
+                mSearchHistoryService.deleteHistory(mSearchHistories.get(position));
+                initHistoryList();
             }
+            return true;
         });
         //上拉刷新
-        mSearchBookActivity.getSrlSearchBookList().setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
-                mHandler.sendMessage(mHandler.obtainMessage(1));
-            }
-        });
+        mSearchBookActivity.getSrlSearchBookList().setOnRefreshListener(refreshLayout -> mHandler.sendMessage(mHandler.obtainMessage(1)));
         mSearchBookActivity.getSrlSearchBookList().setEnableRefresh(false);
+        mSearchBookActivity.getGvSearchBooksList().setNumColumns(1);
+        mSearchBookActivity.getGvSearchBooksList().setDragModel(-1);
         initSuggestionBook();
         initHistoryList();
     }
@@ -247,8 +222,8 @@ public class SearchBookPrensenter implements BasePresenter {
         initmBooksBean();
         mSearchBookAdapter = new SearchBookAdapter(mSearchBookActivity,
                 R.layout.listview_search_book_item, mBooksBean, mBooks);
-        mSearchBookActivity.getLvSearchBooksList().setAdapter(mSearchBookAdapter);
-        mSearchBookActivity.getLvSearchBooksList().setVisibility(View.VISIBLE);
+        mSearchBookActivity.getGvSearchBooksList().setAdapter(mSearchBookAdapter);
+        mSearchBookActivity.getGvSearchBooksList().setVisibility(View.VISIBLE);
         mSearchBookActivity.getLlSuggestBooksView().setVisibility(View.GONE);
         mSearchBookActivity.getLlHistoryView().setVisibility(View.GONE);
     }
@@ -272,23 +247,20 @@ public class SearchBookPrensenter implements BasePresenter {
             mBooksBean.addAll(mBooks.keySet());
             //排序，基于最符合关键字的搜书结果应该是最短的
             //TODO ;这里只做了简单的比较排序，还需要继续完善
-            Collections.sort(mBooksBean, new Comparator<SearchBookBean>() {
-                @Override
-                public int compare(SearchBookBean o1, SearchBookBean o2) {
-                    if (searchKey.equals(o1.getName()))
-                        return -1;
-                    if (searchKey.equals(o2.getName()))
-                        return 1;
-                    if (searchKey.equals(o1.getAuthor()))
-                        return -1;
-                    if (searchKey.equals(o2.getAuthor()))
-                        return 1;
-                    if (o1.getName().length() < o2.getName().length())
-                        return -1;
-                    if (o1.getName().length() == o2.getName().length())
-                        return 0;
+            Collections.sort(mBooksBean, (o1, o2) -> {
+                if (searchKey.equals(o1.getName()))
+                    return -1;
+                if (searchKey.equals(o2.getName()))
                     return 1;
-                }
+                if (searchKey.equals(o1.getAuthor()))
+                    return -1;
+                if (searchKey.equals(o2.getAuthor()))
+                    return 1;
+                if (o1.getName().length() < o2.getName().length())
+                    return -1;
+                if (o1.getName().length() == o2.getName().length())
+                    return 0;
+                return 1;
             });
             /*MyApplication.runOnUiThread(new Runnable() {
                 @Override
@@ -320,17 +292,25 @@ public class SearchBookPrensenter implements BasePresenter {
         mSearchBookActivity.getPbLoading().setVisibility(View.VISIBLE);
         if (StringHelper.isEmpty(searchKey)) {
             mSearchBookActivity.getPbLoading().setVisibility(View.GONE);
-            mSearchBookActivity.getLvSearchBooksList().setVisibility(View.GONE);
+            mSearchBookActivity.getGvSearchBooksList().setVisibility(View.GONE);
             mSearchBookActivity.getLlSuggestBooksView().setVisibility(View.VISIBLE);
             initHistoryList();
-            mSearchBookActivity.getLvSearchBooksList().setAdapter(null);
+            mSearchBookActivity.getGvSearchBooksList().setAdapter(null);
             mSearchBookActivity.getSrlSearchBookList().setEnableRefresh(false);
         } else {
-            mSearchBookActivity.getLvSearchBooksList().setVisibility(View.VISIBLE);
+            mSearchBookActivity.getGvSearchBooksList().setVisibility(View.VISIBLE);
             mSearchBookActivity.getLlSuggestBooksView().setVisibility(View.GONE);
             mSearchBookActivity.getLlHistoryView().setVisibility(View.GONE);
             getData();
-            mSearchBookActivity.getSrlSearchBookList().setEnableRefresh(true);
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (mSearchBookActivity.getGvSearchBooksList().getmScrollView().getScrollY() == 0){
+                    mSearchBookActivity.getSrlSearchBookList().setEnableRefresh(true);
+                }
+                //滑动监听器
+                mSearchBookActivity.getGvSearchBooksList().getmScrollView().setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                    mSearchBookActivity.getSrlSearchBookList().setEnableRefresh(scrollY == 0);
+                });
+            }
             mSearchHistoryService.addOrUpadteHistory(searchKey);
             //收起软键盘
             InputMethodManager imm = (InputMethodManager) MyApplication.getmContext().getSystemService(Context.INPUT_METHOD_SERVICE);

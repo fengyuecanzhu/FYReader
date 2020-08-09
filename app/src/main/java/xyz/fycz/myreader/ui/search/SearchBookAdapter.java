@@ -20,6 +20,7 @@ import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.crawler.BookInfoCrawler;
 import xyz.fycz.myreader.crawler.ReadCrawler;
 import xyz.fycz.myreader.crawler.ReadCrawlerUtil;
+import xyz.fycz.myreader.custom.DragAdapter;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -37,42 +38,62 @@ import java.util.Map;
  * Created by zhao on 2017/7/26.
  */
 
-public class SearchBookAdapter extends ArrayAdapter<SearchBookBean> {
+public class SearchBookAdapter extends DragAdapter {
 
     private int mResourceId;
 
+    private Context mContext;
+
     private ConcurrentMultiValueMap<SearchBookBean, Book> mBooks;
 
-    private ArrayList<SearchBookBean> mTempBooks = new ArrayList<>();
+    private ArrayList<SearchBookBean> mSearchBookBeans;
 
-    private Handler mHandle = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message message) {
+    private ArrayList<SearchBookBean> mTempSearchBookBeans = new ArrayList<>();
 
-            switch (message.what) {
-                case 1:
-                    ViewHolder holder = (ViewHolder) message.obj;
-                    int pos = message.arg1;
-                    SearchBookAdapter.this.initOtherInfo(pos, holder);
-                    break;
-            }
-            return false;
+    private HashMap<SearchBookBean, Book> mTempBooks = new HashMap<>();
+
+    private Handler mHandle = new Handler(message -> {
+
+        switch (message.what) {
+            case 1:
+                ViewHolder holder = (ViewHolder) message.obj;
+                int pos = message.arg1;
+                SearchBookAdapter.this.initOtherInfo(pos, holder);
+                break;
         }
+        return false;
     });
 
     public SearchBookAdapter(Context context, int resourceId, ArrayList<SearchBookBean> datas,
                              ConcurrentMultiValueMap<SearchBookBean, Book> mBooks){
-        super(context, resourceId, datas);
+        mContext = context;
+        mSearchBookBeans = datas;
         mResourceId = resourceId;
         this.mBooks = mBooks;
     }
+
+    @Override
+    public int getCount() {
+        return mSearchBookBeans.size();
+    }
+
+    @Override
+    public SearchBookBean getItem(int position) {
+        return mSearchBookBeans.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         ViewHolder viewHolder = null;
         if (convertView == null){
             viewHolder = new ViewHolder();
-            convertView = LayoutInflater.from(getContext()).inflate(mResourceId,null);
+            convertView = LayoutInflater.from(mContext).inflate(mResourceId,null);
             viewHolder.ivBookImg =  convertView.findViewById(R.id.iv_book_img);
             viewHolder.tvBookName =  convertView.findViewById(R.id.tv_book_name);
             viewHolder.tvAuthor =  convertView.findViewById(R.id.tv_book_author);
@@ -92,17 +113,15 @@ public class SearchBookAdapter extends ArrayAdapter<SearchBookBean> {
     private void initView(final int position, final ViewHolder viewHolder){
         List<Book> aBooks = mBooks.getValues(getItem(position));
         int bookCount = aBooks.size();
-        final Book book = aBooks.get(0);
+        Book book = aBooks.get(0);
         SearchBookBean ssb = new SearchBookBean(book.getName(), book.getAuthor());
 
         //判断是否已经加载，防止多次加载
-        for (SearchBookBean temp : mTempBooks){//已加载
+        /*for (SearchBookBean temp : mTempSearchBookBeans){//已加载
             if (ssb.equals(temp)){
-                viewHolder.tvSource.setText("书源:" + BookSource.fromString(book.getSource()).text
-                        + " 共" + bookCount + "个源");
-                return;
+                book = mTempBooks.get(ssb);
             }
-        }
+        }*/
 
         if (StringHelper.isEmpty(book.getImgUrl())){
             book.setImgUrl("");
@@ -120,7 +139,7 @@ public class SearchBookAdapter extends ArrayAdapter<SearchBookBean> {
             CommonApi.getBookInfo(book, bic, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
-                    mHandle.sendMessage(mHandle.obtainMessage(1,position,0,viewHolder));
+                    mHandle.sendMessage(mHandle.obtainMessage(1, position,0,viewHolder));
                 }
 
                 @Override
@@ -133,12 +152,13 @@ public class SearchBookAdapter extends ArrayAdapter<SearchBookBean> {
         }
         //viewHolder.tvNewestChapter.setText(book.getNewestChapterTitle());
         //添加已经加载的书籍
-        mTempBooks.add(ssb);
+        /*mTempSearchBookBeans.add(ssb);
+        mTempBooks.put(ssb, book);*/
     }
     private void initOtherInfo(final int position, final ViewHolder holder){
         Book book = mBooks.getValue(getItem(position), 0);
         //图片
-        Glide.with(getContext())
+        Glide.with(mContext)
                 .load(book.getImgUrl())
 //                .override(DipPxUtil.dip2px(getContext(), 80), DipPxUtil.dip2px(getContext(), 150))
                 .error(R.mipmap.no_image)
@@ -149,6 +169,11 @@ public class SearchBookAdapter extends ArrayAdapter<SearchBookBean> {
         //简介
         holder.tvDesc.setText("简介:" + book.getDesc());
         holder.tvType.setText(book.getType());
+    }
+
+    @Override
+    public void onDataModelMove(int from, int to) {
+
     }
 
     class ViewHolder{
