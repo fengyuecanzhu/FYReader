@@ -70,49 +70,82 @@
                 android:textColor="@color/sys_red"
                 android:visibility="gone" />
             <!--添加输入框-->
-            <EditText
-                android:id="@+id/et_username"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/editview_shape"
-                android:drawablePadding="10dp"
-                android:hint="@string/et_account_tip"
-                android:inputType="text"
-                android:maxLines="1"
-                android:paddingStart="10dp"
-                android:textSize="18dp" />
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/et_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:drawablePadding="10dp"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="14">
 
-            <EditText
-                android:id="@+id/et_password"
-                style="@style/EditTextStyle"
-                android:background="@drawable/editview_shape"
-                android:hint="@string/et_password_tip"
-                android:inputType="textPassword"
-                android:textSize="18dp" />
+                <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/et_account_tip"
+                        android:inputType="text"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <EditText
-                android:id="@+id/et_rp_password"
-                style="@style/EditTextStyle"
-                android:background="@drawable/editview_shape"
-                android:hint="@string/et_rp_password_tip"
-                android:inputType="textPassword"
-                android:textSize="18dp" />
 
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/et_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="10dp"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="16"
+                    app:passwordToggleEnabled="true"
+                    app:passwordToggleTintMode="src_in">
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/et_password_tip"
+                        android:inputType="textPassword"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/et_rp_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="10dp"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="16"
+                    app:passwordToggleEnabled="true"
+                    app:passwordToggleTintMode="src_in">
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/et_password_tip"
+                        android:inputType="textPassword"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/et_captcha"
-                    style="@style/EditTextStyle"
-                    android:background="@drawable/editview_shape"
-                    android:layout_width="match_parent"
-                    android:layout_weight="1"
-                    android:hint="@string/et_rp_captcha"
-                    android:inputType="text"
-                    android:textSize="18dp" />
+                <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/et_captcha"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawablePadding="10dp"
+                        app:counterEnabled="true"
+                        app:counterMaxLength="4">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/et_rp_captcha"
+                            android:inputType="text"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
 
                 <ImageView
                     android:id="@+id/iv_captcha"
@@ -120,7 +153,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="3"
-                    android:layout_marginTop="10dp"
                     android:paddingStart="7dp" />
 
             </LinearLayout>

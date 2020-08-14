@@ -141,4 +141,23 @@
 
     <color name="highlight">#d3321b</color>
     <color name="darker_gray">#aaaaaaaa</color>
+
+
+    <!--通用一级标题的颜色-->
+    <color name="text_common_h1">#212121</color>
+    <!--通用二级标题的颜色-->
+    <color name="text_common_h2">#727272</color>
+    <!--通用三级标题的颜色-->
+    <color name="text_common_h3">#B2B2B2</color>
+
+    <!--通用分割线细-->
+    <color name="divider_narrow">#E3E3E3</color>
+
+    <!--button-->
+    <color name="widget_button_normal">@color/white</color>
+    <color name="widget_button_selected">#E3E3E3</color>
+
+    <color name="divider_common">#727272</color>
+
+    <color name="translucent_text">#96ffffff</color>
 </resources>

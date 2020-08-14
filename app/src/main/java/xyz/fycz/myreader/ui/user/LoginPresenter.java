@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.ui.user;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -69,50 +70,51 @@ public class LoginPresenter implements BasePresenter {
             }
         });
 
-        mLoginActivity.getLoginBtn().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mHandler.sendMessage(mHandler.obtainMessage(2));
-                if (!code.toLowerCase().equals(mLoginActivity.getEtCaptcha().getText().toString().toLowerCase())){
-                    DialogCreator.createTipDialog(mLoginActivity, "验证码错误！");
-                    return;
-                }
-                if (!NetworkUtils.isNetWorkAvailable()) {
-                    TextHelper.showText("无网络连接！");
-                    return;
-                }
-                mLoginActivity.getLoginBtn().setEnabled(false);
-                final String loginName = mLoginActivity.getUser().getText().toString().trim();
-                String loginPwd = mLoginActivity.getPassword().getText().toString();
-                final Map<String, String> userLoginInfo = new HashMap<>();
-                userLoginInfo.put("loginName", loginName);
-                userLoginInfo.put("loginPwd", CyptoUtils.encode(APPCONST.KEY, loginPwd));
-                //验证用户名和密码
-                UserService.login(userLoginInfo, new ResultCallback() {
-                    @Override
-                    public void onFinish(Object o, int code) {
-                        String result = (String) o;
-                        String[] info = result.split(":");
-                        int resultCode = Integer.parseInt(info[0].trim());
-                        String resultName = info[1].trim();
-                        //最后输出结果
-                        if (resultCode == 102) {
-                            UserService.writeConfig(userLoginInfo);
-                            UserService.writeUsername(loginName);
-                            mLoginActivity.finish();
-                        } else {
-                            mHandler.sendMessage(mHandler.obtainMessage(1));
-                        }
-                        TextHelper.showText(resultName);
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        TextHelper.showText("登录失败\n" + e.getLocalizedMessage());
-                    }
-                });
-
+        mLoginActivity.getLoginBtn().setOnClickListener(v -> {
+            mHandler.sendMessage(mHandler.obtainMessage(2));
+            if (!code.toLowerCase().equals(mLoginActivity.getEtCaptcha().getText().toString().toLowerCase())){
+                DialogCreator.createTipDialog(mLoginActivity, "验证码错误！");
+                return;
             }
+            if (!NetworkUtils.isNetWorkAvailable()) {
+                TextHelper.showText("无网络连接！");
+                return;
+            }
+            ProgressDialog dialog = DialogCreator.createProgressDialog(mLoginActivity, null, "正在登陆...");
+            mLoginActivity.getLoginBtn().setEnabled(false);
+            final String loginName = mLoginActivity.getUser().getText().toString().trim();
+            String loginPwd = mLoginActivity.getPassword().getText().toString();
+            final Map<String, String> userLoginInfo = new HashMap<>();
+            userLoginInfo.put("loginName", loginName);
+            userLoginInfo.put("loginPwd", CyptoUtils.encode(APPCONST.KEY, loginPwd));
+            //验证用户名和密码
+            UserService.login(userLoginInfo, new ResultCallback() {
+                @Override
+                public void onFinish(Object o, int code) {
+                    String result = (String) o;
+                    String[] info = result.split(":");
+                    int resultCode = Integer.parseInt(info[0].trim());
+                    String resultName = info[1].trim();
+                    //最后输出结果
+                    if (resultCode == 102) {
+                        UserService.writeConfig(userLoginInfo);
+                        UserService.writeUsername(loginName);
+                        mLoginActivity.finish();
+                    } else {
+                        mHandler.sendMessage(mHandler.obtainMessage(1));
+                        dialog.dismiss();
+                    }
+                    TextHelper.showText(resultName);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    TextHelper.showText("登录失败\n" + e.getLocalizedMessage());
+                    mHandler.sendMessage(mHandler.obtainMessage(1));
+                    dialog.dismiss();
+                }
+            });
+
         });
 
         mLoginActivity.getTvRegister().setOnClickListener(new View.OnClickListener() {

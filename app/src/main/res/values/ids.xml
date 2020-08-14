@@ -3,4 +3,5 @@
 
     <item name="first" type="id" />
 
+    <item type="id" name="status_bar"/>
 </resources>

@@ -19,6 +19,8 @@
                 android:layout_height="30dp"
                 android:paddingTop="4dp"
                 android:layout_gravity="center_horizontal"
+                android:layout_alignParentStart="true"
+                android:layout_centerInParent="true"
                 android:layout_margin="5dip"
                 app:srcCompat="@mipmap/larrow_black"/>
 

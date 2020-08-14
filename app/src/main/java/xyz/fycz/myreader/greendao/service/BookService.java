@@ -20,10 +20,21 @@ public class BookService extends BaseService {
 
     private ChapterService mChapterService;
     private BookMarkService mBookMarkService;
-
+    private static volatile BookService sInstance;
     public BookService(){
-        mChapterService = new ChapterService();
-        mBookMarkService = new BookMarkService();
+        mChapterService = ChapterService.getInstance();
+        mBookMarkService = BookMarkService.getInstance();
+    }
+
+    public static BookService getInstance() {
+        if (sInstance == null){
+            synchronized (BookService.class){
+                if (sInstance == null){
+                    sInstance = new BookService();
+                }
+            }
+        }
+        return sInstance;
     }
 
     private List<Book> findBooks(String sql, String[] selectionArgs) {
@@ -108,6 +119,25 @@ public class BookService extends BaseService {
         Book book = null;
         try {
             Cursor cursor = selectBySql("select id from book where author = ? and name = ?",new String[]{author,bookName});
+            if (cursor.moveToNext()){
+                String id = cursor.getString(0);
+                book = getBookById(id);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return book;
+    }
+
+    /**
+     * 通过路径查书籍（本地书籍）
+     * @param path
+     * @return
+     */
+    public Book findBookByPath(String path){
+        Book book = null;
+        try {
+            Cursor cursor = selectBySql("select id from book where CHAPTER_URL = ?",new String[]{path});
             if (cursor.moveToNext()){
                 String id = cursor.getString(0);
                 book = getBookById(id);

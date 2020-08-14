@@ -80,12 +80,7 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
 
         viewHolder.tvBookName.setText(book.getName());
         viewHolder.tvBookAuthor.setText(book.getAuthor());
-        viewHolder.ivDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDeleteBookDialog(book);
-            }
-        });
+        viewHolder.ivDelete.setOnClickListener(v -> showDeleteBookDialog(book));
         viewHolder.tvHistoryChapter.setText(book.getHistoryChapterId());
         assert book.getNewestChapterTitle() != null;
         viewHolder.tvNewestChapter.setText(book.getNewestChapterTitle().replace("最近更新 ", ""));

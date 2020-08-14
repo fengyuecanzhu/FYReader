@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.google.android.material.textfield.TextInputLayout;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 
@@ -26,13 +27,13 @@ public class RegisterActivity extends BaseActivity{
     @BindView(R.id.tv_title_text)
     TextView tvTitleText;
     @BindView(R.id.et_username)
-    EditText etUsername;
+    TextInputLayout etUsername;
     @BindView(R.id.et_password)
-    EditText etPassword;
+    TextInputLayout etPassword;
     @BindView(R.id.et_rp_password)
-    EditText etRpPassword;
+    TextInputLayout etRpPassword;
     @BindView(R.id.et_captcha)
-    EditText etCaptcha;
+    TextInputLayout etCaptcha;
     @BindView(R.id.iv_captcha)
     ImageView ivCaptcha;
     @BindView(R.id.bt_register)
@@ -63,19 +64,19 @@ public class RegisterActivity extends BaseActivity{
     }
 
     public EditText getEtUsername() {
-        return etUsername;
+        return etUsername.getEditText();
     }
 
     public EditText getEtPassword() {
-        return etPassword;
+        return etPassword.getEditText();
     }
 
     public EditText getEtRpPassword() {
-        return etRpPassword;
+        return etRpPassword.getEditText();
     }
 
     public EditText getEtCaptcha() {
-        return etCaptcha;
+        return etCaptcha.getEditText();
     }
 
     public ImageView getIvCaptcha() {

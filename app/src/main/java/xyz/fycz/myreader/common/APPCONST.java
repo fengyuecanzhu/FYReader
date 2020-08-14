@@ -65,6 +65,10 @@ public class APPCONST {
 
     public static final int SELECT_FILE_CODE = 10000;
 
+    public static final int PERMISSIONS_REQUEST_STORAGE = 10001;
+
     //设置版本号
     public static final int SETTING_VERSION = 1;
+
+    public static final String FORMAT_FILE_DATE = "yyyy-MM-dd";
 }

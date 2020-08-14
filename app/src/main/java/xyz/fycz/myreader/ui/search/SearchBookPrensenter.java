@@ -92,7 +92,7 @@ public class SearchBookPrensenter implements BasePresenter {
 
     public SearchBookPrensenter(SearchBookActivity searchBookActivity) {
         mSearchBookActivity = searchBookActivity;
-        mSearchHistoryService = new SearchHistoryService();
+        mSearchHistoryService = SearchHistoryService.getInstance();
         for (int i = 0; i < suggestion.length; i++) {
             mSuggestions.add(suggestion[i]);
         }

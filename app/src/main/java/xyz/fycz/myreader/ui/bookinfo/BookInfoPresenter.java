@@ -69,7 +69,7 @@ public class BookInfoPresenter implements BasePresenter {
 
     public BookInfoPresenter(BookInfoActivity bookInfoActivity) {
         mBookInfoActivity = bookInfoActivity;
-        mBookService = new BookService();
+        mBookService = BookService.getInstance();
     }
 
     @Override

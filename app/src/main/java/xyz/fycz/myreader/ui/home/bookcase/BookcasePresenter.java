@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.ui.home.bookcase;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.PopupMenu;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
@@ -51,6 +53,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.ui.about.AboutActivity;
+import xyz.fycz.myreader.ui.filesys.FileSystemActivity;
 import xyz.fycz.myreader.ui.home.MainActivity;
 import xyz.fycz.myreader.ui.search.SearchBookActivity;
 import xyz.fycz.myreader.ui.user.LoginActivity;
@@ -69,6 +72,7 @@ public class BookcasePresenter implements BasePresenter {
     private final BookService mBookService;
     private final ChapterService mChapterService;
     private final MainActivity mMainActivity;
+    private PermissionsChecker mPermissionsChecker;
     private boolean isBookcaseStyleChange;
     private Setting mSetting;
     private final List<Book> errorLoadingBooks = new ArrayList<>();
@@ -95,6 +99,11 @@ public class BookcasePresenter implements BasePresenter {
             MyApplication.getmContext().getString(R.string.menu_backup_webBackup),
             MyApplication.getmContext().getString(R.string.menu_backup_webRestore),
             MyApplication.getmContext().getString(R.string.menu_backup_autoSyn)
+    };
+
+    static final String[] PERMISSIONS = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
     //    private ChapterService mChapterService;
     @SuppressLint("HandlerLeak")
@@ -152,8 +161,9 @@ public class BookcasePresenter implements BasePresenter {
 
     public BookcasePresenter(BookcaseFragment bookcaseFragment) {
         mBookcaseFragment = bookcaseFragment;
-        mBookService = new BookService();
-        mChapterService = new ChapterService();
+        mBookService = BookService.getInstance();
+        ;
+        mChapterService = ChapterService.getInstance();
         mMainActivity = ((MainActivity) (mBookcaseFragment.getActivity()));
 //        mChapterService = new ChapterService();
         mSetting = SysManager.getSetting();
@@ -437,17 +447,32 @@ public class BookcasePresenter implements BasePresenter {
                     init();
                     return true;
                 case R.id.action_addLocalBook:
-                    TextHelper.showText("请选择一个txt格式的书籍文件");
+                    /*TextHelper.showText("请选择一个txt格式的书籍文件");
                     Intent addIntent = new Intent(Intent.ACTION_GET_CONTENT);
                     addIntent.setType("text/plain");
                     addIntent.addCategory(Intent.CATEGORY_OPENABLE);
-                    mMainActivity.startActivityForResult(addIntent, APPCONST.SELECT_FILE_CODE);
+                    mMainActivity.startActivityForResult(addIntent, APPCONST.SELECT_FILE_CODE);*/
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+
+                        if (mPermissionsChecker == null) {
+                            mPermissionsChecker = new PermissionsChecker(mMainActivity);
+                        }
+
+                        //获取读取和写入SD卡的权限
+                        if (mPermissionsChecker.lacksPermissions(PERMISSIONS)) {
+                            //请求权限
+                            ActivityCompat.requestPermissions(mMainActivity, PERMISSIONS, APPCONST.PERMISSIONS_REQUEST_STORAGE);
+                            return true;
+                        }
+                    }
+                    Intent intent = new Intent(mMainActivity, FileSystemActivity.class);
+                    mMainActivity.startActivity(intent);
                     break;
                 case R.id.action_syn:
-                    if (!UserService.isLogin()){
+                    if (!UserService.isLogin()) {
                         TextHelper.showText("请先登录！");
-                        Intent intent = new Intent(mMainActivity, LoginActivity.class);
-                        mMainActivity.startActivity(intent);
+                        Intent loginIntent = new Intent(mMainActivity, LoginActivity.class);
+                        mMainActivity.startActivity(loginIntent);
                         return true;
                     }
                     if (mSetting.isAutoSyn()) {
@@ -578,7 +603,7 @@ public class BookcasePresenter implements BasePresenter {
      * 恢复
      */
     private void webRestore() {
-        if (!NetworkUtils.isNetWorkAvailable()){
+        if (!NetworkUtils.isNetWorkAvailable()) {
             TextHelper.showText("无网络连接！");
             return;
         }
@@ -770,11 +795,11 @@ public class BookcasePresenter implements BasePresenter {
      * 同步书架
      */
     private void synBookcaseToWeb(boolean isAutoSyn) {
-        if (!NetworkUtils.isNetWorkAvailable()){
+        if (!NetworkUtils.isNetWorkAvailable()) {
             if (!isAutoSyn) {
                 TextHelper.showText("无网络连接！");
             }
-           return;
+            return;
         }
         Date nowTime = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");

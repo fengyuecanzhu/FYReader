@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.ui.font;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
@@ -8,6 +9,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.enums.Font;
+import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.TextHelper;
 import xyz.fycz.myreader.util.utils.FileUtils;
 
@@ -25,6 +27,7 @@ public class FontsPresenter implements BasePresenter {
     private FontsAdapter mFontsAdapter;
 
 
+    @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -107,20 +110,7 @@ public class FontsPresenter implements BasePresenter {
             e.printStackTrace();
             TextHelper.showText("读取字体文件出错！\n" + e.getLocalizedMessage());
         }finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            IOUtils.close(fis, fos);
         }
     }
 }

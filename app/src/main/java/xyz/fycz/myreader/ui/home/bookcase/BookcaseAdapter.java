@@ -60,8 +60,8 @@ public abstract class BookcaseAdapter extends DragAdapter {
         mResourceId = textViewResourceId;
         list = objects;
         mEditState = editState;
-        mBookService = new BookService();
-        mChapterService = new ChapterService();
+        mBookService = BookService.getInstance();
+        mChapterService = ChapterService.getInstance();
         mBookcasePresenter = bookcasePresenter;
     }
 

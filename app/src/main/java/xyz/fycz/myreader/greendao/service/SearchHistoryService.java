@@ -15,7 +15,17 @@ import java.util.Date;
 
 
 public class SearchHistoryService extends BaseService {
-
+    private static volatile SearchHistoryService sInstance;
+    public static SearchHistoryService getInstance() {
+        if (sInstance == null){
+            synchronized (SearchHistoryService.class){
+                if (sInstance == null){
+                    sInstance = new SearchHistoryService();
+                }
+            }
+        }
+        return sInstance;
+    }
     private ArrayList<SearchHistory> findSearchHistorys(String sql, String[] selectionArgs) {
         ArrayList<SearchHistory> searchHistories = new ArrayList<>();
         try {

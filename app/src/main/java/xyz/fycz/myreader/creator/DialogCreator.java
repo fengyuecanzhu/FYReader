@@ -630,14 +630,11 @@ public class DialogCreator {
       /*  progressDialog.setPositiveButton("确定",positiveListener);
         progressDialog.setNegativeButton("取消",negativeListener);*/
         // 显示
-        MyApplication.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    progressDialog.show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        MyApplication.runOnUiThread(() -> {
+            try {
+                progressDialog.show();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
         return progressDialog;

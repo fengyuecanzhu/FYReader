@@ -18,7 +18,18 @@ import java.util.List;
 
 
 public class BookMarkService extends BaseService {
+    private static volatile BookMarkService sInstance;
 
+    public static BookMarkService getInstance() {
+        if (sInstance == null){
+            synchronized (BookMarkService.class){
+                if (sInstance == null){
+                    sInstance = new BookMarkService();
+                }
+            }
+        }
+        return sInstance;
+    }
     private ArrayList<BookMark> findBookMarks(String sql, String[] selectionArgs) {
         ArrayList<BookMark> bookMarks = new ArrayList<>();
         try {
