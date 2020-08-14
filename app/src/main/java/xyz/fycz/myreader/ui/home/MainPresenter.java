@@ -131,6 +131,9 @@ public class MainPresenter implements BasePresenter {
      * @return
      */
     public boolean ismEditState(){
+        if (mBookcaseFragment.getmBookcasePresenter() == null) {
+            return false;
+        }
         return mBookcaseFragment.getmBookcasePresenter().ismEditState();
     }
 }

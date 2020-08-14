@@ -19,7 +19,7 @@ public class SyncChaptersController {
         mLocalChapters = localChapters;
         mNetChapters = netChapters;
         mBook = book;
-        mChapterService = new ChapterService();
+        mChapterService = ChapterService.getInstance();
     }
 
     /**

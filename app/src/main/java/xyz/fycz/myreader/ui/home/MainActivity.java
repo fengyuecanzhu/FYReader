@@ -4,10 +4,12 @@ package xyz.fycz.myreader.ui.home;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.FileProvider;
 import android.widget.ImageView;
@@ -22,6 +24,7 @@ import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.creator.DialogCreator;
 import xyz.fycz.myreader.custom.CircleImageView;
+import xyz.fycz.myreader.ui.filesys.FileSystemActivity;
 import xyz.fycz.myreader.util.TextHelper;
 
 import butterknife.BindView;
@@ -100,6 +103,26 @@ public class MainActivity extends BaseActivity {
                 path = getPath(this, uri);
             }
             mMainPrensenter.addLocalBook(path);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case APPCONST.PERMISSIONS_REQUEST_STORAGE: {
+                // 如果取消权限，则返回的值为0
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //跳转到 FileSystemActivity
+                    Intent intent = new Intent(this, FileSystemActivity.class);
+                    startActivity(intent);
+
+                } else {
+                    TextHelper.showText("用户拒绝开启读写权限");
+                }
+                return;
+            }
         }
     }
 

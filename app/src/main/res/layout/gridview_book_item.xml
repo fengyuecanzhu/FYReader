@@ -18,7 +18,7 @@
             android:layout_width="80dp"
             android:layout_height="110dp"
             android:scaleType="fitXY"
-            app:srcCompat="@mipmap/no_image"/>
+            app:srcCompat="@mipmap/default_cover"/>
 
         <TextView
             android:layout_marginTop="5dp"

@@ -16,7 +16,7 @@
             android:layout_width="64dp"
             android:layout_height="88dp"
             android:scaleType="fitXY"
-            app:srcCompat="@mipmap/no_image"/>
+            app:srcCompat="@mipmap/default_cover"/>
 
         <LinearLayout android:id="@+id/ll_book_read"
                       android:layout_width="match_parent"

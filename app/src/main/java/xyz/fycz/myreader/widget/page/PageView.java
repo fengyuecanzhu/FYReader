@@ -346,9 +346,9 @@ public class PageView extends View {
         }
         // 获取具体的加载器
         if ("本地书籍".equals(collBook.getType())){
-            mPageLoader = new LocalPageLoader(this, collBook, new ChapterService(), setting);
+            mPageLoader = new LocalPageLoader(this, collBook, ChapterService.getInstance(), setting);
         }else {
-            mPageLoader = new NetPageLoader(this, collBook, new ChapterService(), mReadCrawler, setting);
+            mPageLoader = new NetPageLoader(this, collBook, ChapterService.getInstance(), mReadCrawler, setting);
         }
         // 判断是否 PageView 已经初始化完成
         if (mViewWidth != 0 || mViewHeight != 0) {

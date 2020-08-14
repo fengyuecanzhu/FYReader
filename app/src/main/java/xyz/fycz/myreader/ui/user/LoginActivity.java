@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.google.android.material.textfield.TextInputLayout;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.util.utils.StringUtils;
@@ -27,15 +28,15 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
     @BindView(R.id.tv_title_text)
     TextView tvTitleText;
     @BindView(R.id.et_user)
-    EditText user;
+    TextInputLayout user;
     @BindView(R.id.et_password)
-    EditText password;
+    TextInputLayout password;
     @BindView(R.id.bt_login)
     Button loginBtn;
     @BindView(R.id.tv_register)
     TextView tvRegister;
     @BindView(R.id.et_captcha)
-    EditText etCaptcha;
+    TextInputLayout etCaptcha;
     @BindView(R.id.iv_captcha)
     ImageView ivCaptcha;
     private LoginPresenter mLoginPresenter;
@@ -98,9 +99,9 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
         //禁止输入中文
         StringUtils.isNotChinese(s);
         //判断两个输入框是否有内容
-        if (user.getText().toString().length() > 3 &&
-                password.getText().toString().length() > 5 &&
-                etCaptcha.getText().toString().length() > 0){
+        if (user.getEditText().getText().toString().length() > 0 &&
+                password.getEditText().getText().toString().length() > 0 &&
+                etCaptcha.getEditText().getText().toString().length() > 0){
             //按钮可以点击
             loginBtn.setEnabled(true);
         }else{
@@ -111,11 +112,11 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
 
 
     public EditText getUser() {
-        return user;
+        return user.getEditText();
     }
 
     public EditText getPassword() {
-        return password;
+        return password.getEditText();
     }
 
     public Button getLoginBtn() {
@@ -135,7 +136,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
     }
 
     public EditText getEtCaptcha() {
-        return etCaptcha;
+        return etCaptcha.getEditText();
     }
 
     public ImageView getIvCaptcha() {

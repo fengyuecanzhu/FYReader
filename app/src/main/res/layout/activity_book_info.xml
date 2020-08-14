@@ -31,7 +31,7 @@
                             android:layout_width="80dp"
                             android:layout_height="120dp"
                             android:scaleType="fitXY"
-                            app:srcCompat="@mipmap/no_image"/>
+                            app:srcCompat="@mipmap/default_cover"/>
 
                     <RelativeLayout
                             android:layout_width="match_parent"

@@ -26,7 +26,6 @@ public class CatalogActivityPresenter implements BasePresenter {
     private CatalogActivity mCatalogActivity;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
     private String[] tabTitle = {"目录", "书签"};
-    private Setting mSetting;
     private boolean isDayStyle;
     private FragmentPagerAdapter tabAdapter;
 
@@ -42,7 +41,7 @@ public class CatalogActivityPresenter implements BasePresenter {
         if (!isDayStyle){
             mCatalogActivity.setStatusBar(R.color.sys_dialog_setting_bg);
             mCatalogActivity.getRlCommonTitle().setBackground(mCatalogActivity.getDrawable(R.color.sys_dialog_setting_bg));
-            mCatalogActivity.getTvBack().setImageDrawable(mCatalogActivity.getDrawable(R.mipmap.larrow3));
+            mCatalogActivity.getTvBack().setImageDrawable(mCatalogActivity.getDrawable(R.mipmap.larrow_white2));
             mCatalogActivity.getIvCancel().setImageDrawable(mCatalogActivity.getDrawable(R.mipmap.ic_cha_black));
             mCatalogActivity.getIvSearch().setImageDrawable(mCatalogActivity.getDrawable(R.mipmap.b9));
             mCatalogActivity.getEtSearch().setTextColor(mCatalogActivity.getResources().getColor(R.color.sys_night_word));
@@ -78,7 +77,9 @@ public class CatalogActivityPresenter implements BasePresenter {
             mCatalogActivity.getIvSearch().setVisibility(View.VISIBLE);
             mCatalogActivity.getEtSearch().setVisibility(View.GONE);
             mCatalogActivity.getIvCancel().setVisibility(View.GONE);
-            mCatalogActivity.getEtSearch().setText("");
+            if(!"".equals(mCatalogActivity.getEtSearch().getText().toString())){
+                mCatalogActivity.getEtSearch().setText("");
+            }
         });
 
         mCatalogActivity.getEtSearch().addTextChangedListener(new TextWatcher() {

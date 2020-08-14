@@ -181,9 +181,9 @@ public class ReadPresenter implements BasePresenter {
 
     public ReadPresenter(ReadActivity readActivity) {
         mReadActivity = readActivity;
-        mBookService = new BookService();
-        mChapterService = new ChapterService();
-        mBookMarkService = new BookMarkService();
+        mBookService = BookService.getInstance();;
+        mChapterService = ChapterService.getInstance();
+        mBookMarkService = BookMarkService.getInstance();
         mSetting = SysManager.getSetting();
     }
 

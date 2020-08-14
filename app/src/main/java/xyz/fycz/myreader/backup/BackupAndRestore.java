@@ -18,7 +18,7 @@ import java.util.List;
 
 public class BackupAndRestore {
 
-    BookService mBookService = new BookService();
+    BookService mBookService = BookService.getInstance();
 
     /**
      * 备份书架

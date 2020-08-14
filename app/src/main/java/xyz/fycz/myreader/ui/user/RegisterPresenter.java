@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.ui.user;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
@@ -199,6 +200,7 @@ public class RegisterPresenter implements BasePresenter {
                 }else if(!mRegisterActivity.getCbAgreement().isChecked()){
                     DialogCreator.createTipDialog(mRegisterActivity, "请勾选同意《用户服务协议》");
                 }else {
+                    ProgressDialog dialog = DialogCreator.createProgressDialog(mRegisterActivity, null, "正在注册...");
                     Map<String, String> userRegisterInfo = new HashMap<>();
                     userRegisterInfo.put("username", username);
                     userRegisterInfo.put("password", password);
@@ -211,11 +213,13 @@ public class RegisterPresenter implements BasePresenter {
                                 UserService.writeUsername(username);
                                 mRegisterActivity.finish();
                             }
+                            dialog.dismiss();
                             TextHelper.showText(info[1]);
                         }
                         @Override
                         public void onError(Exception e) {
                             TextHelper.showText("注册失败：\n" + e.getLocalizedMessage());
+                            dialog.dismiss();
                         }
                     });
                 }

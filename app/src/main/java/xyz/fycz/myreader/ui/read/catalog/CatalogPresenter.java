@@ -31,7 +31,7 @@ public class CatalogPresenter implements BasePresenter {
 
     public CatalogPresenter(CatalogFragment mCatalogFragment) {
         this.mCatalogFragment = mCatalogFragment;
-        mChapterService = new ChapterService();
+        mChapterService = ChapterService.getInstance();
     }
 
     @Override

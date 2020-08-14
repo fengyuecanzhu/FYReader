@@ -17,7 +17,18 @@ import java.util.List;
 
 
 public class ChapterService extends BaseService {
+    private static volatile ChapterService sInstance;
 
+    public static ChapterService getInstance() {
+        if (sInstance == null){
+            synchronized (ChapterService.class){
+                if (sInstance == null){
+                    sInstance = new ChapterService();
+                }
+            }
+        }
+        return sInstance;
+    }
     private List<Chapter> findChapters(String sql, String[] selectionArgs) {
         ArrayList<Chapter> chapters = new ArrayList<>();
         try {
