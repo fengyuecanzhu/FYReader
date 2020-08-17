@@ -2,29 +2,25 @@ package xyz.fycz.myreader.ui.home.bookcase;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.*;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.PopupMenu;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
-import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,10 +54,10 @@ import xyz.fycz.myreader.ui.home.MainActivity;
 import xyz.fycz.myreader.ui.search.SearchBookActivity;
 import xyz.fycz.myreader.ui.user.LoginActivity;
 import xyz.fycz.myreader.util.*;
+import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
+import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
-
-import static xyz.fycz.myreader.application.MyApplication.checkVersionByServer;
 
 
 public class BookcasePresenter implements BasePresenter {
@@ -85,16 +81,26 @@ public class BookcasePresenter implements BasePresenter {
         return es;
     }
 
-    private String downloadingBook;
-    private String downloadingChapter;
-    private boolean isDownloadFinish;
-    private boolean isStopDownload;
-    private int downloadProcess;
-    private PopupMenu pm;
+    private NotificationUtil notificationUtil;//通知工具类
+    private String downloadingBook;//正在下载的书名
+    private String downloadingChapter;//正在下载的章节名
+    private boolean isDownloadFinish = true;//单本书是否下载完成
+    private static boolean isStopDownload = true;//是否停止下载
+    private int curCacheChapterNum;//当前下载的章节数
+    private int needCacheChapterNum;//需要下载的章节数
+    private int tempCacheChapterNum;//上次下载的章节数
+    private int tempCount;//下载超时时间
+    private int downloadInterval = 150;//下载间隔
+    private Runnable sendDownloadNotification;//发送通知的线程
+    private PopupMenu pm;//菜单
+
+    public static final String CANCEL_ACTION = "cancelAction";
+
     private final String[] backupMenu = {
             MyApplication.getmContext().getResources().getString(R.string.menu_backup_backup),
             MyApplication.getmContext().getResources().getString(R.string.menu_backup_restore),
     };
+
     private final String[] webSynMenu = {
             MyApplication.getmContext().getString(R.string.menu_backup_webBackup),
             MyApplication.getmContext().getString(R.string.menu_backup_webRestore),
@@ -124,6 +130,9 @@ public class BookcasePresenter implements BasePresenter {
                     break;
                 case 4:
                     showErrorLoadingBooks();
+                    if (MyApplication.isApkInDebug(mMainActivity)) {
+                        downloadAll(false);
+                    }
                     break;
                 case 5:
                     backup();
@@ -135,7 +144,7 @@ public class BookcasePresenter implements BasePresenter {
                     init();
                     break;
                 case 8:
-                    sendNotification(downloadingBook);
+                    sendNotification();
                     break;
                 case 9:
                     mBookcaseFragment.getRlDownloadTip().setVisibility(View.GONE);
@@ -150,10 +159,8 @@ public class BookcasePresenter implements BasePresenter {
                     MyApplication.runOnUiThread(() -> createMenu());
                     break;
                 case 12:
-                    mBookcaseFragment.getTvStopDownload().setVisibility(View.GONE);
-                    break;
-                case 13:
-                    mBookcaseFragment.getTvStopDownload().setVisibility(View.VISIBLE);
+                    TextHelper.showText("正在后台缓存书籍，具体进度可查看通知栏！");
+                    notificationUtil.requestNotificationPermissionDialog(mMainActivity);
                     break;
             }
         }
@@ -178,6 +185,10 @@ public class BookcasePresenter implements BasePresenter {
         if (mSetting.isAutoSyn() && UserService.isLogin()) {
             synBookcaseToWeb(true);
         }
+
+        sendDownloadNotification = this::sendNotification;
+        notificationUtil = NotificationUtil.getInstance();
+
         getData();
         //是否启用下拉刷新（默认启用）
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -210,16 +221,6 @@ public class BookcasePresenter implements BasePresenter {
                 }
             });
         }
-
-        //停止按钮监听器
-        mBookcaseFragment.getTvStopDownload().setOnClickListener(v -> {
-            if (downloadProcess == 99) {
-                TextHelper.showText("开始缓存下一本书籍！");
-                isDownloadFinish = true;
-            } else {
-                isStopDownload = true;
-            }
-        });
 
     }
 
@@ -511,9 +512,16 @@ public class BookcasePresenter implements BasePresenter {
                             .show();
                     break;
                 case R.id.action_download_all:
-                    DialogCreator.createCommonDialog(mMainActivity, "一键缓存(实验)",
-                            mMainActivity.getString(R.string.all_cathe_tip), true,
-                            (dialog, which) -> downloadAll(), null);
+                    if (!SharedPreUtils.getInstance().getBoolean("isReadDownloadAllTip")) {
+                        DialogCreator.createCommonDialog(mMainActivity, "一键缓存",
+                                mMainActivity.getString(R.string.all_cathe_tip), true,
+                                (dialog, which) -> {
+                                    downloadAll(true);
+                                    SharedPreUtils.getInstance().putBoolean("isReadDownloadAllTip", true);
+                                }, null);
+                    }else {
+                        downloadAll(true);
+                    }
 
                     return true;
                 case R.id.action_backup:
@@ -628,39 +636,64 @@ public class BookcasePresenter implements BasePresenter {
     /**
      * 缓存所有书籍
      */
-    private void downloadAll() {
+    private void downloadAll(boolean isDownloadAllChapters) {
         if (!NetworkUtils.isNetWorkAvailable()) {
             TextHelper.showText("无网络连接！");
             return;
         }
-        mHandler.sendMessage(mHandler.obtainMessage(13));
-        isStopDownload = false;
+        if (isDownloadAllChapters) {
+            mHandler.sendEmptyMessage(12);
+        }
         MyApplication.getApplication().newThread(() -> {
-            downloadFor:
-            for (final Book book : mBooks) {
-                if (BookSource.pinshu.toString().equals(book.getSource()) || "本地书籍".equals(book.getType())) {
-                    continue;
+            ArrayList<Book> needDownloadBooks = new ArrayList<>();
+            for (Book book : mBooks) {
+                if (!BookSource.pinshu.toString().equals(book.getSource()) && !"本地书籍".equals(book.getType())) {
+                    needDownloadBooks.add(book);
                 }
+            }
+            downloadFor:
+            for (final Book book : needDownloadBooks) {
                 isDownloadFinish = false;
                 Thread downloadThread = new Thread(() -> {
                     ArrayList<Chapter> chapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
+                    int end;
+                    if (isDownloadAllChapters) {
+                        end = chapters.size();
+                    } else {
+                        end = book.getHisttoryChapterNum() + 5;
+                    }
                     addDownload(book, chapters,
-                            book.getHisttoryChapterNum(), chapters.size());
+                            book.getHisttoryChapterNum(), end, true);
                 });
                 es.submit(downloadThread);
                 do {
                     try {
-                        Thread.sleep(800);
+                        Thread.sleep(downloadInterval);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     if (isStopDownload) {
-                        DialogCreator.createTipDialog(mMainActivity, "请等待当前书籍缓存完成后缓存任务将全部停止！");
                         break downloadFor;
                     }
                 } while (!isDownloadFinish);
             }
-            mHandler.sendMessage(mHandler.obtainMessage(12));
+            if (isDownloadAllChapters && !isStopDownload) {
+                //通知
+                Intent mainIntent = new Intent(mMainActivity, MainActivity.class);
+                PendingIntent mainPendingIntent = PendingIntent.getActivity(mMainActivity, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                Notification notification = notificationUtil.build(APPCONST.channelIdDownload)
+                        .setSmallIcon(R.drawable.ic_download)
+                        //通知栏大图标
+                        .setLargeIcon(BitmapFactory.decodeResource(MyApplication.getApplication().getResources(), R.mipmap.ic_launcher))
+                        .setOngoing(false)
+                        //点击通知后自动清除
+                        .setAutoCancel(true)
+                        .setContentTitle("缓存完成")
+                        .setContentText("书籍一键缓存完成！")
+                        .setContentIntent(mainPendingIntent)
+                        .build();
+                notificationUtil.notify(1002, notification);
+            }
         });
     }
 
@@ -672,7 +705,7 @@ public class BookcasePresenter implements BasePresenter {
      * @param begin
      * @param end
      */
-    public void addDownload(final Book book, final ArrayList<Chapter> mChapters, int begin, int end) {
+    public void addDownload(final Book book, final ArrayList<Chapter> mChapters, int begin, int end, boolean isDownloadAll) {
         if ("本地书籍".equals(book.getType())) {
             TextHelper.showText("《" + book.getName() + "》是本地书籍，不能缓存");
             return;
@@ -681,52 +714,69 @@ public class BookcasePresenter implements BasePresenter {
             TextHelper.showText("《" + book.getName() + "》章节目录为空，缓存失败，请刷新后重试");
             return;
         }
-        mHandler.sendMessage(mHandler.obtainMessage(10));
+        //取消之前下载
+        if (!isDownloadAll) {
+            if (!isStopDownload) {
+                isStopDownload = true;
+                try {
+                    Thread.sleep(2 * downloadInterval);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        //mHandler.sendMessage(mHandler.obtainMessage(10));
         downloadingBook = book.getName();
         final int finalBegin = Math.max(0, begin);
         final int finalEnd = Math.min(end, mChapters.size());
-        final int needCacheChapterNum = finalEnd - finalBegin;
-        final int[] curCacheChapterNum = {0};
-        //final boolean[] isDownloadFinish = new boolean[1];
+        needCacheChapterNum = finalEnd - finalBegin;
+        curCacheChapterNum = 0;
+        tempCacheChapterNum = 0;
+        isStopDownload = false;
+        ArrayList<Chapter> needDownloadChapters = new ArrayList<>();
         for (int i = finalBegin; i < finalEnd; i++) {
-            //isDownloadFinish[0] = false;
             final Chapter chapter = mChapters.get(i);
             if (StringHelper.isEmpty(chapter.getContent())) {
-                getChapterContent(book, chapter, new ResultCallback() {
-                    @Override
-                    public void onFinish(Object o, int code) {
-                        curCacheChapterNum[0]++;
-                        downloadingChapter = chapter.getTitle();
-                        downloadProcess = curCacheChapterNum[0] * 100 / needCacheChapterNum;
-                        mChapterService.saveOrUpdateChapter(chapter, (String) o);
-                        // isDownloadFinish[0] = true;
-                        mHandler.sendMessage(mHandler.obtainMessage(8));
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        //  isDownloadFinish[0] = true;
-                        curCacheChapterNum[0]++;
-                        downloadProcess = curCacheChapterNum[0] * 100 / needCacheChapterNum;
-                        mHandler.sendMessage(mHandler.obtainMessage(8));
-                    }
-                });
-            } else {
-                //isDownloadFinish[0] = true;
-                curCacheChapterNum[0]++;
-                downloadProcess = curCacheChapterNum[0] * 100 / needCacheChapterNum;
-                mHandler.sendMessage(mHandler.obtainMessage(8));
+                needDownloadChapters.add(chapter);
             }
-            if (curCacheChapterNum[0] == needCacheChapterNum) {
+        }
+        needCacheChapterNum = needDownloadChapters.size();
+        if (!isDownloadAll && needCacheChapterNum > 0) {
+            mHandler.sendEmptyMessage(12);
+        }
+        mHandler.postDelayed(sendDownloadNotification, 2 * downloadInterval);
+        for (Chapter chapter : needDownloadChapters) {
+            getChapterContent(book, chapter, new ResultCallback() {
+                @Override
+                public void onFinish(Object o, int code) {
+                    downloadingChapter = chapter.getTitle();
+                    mChapterService.saveOrUpdateChapter(chapter, (String) o);
+                    curCacheChapterNum++;
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    curCacheChapterNum++;
+                }
+            });
+            try {
+                Thread.sleep(downloadInterval);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (curCacheChapterNum == needCacheChapterNum) {
+                if (!isDownloadAll) {
+                    isStopDownload = true;
+                }
                 mHandler.sendMessage(mHandler.obtainMessage(9));
             }
-                    /*while (true){
-                        if (isDownloadFinish[0]){
-                            break;
-                        }
-                    }*/
             if (isStopDownload) {
                 break;
+            }
+        }
+        if (!isDownloadAll) {
+            if (curCacheChapterNum == needCacheChapterNum) {
+                TextHelper.showText("《" + book.getName() + "》" + mMainActivity.getString(R.string.download_already_all_tips));
             }
         }
     }
@@ -742,21 +792,55 @@ public class BookcasePresenter implements BasePresenter {
         if (StringHelper.isEmpty(chapter.getBookId())) {
             chapter.setBookId(mBook.getId());
         }
-        if (!StringHelper.isEmpty(chapter.getContent())) {
-            if (resultCallback != null) {
-                resultCallback.onFinish(mChapterService.getChapterCatheContent(chapter), 0);
-            }
-        } else {
-            ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
-            CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler, resultCallback);
-        }
+        ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
+        CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler, resultCallback);
     }
 
-    private void sendNotification(String book) {
-        mBookcaseFragment.getPbDownload().setProgress(downloadProcess);
-        mBookcaseFragment.getTvDownloadTip().setText("正在缓存：" + book + "[" + downloadProcess + "%]");
-        if (downloadProcess == 100) {
-            mHandler.sendMessage(mHandler.obtainMessage(9));
+    /**
+     * 发送通知
+     */
+    private void sendNotification() {
+        if (curCacheChapterNum == needCacheChapterNum) {
+            mHandler.sendEmptyMessage(9);
+            notificationUtil.cancelAll();
+            return;
+        } else {
+            Notification notification = notificationUtil.build(APPCONST.channelIdDownload)
+                    .setSmallIcon(R.drawable.ic_download)
+                    //通知栏大图标
+                    .setLargeIcon(BitmapFactory.decodeResource(MyApplication.getApplication().getResources(), R.mipmap.ic_launcher))
+                    .setOngoing(true)
+                    //点击通知后自动清除
+                    .setAutoCancel(true)
+                    .setContentTitle("正在下载：" + downloadingBook +
+                            "[" + curCacheChapterNum + "/" + needCacheChapterNum + "]")
+                    .setContentText(downloadingChapter == null ? "  " : downloadingChapter)
+                    .addAction(R.drawable.ic_stop_black_24dp, "停止",
+                            notificationUtil.getChancelPendingIntent(cancelDownloadReceiver.class))
+                    .build();
+            notificationUtil.notify(1000, notification);
+        }
+        if (tempCacheChapterNum < curCacheChapterNum) {
+            tempCount = 1500 / downloadInterval;
+            tempCacheChapterNum = curCacheChapterNum;
+        } else if (tempCacheChapterNum == curCacheChapterNum) {
+            tempCount--;
+            if (tempCount == 0) {
+                isDownloadFinish = true;
+                notificationUtil.cancel(1000);
+                return;
+            }
+        }
+        mHandler.postDelayed(sendDownloadNotification, 2 * downloadInterval);
+    }
+
+    public static class cancelDownloadReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //todo 跳转之前要处理的逻辑
+            if (CANCEL_ACTION.equals(intent.getAction())) {
+                isStopDownload = true;
+            }
         }
     }
 
@@ -841,6 +925,19 @@ public class BookcasePresenter implements BasePresenter {
     public void cancelEdit() {
         editBookcase(false);
     }
+
+    /**
+     *
+     */
+    public void destroy() {
+        notificationUtil.cancelAll();
+        mHandler.removeCallbacks(sendDownloadNotification);
+        for (int i = 0; i < 13; i++) {
+            mHandler.removeMessages(i + 1);
+        }
+    }
+
+
     /*class NotificationService extends Service{
 
         @Nullable

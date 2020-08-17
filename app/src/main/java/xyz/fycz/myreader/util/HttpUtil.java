@@ -219,55 +219,51 @@ public class HttpUtil {
     }
 
     public static void sendGetRequest_okHttp(final String address, final HttpCallback callback) {
-       MyApplication.getApplication().newThread(new Runnable() {
-            @Override
-            public void run() {
-             /*   HttpURLConnection connection = null;
-                try {
-                    URL url = new URL(address);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    connection.setRequestProperty("Content-type", "text/html");
-                    connection.setRequestProperty("Accept-Charset", "gbk");
-                    connection.setRequestProperty("contentType", "gbk");
-                    connection.setConnectTimeout(5 * 1000);
-                    connection.setReadTimeout(5 * 1000);
-                    connection.setDoInput(true);
-                    connection.setDoOutput(true);
-                    if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                        Log.e("Http", "网络错误异常！!!!");
-                    }
-                    InputStream in = connection.getInputStream();
-                    Log.d("Http", "connection success");
-                    if (callback != null) {
-                        callback.onFinish(in);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e("Http", e.toString());
-                    if (callback != null) {
-                        callback.onError(e);
-                    }
-                } finally {
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
-                }*/
-                try{
-                    OkHttpClient client = getOkHttpClient();
-                    Request request = new Request.Builder()
-                            .addHeader("User-Agent","Mozilla/4.0 (compatible; MSIE 7.0; Windows 7)")
-                            .url(address)
-                            .build();
-                    Response response = client.newCall(request).execute();
-                    callback.onFinish(response.body().byteStream());
-                }catch(Exception e){
-                    e.printStackTrace();
-                    callback.onError(e);
-                }
-            }
-
-        });
+       MyApplication.getApplication().newThread(() -> {
+        /*   HttpURLConnection connection = null;
+           try {
+               URL url = new URL(address);
+               connection = (HttpURLConnection) url.openConnection();
+               connection.setRequestMethod("GET");
+               connection.setRequestProperty("Content-type", "text/html");
+               connection.setRequestProperty("Accept-Charset", "gbk");
+               connection.setRequestProperty("contentType", "gbk");
+               connection.setConnectTimeout(5 * 1000);
+               connection.setReadTimeout(5 * 1000);
+               connection.setDoInput(true);
+               connection.setDoOutput(true);
+               if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                   Log.e("Http", "网络错误异常！!!!");
+               }
+               InputStream in = connection.getInputStream();
+               Log.d("Http", "connection success");
+               if (callback != null) {
+                   callback.onFinish(in);
+               }
+           } catch (Exception e) {
+               e.printStackTrace();
+               Log.e("Http", e.toString());
+               if (callback != null) {
+                   callback.onError(e);
+               }
+           } finally {
+               if (connection != null) {
+                   connection.disconnect();
+               }
+           }*/
+           try{
+               OkHttpClient client = getOkHttpClient();
+               Request request = new Request.Builder()
+                       .addHeader("User-Agent","Mozilla/4.0 (compatible; MSIE 7.0; Windows 7)")
+                       .url(address)
+                       .build();
+               Response response = client.newCall(request).execute();
+               callback.onFinish(response.body().byteStream());
+           }catch(Exception e){
+               e.printStackTrace();
+               callback.onError(e);
+           }
+       });
     }
 
     /**

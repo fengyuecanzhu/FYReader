@@ -22,6 +22,7 @@ import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.crawler.*;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.ui.bookinfo.BookDetailedActivity;
 import xyz.fycz.myreader.ui.bookinfo.BookInfoActivity;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BasePresenter;
@@ -141,7 +142,7 @@ public class SearchBookPrensenter implements BasePresenter {
         });
         //进入书籍详情页
         mSearchBookActivity.getGvSearchBooksList().setOnItemClickListener((adapterView, view, i, l) -> {
-            Intent intent = new Intent(mSearchBookActivity, BookInfoActivity.class);
+            Intent intent = new Intent(mSearchBookActivity, BookDetailedActivity.class);
             intent.putExtra(APPCONST.SEARCH_BOOK_BEAN, new ArrayList<>(mBooks.getValues(mBooksBean.get(i))));
             mSearchBookActivity.startActivity(intent);
         });

@@ -186,12 +186,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
                     public void onClick(DialogInterface dialog, int which) {
                         selectedIndex = which;
                     }
-                }).setNegativeButton("取消", (new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        })).setPositiveButton("确定",
+                }).setNegativeButton("取消", ((dialog, which) -> dialog.dismiss())).setPositiveButton("确定",
                 (dialog, which) -> {
                     switch (selectedIndex) {
                         case 0:
@@ -213,7 +208,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
                     }
                     Thread downloadThread = new Thread(() -> {
                         ArrayList<Chapter> chapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
-                        mBookcasePresenter.addDownload(book, chapters, begin[0], end[0]);
+                        mBookcasePresenter.addDownload(book, chapters, begin[0], end[0], false);
                     });
                     mBookcasePresenter.getEs().submit(downloadThread);
                 }).show();

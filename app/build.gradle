@@ -115,7 +115,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
 
     implementation 'com.h6ah4i.android.widget.verticalseekbar:verticalseekbar:1.0.0'
-
+    //Scroller
+    implementation 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
 }
 
 greendao {

@@ -91,7 +91,44 @@
         <item name="android:divider">@color/divider_common</item>
         <item name="android:dividerHeight">0.5dp</item>
     </style>
+    <!--BookDetail-->
+    <style name="BottomNavigationViewTheme" />
 
+    <style name="BottomNavigation" />
+
+    <style name="BottomNavigation.GroupView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_gravity">bottom</item>
+        <item name="android:elevation">4dp</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <style name="BottomNavigation.ItemView">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <style name="BottomNavigation.ItemView.Icon" parent="">
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_gravity">top|center_horizontal</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_alignParentTop">true</item>
+    </style>
+
+    <style name="BottomNavigation.ItemView.Title" parent="">
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">bottom|center_horizontal</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:textSize">12sp</item>
+    </style>
 
 
 </resources>

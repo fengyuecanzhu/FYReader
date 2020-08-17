@@ -1,9 +1,11 @@
-package xyz.fycz.myreader.base;
+package xyz.fycz.myreader.base.adapter;
 
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.recyclerview.widget.RecyclerView;
+import xyz.fycz.myreader.base.BaseViewHolder;
+import xyz.fycz.myreader.base.IViewHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -148,6 +148,10 @@ public class FileSystemActivity extends BaseTabActivity {
                             true, (dialog, which) -> {
                                 //删除选中的文件
                                 mCurFragment.deleteCheckedFiles();
+                                //改变菜单状态
+                                changeMenuStatus();
+                                //改变是否可以全选
+                                changeCheckedAllStatus();
                                 //提示删除文件成功
                                 TextHelper.showText("删除文件成功");
                             }, null);

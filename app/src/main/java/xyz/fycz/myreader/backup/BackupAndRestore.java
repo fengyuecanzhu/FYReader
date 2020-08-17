@@ -48,20 +48,7 @@ public class BackupAndRestore {
             e.printStackTrace();
             return false;
         } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (oos != null) {
-                try {
-                    oos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            IOUtils.close(bw, oos);
         }
     }
 

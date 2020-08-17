@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/BottomNavigation.GroupView"
+    android:background="@color/white">
+
+
+
+    <FrameLayout
+        android:id="@+id/fl_add_bookcase"
+        style="@style/BottomNavigation.ItemView">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            style="@style/BottomNavigation.ItemView.Icon"
+            android:background="@drawable/ic_vector_add_bookcase"/>
+
+        <TextView
+            android:id="@+id/book_detail_tv_add"
+            style="@style/BottomNavigation.ItemView.Title"
+            android:text="加入书架"
+            android:textColor="@color/black"/>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_open_book"
+        style="@style/BottomNavigation.ItemView"
+        android:background="?colorPrimary">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            style="@style/BottomNavigation.ItemView.Icon"
+            android:background="@drawable/ic_vector_book_read"/>
+
+        <TextView
+            android:id="@+id/book_detail_tv_open"
+            style="@style/BottomNavigation.ItemView.Title"
+            android:text="开始阅读"
+            android:textColor="@color/white"/>
+
+    </FrameLayout>
+
+
+</LinearLayout>

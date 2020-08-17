@@ -54,6 +54,7 @@
             android:roundIcon="@mipmap/ic_launcher"
             android:supportsRtl="true"
             android:theme="@style/AppDayTheme"
+            android:requestLegacyExternalStorage="true"
             android:networkSecurityConfig="@xml/network_security_config">
 
         <activity android:name=".ui.home.Splash">
@@ -74,11 +75,13 @@
                     android:resource="@xml/file_paths"/>
         </provider>
 
-        <activity android:name=".ui.home.MainActivity"/>
+        <activity android:name=".ui.home.MainActivity"
+                  android:launchMode="singleTask"/>
         <activity
                 android:name=".ui.search.SearchBookActivity"
                 android:windowSoftInputMode="stateVisible"/>
         <activity android:name=".ui.bookinfo.BookInfoActivity"/>
+        <activity android:name=".ui.bookinfo.BookDetailedActivity"/>
 
         <activity
                 android:name=".ui.read.ReadActivity"
@@ -101,6 +104,11 @@
 
 
         <activity android:name=".ui.filesys.FileSystemActivity"/>
+
+        <receiver android:name=".util.notification.NotificationClickReceiver"/>
+        <receiver android:name=".ui.home.bookcase.BookcasePresenter$cancelDownloadReceiver"/>
+        <receiver android:name=".ui.read.ReadPresenter$cancelDownloadReceiver"/>
+
     </application>
 
 </manifest>

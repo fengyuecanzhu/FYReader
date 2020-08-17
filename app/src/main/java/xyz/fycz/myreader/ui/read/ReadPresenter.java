@@ -2,11 +2,13 @@ package xyz.fycz.myreader.ui.read;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
@@ -43,11 +45,14 @@ import xyz.fycz.myreader.greendao.service.BookMarkService;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.ui.font.FontsActivity;
+import xyz.fycz.myreader.ui.home.bookcase.BookcasePresenter;
 import xyz.fycz.myreader.ui.read.catalog.CatalogActivity;
 import xyz.fycz.myreader.util.BrightUtil;
 import xyz.fycz.myreader.util.ScreenHelper;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
+import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.widget.page.LocalPageLoader;
@@ -68,6 +73,7 @@ public class ReadPresenter implements BasePresenter {
     private ChapterService mChapterService;
     private BookService mBookService;
     private BookMarkService mBookMarkService;
+    private NotificationUtil notificationUtil;
     private Setting mSetting;
 
     private boolean settingChange;//是否是设置改变
@@ -95,6 +101,12 @@ public class ReadPresenter implements BasePresenter {
     private Runnable keepScreenRunnable;//息屏线程
     private Runnable autoPageRunnable;//自动翻页
     private Runnable upHpbNextPage;//更新自动翻页进度条
+    private Runnable sendDownloadNotification;
+    private static boolean isStopDownload = true;
+
+    private int tempCacheChapterNum;
+    private int tempCount;
+    private String downloadingChapter;
 
     private ReadCrawler mReadCrawler;
 
@@ -103,6 +115,8 @@ public class ReadPresenter implements BasePresenter {
     private int nextPageTime;//下次翻页时间
 
     private int upHpbInterval = 30;//更新翻页进度速度
+
+    private int downloadInterval = 150;
 
     private final CharSequence[] pageMode = {
             "覆盖", "仿真", "滑动", "滚动", "无动画"
@@ -156,6 +170,10 @@ public class ReadPresenter implements BasePresenter {
                 case 8:
                     mReadActivity.getPbLoading().setVisibility(View.GONE);
                     break;
+                case 9:
+                    TextHelper.showText("正在后台缓存书籍，具体进度可查看通知栏！");
+                    notificationUtil.requestNotificationPermissionDialog(mReadActivity);
+                    break;
             }
         }
     };
@@ -168,20 +186,26 @@ public class ReadPresenter implements BasePresenter {
                 int level = intent.getIntExtra("level", 0);
                 try {
                     mPageLoader.updateBattery(level);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
             // 监听分钟的变化
             else if (Intent.ACTION_TIME_TICK.equals(intent.getAction())) {
-                mPageLoader.updateTime();
+                try {
+                    mPageLoader.updateTime();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     };
 
+
     public ReadPresenter(ReadActivity readActivity) {
         mReadActivity = readActivity;
-        mBookService = BookService.getInstance();;
+        mBookService = BookService.getInstance();
+        ;
         mChapterService = ChapterService.getInstance();
         mBookMarkService = BookMarkService.getInstance();
         mSetting = SysManager.getSetting();
@@ -196,6 +220,9 @@ public class ReadPresenter implements BasePresenter {
         autoPageRunnable = this::nextPage;
 
         upHpbNextPage = this::upHpbNextPage;
+
+        sendDownloadNotification = this::sendNotification;
+        notificationUtil = NotificationUtil.getInstance();
 
         //注册广播
         IntentFilter intentFilter = new IntentFilter();
@@ -393,7 +420,7 @@ public class ReadPresenter implements BasePresenter {
                     Intent intent = new Intent(mReadActivity, FontsActivity.class);
                     mReadActivity.startActivityForResult(intent, APPCONST.REQUEST_FONT);
                 }, this::showPageModeDialog, v -> {
-                    if (mSetting.getPageMode() == PageMode.SCROLL){
+                    if (mSetting.getPageMode() == PageMode.SCROLL) {
                         TextHelper.showText("滚动暂时不支持自动翻页");
                         return;
                     }
@@ -509,7 +536,7 @@ public class ReadPresenter implements BasePresenter {
     /**
      * 初始化监听器
      */
-    private void initListener(){
+    private void initListener() {
 
         mReadActivity.getSrlContent().setTouchListener(new PageView.TouchListener() {
             @Override
@@ -523,7 +550,7 @@ public class ReadPresenter implements BasePresenter {
                 if (mPageLoader.getPageStatus() == PageLoader.STATUS_FINISH) {
                     showSettingView();
                 }
-                if (autoPage){
+                if (autoPage) {
                     autoPageStop();
                 }
             }
@@ -539,7 +566,7 @@ public class ReadPresenter implements BasePresenter {
                 if (!hasNextPage && endPageTipCount == 3) {
                     mReadActivity.getTvEndPageTip().setVisibility(View.VISIBLE);
                     mHandler.sendMessage(mHandler.obtainMessage(5));
-                    if (autoPage){
+                    if (autoPage) {
                         autoPageStop();
                     }
                 }
@@ -604,8 +631,6 @@ public class ReadPresenter implements BasePresenter {
     }
 
 
-
-
     /**
      * 章节数据网络同步
      */
@@ -614,7 +639,7 @@ public class ReadPresenter implements BasePresenter {
         if (!isCollected || mChapters.size() == 0 || ("本地书籍".equals(mBook.getType()) &&
                 !ChapterService.isChapterCached(mBook.getId(), mChapters.get(0).getTitle()))) {
             if ("本地书籍".equals(mBook.getType())) {
-                if (!new File(mBook.getChapterUrl()).exists()){
+                if (!new File(mBook.getChapterUrl()).exists()) {
                     TextHelper.showText("书籍缓存为空且源文件不存在，书籍加载失败！");
                     mReadActivity.finish();
                     return;
@@ -729,65 +754,81 @@ public class ReadPresenter implements BasePresenter {
             TextHelper.showText("无网络连接！");
             return;
         }
-        new AlertDialog.Builder(mReadActivity)
-                .setTitle("缓存书籍")
-                .setSingleChoiceItems(APPCONST.DIALOG_DOWNLOAD, selectedIndex, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        selectedIndex = which;
-                    }
-                }).setNegativeButton("取消", (new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        })).setPositiveButton("确定",
-                (dialog, which) -> {
-                    switch (selectedIndex) {
-                        case 0:
-                            addDownload(tvDownloadProgress, mPageLoader.getChapterPos(), mPageLoader.getChapterPos() + 50);
-                            break;
-                        case 1:
-                            addDownload(tvDownloadProgress, mPageLoader.getChapterPos() - 50, mPageLoader.getChapterPos() + 50);
-                            break;
-                        case 2:
-                            addDownload(tvDownloadProgress, mPageLoader.getChapterPos(), mChapters.size());
-                            break;
-                        case 3:
-                            addDownload(tvDownloadProgress, 0, mChapters.size());
-                            break;
-                    }
-                }).show();
+        MyApplication.runOnUiThread(() ->{
+            new AlertDialog.Builder(mReadActivity)
+                    .setTitle("缓存书籍")
+                    .setSingleChoiceItems(APPCONST.DIALOG_DOWNLOAD, selectedIndex, (dialog, which) -> selectedIndex = which).setNegativeButton("取消", ((dialog, which) -> dialog.dismiss())).setPositiveButton("确定",
+                    (dialog, which) -> {
+                        switch (selectedIndex) {
+                            case 0:
+                                addDownload(tvDownloadProgress, mPageLoader.getChapterPos(), mPageLoader.getChapterPos() + 50);
+                                break;
+                            case 1:
+                                addDownload(tvDownloadProgress, mPageLoader.getChapterPos() - 50, mPageLoader.getChapterPos() + 50);
+                                break;
+                            case 2:
+                                addDownload(tvDownloadProgress, mPageLoader.getChapterPos(), mChapters.size());
+                                break;
+                            case 3:
+                                addDownload(tvDownloadProgress, 0, mChapters.size());
+                                break;
+                        }
+                    }).show();
+        });
     }
 
     private void addDownload(final TextView tvDownloadProgress, int begin, int end) {
+        /*//取消之前下载
+        if (!isStopDownload) {
+            isStopDownload = true;
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }*/
         //计算断点章节
         final int finalBegin = Math.max(0, begin);
         final int finalEnd = Math.min(end, mChapters.size());
         needCacheChapterNum = finalEnd - finalBegin;
         curCacheChapterNum = 0;
+        isStopDownload = false;
+        ArrayList<Chapter> needDownloadChapters = new ArrayList<>();
+        for (int i = finalBegin; i < finalEnd; i++) {
+            final Chapter chapter = mChapters.get(i);
+            if (StringHelper.isEmpty(chapter.getContent())) {
+                needDownloadChapters.add(chapter);
+            }
+        }
+        needCacheChapterNum = needDownloadChapters.size();
+        if (needCacheChapterNum > 0) {
+            mHandler.sendEmptyMessage(9);
+            mHandler.postDelayed(sendDownloadNotification, 2 * downloadInterval);
+        }
         MyApplication.getApplication().newThread(() -> {
-            for (int i = finalBegin; i < finalEnd; i++) {
-                final Chapter chapter = mChapters.get(i);
-                if (StringHelper.isEmpty(chapter.getContent())) {
-                    getChapterContent(chapter, new ResultCallback() {
-                        @Override
-                        public void onFinish(Object o, int code) {
-//                                chapter.setContent((String) o);
-                            mChapterService.saveOrUpdateChapter(chapter, (String) o);
-                            curCacheChapterNum++;
-                            mHandler.sendMessage(mHandler.obtainMessage(3, tvDownloadProgress));
-                        }
+            for (Chapter chapter : needDownloadChapters) {
+                getChapterContent(chapter, new ResultCallback() {
+                    @Override
+                    public void onFinish(Object o, int code) {
+                        downloadingChapter = chapter.getTitle();
+                        mChapterService.saveOrUpdateChapter(chapter, (String) o);
+                        curCacheChapterNum++;
+                        mHandler.sendMessage(mHandler.obtainMessage(3, tvDownloadProgress));
+                    }
 
-                        @Override
-                        public void onError(Exception e) {
-                            curCacheChapterNum++;
-                            mHandler.sendMessage(mHandler.obtainMessage(3, tvDownloadProgress));
-                        }
-                    });
-                } else {
-                    curCacheChapterNum++;
-                    mHandler.sendMessage(mHandler.obtainMessage(3, tvDownloadProgress));
+                    @Override
+                    public void onError(Exception e) {
+                        curCacheChapterNum++;
+                        mHandler.sendMessage(mHandler.obtainMessage(3, tvDownloadProgress));
+                    }
+                });
+                try {
+                    Thread.sleep(downloadInterval);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (isStopDownload) {
+                    break;
                 }
             }
             if (curCacheChapterNum == needCacheChapterNum) {
@@ -802,6 +843,52 @@ public class ReadPresenter implements BasePresenter {
             tvDownloadProgress.setText(curCacheChapterNum * 100 / needCacheChapterNum + " %");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 发送通知
+     */
+    private void sendNotification() {
+        if (curCacheChapterNum == needCacheChapterNum) {
+            notificationUtil.cancel(1001);
+            return;
+        } else {
+            Notification notification = notificationUtil.build(APPCONST.channelIdDownload)
+                    .setSmallIcon(R.drawable.ic_download)
+                    //通知栏大图标
+                    .setLargeIcon(BitmapFactory.decodeResource(MyApplication.getApplication().getResources(), R.mipmap.ic_launcher))
+                    .setOngoing(true)
+                    //点击通知后自动清除
+                    .setAutoCancel(true)
+                    .setContentTitle("正在下载：" + mBook.getName() +
+                            "[" + curCacheChapterNum + "/" + needCacheChapterNum + "]")
+                    .setContentText(downloadingChapter == null ? "  " : downloadingChapter)
+                    .addAction(R.drawable.ic_stop_black_24dp, "停止",
+                            notificationUtil.getChancelPendingIntent(cancelDownloadReceiver.class))
+                    .build();
+            notificationUtil.notify(1001, notification);
+        }
+        if (tempCacheChapterNum < curCacheChapterNum) {
+            tempCount = 1500 / downloadInterval;
+            tempCacheChapterNum = curCacheChapterNum;
+        } else if (tempCacheChapterNum == curCacheChapterNum) {
+            tempCount--;
+            if (tempCount == 0) {
+                notificationUtil.cancel(1001);
+                return;
+            }
+        }
+        mHandler.postDelayed(sendDownloadNotification, 2 * downloadInterval);
+    }
+
+    public static class cancelDownloadReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //todo 跳转之前要处理的逻辑
+            if (NotificationClickReceiver.CANCEL_ACTION.equals(intent.getAction())) {
+                isStopDownload = true;
+            }
         }
     }
 
@@ -982,6 +1069,7 @@ public class ReadPresenter implements BasePresenter {
 
     /**
      * 添加本地书籍
+     *
      * @param path
      */
     private void addLocalBook(String path) {
@@ -1001,7 +1089,7 @@ public class ReadPresenter implements BasePresenter {
 
         //判断书籍是否已经添加
         Book existsBook = mBookService.findBookByAuthorAndName(book.getName(), book.getAuthor());
-        if (book.equals(existsBook)){
+        if (book.equals(existsBook)) {
             mBook = existsBook;
             return;
         }
@@ -1012,10 +1100,11 @@ public class ReadPresenter implements BasePresenter {
 
     /**
      * 跳转到指定章节的指定页面
+     *
      * @param chapterPos
      * @param pagePos
      */
-    private void skipToChapterAndPage(final int chapterPos, final int pagePos){
+    private void skipToChapterAndPage(final int chapterPos, final int pagePos) {
         isPrev = false;
         if (StringHelper.isEmpty(mChapters.get(chapterPos).getContent())) {
             if ("本地书籍".equals(mBook.getType())) {
@@ -1122,10 +1211,16 @@ public class ReadPresenter implements BasePresenter {
      */
     public void onDestroy() {
         mReadActivity.unregisterReceiver(mReceiver);
+        mHandler.removeCallbacks(keepScreenRunnable);
+        mHandler.removeCallbacks(upHpbNextPage);
+        mHandler.removeCallbacks(autoPageRunnable);
+        /*mHandler.removeCallbacks(sendDownloadNotification);
+        notificationUtil.cancelAll();
+        MyApplication.getApplication().shutdownThreadPool();*/
         if (autoPage) {
             autoPageStop();
         }
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 9; i++) {
             mHandler.removeMessages(i + 1);
         }
         mPageLoader.closeBook();

@@ -64,6 +64,7 @@ public class BookcaseFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        mBookcasePresenter.destroy();
     }
 
     @Override

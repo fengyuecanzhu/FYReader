@@ -70,8 +70,12 @@ public class LocalBookFragment extends BaseFileFragment {
     protected void processLogic() {
         super.processLogic();
         //更新媒体库
-        MediaScannerConnection.scanFile(getContext(), new String[]{Environment
-                .getExternalStorageDirectory().getAbsolutePath()}, new String[]{"text/plain"}, null);
+        try {
+            MediaScannerConnection.scanFile(getContext(), new String[]{Environment
+                    .getExternalStorageDirectory().getAbsolutePath()}, new String[]{"text/plain"}, null);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         MediaStoreHelper.getAllBookFile(getActivity(),
                 (files) -> {
                     if (files.isEmpty()) {
