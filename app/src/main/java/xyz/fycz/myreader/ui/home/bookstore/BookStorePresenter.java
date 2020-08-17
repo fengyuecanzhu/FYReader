@@ -15,6 +15,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.ui.bookinfo.BookDetailedActivity;
 import xyz.fycz.myreader.ui.bookinfo.BookInfoActivity;
 import xyz.fycz.myreader.ui.home.MainActivity;
 import xyz.fycz.myreader.util.TextHelper;
@@ -175,7 +176,7 @@ public class BookStorePresenter implements BasePresenter {
         mBookStoreBookAdapter.setOnItemClickListener(new BookStoreBookAdapter.OnItemClickListener() {
             @Override
             public void onClick(int pos, View view) {
-                Intent intent = new Intent(mBookStoreFragment.getActivity(), BookInfoActivity.class);
+                Intent intent = new Intent(mBookStoreFragment.getActivity(), BookDetailedActivity.class);
                 intent.putExtra(APPCONST.BOOK, bookList.get(pos));
                 mBookStoreFragment.getActivity().startActivity(intent);
             }

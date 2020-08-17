@@ -13,7 +13,9 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 
@@ -61,6 +63,9 @@ public class MyApplication extends Application {
         application = this;
         HttpUtil.trustAllHosts();//信任所有证书
 //        handleSSLHandshake();
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel();
+        }
         mFixedThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());//初始化线程池
 
         BaseActivity.setCloseAntiHijacking(true);
@@ -120,10 +125,12 @@ public class MyApplication extends Application {
 
     @TargetApi(26)
     private void createNotificationChannel() {
-
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.createNotificationChannel(new NotificationChannel("gxdw_push_and_im", "gxdw", NotificationManager.IMPORTANCE_DEFAULT));
+        NotificationChannel channel = new NotificationChannel(APPCONST.channelIdDownload, "下载通知", NotificationManager.IMPORTANCE_LOW);
+        channel.enableLights(true);//是否在桌面icon右上角展示小红点
+        channel.setLightColor(Color.RED);//小红点颜色
+        channel.setShowBadge(false); //是否在久按桌面图标时显示此渠道的通知
+        notificationManager.createNotificationChannel(channel);
     }
 
 
@@ -246,12 +253,12 @@ public class MyApplication extends Application {
             Document doc = null;
             try {
                 String url = "https://shimo.im/docs/cqkgjPRRydYYhQKt/read";
-                if (isApkInDebug(getmContext())){
+                if (isApkInDebug(getmContext())) {
                     url = "https://shimo.im/docs/zfzpda7MUGskOC9v/read";
                 }
                 doc = Jsoup.connect(url).get();
                 String content = doc.getElementsByClass("ql-editor").text();
-                if (StringHelper.isEmpty(content)){
+                if (StringHelper.isEmpty(content)) {
                     TextHelper.showText("检查更新失败！");
                     return;
                 }
@@ -267,9 +274,9 @@ public class MyApplication extends Application {
                 updateContent = contents[3].substring(contents[3].indexOf(":") + 1);
                 SharedPreUtils spu = SharedPreUtils.getInstance();
                 spu.putString("lanzousKeyStart", contents[4].substring(contents[4].indexOf(":") + 1));
-                if (!StringHelper.isEmpty(downloadLink)){
+                if (!StringHelper.isEmpty(downloadLink)) {
                     spu.putString("downloadLink", downloadLink);
-                }else {
+                } else {
                     spu.putString("downloadLink", URLCONST.APP_DIR_UR);
                 }
                 String[] updateContents = updateContent.split("/");
@@ -307,14 +314,14 @@ public class MyApplication extends Application {
                           final boolean isForceUpdate, final BookcaseFragment mBookcaseFragment) {
         //String version = (versionCode / 100 % 10) + "." + (versionCode / 10 % 10) + "." + (versionCode % 10);
         String cancelTitle;
-        if(isForceUpdate){
+        if (isForceUpdate) {
             cancelTitle = "退出";
-        }else {
+        } else {
             cancelTitle = "忽略此版本";
         }
-        if (mBookcaseFragment == null){
-            DialogCreator.createCommonDialog(activity, "发现新版本：", message, true,  "取消", "立即更新", null,
-            (dialog, which) -> goDownload(activity, url));
+        if (mBookcaseFragment == null) {
+            DialogCreator.createCommonDialog(activity, "发现新版本：", message, true, "取消", "立即更新", null,
+                    (dialog, which) -> goDownload(activity, url));
             return;
         }
 
@@ -345,7 +352,7 @@ public class MyApplication extends Application {
                 });
     }
 
-    private void goDownload(Activity activity, String url){
+    private void goDownload(Activity activity, String url) {
         String downloadLink = url;
         if (url == null || "".equals(url)) {
             downloadLink = URLCONST.APP_DIR_UR;

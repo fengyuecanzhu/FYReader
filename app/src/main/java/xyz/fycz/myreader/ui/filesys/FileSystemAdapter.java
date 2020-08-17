@@ -1,7 +1,7 @@
 package xyz.fycz.myreader.ui.filesys;
 
 
-import xyz.fycz.myreader.base.BaseListAdapter;
+import xyz.fycz.myreader.base.adapter.BaseListAdapter;
 import xyz.fycz.myreader.base.IViewHolder;
 import xyz.fycz.myreader.greendao.service.BookService;
 

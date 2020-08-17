@@ -24,6 +24,7 @@ import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.creator.DialogCreator;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.ui.bookinfo.BookDetailedActivity;
 import xyz.fycz.myreader.ui.bookinfo.BookInfoActivity;
 import xyz.fycz.myreader.ui.read.ReadActivity;
 import xyz.fycz.myreader.util.StringHelper;
@@ -127,7 +128,7 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
                 mContext.startActivity(intent);
             });
             viewHolder.ivBookImg.setOnClickListener(v -> {
-                Intent intent = new Intent(mContext, BookInfoActivity.class);
+                Intent intent = new Intent(mContext, BookDetailedActivity.class);
                 intent.putExtra(APPCONST.BOOK, book);
                 mContext.startActivity(intent);
             });

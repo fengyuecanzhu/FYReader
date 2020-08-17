@@ -38,7 +38,7 @@
     <string name="disclaimer">免责声明</string>
 
     <string name="statement">声明：小说数据全部从网络获取，软件不提供或保存任何小说，详情请参考免责声明：</string>
-    <string name="all_cathe_tip">"说明：本功能属于实验功能，书籍缓存的章节是从历史阅读章节到最新章节！\n\n存在的问题：\n1、书源为品书网的书籍因网站原因无法一键缓存！\n\n2、部分书籍缓存时会卡在99%的位置\n解决方案：点击停止按钮直接进入下一本书籍缓存/重新点击一键缓存！\n\n3、书籍缓存时进入阅读时章节加载可能变慢！\n\n确定要一键缓存？"</string>
+    <string name="all_cathe_tip">"说明：1、书籍缓存的章节是从历史阅读章节到最新章节！\n\n2、书源为品书网的书籍因网站原因无法一键缓存！\n\n确定要一键缓存？"</string>
 
     <!--menu-->
     <string name="menu_book_Top">移至顶部</string>
@@ -50,7 +50,7 @@
     <string name="menu_bookcase_style">切换布局</string>
     <string name="menu_bookcase_add">添加本地</string>
     <string name="menu_bookcase_syn">同步书架</string>
-    <string name="menu_bookcase_download_all">一键缓存(实验)</string>
+    <string name="menu_bookcase_download_all">一键缓存</string>
     <string name="menu_bookcase_backup">备份/恢复</string>
     <string name="menu_bookcase_about">关于软件</string>
 

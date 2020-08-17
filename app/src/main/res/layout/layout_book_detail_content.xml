@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!--简介-->
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="简介："
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+    <TextView
+        android:id="@+id/book_detail_tv_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-10dp"
+        android:ellipsize="end"
+        android:maxLines="5"
+        android:padding="15dp"
+        android:lineSpacingMultiplier="1.2"
+        android:text="简介: "
+        android:textColor="@color/title_black"
+        android:textSize="16sp" />
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:orientation="vertical">
+        <TextView
+                android:layout_marginTop="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:lineSpacingMultiplier="1.2"
+                android:textSize="14sp"
+                android:text="@string/statement"
+                android:textColor="@color/title_black"
+        />
+        <TextView
+                android:id="@+id/tv_disclaimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/disclaimer"
+                android:textColor="#2196F3"
+                android:textSize="14sp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@color/sys_window_back"
+        android:visibility="gone"/>
+
+    <!--书籍目录-->
+    <RelativeLayout
+        android:id="@+id/book_detail_rl_catalog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/book_detail_tv_catalog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:text="最新章节"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/book_detail_tv_catalog_more"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:padding="15dp"
+            android:text="更多"
+            android:textColor="@color/title_black"
+            android:textSize="15sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/book_detail_rv_catalog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/book_detail_tv_catalog"
+            android:foregroundGravity="center" />
+    </RelativeLayout>
+
+
+    <!--底部空白，给底部bottom预留位置-->
+    <!--<View-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="56dp"-->
+    <!--android:background="@color/divider_wide" />-->
+
+</LinearLayout>

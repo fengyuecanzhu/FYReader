@@ -71,4 +71,6 @@ public class APPCONST {
     public static final int SETTING_VERSION = 1;
 
     public static final String FORMAT_FILE_DATE = "yyyy-MM-dd";
+
+    public final static String channelIdDownload = "channel_download";
 }
