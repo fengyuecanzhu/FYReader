@@ -5,12 +5,17 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BasePresenter;
+import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.ChapterService;
+import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.webapi.CommonApi;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +55,32 @@ public class CatalogPresenter implements BasePresenter {
                 changeChapterSort();
             }
         });
-        initChapterTitleList();
+        mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
+        if (mChapters.size() != 0) {
+            initChapterTitleList();
+        }else {
+            mCatalogFragment.getPbLoading().setVisibility(View.VISIBLE);
+            CommonApi.getBookChapters(mBook.getChapterUrl(), ReadCrawlerUtil.getReadCrawler(mBook.getSource()),
+                    new ResultCallback() {
+                        @Override
+                        public void onFinish(Object o, int code) {
+                            mChapters = (ArrayList<Chapter>) o;
+
+                            MyApplication.runOnUiThread(() -> {
+                                mCatalogFragment.getPbLoading().setVisibility(View.GONE);
+                                initChapterTitleList();
+                            });
+
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            e.printStackTrace();
+                            TextHelper.showText("章节目录加载失败！");
+                            MyApplication.runOnUiThread(() -> mCatalogFragment.getPbLoading().setVisibility(View.GONE));
+                        }
+                    });
+        }
         mCatalogFragment.getLvChapterList().setOnItemClickListener((adapterView, view, i, l) -> {
             Chapter chapter = mChapterTitleAdapter.getItem(i);
             final int position;
@@ -76,7 +106,6 @@ public class CatalogPresenter implements BasePresenter {
      * 初始化章节目录
      */
     private void initChapterTitleList() {
-        mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
         //初始化倒序章节
         mConvertChapters.addAll(mChapters);
         Collections.reverse(mConvertChapters);

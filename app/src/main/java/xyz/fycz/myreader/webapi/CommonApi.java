@@ -28,7 +28,6 @@ public class CommonApi extends BaseApi {
             @Override
             public void onError(Exception e) {
                 callback.onError(e);
-
             }
         });
     }

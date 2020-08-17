@@ -9,19 +9,20 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
+import butterknife.OnClick;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.base.adapter.BaseListAdapter;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.crawler.BookInfoCrawler;
@@ -31,8 +32,12 @@ import xyz.fycz.myreader.creator.ChangeSourceDialog;
 import xyz.fycz.myreader.creator.DialogCreator;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.ui.read.ReadActivity;
+import xyz.fycz.myreader.ui.read.catalog.CatalogActivity;
+import xyz.fycz.myreader.ui.read.catalog.ChapterTitleAdapter;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.TextHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -78,14 +83,26 @@ public class BookDetailedActivity extends BaseActivity2 {
     private Book mBook;
     private ArrayList<Book> aBooks;
     private BookService mBookService;
+    private ChapterService mChapterService;
     private ReadCrawler mReadCrawler;
+    private DetailCatalogAdapter mCatalogAdapter;
+    private ArrayList<Chapter> mChapters = new ArrayList<>();
+    private ArrayList<Chapter> mNewestChapters = new ArrayList<>();
+    private boolean isCollected;
+
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    initBookInfo();
+                    if (!"本地书籍".equals(mBook.getType())) {
+                        mChapters.clear();
+                        mNewestChapters.clear();
+                        initBookInfo();
+                        initChapters();
+                        mCatalogAdapter.notifyDataSetChanged();
+                    }
                     break;
                 case 2:
                     createChangeSourceDia();
@@ -110,13 +127,17 @@ public class BookDetailedActivity extends BaseActivity2 {
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         mBookService = BookService.getInstance();
+        mChapterService = ChapterService.getInstance();
         aBooks = (ArrayList<Book>) getIntent().getSerializableExtra(APPCONST.SEARCH_BOOK_BEAN);
         if (aBooks != null) {
             mBook = aBooks.get(0);
         } else {
             mBook = (Book) getIntent().getSerializableExtra(APPCONST.BOOK);
         }
-        mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
+        isCollected = isBookCollected();
+        if (isCollected) {
+            mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
+        }
     }
 
     @Override
@@ -129,8 +150,22 @@ public class BookDetailedActivity extends BaseActivity2 {
     protected void initWidget() {
         super.initWidget();
         initBookInfo();
+
+        //catalog
+        mCatalogAdapter = new DetailCatalogAdapter();
+        bookDetailRvCatalog.setLayoutManager(new LinearLayoutManager(this));
+        bookDetailRvCatalog.setAdapter(mCatalogAdapter);
+
+        initChapters();
+
+        mCatalogAdapter.setOnItemClickListener((view, pos) -> {
+            mBook.setHisttoryChapterNum(mChapters.size() - pos - 1);
+            mBook.setLastReadPosition(0);
+            goReadActivity();
+        });
+
         mTvDisclaimer.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "免责声明", "disclaimer.fy"));
-        if (isBookCollected()) {
+        if (isCollected) {
             bookDetailTvAdd.setText("移除书籍");
             bookDetailTvOpen.setText("继续阅读");
         }
@@ -141,40 +176,25 @@ public class BookDetailedActivity extends BaseActivity2 {
     protected void initClick() {
         super.initClick();
         flAddBookcase.setOnClickListener(view -> {
-            if (!isBookCollected()) {
+            if (!isCollected) {
                 mBookService.addBook(mBook);
+                isCollected = true;
                 TextHelper.showText("成功加入书架");
                 bookDetailTvAdd.setText("移除书籍");
             } else {
                 mBookService.deleteBookById(mBook.getId());
+                isCollected = false;
+                mBook.setHisttoryChapterNum(0);
+                mBook.setLastReadPosition(0);
                 TextHelper.showText("成功移除书籍");
                 bookDetailTvAdd.setText("加入书架");
                 bookDetailTvOpen.setText("开始阅读");
             }
         });
         flOpenBook.setOnClickListener(view -> {
-            final boolean isCollected;
-            if (isBookCollected()) {
-                isCollected = true;
-            } else {
-                mBookService.addBook(mBook);
-                isCollected = false;
-                CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler, new ResultCallback() {
-                    @Override
-                    public void onFinish(Object o, int code) {
-                        mBookService.updateEntity(mBook);
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                    }
-                });
-            }
-            Intent intent = new Intent(this, ReadActivity.class);
-            intent.putExtra(APPCONST.BOOK, mBook);
-            intent.putExtra("isCollected", isCollected);
-            startActivityForResult(intent, APPCONST.REQUEST_READ);
+            goReadActivity();
         });
+
     }
 
     @Override
@@ -224,7 +244,7 @@ public class BookDetailedActivity extends BaseActivity2 {
     }
 
     private void initOtherInfo() {
-        mTvDesc.setText(mBook.getDesc());
+        mTvDesc.setText("\t\t\t\t" + mBook.getDesc());
         mTvType.setText(mBook.getType());
         Glide.with(this)
                 .load(mBook.getImgUrl())
@@ -236,7 +256,7 @@ public class BookDetailedActivity extends BaseActivity2 {
     }
 
     private void createChangeSourceDia() {
-        if (aBooks == null){
+        if (aBooks == null) {
             mHandler.sendMessage(mHandler.obtainMessage(3));
             return;
         }
@@ -256,7 +276,6 @@ public class BookDetailedActivity extends BaseActivity2 {
                 .setTitle("切换书源")
                 .setCancelable(true)
                 .setSingleChoiceItems(sources, checkedItem, (dialog1, which) -> {
-                    boolean isBookCollected = isBookCollected();
                     if (finalCheckedItem == which) {
                         dialog1.dismiss();
                         return;
@@ -268,18 +287,56 @@ public class BookDetailedActivity extends BaseActivity2 {
                     bookTem.setType(book.getType());
                     bookTem.setDesc(book.getDesc());
                     bookTem.setSource(book.getSource());
-                    if (isBookCollected) {
+                    if (isCollected) {
                         mBookService.updateBook(mBook, bookTem);
                     }
                     mBook = bookTem;
                     mHandler.sendMessage(mHandler.obtainMessage(1));
-                    if (isBookCollected) {
+                    if (isCollected) {
                         DialogCreator.createTipDialog(this,
                                 "换源成功，由于不同书源的章节数量不一定相同，故换源后历史章节可能出错！");
                     }
                     dialog1.dismiss();
                 }).create();
         dialog.show();
+    }
+
+    private void initChapters() {
+        if (mChapters.size() == 0 && !"本地书籍".equals(mBook.getType())) {
+            mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
+            CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler, new ResultCallback() {
+                @Override
+                public void onFinish(Object o, int code) {
+                    mChapters = (ArrayList<Chapter>) o;
+                    int end = Math.max(0, mChapters.size() - 10);
+                    for (int i = mChapters.size() - 1; i >= end; i--) {
+                        mNewestChapters.add(mChapters.get(i));
+                    }
+                    MyApplication.runOnUiThread(() -> mCatalogAdapter.refreshItems(mNewestChapters));
+                }
+
+                @Override
+                public void onError(Exception e) {
+
+                }
+            });
+        } else {
+            int end = Math.max(0, mChapters.size() - 10);
+            for (int i = mChapters.size() - 1; i >= end; i--) {
+                mNewestChapters.add(mChapters.get(i));
+                mCatalogAdapter.refreshItems(mNewestChapters);
+            }
+        }
+    }
+
+    private void goReadActivity(){
+        if (!isCollected) {
+            mBookService.addBook(mBook);
+        }
+        Intent intent = new Intent(this, ReadActivity.class);
+        intent.putExtra(APPCONST.BOOK, mBook);
+        intent.putExtra("isCollected", isCollected);
+        startActivityForResult(intent, APPCONST.REQUEST_READ);
     }
 
     /********************************Event***************************************/
@@ -299,7 +356,7 @@ public class BookDetailedActivity extends BaseActivity2 {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_change_source:  //换源
-                if (!NetworkUtils.isNetWorkAvailable()){
+                if (!NetworkUtils.isNetWorkAvailable()) {
                     TextHelper.showText("无网络连接！");
                     return true;
                 }
@@ -323,13 +380,19 @@ public class BookDetailedActivity extends BaseActivity2 {
                 }
                 break;
             case R.id.action_reload:  //重新加载
-                initWidget();
-                processLogic();
+                if (!"本地书籍".equals(mBook.getType())) {
+                    mChapters.clear();
+                    mNewestChapters.clear();
+                    initWidget();
+                    processLogic();
+                }
                 break;
             case R.id.action_open_link:  //打开链接
-                Uri uri = Uri.parse(mBook.getChapterUrl());
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intent);
+                if (!"本地书籍".equals(mBook.getType())) {
+                    Uri uri = Uri.parse(mBook.getChapterUrl());
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                }
                 break;
             default:
                 break;
@@ -337,16 +400,52 @@ public class BookDetailedActivity extends BaseActivity2 {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * 展开简介
+     */
+    @OnClick(R.id.book_detail_tv_desc)
+    protected void showMoreDesc() {
+        if (mTvDesc.getMaxLines() == 5)
+            mTvDesc.setMaxLines(15);
+        else
+            mTvDesc.setMaxLines(5);
+    }
+    /**
+     * 章节列表
+     */
+    @OnClick(R.id.book_detail_tv_catalog_more)
+    public void goToMoreChapter() {
+        Intent intent = new Intent(this, CatalogActivity.class);
+        intent.putExtra(APPCONST.BOOK, mBook);
+        startActivityForResult(intent, APPCONST.REQUEST_CHAPTER_PAGE);
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == APPCONST.REQUEST_READ) {
-            if (data == null) {
-                return;
-            }
-            boolean isCollected = data.getBooleanExtra(APPCONST.RESULT_IS_COLLECTED, false);
-            if (isCollected) {
-                bookDetailTvAdd.setText("移除书籍");
-                bookDetailTvOpen.setText("继续阅读");
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case APPCONST.REQUEST_READ:
+                    if (data == null) {
+                        return;
+                    }
+                    boolean isCollected = data.getBooleanExtra(APPCONST.RESULT_IS_COLLECTED, false);
+                    int lastReadPosition = data.getIntExtra(APPCONST.RESULT_LAST_READ_POSITION, 0);
+                    if (isCollected) {
+                        bookDetailTvAdd.setText("移除书籍");
+                        bookDetailTvOpen.setText("继续阅读");
+                        this.isCollected = true;
+                        mBook.setLastReadPosition(lastReadPosition);
+                    }else {
+                        mBook.setHisttoryChapterNum(0);
+                        mBook.setLastReadPosition(0);
+                    }
+                    mCatalogAdapter.notifyDataSetChanged();
+                    break;
+                case APPCONST.REQUEST_CHAPTER_PAGE:
+                    int[] chapterAndPage = data.getIntArrayExtra(APPCONST.CHAPTER_PAGE);
+                    mBook.setHisttoryChapterNum(chapterAndPage[0]);
+                    mBook.setLastReadPosition(chapterAndPage[1]);
+                    goReadActivity();
+                    break;
             }
         }
     }

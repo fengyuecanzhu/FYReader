@@ -124,7 +124,6 @@ public class ChapterTitleAdapter extends ArrayAdapter<Chapter> {
         };
     }
 
-
     public List<Chapter> getmList() {
         return mList;
     }

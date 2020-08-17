@@ -117,8 +117,11 @@ public class ChapterService extends BaseService {
      * @param bookId
      */
     public void deleteBookALLChapterById(String bookId) {
-        String sel = "delete from chapter where book_id = ?";
-        rawQuery(sel, new String[]{bookId});
+        GreenDaoManager.getInstance().getSession().getChapterDao()
+                .queryBuilder()
+                .where(ChapterDao.Properties.BookId.eq(bookId))
+                .buildDelete()
+                .executeDeleteWithoutDetachingEntities();
         deleteAllChapterCacheFile(bookId);
     }
 

@@ -1,7 +1,6 @@
 package xyz.fycz.myreader.ui.home.bookcase;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +24,6 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.creator.DialogCreator;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.bookinfo.BookDetailedActivity;
-import xyz.fycz.myreader.ui.bookinfo.BookInfoActivity;
 import xyz.fycz.myreader.ui.read.ReadActivity;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.TextHelper;

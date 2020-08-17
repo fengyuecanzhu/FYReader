@@ -131,6 +131,7 @@ public class BookcasePresenter implements BasePresenter {
                 case 4:
                     showErrorLoadingBooks();
                     if (MyApplication.isApkInDebug(mMainActivity)) {
+                        MyApplication.runOnUiThread(() -> mBookcaseAdapter.notifyDataSetChanged());
                         downloadAll(false);
                     }
                     break;
@@ -711,7 +712,9 @@ public class BookcasePresenter implements BasePresenter {
             return;
         }
         if (mChapters.size() == 0) {
-            TextHelper.showText("《" + book.getName() + "》章节目录为空，缓存失败，请刷新后重试");
+            if (!isDownloadAll) {
+                TextHelper.showText("《" + book.getName() + "》章节目录为空，缓存失败，请刷新后重试");
+            }
             return;
         }
         //取消之前下载

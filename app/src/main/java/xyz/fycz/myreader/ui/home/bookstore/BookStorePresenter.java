@@ -16,7 +16,6 @@ import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.bookinfo.BookDetailedActivity;
-import xyz.fycz.myreader.ui.bookinfo.BookInfoActivity;
 import xyz.fycz.myreader.ui.home.MainActivity;
 import xyz.fycz.myreader.util.TextHelper;
 import xyz.fycz.myreader.webapi.BookStoreApi;

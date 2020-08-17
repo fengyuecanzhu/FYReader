@@ -380,7 +380,7 @@ public class DialogCreator {
 
         tvBookName.setText(mBook.getName());
         llBook.setOnClickListener(v -> {
-            /*Intent intent = new Intent(context, BookInfoActivity.class);
+            /*Intent intent = new Intent(context, BookDetailedActivity.class);
             intent.putExtra(APPCONST.BOOK, mBook);
             context.startActivity(intent);*/
         });

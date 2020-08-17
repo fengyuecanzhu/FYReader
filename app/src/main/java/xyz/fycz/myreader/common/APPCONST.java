@@ -54,6 +54,7 @@ public class APPCONST {
     public static final int REQUEST_CHAPTER_PAGE = 1002;
 
     public static final String RESULT_IS_COLLECTED = "result_is_collected";
+    public static final String RESULT_LAST_READ_POSITION = "result_last_read_position";
     public static final int REQUEST_READ = 1;
 
     public static final CharSequence[] DIALOG_DOWNLOAD = {

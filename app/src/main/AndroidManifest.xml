@@ -80,7 +80,6 @@
         <activity
                 android:name=".ui.search.SearchBookActivity"
                 android:windowSoftInputMode="stateVisible"/>
-        <activity android:name=".ui.bookinfo.BookInfoActivity"/>
         <activity android:name=".ui.bookinfo.BookDetailedActivity"/>
 
         <activity
