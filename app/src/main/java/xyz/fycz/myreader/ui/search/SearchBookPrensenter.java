@@ -12,18 +12,12 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 
-import android.widget.TextView;
-import androidx.annotation.NonNull;
-import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.crawler.*;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.ui.bookinfo.BookDetailedActivity;
-import xyz.fycz.myreader.ui.bookinfo.BookInfoActivity;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.callback.ResultCallback;
@@ -39,9 +33,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-
-import me.gujun.android.taggroup.TagGroup;
 
 
 public class SearchBookPrensenter implements BasePresenter {

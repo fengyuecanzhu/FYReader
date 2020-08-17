@@ -111,9 +111,12 @@ public class ReadActivity extends BaseActivity {
     }
 
     private void exit(){
-        // 返回给BookDetail。
+        // 返回给BookDetail
         Intent result = new Intent();
         result.putExtra(APPCONST.RESULT_IS_COLLECTED, mReadPresenter.isCollected());
+        if (mReadPresenter.getmPageLoader() != null) {
+            result.putExtra(APPCONST.RESULT_LAST_READ_POSITION, mReadPresenter.getmPageLoader().getPagePos());
+        }
         setResult(AppCompatActivity.RESULT_OK, result);
         super.onBackPressed();
     }

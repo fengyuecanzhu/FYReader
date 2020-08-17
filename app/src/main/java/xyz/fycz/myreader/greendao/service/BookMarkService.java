@@ -8,6 +8,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.SearchHistory;
 import xyz.fycz.myreader.greendao.gen.BookDao;
 import xyz.fycz.myreader.greendao.gen.BookMarkDao;
+import xyz.fycz.myreader.greendao.gen.ChapterDao;
 import xyz.fycz.myreader.greendao.gen.SearchHistoryDao;
 import xyz.fycz.myreader.util.DateHelper;
 import xyz.fycz.myreader.util.StringHelper;
@@ -114,8 +115,11 @@ public class BookMarkService extends BaseService {
      * @param bookId
      */
     public void deleteBookALLBookMarkById(String bookId) {
-        String sel = "delete from book_mark where book_id = ?";
-        rawQuery(sel, new String[]{bookId});
+        GreenDaoManager.getInstance().getSession().getBookMarkDao()
+                .queryBuilder()
+                .where(BookMarkDao.Properties.BookId.eq(bookId))
+                .buildDelete()
+                .executeDeleteWithoutDetachingEntities();
     }
     /**
      * 批量删除书签

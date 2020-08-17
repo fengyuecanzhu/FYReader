@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import androidx.fragment.app.Fragment;
 import butterknife.BindView;
@@ -23,6 +24,8 @@ public class CatalogFragment extends Fragment {
     ListView lvChapterList;
     @BindView(R.id.change_sort)
     FloatingActionButton fcChangeSort;
+    @BindView(R.id.pb_loading)
+    ProgressBar pbLoading;
 
     Unbinder unbinder;
 
@@ -63,5 +66,9 @@ public class CatalogFragment extends Fragment {
 
     public CatalogPresenter getmCatalogPresent() {
         return mCatalogPresent;
+    }
+
+    public ProgressBar getPbLoading() {
+        return pbLoading;
     }
 }
