@@ -6,7 +6,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/sys_bg2"
                 android:fitsSystemWindows="true"
-                tools:context="xyz.fycz.myreader.ui.search.SearchBookActivity">
+                tools:context="xyz.fycz.myreader.ui.activity.SearchBookActivity">
 
 
     <LinearLayout

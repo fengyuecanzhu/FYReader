@@ -7,8 +7,7 @@ import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.ChapterService;
-import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.crawler.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 

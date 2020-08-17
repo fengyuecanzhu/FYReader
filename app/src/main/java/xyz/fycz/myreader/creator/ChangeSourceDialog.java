@@ -5,7 +5,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import xyz.fycz.myreader.callback.ResultCallback;
-import xyz.fycz.myreader.crawler.*;
+import xyz.fycz.myreader.webapi.crawler.*;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.mulvalmap.ConcurrentMultiValueMap;

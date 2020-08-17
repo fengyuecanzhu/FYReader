@@ -3,7 +3,7 @@
                 android:id="@+id/rl_catalog"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
-                tools:context="xyz.fycz.myreader.ui.read.catalog.CatalogFragment">
+                tools:context="xyz.fycz.myreader.ui.fragment.CatalogFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <ListView

@@ -2,24 +2,19 @@ package xyz.fycz.myreader.creator;
 
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
-import androidx.core.content.FileProvider;
 import android.view.View;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.ui.home.MainActivity;
-import xyz.fycz.myreader.ui.home.bookcase.BookcaseFragment;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.ui.activity.MainActivity;
+import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
+import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.TextHelper;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
@@ -126,12 +121,7 @@ public class APPDownloadTip {
                                                         activity.finish();
                                                     }
                                                 }
-                                            }, new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    activity.installProcess(newFile, isForceUpdate);
-                                                }
-                                            });
+                                            }, (dialog, which) -> activity.installProcess(newFile, isForceUpdate));
                                     activity.installProcess(newFile, isForceUpdate);
                                 }else {
                                     appFile.delete();
@@ -151,20 +141,7 @@ public class APPDownloadTip {
                             if (con != null) {
                                 con.disconnect();
                             }
-                            if (is != null) {
-                                try {
-                                    is.close();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            if (fos != null) {
-                                try {
-                                    fos.close();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
+                            IOUtils.close(is, fos);
                         }
                     }
                 });

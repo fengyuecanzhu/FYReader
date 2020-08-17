@@ -6,7 +6,7 @@
         android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
         android:fitsSystemWindows="true"
         android:id="@+id/read_activity_new"
-        tools:context="xyz.fycz.myreader.ui.read.ReadActivity">
+        tools:context="xyz.fycz.myreader.ui.activity.ReadActivity">
 
     <RelativeLayout
             android:layout_width="match_parent"
