@@ -11,7 +11,7 @@ import android.view.ViewConfiguration;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.ChapterService;
-import xyz.fycz.myreader.crawler.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
 import xyz.fycz.myreader.widget.animation.*;
 
 /**

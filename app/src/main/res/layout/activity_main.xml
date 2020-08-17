@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:context="xyz.fycz.myreader.ui.home.MainActivity">
+    tools:context="xyz.fycz.myreader.ui.activity.MainActivity">
 
     <RelativeLayout
         android:id="@+id/rl_common_title"

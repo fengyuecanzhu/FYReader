@@ -8,7 +8,6 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -25,7 +24,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.ExecutorService;
@@ -45,8 +43,7 @@ import xyz.fycz.myreader.creator.APPDownloadTip;
 import xyz.fycz.myreader.creator.DialogCreator;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.entity.UpdateInfo;
-import xyz.fycz.myreader.ui.home.MainActivity;
-import xyz.fycz.myreader.ui.home.bookcase.BookcaseFragment;
+import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
 import xyz.fycz.myreader.util.*;
 
 

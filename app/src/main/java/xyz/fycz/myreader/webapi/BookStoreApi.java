@@ -2,7 +2,7 @@ package xyz.fycz.myreader.webapi;
 
 
 import xyz.fycz.myreader.callback.ResultCallback;
-import xyz.fycz.myreader.crawler.BiQuGeReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.BiQuGeReadCrawler;
 
 /**
  * Created by zhao on 2017/7/24.

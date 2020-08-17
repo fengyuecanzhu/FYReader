@@ -57,7 +57,7 @@
             android:requestLegacyExternalStorage="true"
             android:networkSecurityConfig="@xml/network_security_config">
 
-        <activity android:name=".ui.home.Splash">
+        <activity android:name=".ui.activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -75,15 +75,15 @@
                     android:resource="@xml/file_paths"/>
         </provider>
 
-        <activity android:name=".ui.home.MainActivity"
+        <activity android:name=".ui.activity.MainActivity"
                   android:launchMode="singleTask"/>
         <activity
-                android:name=".ui.search.SearchBookActivity"
+                android:name=".ui.activity.SearchBookActivity"
                 android:windowSoftInputMode="stateVisible"/>
-        <activity android:name=".ui.bookinfo.BookDetailedActivity"/>
+        <activity android:name=".ui.activity.BookDetailedActivity"/>
 
         <activity
-                android:name=".ui.read.ReadActivity"
+                android:name=".ui.activity.ReadActivity"
                 android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
@@ -92,21 +92,21 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.font.FontsActivity"/>
+        <activity android:name=".ui.activity.FontsActivity"/>
 
-        <activity android:name=".ui.user.LoginActivity"/>
+        <activity android:name=".ui.activity.LoginActivity"/>
 
-        <activity android:name=".ui.user.RegisterActivity"/>
+        <activity android:name=".ui.activity.RegisterActivity"/>
 
-        <activity android:name=".ui.read.catalog.CatalogActivity"/>
-        <activity android:name=".ui.about.AboutActivity"/>
+        <activity android:name=".ui.activity.CatalogActivity"/>
+        <activity android:name=".ui.activity.AboutActivity"/>
 
 
-        <activity android:name=".ui.filesys.FileSystemActivity"/>
+        <activity android:name=".ui.activity.FileSystemActivity"/>
 
         <receiver android:name=".util.notification.NotificationClickReceiver"/>
-        <receiver android:name=".ui.home.bookcase.BookcasePresenter$cancelDownloadReceiver"/>
-        <receiver android:name=".ui.read.ReadPresenter$cancelDownloadReceiver"/>
+        <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver"/>
+        <receiver android:name=".ui.presenter.ReadPresenter$cancelDownloadReceiver"/>
 
     </application>
 

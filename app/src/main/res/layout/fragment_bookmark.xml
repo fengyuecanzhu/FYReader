@@ -3,7 +3,7 @@
                 android:id="@+id/rl_bookmark"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context="xyz.fycz.myreader.ui.read.catalog.bookmark.BookMarkFragment">
+                tools:context="xyz.fycz.myreader.ui.fragment.BookMarkFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <ListView

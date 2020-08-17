@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        tools:context="xyz.fycz.myreader.ui.home.bookcase.BookcaseFragment">
+        tools:context="xyz.fycz.myreader.ui.fragment.BookcaseFragment">
     <com.scwang.smartrefresh.header.MaterialHeader
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>

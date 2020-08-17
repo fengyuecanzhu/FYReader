@@ -1,7 +1,7 @@
 package xyz.fycz.myreader.webapi;
 
 import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.crawler.*;
+import xyz.fycz.myreader.webapi.crawler.*;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.greendao.entity.Book;
 

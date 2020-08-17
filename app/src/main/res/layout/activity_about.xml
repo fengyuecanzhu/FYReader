@@ -5,7 +5,7 @@
               android:fitsSystemWindows="true"
               xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
-              tools:context=".ui.about.AboutActivity">
+              tools:context=".ui.activity.AboutActivity">
 
     <include layout="@layout/title_base"/>
 
