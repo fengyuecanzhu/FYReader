@@ -2,6 +2,7 @@ package xyz.fycz.myreader.widget.page;
 
 import android.content.Context;
 import android.graphics.*;
+import android.text.TextUtils;
 import androidx.core.content.ContextCompat;
 import android.text.TextPaint;
 import io.reactivex.Single;
@@ -9,27 +10,26 @@ import io.reactivex.SingleObserver;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
-import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.enums.Font;
 import xyz.fycz.myreader.enums.Language;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.ScreenUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import static xyz.fycz.myreader.common.APPCONST.*;
 
 /**
  * Created by newbiechen on 17-7-1.
@@ -75,7 +75,7 @@ public abstract class PageLoader {
     // 绘制电池的画笔
     private Paint mBatteryPaint;
     // 绘制提示的画笔
-    private Paint mTipPaint;
+    private TextPaint mTipPaint;
     // 绘制标题的画笔
     private Paint mTitlePaint;
     // 绘制背景颜色的画笔(用来擦除需要重绘的部分)
@@ -161,7 +161,7 @@ public abstract class PageLoader {
         prepareBook();*/
     }
 
-    public void init(){
+    public void init() {
         // 初始化数据
         initData();
         // 初始化画笔
@@ -193,6 +193,7 @@ public abstract class PageLoader {
 
     /**
      * 作用：设置与文字相关的参数
+     *
      * @param textSize
      */
     private void setUpTextParams(float textSize) {
@@ -209,7 +210,7 @@ public abstract class PageLoader {
 
     private void initPaint() {
         // 绘制提示的画笔
-        mTipPaint = new Paint();
+        mTipPaint = new TextPaint();
         mTipPaint.setColor(mTextColor);
         mTipPaint.setTextAlign(Paint.Align.LEFT); // 绘制的起始点
         mTipPaint.setTextSize(ScreenUtils.spToPx(DEFAULT_TIP_SIZE)); // Tip默认的字体大小
@@ -433,7 +434,6 @@ public abstract class PageLoader {
 
     /**
      * 设置页面样式
-     *
      */
     public void setPageStyle(boolean dayMode) {
         /*if (pageStyle != PageStyle.NIGHT) {
@@ -445,13 +445,38 @@ public abstract class PageLoader {
             return;
         }
 */
+        int textColorId;
+        int bgColorId;
+        switch (mSettingManager.getReadStyle()) {
+            case common:
+                textColorId = READ_STYLE_COMMON[0];
+                bgColorId = READ_STYLE_COMMON[1];
+                break;
+            case leather:
+            default:
+                textColorId = READ_STYLE_LEATHER[0];
+                bgColorId = READ_STYLE_LEATHER[1];
+                break;
+            case protectedEye:
+                textColorId = READ_STYLE_PROTECTED_EYE[0];
+                bgColorId = READ_STYLE_PROTECTED_EYE[1];
+                break;
+            case breen:
+                textColorId = READ_STYLE_BREEN_EYE[0];
+                bgColorId = READ_STYLE_BREEN_EYE[1];
+                break;
+            case blueDeep:
+                textColorId = READ_STYLE_BLUE_DEEP[0];
+                bgColorId = READ_STYLE_BLUE_DEEP[1];
+                break;
+        }
         if (!dayMode) {
-            mTextColor = ContextCompat.getColor(mContext, R.color.sys_night_word);
-            mBgColor = ContextCompat.getColor(mContext, R.color.sys_night_bg);
+            mTextColor = ContextCompat.getColor(mContext, READ_STYLE_NIGHT[0]);
+            mBgColor = ContextCompat.getColor(mContext, READ_STYLE_NIGHT[1]);
             mBatteryPaint.setColor(mTextColor);
         } else {
-            mTextColor = ContextCompat.getColor(mContext, mSettingManager.getReadWordColor());
-            mBgColor = ContextCompat.getColor(mContext, mSettingManager.getReadBgColor());
+            mTextColor = ContextCompat.getColor(mContext, textColorId);
+            mBgColor = ContextCompat.getColor(mContext, bgColorId);
             mBatteryPaint.setColor(Color.BLACK);
         }
         // 设置当前颜色样式
@@ -485,9 +510,10 @@ public abstract class PageLoader {
 
     /**
      * 设置字体
+     *
      * @param font
      */
-    public void setFont(Font font){
+    public void setFont(Font font) {
         mSettingManager = SysManager.getSetting();
         //获取字体
         getFont(font);
@@ -517,39 +543,43 @@ public abstract class PageLoader {
 
     /**
      * 获取字体
+     *
      * @param font
      */
-    public void getFont(Font font){
+    public void getFont(Font font) {
         String fontFileName = mSettingManager.getFont().fileName;
-        if (font == Font.本地字体){
+        if (font == Font.本地字体) {
             fontFileName = mSettingManager.getLocalFontName();
         }
         File fontFile = new File(APPCONST.FONT_BOOK_DIR + fontFileName);
         if (font == Font.默认字体 || !fontFile.exists()) {
             mTypeFace = null;
-            if (!fontFile.exists()){
+            if (!fontFile.exists()) {
                 mSettingManager.setFont(Font.默认字体);
                 SysManager.saveSetting(mSettingManager);
             }
         } else {
             try {
                 mTypeFace = Typeface.createFromFile(fontFile);
-            }catch (Exception e){
-                TextHelper.showText(e.getLocalizedMessage());
+            } catch (Exception e) {
+                ToastUtils.showError(e.getLocalizedMessage());
                 mSettingManager.setFont(Font.默认字体);
                 SysManager.saveSetting(mSettingManager);
             }
         }
     }
+
     /**
      * 刷新章节
+     *
      * @param chapter
      */
-    public void refreshChapter(Chapter chapter){
+    public void refreshChapter(Chapter chapter) {
         chapter.setContent(null);
         getChapterContent(chapter);
         openChapter();
     }
+
     /**
      * 设置内容与屏幕的间距
      *
@@ -819,6 +849,7 @@ public abstract class PageLoader {
      *
      */
     public abstract void getChapterContent(Chapter chapter);
+
     /***********************************default method***********************************************/
 
     void drawPage(Bitmap bitmap, boolean isUpdate) {
@@ -850,7 +881,8 @@ public abstract class PageLoader {
                                 , mMarginWidth, tipTop, mTipPaint);
                     }
                 } else {
-                    canvas.drawText(mCurPage.title, mMarginWidth, tipTop, mTipPaint);
+                    String title = TextUtils.ellipsize(mCurPage.title, mTipPaint, mDisplayWidth - 2 * mMarginWidth - mTipPaint.measureText(progress), TextUtils.TruncateAt.END).toString();
+                    canvas.drawText(title, mMarginWidth, tipTop, mTipPaint);
                 }
 
 
@@ -972,10 +1004,10 @@ public abstract class PageLoader {
             }
 
             //设置总距离
-            float interval = mTextInterval +  mTextPaint.getTextSize();
-            float para = mTextPara +  mTextPaint.getTextSize();
-            float titleInterval = mTitleInterval +  mTitlePaint.getTextSize();
-            float titlePara = mTitlePara +  mTextPaint.getTextSize();
+            float interval = mTextInterval + mTextPaint.getTextSize();
+            float para = mTextPara + mTextPaint.getTextSize();
+            float titleInterval = mTitleInterval + mTitlePaint.getTextSize();
+            float titlePara = mTitlePara + mTextPaint.getTextSize();
             String str = null;
 
             //对标题进行绘制
@@ -1521,6 +1553,7 @@ public abstract class PageLoader {
 
     /**
      * 获取书籍进度
+     *
      * @param durChapterIndex
      * @param chapterAll
      * @param durPageIndex

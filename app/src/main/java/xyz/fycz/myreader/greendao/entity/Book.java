@@ -6,13 +6,14 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
+import xyz.fycz.myreader.greendao.service.BookService;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * 书
- * Created by zhao on 2017/7/24.
+ * Created by fengyue on 2020/08/23.
  */
 
 @Entity
@@ -54,13 +55,19 @@ public class Book implements Serializable {
     @Nullable
     private String source;
 
-    @Generated(hash = 1392889320)
+    private boolean isCloseUpdate;//是否关闭更新
+
+    @Nullable
+    private boolean isDownLoadAll = true;//是否一键缓存
+
+    @Generated(hash = 1839780644)
     public Book(String id, String name, String chapterUrl, String imgUrl,
             String desc, String author, String type, String updateDate,
             String newestChapterId, String newestChapterTitle,
             String newestChapterUrl, String historyChapterId,
             int histtoryChapterNum, int sortCode, int noReadNum,
-            int chapterTotalNum, int lastReadPosition, String source) {
+            int chapterTotalNum, int lastReadPosition, String source,
+            boolean isCloseUpdate, boolean isDownLoadAll) {
         this.id = id;
         this.name = name;
         this.chapterUrl = chapterUrl;
@@ -79,6 +86,8 @@ public class Book implements Serializable {
         this.chapterTotalNum = chapterTotalNum;
         this.lastReadPosition = lastReadPosition;
         this.source = source;
+        this.isCloseUpdate = isCloseUpdate;
+        this.isDownLoadAll = isDownLoadAll;
     }
 
     public Book(Book book) {
@@ -100,6 +109,8 @@ public class Book implements Serializable {
         this.chapterTotalNum = book.chapterTotalNum;
         this.lastReadPosition = book.lastReadPosition;
         this.source = book.source;
+        this.isCloseUpdate = book.isCloseUpdate;
+        this.isDownLoadAll = book.isDownLoadAll;
     }
 
     @Generated(hash = 1839243756)
@@ -139,7 +150,7 @@ public class Book implements Serializable {
         return this.author;
     }
     public void setAuthor(String author) {
-        this.author = author;
+        this.author = BookService.formatAuthor(author);
     }
     public String getType() {
         return this.type;
@@ -217,6 +228,15 @@ public class Book implements Serializable {
         this.source = source;
     }
 
+    public boolean getIsCloseUpdate() {
+        return this.isCloseUpdate;
+    }
+
+    public void setIsCloseUpdate(boolean isCloseUpdate) {
+        this.isCloseUpdate = isCloseUpdate;
+    }
+
+
     @Override
     public String toString() {
         return "{\n" +
@@ -238,6 +258,8 @@ public class Book implements Serializable {
                 ",\nchapterTotalNum='" + chapterTotalNum + '\'' +
                 ",\nlastReadPosition='" + lastReadPosition + '\'' +
                 ",\nsource='" + source + '\'' +
+                ",\nisCloseUpdate='" + isCloseUpdate + '\'' +
+                ",\nisDownLoadAll='" + isDownLoadAll + '\'' +
                 "\n}";
     }
 
@@ -256,4 +278,18 @@ public class Book implements Serializable {
     public int hashCode() {
         return Objects.hash(name, chapterUrl, author, source);
     }
+
+    public boolean getIsDownLoadAll() {
+        return this.isDownLoadAll;
+    }
+
+    public void setIsDownLoadAll(boolean isDownLoadAll) {
+        this.isDownLoadAll = isDownLoadAll;
+    }
+
+
+
+
+
+
 }

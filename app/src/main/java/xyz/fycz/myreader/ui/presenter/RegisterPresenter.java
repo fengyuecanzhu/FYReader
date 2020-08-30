@@ -15,7 +15,7 @@ import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.creator.DialogCreator;
 import xyz.fycz.myreader.ui.activity.RegisterActivity;
 import xyz.fycz.myreader.util.CodeUtil;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 
 import java.util.HashMap;
@@ -200,14 +200,16 @@ public class RegisterPresenter implements BasePresenter {
                             int result = Integer.parseInt(info[0].trim());
                             if (result == 101){
                                 UserService.writeUsername(username);
+                                ToastUtils.showSuccess(info[1]);
                                 mRegisterActivity.finish();
+                            }else {
+                                ToastUtils.showWarring(info[1]);
                             }
                             dialog.dismiss();
-                            TextHelper.showText(info[1]);
                         }
                         @Override
                         public void onError(Exception e) {
-                            TextHelper.showText("注册失败：\n" + e.getLocalizedMessage());
+                            ToastUtils.showError("注册失败：\n" + e.getLocalizedMessage());
                             dialog.dismiss();
                         }
                     });

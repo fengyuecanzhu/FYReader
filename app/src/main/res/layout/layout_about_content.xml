@@ -227,7 +227,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_gravity="center_vertical"
-                        android:src="@drawable/ic_launch"
+                        android:src="@drawable/ic_social_github"
                         app:tint="@color/title_black"/>
 
                 <TextView

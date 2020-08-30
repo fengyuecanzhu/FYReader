@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#FF2196F3</color>
+    <color name="colorPrimaryDark">#3F51B5</color>
     <color name="colorAccent">#90cbf6</color>
 
 
@@ -49,6 +49,7 @@
     <color name="little_grey">#f1f1f1</color>
 
     <color name="origin">#ff9602</color>
+    <color name="md_orange_800">#EF6C00</color>
 
     <!-- 透明 -->
     <color name="nothing">#00000000</color>
@@ -80,6 +81,7 @@
     <color name="sys_blue_little"> #338fcf</color>
     <color name="sys_blue_little_deep">#0062ff</color>
     <color name="sys_blue_very_little">#80c0ec</color>
+    <color name="sys_blue_littler">#FFABD3EC</color>
     <color name="sys_blue_very_little_translucent">#883571a4</color>
     <color name="sys_origin">#ef9903</color>
     <color name="sys_word_email_receive">#338ccf</color>
@@ -160,4 +162,12 @@
     <color name="divider_common">#727272</color>
 
     <color name="translucent_text">#96ffffff</color>
+
+    <!--    Toast颜色   -->
+    <color name="toast_default">#FFABD3EC</color>
+    <color name="toast_green">#FFAFE3B2</color>
+    <color name="toast_blue">#FF87CEFA</color>
+    <color name="toast_yellow">#FFFFE284</color>
+    <color name="toast_red">#FFE75B76</color>
+
 </resources>

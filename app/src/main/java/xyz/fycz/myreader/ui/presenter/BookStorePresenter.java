@@ -20,7 +20,7 @@ import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.adapter.BookStoreBookAdapter;
 import xyz.fycz.myreader.ui.adapter.BookStoreBookTypeAdapter;
 import xyz.fycz.myreader.ui.fragment.BookStoreFragment;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.BookStoreApi;
 
 
@@ -108,7 +108,7 @@ public class BookStorePresenter implements BasePresenter {
 
              @Override
              public void onError(Exception e) {
-                 TextHelper.showText(e.getMessage());
+                 ToastUtils.showError(e.getMessage());
              }
          });
 
@@ -128,7 +128,7 @@ public class BookStorePresenter implements BasePresenter {
 
             @Override
             public void onError(Exception e) {
-                TextHelper.showText(e.getMessage());
+                ToastUtils.showError(e.getMessage());
 
             }
         });

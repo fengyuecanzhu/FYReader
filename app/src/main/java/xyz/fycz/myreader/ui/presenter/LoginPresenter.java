@@ -16,7 +16,7 @@ import xyz.fycz.myreader.ui.activity.LoginActivity;
 import xyz.fycz.myreader.ui.activity.RegisterActivity;
 import xyz.fycz.myreader.util.CodeUtil;
 import xyz.fycz.myreader.util.CyptoUtils;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 
 import java.util.HashMap;
@@ -78,7 +78,7 @@ public class LoginPresenter implements BasePresenter {
                 return;
             }
             if (!NetworkUtils.isNetWorkAvailable()) {
-                TextHelper.showText("无网络连接！");
+                ToastUtils.showError("无网络连接！");
                 return;
             }
             ProgressDialog dialog = DialogCreator.createProgressDialog(mLoginActivity, null, "正在登陆...");
@@ -101,16 +101,18 @@ public class LoginPresenter implements BasePresenter {
                         UserService.writeConfig(userLoginInfo);
                         UserService.writeUsername(loginName);
                         mLoginActivity.finish();
+                        ToastUtils.showSuccess(resultName);
                     } else {
                         mHandler.sendMessage(mHandler.obtainMessage(1));
                         dialog.dismiss();
+                        ToastUtils.showWarring(resultName);
                     }
-                    TextHelper.showText(resultName);
+
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    TextHelper.showText("登录失败\n" + e.getLocalizedMessage());
+                    ToastUtils.showError("登录失败\n" + e.getLocalizedMessage());
                     mHandler.sendMessage(mHandler.obtainMessage(1));
                     dialog.dismiss();
                 }

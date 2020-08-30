@@ -9,13 +9,13 @@ import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.ui.adapter.ChapterTitleAdapter;
 import xyz.fycz.myreader.ui.fragment.CatalogFragment;
-import xyz.fycz.myreader.util.TextHelper;
 import xyz.fycz.myreader.webapi.CommonApi;
 
 import java.util.ArrayList;
@@ -50,9 +50,10 @@ public class CatalogPresenter implements BasePresenter {
         mCatalogFragment.getFcChangeSort().setOnClickListener(view -> {
             if (curSortflag == 0) {//当前正序
                 curSortflag = 1;
-                changeChapterSort();
             } else {//当前倒序
                 curSortflag = 0;
+            }
+            if (mChapterTitleAdapter != null) {
                 changeChapterSort();
             }
         });
@@ -60,6 +61,10 @@ public class CatalogPresenter implements BasePresenter {
         if (mChapters.size() != 0) {
             initChapterTitleList();
         }else {
+            if ("本地书籍".equals(mBook.getType())){
+                ToastUtils.showWarring("本地书籍请先拆分章节！");
+                return;
+            }
             mCatalogFragment.getPbLoading().setVisibility(View.VISIBLE);
             CommonApi.getBookChapters(mBook.getChapterUrl(), ReadCrawlerUtil.getReadCrawler(mBook.getSource()),
                     new ResultCallback() {
@@ -77,7 +82,7 @@ public class CatalogPresenter implements BasePresenter {
                         @Override
                         public void onError(Exception e) {
                             e.printStackTrace();
-                            TextHelper.showText("章节目录加载失败！");
+                            ToastUtils.showError("章节目录加载失败！\n" + e.getLocalizedMessage());
                             MyApplication.runOnUiThread(() -> mCatalogFragment.getPbLoading().setVisibility(View.GONE));
                         }
                     });

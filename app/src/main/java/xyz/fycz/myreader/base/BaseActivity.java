@@ -14,7 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import androidx.appcompat.app.AppCompatActivity;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.util.Anti_hijackingUtils;
-import xyz.fycz.myreader.util.SystemBarTintManager;
+import xyz.fycz.myreader.util.StatusBarUtil;
 
 
 
@@ -41,7 +41,7 @@ public class BaseActivity extends AppCompatActivity {
         Log.d("ActivityName: ",getLocalClassName());
         DisplayMetrics dm = new DisplayMetrics();
         //获取屏幕宽高
-        if(height == 0 || height == 0){
+        if(height == 0 || width == 0){
             getWindowManager().getDefaultDisplay().getMetrics(dm);
             width = dm.widthPixels;
             height = dm.heightPixels;
@@ -90,18 +90,6 @@ public class BaseActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    @TargetApi(19)
-    protected void setTranslucentStatus(boolean on) {
-        Window win = getWindow();
-        WindowManager.LayoutParams winParams = win.getAttributes();
-        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
-        if (on) {
-            winParams.flags |= bits;
-        } else {
-            winParams.flags &= ~bits;
-        }
-        win.setAttributes(winParams);
-    }
 
     public void setDisallowAntiHijacking(boolean disallowAntiHijacking) {
         this.disallowAntiHijacking = disallowAntiHijacking;
@@ -113,13 +101,25 @@ public class BaseActivity extends AppCompatActivity {
      * 设置状态栏颜色
      * @param colorId
      */
-    public void setStatusBar(int colorId){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            setTranslucentStatus(true);
-            SystemBarTintManager tintManager = new SystemBarTintManager(this);
-            tintManager.setStatusBarTintEnabled(true);
-            tintManager.setStatusBarTintResource(colorId);//通知栏所需颜色ID
+    public void setStatusBar(int colorId, boolean dark){
+        //沉浸式代码配置
+        //当FitsSystemWindows设置 true 时，会在屏幕最上方预留出状态栏高度的 padding
+        StatusBarUtil.setRootViewFitsSystemWindows(this, true);
+        //设置状态栏透明
+        StatusBarUtil.setTranslucentStatus(this);
+        if (colorId != 0) {
+            StatusBarUtil.setStatusBarColor(this, getResources().getColor(colorId));
         }
+        //一般的手机的状态栏文字和图标都是白色的, 可如果你的应用也是纯白色的, 或导致状态栏文字看不清
+        //所以如果你是这种情况,请使用以下代码, 设置状态使用深色文字图标风格, 否则你可以选择性注释掉这个if内容
+        if (!dark) {
+            if (!StatusBarUtil.setStatusBarDarkTheme(this, true)) {
+                //如果不支持设置深色风格 为了兼容总不能让状态栏白白的看不清, 于是设置一个状态栏颜色为半透明,
+                //这样半透明+白=灰, 状态栏的文字能看得清
+                StatusBarUtil.setStatusBarColor(this, 0x55000000);
+            }
+        }
+
     }
 
     public InputMethodManager getmInputMethodManager() {

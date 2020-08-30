@@ -27,16 +27,23 @@ public class Chapter {
     @Nullable
     private String content;//章节正文
 
+    //章节内容在文章中的起始位置(本地)
+    private long start;
+    //章节内容在文章中的终止位置(本地)
+    private long end;
 
-    @Generated(hash = 1019441369)
+
+    @Generated(hash = 763230955)
     public Chapter(String id, String bookId, int number, String title, String url,
-                   String content) {
+            String content, long start, long end) {
         this.id = id;
         this.bookId = bookId;
         this.number = number;
         this.title = title;
         this.url = url;
         this.content = content;
+        this.start = start;
+        this.end = end;
     }
     @Generated(hash = 393170288)
     public Chapter() {
@@ -86,4 +93,19 @@ public class Chapter {
         this.content = content;
     }
 
+    public long getStart() {
+        return start;
+    }
+
+    public void setStart(long start) {
+        this.start = start;
+    }
+
+    public long getEnd() {
+        return end;
+    }
+
+    public void setEnd(long end) {
+        this.end = end;
+    }
 }

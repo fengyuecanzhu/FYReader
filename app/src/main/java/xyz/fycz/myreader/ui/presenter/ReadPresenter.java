@@ -30,6 +30,8 @@ import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
+import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
+import xyz.fycz.myreader.util.*;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.creator.DialogCreator;
@@ -46,10 +48,6 @@ import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.ui.activity.FontsActivity;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.activity.CatalogActivity;
-import xyz.fycz.myreader.util.BrightUtil;
-import xyz.fycz.myreader.util.ScreenHelper;
-import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.util.TextHelper;
 import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
 import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -95,7 +93,7 @@ public class ReadPresenter implements BasePresenter {
 
     private PageLoader mPageLoader;//页面加载器
 
-    private int screenTimeOut = 60 * 3;//息屏时间（单位：秒），小于零表示常亮
+    private int screenTimeOut;//息屏时间（单位：秒），dengy零表示常亮
 
     private Runnable keepScreenRunnable;//息屏线程
     private Runnable autoPageRunnable;//自动翻页
@@ -163,16 +161,20 @@ public class ReadPresenter implements BasePresenter {
                     }
                     break;
                 case 7:
-                    TextHelper.showText("无网络连接！");
+                    ToastUtils.showWarring("无网络连接！");
                     mPageLoader.chapterError();
                     break;
                 case 8:
                     mReadActivity.getPbLoading().setVisibility(View.GONE);
                     break;
                 case 9:
-                    TextHelper.showText("正在后台缓存书籍，具体进度可查看通知栏！");
+                    ToastUtils.showInfo("正在后台缓存书籍，具体进度可查看通知栏！");
                     notificationUtil.requestNotificationPermissionDialog(mReadActivity);
                     break;
+                case 10:
+                    if (mPageLoader != null) {
+                        mPageLoader.chapterError();
+                    }
             }
         }
     };
@@ -212,6 +214,9 @@ public class ReadPresenter implements BasePresenter {
 
     @Override
     public void start() {
+        //息屏时间
+        screenTimeOut = mSetting.getResetScreen() * 60;
+
         //保持屏幕常亮
         keepScreenRunnable = this::unKeepScreenOn;
 
@@ -281,6 +286,7 @@ public class ReadPresenter implements BasePresenter {
                 view -> {//返回
                     mSettingDialog.dismiss();
                     mReadActivity.onBackPressed();
+                }, v -> {//换源
                 }, v -> {//刷新
                     isPrev = false;
                     if (!"本地书籍".equals(mBook.getType())) {
@@ -408,23 +414,28 @@ public class ReadPresenter implements BasePresenter {
                 this::changeStyle, v -> reduceTextSize(), v -> increaseTextSize(), v -> {
                     if (mSetting.isVolumeTurnPage()) {
                         mSetting.setVolumeTurnPage(false);
-                        TextHelper.showText("音量键翻页已关闭！");
+                        ToastUtils.showSuccess("音量键翻页已关闭！");
                     } else {
                         mSetting.setVolumeTurnPage(true);
-                        TextHelper.showText("音量键翻页已开启！");
+                        ToastUtils.showSuccess("音量键翻页已开启！");
                     }
                     SysManager.saveSetting(mSetting);
                 }, v -> {
                     Intent intent = new Intent(mReadActivity, FontsActivity.class);
                     mReadActivity.startActivityForResult(intent, APPCONST.REQUEST_FONT);
+                    mSettingDetailDialog.dismiss();
                 }, this::showPageModeDialog, v -> {
                     if (mSetting.getPageMode() == PageMode.SCROLL) {
-                        TextHelper.showText("滚动暂时不支持自动翻页");
+                        ToastUtils.showWarring("滚动暂时不支持自动翻页");
                         return;
                     }
                     mSettingDetailDialog.dismiss();
                     autoPage = !autoPage;
                     autoPage();
+                }, v -> {
+                    Intent intent = new Intent(mReadActivity, MoreSettingActivity.class);
+                    mReadActivity.startActivityForResult(intent, APPCONST.REQUEST_RESET_SCREEN_TIME);
+                    mSettingDetailDialog.dismiss();
                 });
     }
 
@@ -515,6 +526,11 @@ public class ReadPresenter implements BasePresenter {
                     int[] chapterAndPage = data.getIntArrayExtra(APPCONST.CHAPTER_PAGE);
                     assert chapterAndPage != null;
                     skipToChapterAndPage(chapterAndPage[0], chapterAndPage[1]);
+                    break;
+                case APPCONST.REQUEST_RESET_SCREEN_TIME:
+                    int resetScreen = data.getIntExtra(APPCONST.RESULT_RESET_SCREEN, 0);
+                    screenTimeOut = resetScreen * 60;
+                    screenOffTimerStart();
                     break;
             }
         }
@@ -638,7 +654,7 @@ public class ReadPresenter implements BasePresenter {
                 !ChapterService.isChapterCached(mBook.getId(), mChapters.get(0).getTitle()))) {
             if ("本地书籍".equals(mBook.getType())) {
                 if (!new File(mBook.getChapterUrl()).exists()) {
-                    TextHelper.showText("书籍缓存为空且源文件不存在，书籍加载失败！");
+                    ToastUtils.showWarring("书籍缓存为空且源文件不存在，书籍加载失败！");
                     mReadActivity.finish();
                     return;
                 }
@@ -689,12 +705,13 @@ public class ReadPresenter implements BasePresenter {
      * 初始化章节
      */
     private void initChapters() {
+        mBook.setNoReadNum(0);
         mBook.setChapterTotalNum(mChapters.size());
         if (!StringHelper.isEmpty(mBook.getId())) {
             mBookService.updateEntity(mBook);
         }
         if (mChapters.size() == 0) {
-            TextHelper.showLongText("该书查询不到任何章节");
+            ToastUtils.showWarring("该书查询不到任何章节");
             mHandler.sendMessage(mHandler.obtainMessage(8));
             settingChange = false;
         } else {
@@ -745,14 +762,14 @@ public class ReadPresenter implements BasePresenter {
 
     protected void downloadBook(final TextView tvDownloadProgress) {
         if ("本地书籍".equals(mBook.getType())) {
-            TextHelper.showText("《" + mBook.getName() + "》是本地书籍，不能缓存");
+            ToastUtils.showWarring("《" + mBook.getName() + "》是本地书籍，不能缓存");
             return;
         }
         if (!NetworkUtils.isNetWorkAvailable()) {
-            TextHelper.showText("无网络连接！");
+            ToastUtils.showWarring("无网络连接！");
             return;
         }
-        MyApplication.runOnUiThread(() ->{
+        MyApplication.runOnUiThread(() -> {
             new AlertDialog.Builder(mReadActivity)
                     .setTitle("缓存书籍")
                     .setSingleChoiceItems(APPCONST.DIALOG_DOWNLOAD, selectedIndex, (dialog, which) -> selectedIndex = which).setNegativeButton("取消", ((dialog, which) -> dialog.dismiss())).setPositiveButton("确定",
@@ -785,6 +802,9 @@ public class ReadPresenter implements BasePresenter {
                 e.printStackTrace();
             }
         }*/
+        if (SysManager.getSetting().getCatheGap() != 0){
+            downloadInterval = SysManager.getSetting().getCatheGap();
+        }
         //计算断点章节
         final int finalBegin = Math.max(0, begin);
         final int finalEnd = Math.min(end, mChapters.size());
@@ -830,7 +850,7 @@ public class ReadPresenter implements BasePresenter {
                 }
             }
             if (curCacheChapterNum == needCacheChapterNum) {
-                TextHelper.showText("《" + mBook.getName() + "》" + mReadActivity.getString(R.string.download_already_all_tips));
+                ToastUtils.showInfo("《" + mBook.getName() + "》" + mReadActivity.getString(R.string.download_already_all_tips));
             }
         });
     }
@@ -976,28 +996,6 @@ public class ReadPresenter implements BasePresenter {
             mSetting.setDayStyle(true);
         }
         mSetting.setReadStyle(readStyle);
-        switch (readStyle) {
-            case common:
-                mSetting.setReadBgColor(R.color.sys_common_bg);
-                mSetting.setReadWordColor(R.color.sys_common_word);
-                break;
-            case leather:
-                mSetting.setReadBgColor(R.color.sys_leather_bg);
-                mSetting.setReadWordColor(R.color.sys_leather_word);
-                break;
-            case protectedEye:
-                mSetting.setReadBgColor(R.color.sys_protect_eye_bg);
-                mSetting.setReadWordColor(R.color.sys_protect_eye_word);
-                break;
-            case breen:
-                mSetting.setReadBgColor(R.color.sys_breen_bg);
-                mSetting.setReadWordColor(R.color.sys_breen_word);
-                break;
-            case blueDeep:
-                mSetting.setReadBgColor(R.color.sys_blue_deep_bg);
-                mSetting.setReadWordColor(R.color.sys_blue_deep_word);
-                break;
-        }
         SysManager.saveSetting(mSetting);
         MyApplication.runOnUiThread(() -> mPageLoader.setPageStyle(true));
     }
@@ -1025,7 +1023,7 @@ public class ReadPresenter implements BasePresenter {
      * 重置黑屏时间
      */
     private void screenOffTimerStart() {
-        if (screenTimeOut < 0) {
+        if (screenTimeOut <= 0) {
             keepScreenOn(true);
             return;
         }
@@ -1083,7 +1081,8 @@ public class ReadPresenter implements BasePresenter {
         book.setNewestChapterTitle("未拆分章节");
         book.setAuthor("本地书籍");
         book.setSource(BookSource.local.toString());
-        book.setDesc("");
+        book.setDesc("无");
+        book.setIsCloseUpdate(true);
 
         //判断书籍是否已经添加
         Book existsBook = mBookService.findBookByAuthorAndName(book.getName(), book.getAuthor());
@@ -1106,7 +1105,7 @@ public class ReadPresenter implements BasePresenter {
         isPrev = false;
         if (StringHelper.isEmpty(mChapters.get(chapterPos).getContent())) {
             if ("本地书籍".equals(mBook.getType())) {
-                TextHelper.showText("该章节无内容！");
+                ToastUtils.showWarring("该章节无内容！");
                 return;
             }
             mReadActivity.getPbLoading().setVisibility(View.VISIBLE);
@@ -1121,7 +1120,7 @@ public class ReadPresenter implements BasePresenter {
                 @Override
                 public void onError(Exception e) {
                     mHandler.sendMessage(mHandler.obtainMessage(2, chapterPos, pagePos));
-                    mPageLoader.chapterError();
+                    mHandler.sendEmptyMessage(10);
                 }
             });
         } else {

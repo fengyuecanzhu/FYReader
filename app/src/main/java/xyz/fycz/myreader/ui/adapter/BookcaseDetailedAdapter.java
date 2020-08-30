@@ -27,7 +27,7 @@ import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.presenter.BookcasePresenter;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 
 
 /**
@@ -79,8 +79,9 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
                 .into(viewHolder.ivBookImg);
 
         viewHolder.tvBookName.setText(book.getName());
-        viewHolder.tvBookAuthor.setText(book.getAuthor());
         viewHolder.ivDelete.setOnClickListener(v -> showDeleteBookDialog(book));
+
+        viewHolder.tvBookAuthor.setText(book.getAuthor());
         viewHolder.tvHistoryChapter.setText(book.getHistoryChapterId());
         assert book.getNewestChapterTitle() != null;
         viewHolder.tvNewestChapter.setText(book.getNewestChapterTitle().replace("最近更新 ", ""));
@@ -122,7 +123,6 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
             viewHolder.llBookRead.setOnClickListener(v -> {
                 Intent intent = new Intent(mContext, ReadActivity.class);
                 intent.putExtra(APPCONST.BOOK, book);
-                book.setNoReadNum(0);
                 mBookService.updateEntity(book);
                 mContext.startActivity(intent);
             });
@@ -141,9 +141,9 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
                                         switch (which) {
                                             case 0:
                                                 book.setSortCode(0);
-                                                mBookService.updateBook(book);
+                                                mBookService.updateEntity(book);
                                                 mBookcasePresenter.init();
-                                                TextHelper.showText("书籍《" + book.getName() + "》移至顶部成功！");
+                                                ToastUtils.showSuccess("书籍《" + book.getName() + "》移至顶部成功！");
                                                 break;
                                             case 1:
                                                 downloadBook(book);

@@ -39,7 +39,7 @@ public class FontsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fonts);
         ButterKnife.bind(this);
-        setStatusBar(R.color.sys_line);
+        setStatusBar(R.color.white, false);
         mFontsPresenter = new FontsPresenter(this);
         mFontsPresenter.start();
     }

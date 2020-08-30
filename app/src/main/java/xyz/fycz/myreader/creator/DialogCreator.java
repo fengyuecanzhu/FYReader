@@ -13,10 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
+import android.widget.*;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +27,7 @@ import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.enums.ReadStyle;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
+import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.util.BrightUtil;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.StringHelper;
@@ -69,7 +67,8 @@ public class DialogCreator {
                                                  final View.OnClickListener languageChangeListener,
                                                  final View.OnClickListener onFontClickListener,
                                                  final OnPageModeChangeListener onModeClickListener,
-                                                 View.OnClickListener autoScrollListener) {
+                                                 View.OnClickListener autoScrollListener,
+                                                 View.OnClickListener moreSettingListener) {
         final Dialog dialog = new Dialog(context, R.style.jmui_default_dialog_style);
         final View view = LayoutInflater.from(context).inflate(R.layout.dialog_read_setting_detail, null);
         dialog.setContentView(view);
@@ -300,6 +299,8 @@ public class DialogCreator {
         });
         tvAutoScroll.setOnClickListener(autoScrollListener);
 
+        view.findViewById(R.id.tv_read_setting_more).setOnClickListener(moreSettingListener);
+
         return dialog;
     }
 
@@ -329,6 +330,7 @@ public class DialogCreator {
      */
     public static Dialog createReadSetting(final Context context, final boolean isDayStyle, int chapterProgress, int maxProcess, final Book mBook, Chapter mChapter,
                                            View.OnClickListener backListener,
+                                           View.OnClickListener changeSourceListener,
                                            View.OnClickListener refreshListener,
                                            View.OnClickListener bookMarkListener,
                                            final OnSkipChapterListener lastChapterListener,
@@ -342,9 +344,11 @@ public class DialogCreator {
         final Dialog dialog = new Dialog(context, R.style.jmui_default_dialog_style);
         final View view = LayoutInflater.from(context).inflate(R.layout.dialog_read_setting, null);
         dialog.setContentView(view);
+
         LinearLayout llBack = (LinearLayout) view.findViewById(R.id.ll_title_back);
         LinearLayout llBook = view.findViewById(R.id.ll_book_name);
         TextView tvBookName = view.findViewById(R.id.tv_book_name_top);
+        ImageView ivChangeSource = view.findViewById(R.id.iv_change_source);
         ImageView ivRefresh = view.findViewById(R.id.iv_refresh);
         ImageView ivBookMark = view.findViewById(R.id.iv_book_mark);
         ImageView ivMore = view.findViewById(R.id.iv_more);
@@ -384,6 +388,9 @@ public class DialogCreator {
             intent.putExtra(APPCONST.BOOK, mBook);
             context.startActivity(intent);*/
         });
+        //换源
+        ivChangeSource.setOnClickListener(changeSourceListener);
+
         //刷新
         ivRefresh.setOnClickListener(refreshListener);
         String url = mChapter.getUrl();
@@ -399,16 +406,13 @@ public class DialogCreator {
         tvChapterTitle.setText(mChapter.getTitle());
         tvChapterUrl.setText(StringHelper.isEmpty(url) ? mChapter.getId() : url);
         //跳转对应章节
-        llChapter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String url = tvChapterUrl.getText().toString();
-                if (!"本地书籍".equals(mBook.getType()) && !StringHelper.isEmpty(url)) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    Uri uri = Uri.parse(url);
-                    intent.setData(uri);
-                    context.startActivity(intent);
-                }
+        llChapter.setOnClickListener(v -> {
+            String url1 = tvChapterUrl.getText().toString();
+            if (!"本地书籍".equals(mBook.getType()) && !StringHelper.isEmpty(url1)) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri uri = Uri.parse(url1);
+                intent.setData(uri);
+                context.startActivity(intent);
             }
         });
 
@@ -419,20 +423,14 @@ public class DialogCreator {
         }
 
         llBack.setOnClickListener(backListener);
-        tvLastChapter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (lastChapterListener != null){
-                    lastChapterListener.onClick(tvChapterTitle, tvChapterUrl, sbChapterProgress);
-                }
+        tvLastChapter.setOnClickListener(v -> {
+            if (lastChapterListener != null){
+                lastChapterListener.onClick(tvChapterTitle, tvChapterUrl, sbChapterProgress);
             }
         });
-        tvNextChapter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (nextChapterListener != null){
-                    nextChapterListener.onClick(tvChapterTitle, tvChapterUrl, sbChapterProgress);
-                }
+        tvNextChapter.setOnClickListener(v -> {
+            if (nextChapterListener != null){
+                nextChapterListener.onClick(tvChapterTitle, tvChapterUrl, sbChapterProgress);
             }
         });
         sbChapterProgress.setProgress(chapterProgress);
@@ -442,34 +440,28 @@ public class DialogCreator {
         sbChapterProgress.setOnSeekBarChangeListener(onSeekBarChangeListener);
         ivVoice.setOnClickListener(voiceOnClickListener);
         //日夜切换
-        llNightAndDay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                boolean isDay;
-                if (tvNightAndDay.getText().toString().equals(context.getString(R.string.day))) {
-                    isDay = false;
-                    ivNightAndDay.setImageResource(R.mipmap.ao);
-                    tvNightAndDay.setText(context.getString(R.string.night));
-                } else {
-                    isDay = true;
-                    ivNightAndDay.setImageResource(R.mipmap.z4);
-                    tvNightAndDay.setText(context.getString(R.string.day));
-                }
-                if (onClickNightAndDayListener != null) {
-                    onClickNightAndDayListener.onClick(dialog, view, isDay);
-                }
+        llNightAndDay.setOnClickListener(view1 -> {
+            boolean isDay;
+            if (tvNightAndDay.getText().toString().equals(context.getString(R.string.day))) {
+                isDay = false;
+                ivNightAndDay.setImageResource(R.mipmap.ao);
+                tvNightAndDay.setText(context.getString(R.string.night));
+            } else {
+                isDay = true;
+                ivNightAndDay.setImageResource(R.mipmap.z4);
+                tvNightAndDay.setText(context.getString(R.string.day));
+            }
+            if (onClickNightAndDayListener != null) {
+                onClickNightAndDayListener.onClick(dialog, view1, isDay);
             }
         });
 
         //缓存章节
-        final TextView tvDownloadProgress = (TextView)view.findViewById(R.id.tv_download_progress);
-        LinearLayout llDonwloadCache = (LinearLayout)view.findViewById(R.id.ll_download_cache);
-        llDonwloadCache.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onClickDownloadAllChapterListener != null){
-                    onClickDownloadAllChapterListener.onClick(dialog,v,tvDownloadProgress);
-                }
+        final TextView tvDownloadProgress = view.findViewById(R.id.tv_download_progress);
+        LinearLayout llDonwloadCache = view.findViewById(R.id.ll_download_cache);
+        llDonwloadCache.setOnClickListener(v -> {
+            if (onClickDownloadAllChapterListener != null){
+                onClickDownloadAllChapterListener.onClick(dialog,v,tvDownloadProgress);
             }
         });
 
@@ -773,5 +765,10 @@ public class DialogCreator {
 
     public interface OnSkipChapterListener{
         void onClick(TextView chapterTitle, TextView chapterUrl, SeekBar sbReadChapterProgress);
+    }
+
+    public interface OnMultiDialogListener{
+        void onItemClick(DialogInterface dialog,int which,boolean isChecked);
+        void onSelectAll(boolean isSelectAll);
     }
 }

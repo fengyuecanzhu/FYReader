@@ -11,9 +11,8 @@ import androidx.core.app.ActivityCompat;
 import android.view.Window;
 import android.view.WindowManager;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.util.PermissionsChecker;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 
 public class SplashActivity extends AppCompatActivity {
     /*************Constant**********/
@@ -89,7 +88,7 @@ public class SplashActivity extends AppCompatActivity {
                 } else {
                     //申请权限失败
                     finish();
-                    TextHelper.showText("请给予储存权限，否则程序无法正常运行！");
+                    ToastUtils.showWarring("请给予储存权限，否则程序无法正常运行！");
                 }
                 return;
             }

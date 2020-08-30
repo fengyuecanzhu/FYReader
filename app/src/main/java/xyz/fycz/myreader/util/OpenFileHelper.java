@@ -98,7 +98,7 @@ public class OpenFileHelper {
             context.startActivity(intent); //这里最好try一下，有可能会报错。 比如说你的MIME类型是打开邮箱，但是你手机里面没装邮箱客户端，就会报错。
         }catch (Exception e){
             e.printStackTrace();
-            TextHelper.showText("没有安装相应的文件读取工具或者文件错误");
+            ToastUtils.showError("没有安装相应的文件读取工具或者文件错误");
         }
 
     }

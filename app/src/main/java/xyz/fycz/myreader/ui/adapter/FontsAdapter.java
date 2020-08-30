@@ -34,10 +34,12 @@ import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.Font;
 import xyz.fycz.myreader.ui.activity.FontsActivity;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.IOUtils;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
+import xyz.fycz.myreader.widget.ProgressButton;
 
 
 public class FontsAdapter extends ArrayAdapter<Font> {
@@ -56,7 +58,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
                     break;
                 case 2:
                     Font font = (Font) msg.obj;
-                    TextHelper.showText(font.toString() + "字体下载完成");
+                    ToastUtils.showSuccess(font.toString() + "字体下载完成");
                     notifyDataSetChanged();
                     break;
                 case 3:
@@ -92,7 +94,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
             viewHolder = new ViewHolder();
             convertView = LayoutInflater.from(getContext()).inflate(mResourceId, null);
             viewHolder.tvFontName = (TextView) convertView.findViewById(R.id.tv_font_name);
-            viewHolder.btnFontUse = (Button) convertView.findViewById(R.id.btn_font_use);
+            viewHolder.btnFontUse = (ProgressButton) convertView.findViewById(R.id.btn_font_use);
             //viewHolder.tvExample = (TextView)convertView.findViewById(R.id.tv_font_example);
             convertView.setTag(viewHolder);
         } else {
@@ -121,8 +123,10 @@ public class FontsAdapter extends ArrayAdapter<Font> {
             if (setting.getFont() == Font.本地字体) {
                 viewHolder.tvFontName.setText(setting.getLocalFontName());
                 viewHolder.btnFontUse.setText(getContext().getString(R.string.font_change));
+                viewHolder.btnFontUse.setButtonColor(mFontsActivity.getColor(R.color.toast_blue));
             } else {
                 viewHolder.btnFontUse.setText(getContext().getString(R.string.font_select));
+                viewHolder.btnFontUse.setButtonColor(mFontsActivity.getColor(R.color.sys_blue_littler));
             }
             viewHolder.btnFontUse.setEnabled(true);
             viewHolder.btnFontUse.setOnClickListener(new View.OnClickListener() {
@@ -159,7 +163,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
                                 }
                             }).create();
                     dialog.show();*/
-                    TextHelper.showText("请选择一个ttf格式的字体文件");
+                    ToastUtils.showInfo("请选择一个ttf格式的字体文件");
                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                     intent.setType("*/*");
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -171,37 +175,34 @@ public class FontsAdapter extends ArrayAdapter<Font> {
 
         if (font != Font.默认字体 && !fontFile.exists()) {
             viewHolder.btnFontUse.setEnabled(true);
+            viewHolder.btnFontUse.setButtonColor(mFontsActivity.getColor(R.color.sys_blue_littler));
             viewHolder.btnFontUse.setText(getContext().getString(R.string.font_download));
-            viewHolder.btnFontUse.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    viewHolder.btnFontUse.setEnabled(false);
-                    addDownloadFont(font, viewHolder);
-                }
+            viewHolder.btnFontUse.setOnClickListener(v -> {
+                viewHolder.btnFontUse.setEnabled(false);
+                addDownloadFont(font, viewHolder);
             });
         } else if (setting.getFont() == font) {
             viewHolder.btnFontUse.setText(getContext().getString(R.string.font_using));
             viewHolder.btnFontUse.setEnabled(false);
+            viewHolder.btnFontUse.setButtonColor(mFontsActivity.getColor(R.color.sys_word_very_little));
         } else {
             viewHolder.btnFontUse.setText(getContext().getString(R.string.font_use));
             viewHolder.btnFontUse.setEnabled(true);
-            viewHolder.btnFontUse.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    setting.setFont(font);
-                    SysManager.saveSetting(setting);
-                    notifyDataSetChanged();
-                    Intent intent = new Intent();
-                    intent.putExtra(APPCONST.FONT, font);
-                    ((Activity) getContext()).setResult(Activity.RESULT_OK, intent);
-                }
+            viewHolder.btnFontUse.setButtonColor(mFontsActivity.getColor(R.color.toast_blue));
+            viewHolder.btnFontUse.setOnClickListener(v -> {
+                setting.setFont(font);
+                SysManager.saveSetting(setting);
+                notifyDataSetChanged();
+                Intent intent = new Intent();
+                intent.putExtra(APPCONST.FONT, font);
+                ((Activity) getContext()).setResult(Activity.RESULT_OK, intent);
             });
         }
     }
 
     private void addDownloadFont(final Font font, final ViewHolder viewHolder) {
         if (!NetworkUtils.isNetWorkAvailable()) {
-            TextHelper.showText("无网络连接!");
+            ToastUtils.showWarring("无网络连接!");
             mHandler.sendMessage(mHandler.obtainMessage(3));
             return;
         }
@@ -225,78 +226,63 @@ public class FontsAdapter extends ArrayAdapter<Font> {
     }
 
     private void downloadFont(final String url, final Font font, final ViewHolder viewHolder) {
-        MyApplication.getApplication().newThread(new Runnable() {
-            @Override
-            public void run() {
-                HttpURLConnection con = null;
-                InputStream is = null;
-                FileOutputStream fos = null;
-                File fontFile = null;
-                try {
-                    URL webUrl = new URL(url);
-                    mHandler.sendMessage(mHandler.obtainMessage(4, viewHolder));
-                    con = (HttpURLConnection) webUrl.openConnection();
-                    is = con.getInputStream();
-                    int fileLength = con.getContentLength();
-                    String filePath = APPCONST.FONT_BOOK_DIR + font.fileName + ".temp";
-                    fontFile = FileUtils.getFile(filePath);
-                    fos = new FileOutputStream(fontFile);
-                    byte[] tem = new byte[1024];
-                    int len = 0;
-                    int alreadyLen = 0;
-                    while ((len = is.read(tem)) != -1) {
-                        fos.write(tem, 0, len);
-                        alreadyLen += len;
-                        mHandler.sendMessage(mHandler.obtainMessage(1, alreadyLen, fileLength, viewHolder));
-                    }
-                    fos.flush();
-                    if (fileLength == fontFile.length()) {
-                        String newPath = filePath.replace(".temp", "");
-                        File newFile = new File(newPath);
-                        if (fontFile.renameTo(newFile)) {
-                            mHandler.sendMessage(mHandler.obtainMessage(2, font));
-                        } else {
-                            TextHelper.showText(font.toString() + "字体下载失败！");
-                            fontFile.delete();
-                            mHandler.sendMessage(mHandler.obtainMessage(3));
-                        }
+        MyApplication.getApplication().newThread(() -> {
+            HttpURLConnection con = null;
+            InputStream is = null;
+            FileOutputStream fos = null;
+            File fontFile = null;
+            try {
+                URL webUrl = new URL(url);
+                mHandler.sendMessage(mHandler.obtainMessage(4, viewHolder));
+                con = (HttpURLConnection) webUrl.openConnection();
+                is = con.getInputStream();
+                int fileLength = con.getContentLength();
+                String filePath = APPCONST.FONT_BOOK_DIR + font.fileName + ".temp";
+                fontFile = FileUtils.getFile(filePath);
+                fos = new FileOutputStream(fontFile);
+                byte[] tem = new byte[1024];
+                int len = 0;
+                int alreadyLen = 0;
+                while ((len = is.read(tem)) != -1) {
+                    fos.write(tem, 0, len);
+                    alreadyLen += len;
+                    mHandler.sendMessage(mHandler.obtainMessage(1, alreadyLen, fileLength, viewHolder));
+                }
+                fos.flush();
+                if (fileLength == fontFile.length()) {
+                    String newPath = filePath.replace(".temp", "");
+                    File newFile = new File(newPath);
+                    if (fontFile.renameTo(newFile)) {
+                        mHandler.sendMessage(mHandler.obtainMessage(2, font));
                     } else {
-                        TextHelper.showText(font.toString() + "字体下载失败！");
+                        ToastUtils.showError(font.toString() + "字体下载失败！(Error：fontFile.renameTo(newFile))");
                         fontFile.delete();
                         mHandler.sendMessage(mHandler.obtainMessage(3));
                     }
-                } catch (IOException e) {
-                    TextHelper.showText(font.toString() + "字体下载失败！");
-                    if (fontFile != null) {
-                        fontFile.delete();
-                    }
+                } else {
+                    ToastUtils.showError(font.toString() + "字体下载失败！(Error：fileLength == fontFile.length())");
+                    fontFile.delete();
                     mHandler.sendMessage(mHandler.obtainMessage(3));
-                    e.printStackTrace();
-                } finally {
-                    if (con != null) {
-                        con.disconnect();
-                    }
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (fos != null) {
-                        try {
-                            fos.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
                 }
+            } catch (IOException e) {
+                ToastUtils.showError(font.toString() + "字体下载失败！\n" + e.getLocalizedMessage());
+                if (fontFile != null) {
+                    fontFile.delete();
+                }
+                mHandler.sendMessage(mHandler.obtainMessage(3));
+                e.printStackTrace();
+            } finally {
+                if (con != null) {
+                    con.disconnect();
+                }
+                IOUtils.close(is, fos);
             }
         });
     }
 
     private void updateDownloadPro(int alreadyLen, int fileLen, ViewHolder viewHolder) {
         int process = alreadyLen * 100 / fileLen;
+        viewHolder.btnFontUse.setProgress(process);
         viewHolder.btnFontUse.setText(process + "%");
         viewHolder.btnFontUse.setEnabled(false);
     }
@@ -338,7 +324,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
     class ViewHolder {
         //TextView tvExample;
         TextView tvFontName;
-        Button btnFontUse;
+        ProgressButton btnFontUse;
     }
 
 }

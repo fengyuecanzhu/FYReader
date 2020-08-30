@@ -28,7 +28,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.ui.presenter.BookcasePresenter;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.widget.BadgeView;
@@ -47,7 +47,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
     protected BookService mBookService;
     protected ChapterService mChapterService;
     protected BookcasePresenter mBookcasePresenter;
-    protected final String[] menu = {
+    protected String[] menu = {
             MyApplication.getmContext().getResources().getString(R.string.menu_book_Top),
             MyApplication.getmContext().getResources().getString(R.string.menu_book_download),
             MyApplication.getmContext().getResources().getString(R.string.menu_book_cache),
@@ -91,6 +91,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
     public long getItemId(int position) {
         return list.get(position).getSortCode();
     }
+
 
     public void remove(Book item) {
         list.remove(item);
@@ -171,11 +172,11 @@ public abstract class BookcaseAdapter extends DragAdapter {
 
     protected void downloadBook(final Book book) {
         if (!NetworkUtils.isNetWorkAvailable()) {
-            TextHelper.showText("无网络连接！");
+            ToastUtils.showWarring("无网络连接！");
             return;
         }
         if ("本地书籍".equals(book.getType())){
-            TextHelper.showText("《" + book.getName() + "》是本地书籍，不能缓存");
+            ToastUtils.showWarring("《" + book.getName() + "》是本地书籍，不能缓存");
             return;
         }
         final int[] begin = new int[1];

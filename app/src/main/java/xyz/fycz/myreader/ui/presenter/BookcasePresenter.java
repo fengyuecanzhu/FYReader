@@ -35,6 +35,7 @@ import xyz.fycz.myreader.backup.UserService;
 import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.ui.activity.*;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.creator.DialogCreator;
@@ -46,11 +47,6 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
-import xyz.fycz.myreader.ui.activity.AboutActivity;
-import xyz.fycz.myreader.ui.activity.FileSystemActivity;
-import xyz.fycz.myreader.ui.activity.MainActivity;
-import xyz.fycz.myreader.ui.activity.SearchBookActivity;
-import xyz.fycz.myreader.ui.activity.LoginActivity;
 import xyz.fycz.myreader.ui.adapter.BookcaseAdapter;
 import xyz.fycz.myreader.ui.adapter.BookcaseDetailedAdapter;
 import xyz.fycz.myreader.ui.adapter.BookcaseDragAdapter;
@@ -89,11 +85,14 @@ public class BookcasePresenter implements BasePresenter {
     private static boolean isStopDownload = true;//是否停止下载
     private int curCacheChapterNum;//当前下载的章节数
     private int needCacheChapterNum;//需要下载的章节数
+    private int successCathe;//成功章节数
+    private int errorCathe;//失败章节数
     private int tempCacheChapterNum;//上次下载的章节数
     private int tempCount;//下载超时时间
     private int downloadInterval = 150;//下载间隔
     private Runnable sendDownloadNotification;//发送通知的线程
     private PopupMenu pm;//菜单
+    private boolean isFirstRefresh = true;//是否首次进入刷新
 
     public static final String CANCEL_ACTION = "cancelAction";
 
@@ -132,6 +131,10 @@ public class BookcasePresenter implements BasePresenter {
                 case 4:
                     showErrorLoadingBooks();
                     if (MyApplication.isApkInDebug(mMainActivity)) {
+                        if (isFirstRefresh) {
+                            initBook();
+                            isFirstRefresh = false;
+                        }
                         downloadAll(false);
                     }
                     break;
@@ -160,7 +163,7 @@ public class BookcasePresenter implements BasePresenter {
                     MyApplication.runOnUiThread(() -> createMenu());
                     break;
                 case 12:
-                    TextHelper.showText("正在后台缓存书籍，具体进度可查看通知栏！");
+                    ToastUtils.showInfo("正在后台缓存书籍，具体进度可查看通知栏！");
                     notificationUtil.requestNotificationPermissionDialog(mMainActivity);
                     break;
             }
@@ -183,14 +186,16 @@ public class BookcasePresenter implements BasePresenter {
         if (mSetting.getBookcaseStyle() == null) {
             mSetting.setBookcaseStyle(BookcaseStyle.listMode);
         }
-        if (mSetting.isAutoSyn() && UserService.isLogin()) {
-            synBookcaseToWeb(true);
-        }
 
         sendDownloadNotification = this::sendNotification;
         notificationUtil = NotificationUtil.getInstance();
 
         getData();
+
+        if (mSetting.isAutoSyn() && UserService.isLogin()) {
+            synBookcaseToWeb(true);
+        }
+
         //是否启用下拉刷新（默认启用）
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mBookcaseFragment.getSrlContent().setEnableRefresh(false);
@@ -242,7 +247,7 @@ public class BookcasePresenter implements BasePresenter {
                 mMainActivity.getIvMore().setVisibility(View.GONE);
 //                VibratorUtil.Vibrate(mBookcaseFragment.getActivity(), 100);
             } else {
-                TextHelper.showText("当前无任何书籍，无法编辑书架!");
+                ToastUtils.showWarring("当前无任何书籍，无法编辑书架!");
             }
         } else {
             mMainActivity.getRlCommonTitle().setVisibility(View.VISIBLE);
@@ -291,7 +296,9 @@ public class BookcasePresenter implements BasePresenter {
 
     public void getData() {
         init();
-        initNoReadNum();
+        if (mSetting.isRefreshWhenStart() || android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            initNoReadNum();
+        }
     }
 
     private void initBook() {
@@ -315,7 +322,7 @@ public class BookcasePresenter implements BasePresenter {
             mHandler.sendMessage(mHandler.obtainMessage(3));
         }
         for (final Book book : mBooks) {
-            if ("本地书籍".equals(book.getType())) {
+            if ("本地书籍".equals(book.getType()) || book.getIsCloseUpdate()) {
                 mBookcaseAdapter.getIsLoading().put(book.getId(), false);
                 mHandler.sendMessage(mHandler.obtainMessage(1));
                 continue;
@@ -326,12 +333,12 @@ public class BookcasePresenter implements BasePresenter {
                 CommonApi.getBookChapters(book.getChapterUrl(), mReadCrawler, new ResultCallback() {
                     @Override
                     public void onFinish(Object o, int code) {
-                        final ArrayList<Chapter> chapters = (ArrayList<Chapter>) o;
+                        ArrayList<Chapter> chapters = (ArrayList<Chapter>) o;
                         int noReadNum = chapters.size() - book.getChapterTotalNum();
                         book.setNoReadNum(Math.max(noReadNum, 0));
                         book.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
                         mBookcaseAdapter.getIsLoading().put(book.getId(), false);
-                        updateAllOldChapterData(mChapters, chapters, book.getId());
+                        mChapterService.updateAllOldChapterData(mChapters, chapters, book.getId());
                         mHandler.sendMessage(mHandler.obtainMessage(1));
                         mBookService.updateEntity(book);
                     }
@@ -350,46 +357,13 @@ public class BookcasePresenter implements BasePresenter {
             while (true) {
                 if (finishLoadBookCount == mBooks.size()) {
                     mHandler.sendMessage(mHandler.obtainMessage(4));
+                    mHandler.sendMessage(mHandler.obtainMessage(2));
                     break;
                 }
             }
         });
     }
 
-    /**
-     * 更新所有章节
-     *
-     * @param newChapters
-     */
-    private void updateAllOldChapterData(ArrayList<Chapter> mChapters, ArrayList<Chapter> newChapters, String bookId) {
-        int i;
-        for (i = 0; i < mChapters.size() && i < newChapters.size(); i++) {
-            Chapter oldChapter = mChapters.get(i);
-            Chapter newChapter = newChapters.get(i);
-            if (!oldChapter.getTitle().equals(newChapter.getTitle())) {
-                oldChapter.setTitle(newChapter.getTitle());
-                oldChapter.setUrl(newChapter.getUrl());
-                oldChapter.setContent(null);
-                mChapterService.saveOrUpdateChapter(oldChapter, null);
-            }
-        }
-        if (mChapters.size() < newChapters.size()) {
-            int start = mChapters.size();
-            for (int j = mChapters.size(); j < newChapters.size(); j++) {
-                newChapters.get(j).setId(StringHelper.getStringRandom(25));
-                newChapters.get(j).setBookId(bookId);
-                mChapters.add(newChapters.get(j));
-//                mChapterService.addChapter(newChapters.get(j));
-            }
-            mChapterService.addChapters(mChapters.subList(start, mChapters.size()));
-        } else if (mChapters.size() > newChapters.size()) {
-            for (int j = newChapters.size(); j < mChapters.size(); j++) {
-                mChapterService.deleteEntity(mChapters.get(j));
-                mChapterService.deleteChapterCacheFile(mChapters.get(j));
-            }
-            mChapters.subList(0, newChapters.size());
-        }
-    }
 
     private void setThemeColor(int colorPrimary, int colorPrimaryDark) {
 //        mToolbar.setBackgroundResource(colorPrimary);
@@ -411,7 +385,7 @@ public class BookcasePresenter implements BasePresenter {
         if (errorLoadingBooks.size() > 0) {
             s.deleteCharAt(s.lastIndexOf("、"));
             s.append(" 更新失败");
-            TextHelper.showText(s.toString());
+            ToastUtils.showError(s.toString());
         }
     }
 
@@ -439,23 +413,17 @@ public class BookcasePresenter implements BasePresenter {
                     mBookcaseFragment.getGvBook().getmScrollView().setScrollY(0);
                     if (mSetting.getBookcaseStyle().equals(BookcaseStyle.listMode)) {
                         mSetting.setBookcaseStyle(BookcaseStyle.threePalaceMode);
-                        TextHelper.showText("已切换为三列网格视图！");
+                        ToastUtils.show("已切换为三列网格视图！");
                     } else {
                         mSetting.setBookcaseStyle(BookcaseStyle.listMode);
-                        TextHelper.showText("已切换为列表视图！");
+                        ToastUtils.show("已切换为列表视图！");
                     }
                     isBookcaseStyleChange = true;
                     SysManager.saveSetting(mSetting);
                     init();
                     return true;
                 case R.id.action_addLocalBook:
-                    /*TextHelper.showText("请选择一个txt格式的书籍文件");
-                    Intent addIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                    addIntent.setType("text/plain");
-                    addIntent.addCategory(Intent.CATEGORY_OPENABLE);
-                    mMainActivity.startActivityForResult(addIntent, APPCONST.SELECT_FILE_CODE);*/
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-
                         if (mPermissionsChecker == null) {
                             mPermissionsChecker = new PermissionsChecker(mMainActivity);
                         }
@@ -472,7 +440,7 @@ public class BookcasePresenter implements BasePresenter {
                     break;
                 case R.id.action_syn:
                     if (!UserService.isLogin()) {
-                        TextHelper.showText("请先登录！");
+                        ToastUtils.showWarring("请先登录！");
                         Intent loginIntent = new Intent(mMainActivity, LoginActivity.class);
                         mMainActivity.startActivity(loginIntent);
                         return true;
@@ -504,7 +472,7 @@ public class BookcasePresenter implements BasePresenter {
                                                     tip = "每日自动同步已开启！";
                                                 }
                                                 SysManager.saveSetting(mSetting);
-                                                TextHelper.showText(tip);
+                                                ToastUtils.showSuccess(tip);
                                                 break;
                                         }
                                     })
@@ -545,6 +513,10 @@ public class BookcasePresenter implements BasePresenter {
                             .create();
                     bookDialog.show();
                     return true;
+                case R.id.action_setting:
+                    Intent settingIntent = new Intent(mMainActivity, MoreSettingActivity.class);
+                    mMainActivity.startActivity(settingIntent);
+                    return true;
                 case R.id.action_about:
                     Intent aboutIntent = new Intent(mMainActivity, AboutActivity.class);
                     mMainActivity.startActivity(aboutIntent);
@@ -577,6 +549,10 @@ public class BookcasePresenter implements BasePresenter {
      * 备份
      */
     private void backup() {
+        if (mBooks.size() == 0){
+            ToastUtils.showWarring("当前书架无任何书籍，无法备份！");
+            return;
+        }
         DialogCreator.createCommonDialog(mMainActivity, "确认备份吗?", "新备份会替换原有备份！", true,
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
@@ -600,7 +576,7 @@ public class BookcasePresenter implements BasePresenter {
 //                            DialogCreator.createTipDialog(mMainActivity,
 //                                    "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");
                         mSetting = SysManager.getSetting();
-                        TextHelper.showText("书架恢复成功！");
+                        ToastUtils.showSuccess("书架恢复成功！");
                     } else {
                         DialogCreator.createTipDialog(mMainActivity, "未找到备份文件或未给予储存权限，恢复失败！");
                     }
@@ -613,7 +589,7 @@ public class BookcasePresenter implements BasePresenter {
      */
     private void webRestore() {
         if (!NetworkUtils.isNetWorkAvailable()) {
-            TextHelper.showText("无网络连接！");
+            ToastUtils.showWarring("无网络连接！");
             return;
         }
         DialogCreator.createCommonDialog(mMainActivity, "确认同步吗?", "将书架从网络同步至本地会覆盖原有书架！", true,
@@ -625,7 +601,7 @@ public class BookcasePresenter implements BasePresenter {
 //                                    DialogCreator.createTipDialog(mMainActivity,
 //                                            "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");、
                             mSetting = SysManager.getSetting();
-                            TextHelper.showText("成功将书架从网络同步至本地！");
+                            ToastUtils.showSuccess("成功将书架从网络同步至本地！");
                         } else {
                             DialogCreator.createTipDialog(mMainActivity, "未找到同步文件，同步失败！");
                         }
@@ -639,18 +615,27 @@ public class BookcasePresenter implements BasePresenter {
      */
     private void downloadAll(boolean isDownloadAllChapters) {
         if (!NetworkUtils.isNetWorkAvailable()) {
-            TextHelper.showText("无网络连接！");
+            ToastUtils.showWarring("无网络连接！");
             return;
         }
-        if (isDownloadAllChapters) {
-            mHandler.sendEmptyMessage(12);
+        if (mBooks.size() == 0){
+            ToastUtils.showWarring("当前书架没有任何书籍，无法一键缓存！");
+            return;
         }
         MyApplication.getApplication().newThread(() -> {
             ArrayList<Book> needDownloadBooks = new ArrayList<>();
             for (Book book : mBooks) {
-                if (!BookSource.pinshu.toString().equals(book.getSource()) && !"本地书籍".equals(book.getType())) {
+                if (!BookSource.pinshu.toString().equals(book.getSource()) && !"本地书籍".equals(book.getType())
+                && book.getIsDownLoadAll()) {
                     needDownloadBooks.add(book);
                 }
+            }
+            if(needDownloadBooks.size() == 0){
+                ToastUtils.showWarring("当前书架书籍不支持/已关闭(可在设置开启)一键缓存！");
+                return;
+            }
+            if (isDownloadAllChapters) {
+                mHandler.sendEmptyMessage(12);
             }
             downloadFor:
             for (final Book book : needDownloadBooks) {
@@ -708,14 +693,17 @@ public class BookcasePresenter implements BasePresenter {
      */
     public void addDownload(final Book book, final ArrayList<Chapter> mChapters, int begin, int end, boolean isDownloadAll) {
         if ("本地书籍".equals(book.getType())) {
-            TextHelper.showText("《" + book.getName() + "》是本地书籍，不能缓存");
+            ToastUtils.showWarring("《" + book.getName() + "》是本地书籍，不能缓存");
             return;
         }
         if (mChapters.size() == 0) {
             if (!isDownloadAll) {
-                TextHelper.showText("《" + book.getName() + "》章节目录为空，缓存失败，请刷新后重试");
+                ToastUtils.showWarring("《" + book.getName() + "》章节目录为空，缓存失败，请刷新后重试");
             }
             return;
+        }
+        if (SysManager.getSetting().getCatheGap() != 0){
+            downloadInterval = SysManager.getSetting().getCatheGap();
         }
         //取消之前下载
         if (!isDownloadAll) {
@@ -735,6 +723,8 @@ public class BookcasePresenter implements BasePresenter {
         needCacheChapterNum = finalEnd - finalBegin;
         curCacheChapterNum = 0;
         tempCacheChapterNum = 0;
+        successCathe = 0;
+        errorCathe = 0;
         isStopDownload = false;
         ArrayList<Chapter> needDownloadChapters = new ArrayList<>();
         for (int i = finalBegin; i < finalEnd; i++) {
@@ -754,12 +744,14 @@ public class BookcasePresenter implements BasePresenter {
                 public void onFinish(Object o, int code) {
                     downloadingChapter = chapter.getTitle();
                     mChapterService.saveOrUpdateChapter(chapter, (String) o);
+                    successCathe++;
                     curCacheChapterNum++;
                 }
 
                 @Override
                 public void onError(Exception e) {
                     curCacheChapterNum++;
+                    errorCathe++;
                 }
             });
             try {
@@ -779,7 +771,7 @@ public class BookcasePresenter implements BasePresenter {
         }
         if (!isDownloadAll) {
             if (curCacheChapterNum == needCacheChapterNum) {
-                TextHelper.showText("《" + book.getName() + "》" + mMainActivity.getString(R.string.download_already_all_tips));
+                ToastUtils.showInfo("《" + book.getName() + "》" + mMainActivity.getString(R.string.download_already_all_tips));
             }
         }
     }
@@ -870,11 +862,11 @@ public class BookcasePresenter implements BasePresenter {
         //判断书籍是否已经添加
         Book existsBook = mBookService.findBookByAuthorAndName(book.getName(), book.getAuthor());
         if (book.equals(existsBook)) {
-            TextHelper.showText("该书籍已存在，请勿重复添加！");
+            ToastUtils.showWarring("该书籍已存在，请勿重复添加！");
             return;
         }
         mBookService.addBook(book);
-        TextHelper.showText("本地书籍添加成功");
+        ToastUtils.showSuccess("本地书籍添加成功");
         init();
     }
 
@@ -884,7 +876,13 @@ public class BookcasePresenter implements BasePresenter {
     private void synBookcaseToWeb(boolean isAutoSyn) {
         if (!NetworkUtils.isNetWorkAvailable()) {
             if (!isAutoSyn) {
-                TextHelper.showText("无网络连接！");
+                ToastUtils.showWarring("无网络连接！");
+            }
+            return;
+        }
+        if (mBooks.size() == 0){
+            if (!isAutoSyn) {
+                ToastUtils.showWarring("当前书架无任何书籍，无法同步！");
             }
             return;
         }

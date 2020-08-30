@@ -81,17 +81,25 @@ public class BackupAndRestore {
                     sBookFields[i] = sBookFields[i].substring(sBookFields[i].indexOf("'") + 1, sBookFields[i].lastIndexOf("'"));
                 }
                 String source = "null";
+                boolean isCloseUpdate = false;
+                boolean isDownloadAll = true;
                 if(!sBookFields[2].contains("novel.fycz.xyz")){
                     source = sBookFields[17];
                 }
                 if ("本地书籍".equals(sBookFields[4])){
                     sBookFields[15] = "0";
                 }
+                if (sBookFields.length >= 19){
+                    isCloseUpdate = Boolean.parseBoolean(sBookFields[18]);
+                }
+                if (sBookFields.length >= 20){
+                    isDownloadAll = Boolean.parseBoolean(sBookFields[19]);
+                }
                 Book book = new Book(sBookFields[0], sBookFields[1], sBookFields[2], sBookFields[3], sBookFields[4],
                         sBookFields[5], sBookFields[6], sBookFields[7], sBookFields[8], sBookFields[9], sBookFields[10],
                         sBookFields[11], Integer.parseInt(sBookFields[12]), Integer.parseInt(sBookFields[13]),
                         Integer.parseInt(sBookFields[14]), Integer.parseInt(sBookFields[15]), Integer.parseInt(sBookFields[16])
-                        , source);
+                        , source, isCloseUpdate, isDownloadAll);
                 books.add(book);
             }
             mBookService.deleteAllBooks();

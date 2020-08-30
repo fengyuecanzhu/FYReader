@@ -12,7 +12,7 @@ import xyz.fycz.myreader.enums.Font;
 import xyz.fycz.myreader.ui.activity.FontsActivity;
 import xyz.fycz.myreader.ui.adapter.FontsAdapter;
 import xyz.fycz.myreader.util.IOUtils;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 
 import java.io.*;
@@ -83,12 +83,12 @@ public class FontsPresenter implements BasePresenter {
     public void saveLocalFont(String path){
         File fontFile = new File(path);
         if (!fontFile.exists()){
-            TextHelper.showText("未找到字体文件！");
+            ToastUtils.showWarring("未找到字体文件！");
             return;
         }
         String fontName = fontFile.getName();
         if (!fontName.endsWith(".ttf")){
-            TextHelper.showText("字体更换失败，请选择ttf格式的字体文件！");
+            ToastUtils.showError("字体更换失败，请选择ttf格式的字体文件！");
             return;
         }
         String dirPath = fontFile.getParentFile().getAbsolutePath() + "/";
@@ -110,7 +110,7 @@ public class FontsPresenter implements BasePresenter {
             mFontsAdapter.saveLocalFontName(fontName);
         } catch (IOException e) {
             e.printStackTrace();
-            TextHelper.showText("读取字体文件出错！\n" + e.getLocalizedMessage());
+            ToastUtils.showError("读取字体文件出错！\n" + e.getLocalizedMessage());
         }finally {
             IOUtils.close(fis, fos);
         }

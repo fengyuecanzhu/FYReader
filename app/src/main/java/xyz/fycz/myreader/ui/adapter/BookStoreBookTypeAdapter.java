@@ -64,15 +64,12 @@ public class BookStoreBookTypeAdapter extends RecyclerView.Adapter<BookStoreBook
 
         if (onItemClickListener != null) {
 
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            holder.itemView.setOnClickListener(view -> {
 
-                    onItemClickListener.onClick(position, view);
-                    selectPos = position;
-                    BookStoreBookTypeAdapter.this.notifyDataSetChanged();
+                onItemClickListener.onClick(position, view);
+                selectPos = position;
+                BookStoreBookTypeAdapter.this.notifyDataSetChanged();
 
-                }
             });
 
         }

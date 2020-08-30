@@ -25,11 +25,11 @@ public class PermissionHelper {
             if (checkReadPhoneStatePermission != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.READ_PHONE_STATE}, 1);
-                TextHelper.showText("当前应用未拥读取设备状态权限");
+                ToastUtils.showWarring("当前应用未拥读取设备状态权限");
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.READ_PHONE_STATE}, 1);
-                TextHelper.showText("当前应用未拥读取设备状态权限");
+                ToastUtils.showWarring("当前应用未拥读取设备状态权限");
             } else {
                 permission = true;
             }
@@ -51,11 +51,11 @@ public class PermissionHelper {
             if (checkReadPhoneStatePermission != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-                TextHelper.showText("当前应用未拥有蓝牙设备使用权限");
+                ToastUtils.showWarring("当前应用未拥有蓝牙设备使用权限");
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-                TextHelper.showText("当前应用未拥有蓝牙设备使用权限");
+                ToastUtils.showWarring("当前应用未拥有蓝牙设备使用权限");
             } else {
                 permission = true;
             }
@@ -78,11 +78,11 @@ public class PermissionHelper {
             if (checkReadPhoneStatePermission != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                TextHelper.showText("当前应用未拥有存储设备读写权限");
+                ToastUtils.showWarring("当前应用未拥有存储设备读写权限");
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                TextHelper.showText("当前应用未拥有存储设备读写权限");
+                ToastUtils.showWarring("当前应用未拥有存储设备读写权限");
             } else {
                 permission = true;
             }
@@ -104,11 +104,11 @@ public class PermissionHelper {
             if (checkReadPhoneStatePermission != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.RECORD_AUDIO}, 1);
-                TextHelper.showText("当前应用未拥有音频录制权限");
+                ToastUtils.showWarring("当前应用未拥有音频录制权限");
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.RECORD_AUDIO}, 1);
-                TextHelper.showText("当前应用未拥有音频录制权限");
+                ToastUtils.showWarring("当前应用未拥有音频录制权限");
             } else {
                 permission = true;
             }
@@ -130,11 +130,11 @@ public class PermissionHelper {
             if (checkReadPhoneStatePermission != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.CAMERA}, 1);
-                TextHelper.showText("当前应用未拥有调用摄像头权限");
+                ToastUtils.showWarring("当前应用未拥有调用摄像头权限");
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.CAMERA}, 1);
-                TextHelper.showText("当前应用未拥有调用摄像头权限");
+                ToastUtils.showWarring("当前应用未拥有调用摄像头权限");
             } else {
                 permission = true;
             }

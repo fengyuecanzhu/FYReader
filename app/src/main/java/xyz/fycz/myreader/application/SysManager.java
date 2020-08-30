@@ -48,21 +48,24 @@ public class SysManager {
     private static Setting getDefaultSetting(){
         Setting setting = new Setting();
         setting.setDayStyle(true);
-        setting.setReadBgColor(R.color.sys_protect_eye_bg);
-        setting.setReadStyle(ReadStyle.protectedEye);
+        setting.setReadStyle(ReadStyle.leather);
         setting.setReadWordSize(25);
-        setting.setReadWordColor(R.color.sys_protect_eye_word);
         setting.setBrightProgress(50);
         setting.setBrightFollowSystem(true);
         setting.setLanguage(Language.simplified);
         setting.setFont(Font.默认字体);
         setting.setAutoScrollSpeed(300);
         setting.setPageMode(PageMode.SIMULATION);
-        setting.setVolumeTurnPage(false);
+        setting.setVolumeTurnPage(true);
+        setting.setResetScreen(3);
         setting.setBookcaseStyle(BookcaseStyle.listMode);
         setting.setNewestVersionCode(getVersionCode());
         setting.setLocalFontName("");
         setting.setAutoSyn(false);
+        setting.setMatchChapter(true);
+        setting.setMatchChapterSuitability(0.7f);
+        setting.setCatheGap(150);
+        setting.setRefreshWhenStart(false);
         setting.setSettingVersion(APPCONST.SETTING_VERSION);
         return setting;
     }
@@ -73,6 +76,11 @@ public class SysManager {
      */
 
     public static void resetSetting(){
-        saveSetting(getDefaultSetting());
+        Setting setting = getSetting();
+        setting.setVolumeTurnPage(true);
+        setting.setMatchChapter(true);
+        setting.setResetScreen(3);
+        setting.setSettingVersion(APPCONST.SETTING_VERSION);
+        saveSetting(setting);
     }
 }

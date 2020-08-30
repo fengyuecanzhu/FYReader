@@ -42,7 +42,7 @@ public class AboutActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         ButterKnife.bind(this);
-        setStatusBar(R.color.sys_line);
+        setStatusBar(R.color.white, false);
         mAboutPresenter = new AboutPresenter(this);
         mAboutPresenter.start();
     }

@@ -22,16 +22,22 @@ import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.creator.DialogCreator;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.presenter.BookcasePresenter;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.util.TextHelper;
-
+import xyz.fycz.myreader.util.ToastUtils;
 
 
 public class BookcaseDragAdapter extends BookcaseAdapter {
-
-
+    ViewHolder viewHolder = null;
+    protected String[] menu = {
+            MyApplication.getmContext().getResources().getString(R.string.menu_book_detail),
+            MyApplication.getmContext().getResources().getString(R.string.menu_book_Top),
+            MyApplication.getmContext().getResources().getString(R.string.menu_book_download),
+            MyApplication.getmContext().getResources().getString(R.string.menu_book_cache),
+            MyApplication.getmContext().getResources().getString(R.string.menu_book_delete)
+    };
     public BookcaseDragAdapter(Context context, int textViewResourceId, ArrayList<Book> objects,
                                boolean editState, BookcasePresenter bookcasePresenter) {
         super(context, textViewResourceId, objects, editState, bookcasePresenter);
@@ -40,7 +46,6 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder = null;
         if (convertView == null || convertView.getTag() instanceof BookcaseDetailedAdapter.ViewHolder) {
             viewHolder = new ViewHolder();
             convertView = LayoutInflater.from(mContext).inflate(mResourceId, null);
@@ -53,11 +58,11 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        initView(position, viewHolder);
+        initView(position);
         return convertView;
     }
 
-    private void initView(int position, ViewHolder viewHolder) {
+    private void initView(int position) {
         final Book book = getItem(position);
         if (StringHelper.isEmpty(book.getImgUrl())) {
             book.setImgUrl("");
@@ -72,12 +77,7 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
                 .into(viewHolder.ivBookImg);
 
         viewHolder.tvBookName.setText(book.getName());
-        viewHolder.ivDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDeleteBookDialog(book);
-            }
-        });
+        viewHolder.ivDelete.setOnClickListener(v -> showDeleteBookDialog(book));
 
 
         if (mEditState) {
@@ -90,99 +90,95 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
             boolean isLoading = false;
             try {
                 isLoading = isBookLoading(book.getId());
-            }catch (Exception ignored){
+            } catch (Exception ignored) {
             }
-            if (isLoading){
+            if (isLoading) {
                 viewHolder.pbLoading.setVisibility(View.VISIBLE);
                 viewHolder.tvNoReadNum.setVisibility(View.GONE);
-            }else {
+            } else {
                 viewHolder.pbLoading.setVisibility(View.GONE);
                 int notReadNum = book.getChapterTotalNum() - book.getHisttoryChapterNum() + book.getNoReadNum() - 1;
-                if (notReadNum != 0){
+                if (notReadNum != 0) {
                     viewHolder.tvNoReadNum.setVisibility(View.VISIBLE);
-                    if(book.getNoReadNum() != 0){
+                    if (book.getNoReadNum() != 0) {
                         viewHolder.tvNoReadNum.setHighlight(true);
-                        if (notReadNum == -1){
+                        if (notReadNum == -1) {
                             notReadNum = book.getNoReadNum() - 1;
                         }
-                    }else {
+                    } else {
                         viewHolder.tvNoReadNum.setHighlight(false);
                     }
                     viewHolder.tvNoReadNum.setBadgeCount(notReadNum);
-                }else {
+                } else {
                     viewHolder.tvNoReadNum.setVisibility(View.GONE);
                 }
             }
-            viewHolder.ivBookImg.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent( mContext, ReadActivity.class);
-                    intent.putExtra(APPCONST.BOOK, book);
-                    book.setNoReadNum(0);
-                    mBookService.updateEntity(book);
-                    mContext.startActivity(intent);
-                }
+            viewHolder.ivBookImg.setOnClickListener(v -> {
+                Intent intent = new Intent(mContext, ReadActivity.class);
+                intent.putExtra(APPCONST.BOOK, book);
+                mBookService.updateEntity(book);
+                mContext.startActivity(intent);
             });
-            viewHolder.ivBookImg.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if (!ismEditState()){
-                        AlertDialog bookDialog = new AlertDialog.Builder(mContext)
-                                .setTitle(book.getName())
-                                .setAdapter(new ArrayAdapter<>(mContext,
-                                                android.R.layout.simple_list_item_1, menu),
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                switch (which) {
-                                                    case 0:
-                                                        book.setSortCode(0);
-                                                        mBookService.updateBook(book);
-                                                        mBookcasePresenter.init();
-                                                        TextHelper.showText("书籍《" + book.getName() + "》移至顶部成功！");
-                                                        break;
-                                                    case 1:
-                                                        downloadBook(book);
-                                                        break;
-                                                    case 2:
-                                                        MyApplication.getApplication().newThread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                try {
-                                                                    if (unionChapterCathe(book)) {
-                                                                        DialogCreator.createTipDialog(mContext,
-                                                                                "缓存导出成功，导出目录："
-                                                                                        + APPCONST.TXT_BOOK_DIR);
-                                                                    }else {
-                                                                        DialogCreator.createTipDialog(mContext,
-                                                                                "章节目录为空或未找到缓存文件，缓存导出失败！");
-                                                                    }
-                                                                } catch (IOException e) {
-                                                                    e.printStackTrace();
-                                                                    DialogCreator.createTipDialog(mContext,
-                                                                            "章节目录为空或未找到缓存文件，缓存导出失败！");
-                                                                }
+            viewHolder.ivBookImg.setOnLongClickListener(v -> {
+                if (!ismEditState()) {
+                    AlertDialog bookDialog = new AlertDialog.Builder(mContext)
+                            .setTitle(book.getName())
+                            .setAdapter(new ArrayAdapter<>(mContext,
+                                            android.R.layout.simple_list_item_1, menu),
+                                    (dialog, which) -> {
+                                        switch (which) {
+                                            case 0:
+                                                Intent intent = new Intent(mContext, BookDetailedActivity.class);
+                                                intent.putExtra(APPCONST.BOOK, book);
+                                                mContext.startActivity(intent);
+                                                break;
+                                            case 1:
+                                                book.setSortCode(0);
+                                                mBookService.updateEntity(book);
+                                                mBookcasePresenter.init();
+                                                ToastUtils.showSuccess("书籍《" + book.getName() + "》移至顶部成功！");
+                                                break;
+                                            case 2:
+                                                downloadBook(book);
+                                                break;
+                                            case 3:
+                                                MyApplication.getApplication().newThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        try {
+                                                            if (unionChapterCathe(book)) {
+                                                                DialogCreator.createTipDialog(mContext,
+                                                                        "缓存导出成功，导出目录："
+                                                                                + APPCONST.TXT_BOOK_DIR);
+                                                            } else {
+                                                                DialogCreator.createTipDialog(mContext,
+                                                                        "章节目录为空或未找到缓存文件，缓存导出失败！");
                                                             }
-                                                        });
-                                                        break;
-                                                    case 3:
-                                                        showDeleteBookDialog(book);
-                                                        break;
-                                                }
-                                            }
-                                        })
-                                .setNegativeButton(null, null)
-                                .setPositiveButton(null, null)
-                                .create();
-                        bookDialog.show();
-                        return true;
-                    }
-                    return false;
+                                                        } catch (IOException e) {
+                                                            e.printStackTrace();
+                                                            DialogCreator.createTipDialog(mContext,
+                                                                    "章节目录为空或未找到缓存文件，缓存导出失败！");
+                                                        }
+                                                    }
+                                                });
+                                                break;
+                                            case 4:
+                                                showDeleteBookDialog(book);
+                                                break;
+                                        }
+                                    })
+                            .setNegativeButton(null, null)
+                            .setPositiveButton(null, null)
+                            .create();
+                    bookDialog.show();
+                    return true;
                 }
+                return false;
             });
         }
 
     }
+
     class ViewHolder extends BookcaseAdapter.ViewHolder {
     }
 }

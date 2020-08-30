@@ -4,9 +4,11 @@
 
     <!-- ********************************permission************************************ -->
     <!-- 控制振动 -->
-    <uses-permission android:name="android.permission.VIBRATE"/> <!-- 读取手机状态和身份 -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- 读取手机状态和身份 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="com.example.broadcast.permission"/> <!-- 拍摄照片和视频 -->
+    <uses-permission android:name="com.example.broadcast.permission"/>
+    <!-- 拍摄照片和视频 -->
     <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
     <!-- 访问闪光灯 -->
     <!-- <uses-permission android:name="android.permission.FLASHLIGHT" /> -->
@@ -24,20 +26,28 @@
     <!-- 添加或修改日历活动，并在所有者不知情的情况下向邀请对象发送电子邮件 -->
     <!-- <uses-permission android:name="android.permission.WRITE_CALENDAR" /> -->
     <!-- 拥有完全的网络访问权限 -->
-    <uses-permission android:name="android.permission.INTERNET"/> <!-- 查看网络连接 -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/> <!-- 查看WLAN连接 -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/> <!-- 修改或删除您的USB存储设备中的内容 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- 查看网络连接 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- 查看WLAN连接 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <!-- 修改或删除您的USB存储设备中的内容 -->
 
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEM"/>
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> <!-- 读取您的USB存储设备中的内容 -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/> <!-- 拨打电话 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- 读取您的USB存储设备中的内容 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!-- 拨打电话 -->
     <!-- <uses-permission android:name="android.permission.CALL_PHONE" /> -->
     <!-- 开机启动 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.Manifest.permission.INTERNAL_SYSTEM_WINDOW"/> <!-- 停用屏幕锁定 -->
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/> <!-- 防止手机休眠 -->
-    <uses-permission android:name="android.permission.WAKE_LOCK"/> <!-- 检索正在运行的应用 -->
+    <uses-permission android:name="android.Manifest.permission.INTERNAL_SYSTEM_WINDOW"/>
+    <!-- 停用屏幕锁定 -->
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <!-- 防止手机休眠 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!-- 检索正在运行的应用 -->
     <!-- <uses-permission android:name="android.permission.GET_TASKS" /> -->
     <!-- 连接WLAN网络和断开连接 -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
@@ -103,6 +113,8 @@
 
 
         <activity android:name=".ui.activity.FileSystemActivity"/>
+
+        <activity android:name=".ui.activity.MoreSettingActivity"/>
 
         <receiver android:name=".util.notification.NotificationClickReceiver"/>
         <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver"/>

@@ -94,7 +94,8 @@ dependencies {
 
     implementation 'com.journeyapps:zxing-android-embedded:3.5.0'
 
-    implementation 'org.greenrobot:greendao:3.2.2'
+    implementation 'org.greenrobot:greendao:3.3.0'
+    implementation 'com.github.yuweiguocn:GreenDaoUpgradeHelper:v2.2.1'
 
     implementation 'org.jsoup:jsoup:1.11.3'
 
@@ -117,10 +118,16 @@ dependencies {
     implementation 'com.h6ah4i.android.widget.verticalseekbar:verticalseekbar:1.0.0'
     //Scroller
     implementation 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
+
+    //Toasty
+    implementation 'com.github.GrenderG:Toasty:1.5.0'
+
+    //字符串比较
+    implementation 'net.ricecode:string-similarity:1.0.0'
 }
 
 greendao {
-    schemaVersion 9
+    schemaVersion 11
     daoPackage 'xyz.fycz.myreader.greendao.gen'
 //    targetGenDir 'src/main/java'
 }
