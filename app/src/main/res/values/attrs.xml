@@ -8,18 +8,35 @@
     </declare-styleable>
 
     <declare-styleable name="Animation_emerge">
-        <attr name="windowEnterAnimation" format="integer" />
-        <attr name="windowExitAnimation" format="integer" />
+        <attr name="windowEnterAnimation" format="integer"/>
+        <attr name="windowExitAnimation" format="integer"/>
 
     </declare-styleable>
 
     <declare-styleable name="CircleImageView">
-        <attr name="civ_border_width" format="dimension" />
-        <attr name="civ_border_color" format="color" />
-        <attr name="civ_border_overlay" format="boolean" />
-        <attr name="civ_fill_color" format="color" />
+        <attr name="civ_border_width" format="dimension"/>
+        <attr name="civ_border_color" format="color"/>
+        <attr name="civ_border_overlay" format="boolean"/>
+        <attr name="civ_fill_color" format="color"/>
     </declare-styleable>
 
 
+
+    <attr name="progressColor" format="color"/>
+    <attr name="progressBackColor" format="color"/>
+    <attr name="progress" format="integer"/>
+    <attr name="minProgress" format="integer"/>
+    <attr name="maxProgress" format="integer"/>
+
+    <declare-styleable name="ProgressButton">
+        <attr name="progressColor"/>
+        <attr name="progressBackColor"/>
+        <attr name="buttonColor" format="color"/>
+        <attr name="cornerRadius" format="dimension"/>
+        <attr name="progress"/>
+        <attr name="minProgress"/>
+        <attr name="maxProgress"/>
+        <attr name="progressMargin" format="dimension"/>
+    </declare-styleable>
 
 </resources>

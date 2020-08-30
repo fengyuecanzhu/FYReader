@@ -41,7 +41,7 @@ public class CatalogActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
         ButterKnife.bind(this);
-        setStatusBar(R.color.sys_line);
+        setStatusBar(0, false);
         mCatalogPresenter = new CatalogActivityPresenter(this);
         mCatalogPresenter.start();
     }

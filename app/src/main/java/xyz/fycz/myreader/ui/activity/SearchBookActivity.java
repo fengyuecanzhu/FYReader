@@ -60,7 +60,7 @@ public class SearchBookActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_book);
         ButterKnife.bind(this);
-        setStatusBar(R.color.sys_line);
+        setStatusBar(R.color.white, false);
         mSearchBookPrensenter = new SearchBookPrensenter(this);
         mSearchBookPrensenter.start();
     }

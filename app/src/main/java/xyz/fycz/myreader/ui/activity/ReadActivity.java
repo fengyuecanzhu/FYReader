@@ -98,12 +98,9 @@ public class ReadActivity extends BaseActivity {
                             exit();
                         }
                     }
-                    , new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mReadPresenter.deleteBook();
-                            exit();
-                        }
+                    , (dialog, which) -> {
+                        mReadPresenter.deleteBook();
+                        exit();
                     });
         } else {
             mReadPresenter.saveLastChapterReadPosition();
@@ -117,6 +114,7 @@ public class ReadActivity extends BaseActivity {
         result.putExtra(APPCONST.RESULT_IS_COLLECTED, mReadPresenter.isCollected());
         if (mReadPresenter.getmPageLoader() != null) {
             result.putExtra(APPCONST.RESULT_LAST_READ_POSITION, mReadPresenter.getmPageLoader().getPagePos());
+            result.putExtra(APPCONST.RESULT_HISTORY_CHAPTER, mReadPresenter.getmPageLoader().getChapterPos());
         }
         setResult(AppCompatActivity.RESULT_OK, result);
         super.onBackPressed();

@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <include layout="@layout/toolbar"/>
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/btn_black"
+                        android:text="@string/read_setting"/>
+
+            </RelativeLayout>
+            <RelativeLayout
+                    android:id="@+id/more_setting_rl_volume"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:background="@drawable/selector_common_bg">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/title_black"
+                        android:textSize="@dimen/text_normal_size"
+                        android:text="@string/volume_turn_page"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/more_setting_sc_volume"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:clickable="false"
+                        android:longClickable="false"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                    android:id="@+id/more_setting_rl_reset_screen"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:background="@drawable/selector_common_bg">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/title_black"
+                        android:layout_centerVertical="true"
+                        android:textSize="@dimen/text_normal_size"
+                        android:text="@string/reset_screen_time"/>
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                        android:id="@+id/more_setting_sc_reset_screen"
+                        android:layout_width="115dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:gravity="center"
+                        android:dropDownWidth="75dp"
+                        android:clickable="false"
+                        android:longClickable="false"/>
+            </RelativeLayout>
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/btn_black"
+                        android:text="@string/bookcase_setting"/>
+            </RelativeLayout>
+            <RelativeLayout
+                    android:id="@+id/more_setting_rl_auto_refresh"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:background="@drawable/selector_common_bg">
+
+                <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/selector_common_bg">
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/text_normal_size"
+                            android:textColor="@color/title_black"
+                            android:text="@string/auto_refresh"/>
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:textColor="@color/gray"
+                            android:text="@string/auto_refresh_tip"/>
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/more_setting_sc_auto_refresh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:clickable="false"
+                        android:longClickable="false"/>
+            </RelativeLayout>
+
+            <LinearLayout
+                    android:id="@+id/more_setting_ll_close_refresh"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:paddingTop="8dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/selector_common_bg">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_normal_size"
+                        android:textColor="@color/title_black"
+                        android:text="@string/close_refresh"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="5dp"
+                        android:textColor="@color/gray"
+                        android:text="@string/close_refresh_tip"/>
+            </LinearLayout>
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/btn_black"
+                        android:text="@string/change_source_setting"/>
+                <ImageView
+                        android:id="@+id/more_setting_iv_match_chapter_tip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:src="@drawable/ic_question"
+                        android:tint="@color/grey"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                    android:id="@+id/more_setting_rl_match_chapter"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:background="@drawable/selector_common_bg">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/title_black"
+                        android:textSize="@dimen/text_normal_size"
+                        android:text="@string/match_chapters"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/more_setting_sc_match_chapter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:clickable="false"
+                        android:longClickable="false"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                    android:id="@+id/more_setting_rl_match_chapter_suitability"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:background="@drawable/selector_common_bg">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:textSize="@dimen/text_normal_size"
+                        android:textColor="@color/title_black"
+                        android:text="@string/match_chapters_sui"/>
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                        android:id="@+id/more_setting_sc_match_chapter_suitability"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:gravity="center"
+                        android:dropDownWidth="60dp"
+                        android:textColor="@color/title_black"
+                        android:clickable="false"
+                        android:longClickable="false"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/btn_black"
+                        android:text="@string/cathe_setting"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                    android:id="@+id/more_setting_rl_cathe_gap"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:background="@drawable/selector_common_bg">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/title_black"
+                        android:textSize="@dimen/text_normal_size"
+                        android:text="@string/cathe_gap"/>
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                        android:id="@+id/more_setting_sc_cathe_gap"
+                        android:layout_width="115dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:gravity="center"
+                        android:dropDownWidth="75dp"
+                        android:textColor="@color/title_black"
+                        android:clickable="false"
+                        android:longClickable="false"/>
+            </RelativeLayout>
+
+            <LinearLayout
+                    android:id="@+id/more_setting_ll_download_all"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:paddingTop="8dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/selector_common_bg">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_normal_size"
+                        android:textColor="@color/title_black"
+                        android:text="@string/download_all"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="5dp"
+                        android:textColor="@color/gray"
+                        android:text="@string/download_all_tip"/>
+            </LinearLayout>
+            <RelativeLayout
+                    android:id="@+id/more_setting_rl_delete_cathe"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:background="@drawable/selector_common_bg">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/title_black"
+                        android:textSize="@dimen/text_normal_size"
+                        android:text="@string/clear_cathe"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

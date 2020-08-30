@@ -38,10 +38,23 @@
     <string name="disclaimer">免责声明</string>
 
     <string name="statement">声明：小说数据全部从网络获取，软件不提供或保存任何小说，详情请参考免责声明：</string>
-    <string name="all_cathe_tip">"说明：1、书籍缓存的章节是从历史阅读章节到最新章节！\n\n2、书源为品书网的书籍因网站原因无法一键缓存！\n\n确定要一键缓存？"</string>
+    <string name="all_cathe_tip">说明：1、书籍缓存的章节是从历史阅读章节到最新章节！\n\n2、书源为品书网的书籍因网站原因无法一键缓存！\n\n确定要一键缓存？"</string>
+    <string name="match_chapter_tip">功能背景：由于不同书源的章节数量不一定相同，换源后历史阅读章节可能出错！
+        \n\n功能介绍：软件采用智能匹配历史章节的算法，可在书籍换源后为您自动匹配历史阅读章节！
+        \n\n功能设置：您可在设置界面开启/关闭此功能(默认关闭)，并可更改智能匹配度。
+        \n\n智能匹配度：智能匹配度是将历史阅读章节标题与换源后章节目录各个章节标题进行相似度比较的阈值，默认为0.7，智能匹配度越高，匹配越精确，但匹配成功率越低。
+        \n\n注：匹配算法不能保证100%匹配正确
+    </string>
+    <string name="change_source_tip1">换源成功，由于不同书源的章节数量不一定相同，换源后历史阅读章节可能出错！
+        \n\n注：您已开启历史章节智能匹配功能，将为您自动匹配历史阅读章节(匹配算法不能保证100%匹配正确)，是否匹配成功请查看提示！
+    </string>
+    <string name="change_source_tip2">换源成功，由于不同书源的章节数量不一定相同，换源后历史阅读章节可能出错！
+        \n\n注：软件提供了智能匹配历史章节功能，您可在设置界面开启！
+    </string>
 
     <!--menu-->
     <string name="menu_book_Top">移至顶部</string>
+    <string name="menu_book_detail">书籍详情</string>
     <string name="menu_book_download">缓存书籍</string>
     <string name="menu_book_cache">导出缓存</string>
     <string name="menu_book_delete">删除书籍</string>
@@ -51,8 +64,9 @@
     <string name="menu_bookcase_add">添加本地</string>
     <string name="menu_bookcase_syn">同步书架</string>
     <string name="menu_bookcase_download_all">一键缓存</string>
+    <string name="menu_settings">应用设置</string>
     <string name="menu_bookcase_backup">备份/恢复</string>
-    <string name="menu_bookcase_about">关于软件</string>
+    <string name="menu_bookcase_about">关于应用</string>
 
     <string name="menu_backup_backup">备份</string>
     <string name="menu_backup_restore">恢复</string>
@@ -77,7 +91,9 @@
     <string name="et_account_tip">请输入用户名</string>
     <string name="text_register">注册</string>
     <string name="text_agreement_tip">我已阅读并同意《</string>
-    <string name="link_agreement"><a href="https://shimo.im/docs/RgkDpd3D3Gp6t3rD">用户服务协议</a></string>
+    <string name="link_agreement">
+        <a href="https://shimo.im/docs/RgkDpd3D3Gp6t3rD">用户服务协议</a>
+    </string>
     <string name="add_book_mark">添加书签</string>
     <string name="share_app">分享软件</string>
     <string name="update_log">更新日志</string>
@@ -93,4 +109,48 @@
     <string name="file_add_shelf">加入书架</string>
     <string name="file_add_shelves">加入书架(%1$d)</string>
     <string name="file_add_succeed">成功添加%1$d本书</string>
+    <string name="menu_change_source">更换书源</string>
+    <string name="menu_reload">重新加载</string>
+    <string name="menu_open_link">打开链接</string>
+    <string name="menu_is_update">启用更新</string>
+    <string name="volume_turn_page">音量键翻页</string>
+    <string name="reset_screen_time">息屏时间</string>
+    <string name="read_setting">阅读设置</string>
+    <string name="bookcase_setting">书架设置</string>
+    <string name="change_source_setting">换源设置</string>
+    <string name="auto_refresh">自动刷新</string>
+    <string name="auto_refresh_tip">打开软件时自动更新书籍</string>
+    <string name="match_chapters">历史章节智能匹配</string>
+    <string name="match_chapters_sui">智能匹配度</string>
+    <string name="cathe_setting">缓存设置</string>
+    <string name="cathe_gap">章节缓存间隔</string>
+    <string name="clear_cathe">清除缓存</string>
+    <string name="download_all_tip">选择一键缓存的书籍</string>
+    <string name="download_all">一键缓存</string>
+    <string name="close_refresh">禁用更新</string>
+    <string name="close_refresh_tip">选择禁用更新的书籍</string>
+
+
+    <string-array name="reset_screen_time">
+        <item>常亮</item>
+        <item>1分钟</item>
+        <item>3分钟</item>
+        <item>5分钟</item>
+    </string-array>
+
+    <string-array name="match_chapter_suitability">
+        <item>0.5</item>
+        <item>0.6</item>
+        <item>0.7</item>
+        <item>0.8</item>
+        <item>0.9</item>
+    </string-array>
+
+    <string-array name="cathe_chapter_gap">
+        <item>50ms</item>
+        <item>100ms</item>
+        <item>150ms</item>
+        <item>200ms</item>
+        <item>250ms</item>
+    </string-array>
 </resources>

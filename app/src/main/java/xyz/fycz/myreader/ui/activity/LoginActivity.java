@@ -46,7 +46,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-        setStatusBar(R.color.sys_line);
+        setStatusBar(R.color.white, false);
         mLoginPresenter = new LoginPresenter(this);
         mLoginPresenter.start();
     }

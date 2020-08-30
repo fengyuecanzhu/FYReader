@@ -258,7 +258,14 @@
         </LinearLayout>
 
 
-
+        <TextView
+                android:id="@+id/tv_read_setting_more"
+                android:padding="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="更多设置 >>"
+                android:textColor="@color/sys_dialog_setting_word_bright"
+                android:gravity="center_horizontal"/>
 
     </LinearLayout>
 

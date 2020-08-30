@@ -1,21 +1,29 @@
 package xyz.fycz.myreader.base;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import android.view.Menu;
+import android.view.MenuItem;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.util.StatusBarCompat;
+import xyz.fycz.myreader.util.StatusBarUtil;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 /**
  * @author fengyue
@@ -73,6 +81,7 @@ public abstract class BaseActivity2 extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityManage.addActivity(this);
         setContentView(getContentId());
         initData(savedInstanceState);
         unbinder = ButterKnife.bind(this);
@@ -95,6 +104,7 @@ public abstract class BaseActivity2 extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        ActivityManage.removeActivity(this);
         unbinder.unbind();
         if (mDisposable != null){
             mDisposable.dispose();
@@ -104,7 +114,7 @@ public abstract class BaseActivity2 extends AppCompatActivity {
     /**************************used method area*******************************************/
 
     protected void startActivity(Class<? extends AppCompatActivity> activity){
-        Intent intent = new Intent(this,activity);
+        Intent intent = new Intent(this, activity);
         startActivity(intent);
     }
 
@@ -121,7 +131,53 @@ public abstract class BaseActivity2 extends AppCompatActivity {
         return actionBar;
     }
 
-    protected void setStatusBarColor(int statusColor){
-        StatusBarCompat.compat(this, ContextCompat.getColor(this, statusColor));
+    protected void setStatusBarColor(int statusColor, boolean dark){
+        //沉浸式代码配置
+        //当FitsSystemWindows设置 true 时，会在屏幕最上方预留出状态栏高度的 padding
+        StatusBarUtil.setRootViewFitsSystemWindows(this, true);
+        //设置状态栏透明
+        StatusBarUtil.setTranslucentStatus(this);
+        StatusBarUtil.setStatusBarColor(this, getResources().getColor(statusColor));
+
+        //一般的手机的状态栏文字和图标都是白色的, 可如果你的应用也是纯白色的, 或导致状态栏文字看不清
+        //所以如果你是这种情况,请使用以下代码, 设置状态使用深色文字图标风格, 否则你可以选择性注释掉这个if内容
+        if (!dark) {
+            if (!StatusBarUtil.setStatusBarDarkTheme(this, true)) {
+                //如果不支持设置深色风格 为了兼容总不能让状态栏白白的看不清, 于是设置一个状态栏颜色为半透明,
+                //这样半透明+白=灰, 状态栏的文字能看得清
+                StatusBarUtil.setStatusBarColor(this, 0x55000000);
+            }
+        }
     }
+
+    @SuppressLint("PrivateApi")
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu != null) {
+            //展开菜单显示图标
+            if (menu.getClass().getSimpleName().equalsIgnoreCase("MenuBuilder")) {
+                try {
+                    Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    method.setAccessible(true);
+                    method.invoke(menu, true);
+                    method = menu.getClass().getDeclaredMethod("getNonActionItems");
+                    ArrayList<MenuItem> menuItems = (ArrayList<MenuItem>) method.invoke(menu);
+                    if (!menuItems.isEmpty()) {
+                        for (MenuItem menuItem : menuItems) {
+                            Drawable drawable = menuItem.getIcon();
+                            if (drawable != null) {
+                                drawable.mutate();
+                                drawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_ATOP);
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
+
 }

@@ -61,18 +61,27 @@
                     android:gravity="center"
                     android:orientation="horizontal"
                     android:paddingRight="10dp">
-
+                <ImageView
+                        android:id="@+id/iv_change_source"
+                        android:layout_width="33dp"
+                        android:layout_height="match_parent"
+                        android:tint="@color/little_black_white"
+                        android:src="@drawable/ic_change_source"
+                        android:visibility="gone"/>
                 <ImageView
                         android:id="@+id/iv_refresh"
-                        android:layout_width="25dp"
+                        android:layout_marginLeft="15dp"
+                        android:layout_width="30dp"
                         android:layout_height="match_parent"
-                        app:srcCompat="@mipmap/ic_refresh"/>
+                        android:tint="@color/little_black_white"
+                        android:src="@drawable/ic_refresh"/>
                 <ImageView
                         android:id="@+id/iv_book_mark"
                         android:layout_marginLeft="12dp"
                         android:layout_width="33dp"
                         android:layout_height="match_parent"
-                        app:srcCompat="@drawable/ic_bookmark"/>
+                        android:tint="@color/little_black_white"
+                        android:src="@drawable/ic_bookmark"/>
                 <ImageView
                         android:id="@+id/iv_voice_read"
                         android:layout_width="25dp"

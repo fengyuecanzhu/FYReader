@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 
 
 public class BiQuGeReadCrawler implements ReadCrawler, BookInfoCrawler {
-    private static final String NAME_SPACE = "https://www.52bqg.com";
-    private static final String NOVEL_SEARCH = "https://www.52bqg.com/modules/article/search.php";
+    private static final String NAME_SPACE = "https://www.52bqg.net";
+    private static final String NOVEL_SEARCH = "https://www.52bqg.net/modules/article/search.php";
     private static final String SEARCH_KEY = "searchkey";
     private static final String CHARSET = "GBK";
     private ReadCrawler rc = new TianLaiReadCrawler();

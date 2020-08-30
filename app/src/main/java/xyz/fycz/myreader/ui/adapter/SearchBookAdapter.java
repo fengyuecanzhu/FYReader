@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.ui.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
@@ -155,14 +157,16 @@ public class SearchBookAdapter extends DragAdapter {
     private void initOtherInfo(final int position, final ViewHolder holder){
         Book book = mBooks.getValue(getItem(position), 0);
         //图片
-        Glide.with(mContext)
-                .load(book.getImgUrl())
+        if (!MyApplication.isDestroy((Activity) mContext)) {
+            Glide.with(mContext)
+                    .load(book.getImgUrl())
 //                .override(DipPxUtil.dip2px(getContext(), 80), DipPxUtil.dip2px(getContext(), 150))
-                .error(R.mipmap.no_image)
-                .placeholder(R.mipmap.no_image)
-                //设置圆角
-                .apply(RequestOptions.bitmapTransform(new RoundedCorners(8)))
-                .into(holder.ivBookImg);
+                    .error(R.mipmap.no_image)
+                    .placeholder(R.mipmap.no_image)
+                    //设置圆角
+                    .apply(RequestOptions.bitmapTransform(new RoundedCorners(8)))
+                    .into(holder.ivBookImg);
+        }
         //简介
         holder.tvDesc.setText("简介:" + book.getDesc());
         holder.tvType.setText(book.getType());

@@ -13,7 +13,7 @@ import xyz.fycz.myreader.creator.DialogCreator;
 import xyz.fycz.myreader.ui.activity.AboutActivity;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 
 /**
  * @author fengyue
@@ -40,7 +40,7 @@ public class AboutPresenter implements BasePresenter {
             //把数据设置到剪切板上
             assert mClipboardManager != null;
             mClipboardManager.setPrimaryClip(mClipData);
-            TextHelper.showText("邮箱复制成功！");
+            ToastUtils.showSuccess("邮箱复制成功！");
         });
         mAboutActivity.getVmShare().setOnClickListener(v -> ShareUtils.share(mAboutActivity, mAboutActivity.getString(R.string.share_text) +
                 SharedPreUtils.getInstance().getString("downloadLink")));
@@ -56,7 +56,7 @@ public class AboutPresenter implements BasePresenter {
             intent.setData(Uri.parse(address));
             mAboutActivity.startActivity(intent);
         } catch (Exception e) {
-            TextHelper.showText(e.getLocalizedMessage());
+            ToastUtils.showError(e.getLocalizedMessage());
         }
     }
 }

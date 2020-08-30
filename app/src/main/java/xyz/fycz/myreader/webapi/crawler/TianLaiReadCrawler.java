@@ -58,7 +58,7 @@ public class TianLaiReadCrawler implements ReadCrawler{
             char c = 160;
             String spaec = "" + c;
             content = content.replace(spaec, "  ");
-            content = content.replace("一秒记住【笔趣阁 www.52bqg.com】，精彩小说无弹窗免费阅读！", "");
+            content = content.replace("一秒记住【笔趣阁 www.52bqg.net】，精彩小说无弹窗免费阅读！", "");
             return content;
         } else {
             return "";

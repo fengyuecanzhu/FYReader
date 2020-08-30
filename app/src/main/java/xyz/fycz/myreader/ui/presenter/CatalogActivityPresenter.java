@@ -41,15 +41,13 @@ public class CatalogActivityPresenter implements BasePresenter {
         isDayStyle = setting.isDayStyle();
         //设置日夜间
         if (!isDayStyle){
-            mCatalogActivity.setStatusBar(R.color.sys_dialog_setting_bg);
+            mCatalogActivity.setStatusBar(R.color.sys_dialog_setting_bg, true);
             mCatalogActivity.getRlCommonTitle().setBackground(mCatalogActivity.getDrawable(R.color.sys_dialog_setting_bg));
             mCatalogActivity.getTvBack().setImageDrawable(mCatalogActivity.getDrawable(R.mipmap.larrow_white2));
             mCatalogActivity.getIvCancel().setImageDrawable(mCatalogActivity.getDrawable(R.mipmap.ic_cha_black));
             mCatalogActivity.getIvSearch().setImageDrawable(mCatalogActivity.getDrawable(R.mipmap.b9));
             mCatalogActivity.getEtSearch().setTextColor(mCatalogActivity.getResources().getColor(R.color.sys_night_word));
             mCatalogActivity.getEtSearch().setHintTextColor(mCatalogActivity.getResources().getColor(R.color.sys_night_word));
-        }else {
-            mCatalogActivity.getEtSearch().setTextColor(mCatalogActivity.getResources().getColor(setting.getReadWordColor()));
         }
         init();
 

@@ -256,7 +256,7 @@ public class MyApplication extends Application {
                 doc = Jsoup.connect(url).get();
                 String content = doc.getElementsByClass("ql-editor").text();
                 if (StringHelper.isEmpty(content)) {
-                    TextHelper.showText("检查更新失败！");
+                    ToastUtils.showError("检查更新失败！");
                     return;
                 }
                 String[] contents = content.split(";");
@@ -292,11 +292,11 @@ public class MyApplication extends Application {
                                 mBookcaseFragment);
                     }
                 } else if (isManualCheck) {
-                    TextHelper.showText("已经是最新版本！");
+                    ToastUtils.showSuccess("已经是最新版本！");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                TextHelper.showText("无网络连接！");
+                ToastUtils.showError("检查更新失败！");
             }
         });
     }
@@ -329,7 +329,7 @@ public class MyApplication extends Application {
                     }
                 }, (dialog, which) -> {
                     if (url == null || "".equals(url)) {
-                        TextHelper.showText("获取链接失败，请前往浏览器下载！");
+                        ToastUtils.showError("获取链接失败，请前往浏览器下载！");
                         Intent intent = new Intent();
                         intent.setAction(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(URLCONST.APP_DIR_UR));
@@ -370,6 +370,15 @@ public class MyApplication extends Application {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * 判断Activity是否Destroy
+     * @param mActivity
+     * @return
+     */
+    public static boolean isDestroy(Activity mActivity) {
+        return mActivity == null || mActivity.isFinishing() || mActivity.isDestroyed();
     }
 
 }

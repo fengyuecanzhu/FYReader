@@ -21,9 +21,11 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity2;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.crawler.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -36,7 +38,6 @@ import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.ui.adapter.DetailCatalogAdapter;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.util.TextHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 
@@ -53,8 +54,6 @@ public class BookDetailedActivity extends BaseActivity2 {
     TextView mTvAuthor;
     @BindView(R.id.book_detail_tv_type)
     TextView mTvType;
-    @BindView(R.id.book_detail_newest_chapter)
-    TextView mTvNewestChapter;
     @BindView(R.id.book_detail_source)
     TextView mTvSource;
     @BindView(R.id.book_detail_tv_add)
@@ -97,7 +96,7 @@ public class BookDetailedActivity extends BaseActivity2 {
                         mChapters.clear();
                         mNewestChapters.clear();
                         initBookInfo();
-                        initChapters();
+                        initChapters(true);
                         mCatalogAdapter.notifyDataSetChanged();
                     }
                     break;
@@ -140,6 +139,7 @@ public class BookDetailedActivity extends BaseActivity2 {
     @Override
     protected void setUpToolbar(Toolbar toolbar) {
         super.setUpToolbar(toolbar);
+        setStatusBarColor(R.color.colorPrimary, true);
         getSupportActionBar().setTitle(mBook.getName());
     }
 
@@ -153,7 +153,7 @@ public class BookDetailedActivity extends BaseActivity2 {
         bookDetailRvCatalog.setLayoutManager(new LinearLayoutManager(this));
         bookDetailRvCatalog.setAdapter(mCatalogAdapter);
 
-        initChapters();
+        initChapters(false);
 
         mCatalogAdapter.setOnItemClickListener((view, pos) -> {
             mBook.setHisttoryChapterNum(mChapters.size() - pos - 1);
@@ -174,23 +174,29 @@ public class BookDetailedActivity extends BaseActivity2 {
         super.initClick();
         flAddBookcase.setOnClickListener(view -> {
             if (!isCollected) {
+                mBook.setNoReadNum(mChapters.size());
+                mBook.setChapterTotalNum(0);
                 mBookService.addBook(mBook);
+                for (Chapter chapter : mChapters) {
+                    chapter.setId(StringHelper.getStringRandom(25));
+                    chapter.setBookId(mBook.getId());
+                }
+                mChapterService.addChapters(mChapters);
                 isCollected = true;
-                TextHelper.showText("成功加入书架");
+                ToastUtils.showSuccess("成功加入书架");
                 bookDetailTvAdd.setText("移除书籍");
             } else {
                 mBookService.deleteBookById(mBook.getId());
                 isCollected = false;
                 mBook.setHisttoryChapterNum(0);
+                mBook.setHistoryChapterId("未开始阅读");
                 mBook.setLastReadPosition(0);
-                TextHelper.showText("成功移除书籍");
+                ToastUtils.showSuccess("成功移除书籍");
                 bookDetailTvAdd.setText("加入书架");
                 bookDetailTvOpen.setText("开始阅读");
             }
         });
-        flOpenBook.setOnClickListener(view -> {
-            goReadActivity();
-        });
+        flOpenBook.setOnClickListener(view -> goReadActivity());
 
     }
 
@@ -199,6 +205,11 @@ public class BookDetailedActivity extends BaseActivity2 {
         super.processLogic();
     }
 
+    /**
+     * 判断是否在书架
+     *
+     * @return
+     */
     private boolean isBookCollected() {
         Book book = mBookService.findBookByAuthorAndName(mBook.getName(), mBook.getAuthor());
         if (book == null) {
@@ -209,13 +220,15 @@ public class BookDetailedActivity extends BaseActivity2 {
         }
     }
 
+    /**
+     * 初始化书籍信息
+     */
     private void initBookInfo() {
         mTvAuthor.setText(mBook.getAuthor());
         if (StringHelper.isEmpty(mBook.getImgUrl())) {
             mBook.setImgUrl("");
         }
         assert mBook.getNewestChapterTitle() != null;
-        mTvNewestChapter.setText("最新章节:" + mBook.getNewestChapterTitle().replace("最近更新 ", ""));
         mTvDesc.setText("");
         mTvType.setText("");
         if (!"null".equals(mBook.getSource())) {
@@ -240,18 +253,26 @@ public class BookDetailedActivity extends BaseActivity2 {
         }
     }
 
+    /**
+     * 初始化其他书籍信息
+     */
     private void initOtherInfo() {
         mTvDesc.setText("\t\t\t\t" + mBook.getDesc());
         mTvType.setText(mBook.getType());
-        Glide.with(this)
-                .load(mBook.getImgUrl())
-                .error(R.mipmap.no_image)
-                .placeholder(R.mipmap.no_image)
-                //设置圆角
-                .apply(RequestOptions.bitmapTransform(new RoundedCorners(8)))
-                .into(mIvCover);
+        if (!MyApplication.isDestroy(this)) {
+            Glide.with(this)
+                    .load(mBook.getImgUrl())
+                    .error(R.mipmap.no_image)
+                    .placeholder(R.mipmap.no_image)
+                    //设置圆角
+                    .apply(RequestOptions.bitmapTransform(new RoundedCorners(8)))
+                    .into(mIvCover);
+        }
     }
 
+    /**
+     * 创建换源对话框
+     */
     private void createChangeSourceDia() {
         if (aBooks == null) {
             mHandler.sendMessage(mHandler.obtainMessage(3));
@@ -290,22 +311,48 @@ public class BookDetailedActivity extends BaseActivity2 {
                     mBook = bookTem;
                     mHandler.sendMessage(mHandler.obtainMessage(1));
                     if (isCollected) {
-                        DialogCreator.createTipDialog(this,
-                                "换源成功，由于不同书源的章节数量不一定相同，故换源后历史章节可能出错！");
+                        String tip = null;
+                        if (SysManager.getSetting().isMatchChapter()) {
+                            tip = getString(R.string.change_source_tip1);
+                        }else {
+                            tip = getString(R.string.change_source_tip2);
+                        }
+                        DialogCreator.createTipDialog(this, tip);
                     }
                     dialog1.dismiss();
                 }).create();
         dialog.show();
     }
 
-    private void initChapters() {
+    /**
+     * 初始化章节目录
+     */
+    private void initChapters(boolean isChangeSource) {
         if (mChapters.size() == 0 && !"本地书籍".equals(mBook.getType())) {
             mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
+            if (isCollected) {
+                mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
+            }
             CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
-                    mChapters = (ArrayList<Chapter>) o;
-                    int end = Math.max(0, mChapters.size() - 10);
+                    ArrayList<Chapter> chapters = (ArrayList<Chapter>) o;
+                    if (isCollected) {
+                        int noReadNum = chapters.size() - mBook.getChapterTotalNum();
+                        mBook.setNoReadNum(Math.max(noReadNum, 0));
+                        mBook.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
+                        mChapterService.updateAllOldChapterData(mChapters, chapters, mBook.getId());
+                        mBookService.updateEntity(mBook);
+                        if (isChangeSource && SysManager.getSetting().isMatchChapter()) {
+                            if (mBookService.matchHistoryChapterPos(mBook, chapters)) {
+                                ToastUtils.showSuccess("历史阅读章节匹配成功！");
+                            } else {
+                                ToastUtils.showError("历史阅读章节匹配失败！");
+                            }
+                        }
+                    }
+                    mChapters = chapters;
+                    int end = Math.max(0, mChapters.size() - 6);
                     for (int i = mChapters.size() - 1; i >= end; i--) {
                         mNewestChapters.add(mChapters.get(i));
                     }
@@ -314,11 +361,11 @@ public class BookDetailedActivity extends BaseActivity2 {
 
                 @Override
                 public void onError(Exception e) {
-
+                    ToastUtils.showError("最新章节加载失败！");
                 }
             });
         } else {
-            int end = Math.max(0, mChapters.size() - 10);
+            int end = Math.max(0, mChapters.size() - 6);
             for (int i = mChapters.size() - 1; i >= end; i--) {
                 mNewestChapters.add(mChapters.get(i));
                 mCatalogAdapter.refreshItems(mNewestChapters);
@@ -326,7 +373,10 @@ public class BookDetailedActivity extends BaseActivity2 {
         }
     }
 
-    private void goReadActivity(){
+    /**
+     * 前往阅读界面
+     */
+    private void goReadActivity() {
         if (!isCollected) {
             mBookService.addBook(mBook);
         }
@@ -337,10 +387,31 @@ public class BookDetailedActivity extends BaseActivity2 {
     }
 
     /********************************Event***************************************/
+    /**
+     * 创建菜单
+     *
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if ("本地书籍".equals(mBook.getType())) {
+            return false;
+        }
         getMenuInflater().inflate(R.menu.menu_book_detail, menu);
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem isUpdate = menu.findItem(R.id.action_is_update);
+        if (isCollected) {
+            isUpdate.setVisible(true);
+            isUpdate.setChecked(!mBook.getIsCloseUpdate());
+        } else {
+            isUpdate.setVisible(false);
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     /**
@@ -354,7 +425,7 @@ public class BookDetailedActivity extends BaseActivity2 {
         switch (item.getItemId()) {
             case R.id.action_change_source:  //换源
                 if (!NetworkUtils.isNetWorkAvailable()) {
-                    TextHelper.showText("无网络连接！");
+                    ToastUtils.showWarring("无网络连接！");
                     return true;
                 }
                 pbLoading.setVisibility(View.VISIBLE);
@@ -377,19 +448,19 @@ public class BookDetailedActivity extends BaseActivity2 {
                 }
                 break;
             case R.id.action_reload:  //重新加载
-                if (!"本地书籍".equals(mBook.getType())) {
-                    mChapters.clear();
-                    mNewestChapters.clear();
-                    initWidget();
-                    processLogic();
-                }
+                mChapters.clear();
+                mNewestChapters.clear();
+                initWidget();
+                processLogic();
+                break;
+            case R.id.action_is_update://是否更新
+                mBook.setIsCloseUpdate(!mBook.getIsCloseUpdate());
+                mBookService.updateEntity(mBook);
                 break;
             case R.id.action_open_link:  //打开链接
-                if (!"本地书籍".equals(mBook.getType())) {
-                    Uri uri = Uri.parse(mBook.getChapterUrl());
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                    startActivity(intent);
-                }
+                Uri uri = Uri.parse(mBook.getChapterUrl());
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
                 break;
             default:
                 break;
@@ -407,6 +478,7 @@ public class BookDetailedActivity extends BaseActivity2 {
         else
             mTvDesc.setMaxLines(5);
     }
+
     /**
      * 章节列表
      */
@@ -416,6 +488,14 @@ public class BookDetailedActivity extends BaseActivity2 {
         intent.putExtra(APPCONST.BOOK, mBook);
         startActivityForResult(intent, APPCONST.REQUEST_CHAPTER_PAGE);
     }
+
+    /**
+     * 阅读/章节界面反馈结果处理
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
@@ -426,13 +506,19 @@ public class BookDetailedActivity extends BaseActivity2 {
                     }
                     boolean isCollected = data.getBooleanExtra(APPCONST.RESULT_IS_COLLECTED, false);
                     int lastReadPosition = data.getIntExtra(APPCONST.RESULT_LAST_READ_POSITION, 0);
+                    int historyChapterPos = data.getIntExtra(APPCONST.RESULT_HISTORY_CHAPTER, 0);
                     if (isCollected) {
                         bookDetailTvAdd.setText("移除书籍");
                         bookDetailTvOpen.setText("继续阅读");
                         this.isCollected = true;
+                        if (mChapters != null && mChapters.size() != 0) {
+                            mBook.setHistoryChapterId(mChapters.get(historyChapterPos).getTitle());
+                        }
+                        mBook.setHisttoryChapterNum(historyChapterPos);
                         mBook.setLastReadPosition(lastReadPosition);
-                    }else {
+                    } else {
                         mBook.setHisttoryChapterNum(0);
+                        mBook.setHistoryChapterId("未开始阅读");
                         mBook.setLastReadPosition(0);
                     }
                     mCatalogAdapter.notifyDataSetChanged();

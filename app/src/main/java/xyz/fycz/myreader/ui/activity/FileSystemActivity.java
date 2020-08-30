@@ -16,7 +16,7 @@ import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.ui.fragment.BaseFileFragment;
 import xyz.fycz.myreader.ui.fragment.FileCategoryFragment;
 import xyz.fycz.myreader.ui.fragment.LocalBookFragment;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 
 
 import java.io.File;
@@ -81,7 +81,7 @@ public class FileSystemActivity extends BaseTabActivity {
     @Override
     protected void setUpToolbar(Toolbar toolbar) {
         super.setUpToolbar(toolbar);
-        setStatusBarColor(R.color.sys_line);
+        setStatusBarColor(R.color.white, false);
         getSupportActionBar().setTitle("添加本地");
     }
 
@@ -139,7 +139,7 @@ public class FileSystemActivity extends BaseTabActivity {
                     //改变是否可以全选
                     changeCheckedAllStatus();
                     //提示加入书架成功
-                    TextHelper.showText(getResources().getString(R.string.file_add_succeed, books.size()));
+                    ToastUtils.showSuccess(getResources().getString(R.string.file_add_succeed, books.size()));
 
                 }
         );
@@ -156,7 +156,7 @@ public class FileSystemActivity extends BaseTabActivity {
                                 //改变是否可以全选
                                 changeCheckedAllStatus();
                                 //提示删除文件成功
-                                TextHelper.showText("删除文件成功");
+                                ToastUtils.showSuccess("删除文件成功");
                             }, null);
                 }
         );
@@ -190,7 +190,8 @@ public class FileSystemActivity extends BaseTabActivity {
             book.setNewestChapterTitle("未拆分章节");
             book.setAuthor("本地书籍");
             book.setSource(BookSource.local.toString());
-            book.setDesc("");
+            book.setDesc("无");
+            book.setIsCloseUpdate(true);
             books.add(book);
         }
         return books;

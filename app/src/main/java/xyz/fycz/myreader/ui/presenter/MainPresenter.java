@@ -15,7 +15,7 @@ import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
 import xyz.fycz.myreader.ui.activity.SearchBookActivity;
 import xyz.fycz.myreader.ui.activity.LoginActivity;
-import xyz.fycz.myreader.util.TextHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,11 +44,11 @@ public class MainPresenter implements BasePresenter {
             int settingVersion = mSetting.getSettingVersion();
             if (settingVersion < APPCONST.SETTING_VERSION){
                 SysManager.resetSetting();
-                DialogCreator.createTipDialog(mMainActivity, "因组件升级，已恢复默认设置！");
+                //DialogCreator.createTipDialog(mMainActivity, "因组件升级，阅读字体及背景颜色已恢复默认颜色！");
             }
         }catch (Exception e){
             SysManager.resetSetting();
-            DialogCreator.createTipDialog(mMainActivity, "因组件升级，已恢复默认设置！");
+            //DialogCreator.createTipDialog(mMainActivity, "因组件升级，阅读字体及背景颜色已恢复默认颜色");
         }
         init();
         checkVersionByServer(mMainActivity, false, (BookcaseFragment) mFragments.get(0));
@@ -64,11 +64,11 @@ public class MainPresenter implements BasePresenter {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (file.delete()) {
-                                    TextHelper.showText("退出成功");
+                                    ToastUtils.showSuccess("退出成功");
                                     Intent intent = new Intent(mMainActivity, LoginActivity.class);
                                     mMainActivity.startActivity(intent);
                                 } else {
-                                    TextHelper.showText("退出失败");
+                                    ToastUtils.showError("退出失败(Error：file.delete())");
                                 }
                             }
                         }, (dialog, which) -> dialog.dismiss());

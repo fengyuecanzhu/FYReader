@@ -23,7 +23,7 @@ public class TelephonyUtil {
             String tel1 = (String)getPhoneNumber.invoke(tm, 1);
 
             IMSI = tm.getSubscriberId();
-            TextHelper.showText(IMSI);
+            ToastUtils.showInfo(IMSI);
         }catch (Exception e){
             e.printStackTrace();
             tel = "";

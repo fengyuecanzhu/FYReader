@@ -235,6 +235,42 @@ public class ChapterService extends BaseService {
     }
 
     /**
+     * 更新所有章节
+     *
+     * @param newChapters
+     */
+    public void updateAllOldChapterData(ArrayList<Chapter> mChapters, ArrayList<Chapter> newChapters, String bookId) {
+        int i;
+        for (i = 0; i < mChapters.size() && i < newChapters.size(); i++) {
+            Chapter oldChapter = mChapters.get(i);
+            Chapter newChapter = newChapters.get(i);
+            if (!oldChapter.getTitle().equals(newChapter.getTitle())) {
+                oldChapter.setTitle(newChapter.getTitle());
+                oldChapter.setUrl(newChapter.getUrl());
+                oldChapter.setContent(null);
+                saveOrUpdateChapter(oldChapter, null);
+            }
+        }
+        if (mChapters.size() < newChapters.size()) {
+            int start = mChapters.size();
+            for (int j = mChapters.size(); j < newChapters.size(); j++) {
+                newChapters.get(j).setId(StringHelper.getStringRandom(25));
+                newChapters.get(j).setBookId(bookId);
+                mChapters.add(newChapters.get(j));
+//                mChapterService.addChapter(newChapters.get(j));
+            }
+            addChapters(mChapters.subList(start, mChapters.size()));
+        } else if (mChapters.size() > newChapters.size()) {
+            for (int j = newChapters.size(); j < mChapters.size(); j++) {
+                deleteEntity(mChapters.get(j));
+                deleteChapterCacheFile(mChapters.get(j));
+            }
+            mChapters.subList(0, newChapters.size());
+        }
+    }
+
+
+    /**
      * 根据文件名判断是否被缓存过 (因为可能数据库显示被缓存过，但是文件中却没有的情况，所以需要根据文件判断是否被缓存
      * 过)
      *

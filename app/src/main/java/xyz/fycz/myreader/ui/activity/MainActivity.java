@@ -23,10 +23,10 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.creator.DialogCreator;
 import xyz.fycz.myreader.custom.CircleImageView;
 import xyz.fycz.myreader.ui.presenter.MainPresenter;
-import xyz.fycz.myreader.util.TextHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import xyz.fycz.myreader.util.ToastUtils;
 
 import java.io.File;
 
@@ -63,7 +63,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        setStatusBar(R.color.sys_line);
+        setStatusBar(R.color.white, false);
         mMainPrensenter = new MainPresenter(this);
         mMainPrensenter.start();
     }
@@ -75,7 +75,7 @@ public class MainActivity extends BaseActivity {
             return;
         }
         if (System.currentTimeMillis() - APPCONST.exitTime > APPCONST.exitConfirmTime) {
-            TextHelper.showText("再按一次退出");
+            ToastUtils.showExit("再按一次退出");
             APPCONST.exitTime = System.currentTimeMillis();
         } else {
             super.onBackPressed();
@@ -117,7 +117,7 @@ public class MainActivity extends BaseActivity {
                     startActivity(intent);
 
                 } else {
-                    TextHelper.showText("用户拒绝开启读写权限");
+                    ToastUtils.showWarring("用户拒绝开启读写权限");
                 }
                 return;
             }

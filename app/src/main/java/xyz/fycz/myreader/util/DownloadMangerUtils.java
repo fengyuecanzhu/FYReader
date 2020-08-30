@@ -126,7 +126,7 @@ public class DownloadMangerUtils {
             manager.enqueue(request);
         } catch (Exception e) {
             e.printStackTrace();
-            TextHelper.showText("下载错误:" + e.toString());
+            ToastUtils.showError("下载错误:" + e.getLocalizedMessage());
         }
 
     }
@@ -407,11 +407,11 @@ public class DownloadMangerUtils {
             if (checkReadPhoneStatePermission != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                TextHelper.showText("当前应用未拥有存储设备读写权限");
+                ToastUtils.showWarring("当前应用未拥有存储设备读写权限");
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 // 弹出对话框接收权限
                 ActivityCompat.requestPermissions((AppCompatActivity) context, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                TextHelper.showText("当前应用未拥有存储设备读写权限");
+                ToastUtils.showWarring("当前应用未拥有存储设备读写权限");
             } else {
                 permission = true;
             }

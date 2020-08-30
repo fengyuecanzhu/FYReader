@@ -72,7 +72,7 @@ public class BookMarkService extends BaseService {
         BookMark bookMark = null;
         String sql = "select * from book_mark where title = ?";
         Cursor cursor = selectBySql(sql,new String[]{title});
-        if (cursor == null) return bookMark;
+        if (cursor == null) return null;
         if (cursor.moveToNext()){
             bookMark = new BookMark();
             bookMark.setId(cursor.getString(0));

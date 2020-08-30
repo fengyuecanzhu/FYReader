@@ -5,11 +5,11 @@ import xyz.fycz.myreader.common.ErrorCode;
 import xyz.fycz.myreader.entity.JsonModel;
 import xyz.fycz.myreader.util.HttpUtil;
 import xyz.fycz.myreader.util.JsonArrayToObjectArray;
-import xyz.fycz.myreader.util.TextHelper;
 import com.google.gson.Gson;
 import xyz.fycz.myreader.callback.JsonCallback;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.source.HttpDataSource;
+import xyz.fycz.myreader.util.ToastUtils;
 
 import java.util.Map;
 
@@ -223,7 +223,7 @@ public class BaseApi {
     private static void noSuccess(JsonModel jsonModel, ResultCallback callback){
         if (!jsonModel.isSuccess()) {
             if (jsonModel.getError() == ErrorCode.no_security) {
-                TextHelper.showText("登录过期，请重新登录");
+                ToastUtils.showWarring("登录过期，请重新登录");
                 SysManager.logout();
             } else {
                 if (jsonModel.getError() == 0) {

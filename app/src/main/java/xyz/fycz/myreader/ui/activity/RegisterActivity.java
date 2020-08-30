@@ -46,7 +46,7 @@ public class RegisterActivity extends BaseActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         ButterKnife.bind(this);
-        setStatusBar(R.color.sys_line);
+        setStatusBar(R.color.white, false);
         mRegisterPresenter = new RegisterPresenter(this);
         mRegisterPresenter.start();
     }

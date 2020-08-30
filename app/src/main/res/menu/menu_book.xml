@@ -39,6 +39,13 @@
             android:title="@string/menu_bookcase_download_all"
             app:showAsAction="never"
             android:visible="true"/>
+
+    <item
+            android:id="@+id/action_setting"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/menu_settings"
+            app:showAsAction="never"
+            android:visible="true"/>
     <item
             android:id="@+id/action_about"
             android:icon="@drawable/ic_about"
