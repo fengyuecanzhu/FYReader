@@ -71,12 +71,13 @@ public class ChapterTitleAdapter extends ArrayAdapter<Chapter> {
         } else {
             viewHolder.tvTitle.setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.selector_category_unload), null, null, null);
         }
-        if (!setting.isDayStyle()) {
+        viewHolder.tvTitle.setTextColor(getContext().getColor(R.color.textSecondary));
+        /*if (!setting.isDayStyle()) {
             viewHolder.tvTitle.setTextColor(getContext().getResources().getColor(R.color.sys_night_word));
             viewHolder.vLine.setBackground(getContext().getDrawable(R.color.sys_dialog_setting_line));
         }else {
             viewHolder.tvTitle.setTextColor(getContext().getColor(R.color.title_black));
-        }
+        }*/
 
         if (chapter.getNumber() == mBook.getHisttoryChapterNum()) {
             viewHolder.tvTitle.setTextColor(getContext().getResources().getColor(R.color.colorAccent));

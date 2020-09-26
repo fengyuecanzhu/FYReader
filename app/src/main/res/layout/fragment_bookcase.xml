@@ -5,7 +5,7 @@
         android:id="@+id/srl_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@color/colorBackground"
         tools:context="xyz.fycz.myreader.ui.fragment.BookcaseFragment">
     <com.scwang.smartrefresh.header.MaterialHeader
             android:layout_width="match_parent"
@@ -30,14 +30,15 @@
             <ImageView
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    app:srcCompat="@mipmap/nonono"/>
+                    app:tint="@color/textSecondary"
+                    app:srcCompat="@drawable/ic_vector_add_bookcase"/>
 
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:text="当前无任何书籍，点击添加"
-                    android:textColor="@color/title_black"
+                    android:textColor="@color/textSecondary"
                     android:textSize="16sp"/>
         </LinearLayout>
 
@@ -59,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="39dp"
                 android:layout_alignParentBottom="true"
-                android:background="@color/sys_dialog_setting_line"
+                android:background="@color/colorForeground"
                 android:visibility="gone">
 
             <ProgressBar
@@ -75,7 +76,7 @@
                     android:id="@+id/tv_download_tip"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:textColor="@color/sys_dialog_setting_word_bright"
+                    android:textColor="@color/textSecondary"
                     android:text="正在初始化..."
                     android:gravity="center_vertical|start"
                     android:maxLines="1"
@@ -93,9 +94,55 @@
                     android:gravity="center_vertical"
                     android:paddingEnd="15dp"
                     android:paddingStart="15dp"
-                    android:visibility="gone"
-            />
+                    android:visibility="gone"/>
         </RelativeLayout>
 
+        <RelativeLayout
+                android:id="@+id/rl_book_edit"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:paddingRight="10dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/colorForeground"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+            <CheckBox
+                    android:id="@+id/book_selected_all"
+                    android:layout_width="120dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="15dp"
+                    android:text="全选"
+                    android:textSize="15dp"
+                    android:textColor="@color/textSecondary"
+                    android:theme="@style/MyCheckBox" />
+
+            <Button
+                    android:id="@+id/book_add_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:minWidth="110dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:enabled="false"
+                    android:clickable="false"
+                    android:background="@drawable/selector_btn_add"
+                    android:textColor="@color/selector_btn_file_add"
+                    android:text="加入分组" />
+
+            <Button
+                    android:id="@+id/book_btn_delete"
+                    android:layout_width="70dp"
+                    android:layout_height="35dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="15dp"
+                    android:enabled="false"
+                    android:clickable="false"
+                    android:background="@drawable/selector_btn_add"
+                    android:textColor="@color/selector_btn_file_add"
+                    android:layout_toLeftOf="@id/book_add_group"
+                    android:text="删除"/>
+        </RelativeLayout>
     </RelativeLayout>
 </com.scwang.smartrefresh.layout.SmartRefreshLayout>

@@ -1,33 +1,58 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="horizontal"
-    tools:context="xyz.fycz.myreader.ui.fragment.BookStoreFragment">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_type_list"
+<xyz.fycz.myreader.widget.RefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="7">
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <com.scwang.smartrefresh.layout.SmartRefreshLayout
-        android:id="@+id/srl_book_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="3">
-        <com.scwang.smartrefresh.header.MaterialHeader
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_book_list"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        tools:context="xyz.fycz.myreader.ui.fragment.BookStoreFragment">
+    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@color/colorBackground"
+            android:orientation="horizontal">
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_type_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="10">
         </androidx.recyclerview.widget.RecyclerView>
-    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="3">
+
+            <com.scwang.smartrefresh.layout.SmartRefreshLayout
+                    android:id="@+id/srl_book_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                <com.scwang.smartrefresh.header.MaterialHeader
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_book_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                <com.scwang.smartrefresh.layout.footer.ClassicsFooter
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:srlTextLoading="@string/loading_tip"
+                        app:srlTextFailed="@string/loading_tip"
+                        app:srlTextPulling="下拉加载更多"
+                        app:srlAccentColor="@color/textSecondary"/>
+            </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+            <ProgressBar
+                    android:id="@+id/pb_loading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:visibility="gone"/>
+
+        </RelativeLayout>
 
 
-
-</LinearLayout>
+    </LinearLayout>
+</xyz.fycz.myreader.widget.RefreshLayout>

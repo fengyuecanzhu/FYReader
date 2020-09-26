@@ -23,7 +23,7 @@ public abstract class BaseFragment extends Fragment {
     protected CompositeDisposable mDisposable;
 
     private View root = null;
-    private Unbinder unbinder;
+    protected Unbinder unbinder;
 
     @LayoutRes
     protected abstract int getContentId();

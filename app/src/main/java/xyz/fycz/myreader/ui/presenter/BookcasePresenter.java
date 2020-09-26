@@ -9,17 +9,22 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.view.Menu;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.PopupMenu;
 
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.PopupMenu;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +32,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
@@ -35,6 +42,10 @@ import xyz.fycz.myreader.backup.UserService;
 import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.creator.MultiChoiceDialog;
+import xyz.fycz.myreader.creator.MyAlertDialog;
+import xyz.fycz.myreader.greendao.entity.BookGroup;
+import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.ui.activity.*;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -56,14 +67,19 @@ import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 
+import static xyz.fycz.myreader.application.MyApplication.checkVersionByServer;
+
 
 public class BookcasePresenter implements BasePresenter {
 
     private final BookcaseFragment mBookcaseFragment;
     private final ArrayList<Book> mBooks = new ArrayList<>();//书目数组
+    private ArrayList<BookGroup> mBookGroups = new ArrayList<>();//书籍分组
+    private CharSequence[] mGroupNames;//书籍分组名称
     private BookcaseAdapter mBookcaseAdapter;
     private final BookService mBookService;
     private final ChapterService mChapterService;
+    private final BookGroupService mBookGroupService;
     private final MainActivity mMainActivity;
     private PermissionsChecker mPermissionsChecker;
     private boolean isBookcaseStyleChange;
@@ -91,21 +107,10 @@ public class BookcasePresenter implements BasePresenter {
     private int tempCount;//下载超时时间
     private int downloadInterval = 150;//下载间隔
     private Runnable sendDownloadNotification;//发送通知的线程
-    private PopupMenu pm;//菜单
     private boolean isFirstRefresh = true;//是否首次进入刷新
+    private boolean isGroup;
 
     public static final String CANCEL_ACTION = "cancelAction";
-
-    private final String[] backupMenu = {
-            MyApplication.getmContext().getResources().getString(R.string.menu_backup_backup),
-            MyApplication.getmContext().getResources().getString(R.string.menu_backup_restore),
-    };
-
-    private final String[] webSynMenu = {
-            MyApplication.getmContext().getString(R.string.menu_backup_webBackup),
-            MyApplication.getmContext().getString(R.string.menu_backup_webRestore),
-            MyApplication.getmContext().getString(R.string.menu_backup_autoSyn)
-    };
 
     static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -118,9 +123,11 @@ public class BookcasePresenter implements BasePresenter {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    MyApplication.runOnUiThread(() -> mBookcaseAdapter.notifyDataSetChanged());
-                    finishLoadBookCount++;
-                    mBookcaseFragment.getSrlContent().finishRefresh();
+                    if (!MyApplication.isDestroy(mMainActivity)) {
+                        MyApplication.runOnUiThread(() -> mBookcaseAdapter.notifyDataSetChanged());
+                        finishLoadBookCount++;
+                        mBookcaseFragment.getSrlContent().finishRefresh();
+                    }
                     break;
                 case 2:
                     mBookcaseFragment.getSrlContent().finishRefresh();
@@ -139,10 +146,8 @@ public class BookcasePresenter implements BasePresenter {
                     }
                     break;
                 case 5:
-                    backup();
                     break;
                 case 6:
-                    restore();
                     break;
                 case 7:
                     init();
@@ -151,7 +156,7 @@ public class BookcasePresenter implements BasePresenter {
                     sendNotification();
                     break;
                 case 9:
-                    mBookcaseFragment.getRlDownloadTip().setVisibility(View.GONE);
+                    //mBookcaseFragment.getRlDownloadTip().setVisibility(View.GONE);
                     isDownloadFinish = true;
                     break;
                 case 10:
@@ -160,9 +165,6 @@ public class BookcasePresenter implements BasePresenter {
                     mBookcaseFragment.getRlDownloadTip().setVisibility(View.VISIBLE);
                     break;
                 case 11:
-                    MyApplication.runOnUiThread(() -> createMenu());
-                    break;
-                case 12:
                     ToastUtils.showInfo("正在后台缓存书籍，具体进度可查看通知栏！");
                     notificationUtil.requestNotificationPermissionDialog(mMainActivity);
                     break;
@@ -170,19 +172,22 @@ public class BookcasePresenter implements BasePresenter {
         }
     };
 
+    //构造方法
     public BookcasePresenter(BookcaseFragment bookcaseFragment) {
         mBookcaseFragment = bookcaseFragment;
         mBookService = BookService.getInstance();
-        ;
         mChapterService = ChapterService.getInstance();
-        mMainActivity = ((MainActivity) (mBookcaseFragment.getActivity()));
+        mBookGroupService = BookGroupService.getInstance();
+        mMainActivity = (MainActivity) (mBookcaseFragment.getActivity());
 //        mChapterService = new ChapterService();
         mSetting = SysManager.getSetting();
         mBackupAndRestore = new BackupAndRestore();
     }
 
+    //启动
     @Override
     public void start() {
+        checkVersionByServer(mMainActivity, false, mBookcaseFragment);
         if (mSetting.getBookcaseStyle() == null) {
             mSetting.setBookcaseStyle(BookcaseStyle.listMode);
         }
@@ -213,12 +218,6 @@ public class BookcasePresenter implements BasePresenter {
         //长按事件监听
         mBookcaseFragment.getGvBook().setOnItemLongClickListener((parent, view, position, id) -> false);
 
-        //更多按钮监听器
-        mMainActivity.getIvMore().setOnClickListener(v -> mHandler.sendMessage(mHandler.obtainMessage(11)));
-
-        //完成按钮监听器
-        mMainActivity.getTvEditFinish().setOnClickListener(v -> editBookcase(false));
-
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             //滑动监听器
             mBookcaseFragment.getGvBook().getmScrollView().setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
@@ -228,44 +227,61 @@ public class BookcasePresenter implements BasePresenter {
             });
         }
 
+        //全选监听器
+        mBookcaseFragment.getmCbSelectAll().setOnClickListener(v -> {
+            //设置全选状态
+            boolean isChecked = mBookcaseFragment.getmCbSelectAll().isChecked();
+            mBookcaseAdapter.setCheckedAll(isChecked);
+        });
+
+        //删除监听器
+        mBookcaseFragment.getmBtnDelete().setOnClickListener(v -> {
+            DialogCreator.createCommonDialog(mMainActivity, "批量删除书籍",
+                    "确定要删除这些书籍吗？", true, (dialog, which) -> {
+                        for (Book book : mBookcaseAdapter.getSelectBooks()) {
+                            mBookService.deleteBook(book);
+                        }
+                        ToastUtils.showSuccess("书籍删除成功！");
+                        init();
+                    }, null);
+        });
+
+        //加入分组监听器
+        mBookcaseFragment.getmBtnAddGroup().setOnClickListener(v -> {
+            initBookGroups(true);
+            showSelectGroupDia((dialog, which) -> {
+                if (which < mBookGroups.size()) {
+                    BookGroup bookGroup = mBookGroups.get(which);
+                    ArrayList<Book> mSelectBooks = (ArrayList<Book>) mBookcaseAdapter.getSelectBooks();
+                    for (Book book : mSelectBooks) {
+                        book.setGroupId(bookGroup.getId());
+                    }
+                    mBookService.updateBooks(mSelectBooks);
+                    ToastUtils.showSuccess("成功将《" + mSelectBooks.get(0).getName() + "》"
+                            + (mSelectBooks.size() > 1 ? "等" : "")
+                            + "加入[" + bookGroup.getName() + "]分组");
+                    init();
+                } else if (which == mBookGroups.size()) {
+                    showAddOrRenameGroupDia(false, 0);
+                }
+            });
+        });
     }
 
-    /**
-     * 编辑书架
-     *
-     * @param isEdit
-     */
-    private void editBookcase(boolean isEdit) {
-        if (isEdit) {
-            if (mBooks.size() > 0) {
-                mBookcaseFragment.getSrlContent().setEnableRefresh(false);
-                mBookcaseAdapter.setmEditState(true);
-                mBookcaseFragment.getGvBook().setDragModel(DragSortGridView.DRAG_BY_LONG_CLICK);
-                mBookcaseAdapter.notifyDataSetChanged();
-                mMainActivity.getRlCommonTitle().setVisibility(View.GONE);
-                mMainActivity.getRlEditTitle().setVisibility(View.VISIBLE);
-                mMainActivity.getIvMore().setVisibility(View.GONE);
-//                VibratorUtil.Vibrate(mBookcaseFragment.getActivity(), 100);
-            } else {
-                ToastUtils.showWarring("当前无任何书籍，无法编辑书架!");
-            }
-        } else {
-            mMainActivity.getRlCommonTitle().setVisibility(View.VISIBLE);
-            mMainActivity.getIvMore().setVisibility(View.VISIBLE);
-            mMainActivity.getRlEditTitle().setVisibility(View.GONE);
-            if (mBookcaseFragment.getGvBook().getmScrollView().getScrollY() == 0
-                    && android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                mBookcaseFragment.getSrlContent().setEnableRefresh(true);
-            }
-            mBookcaseFragment.getGvBook().setDragModel(-1);
-            mBookcaseAdapter.setmEditState(false);
-            mBookcaseAdapter.notifyDataSetChanged();
+
+    //获取数据
+    public void getData() {
+        init();
+        initBookGroups(true);
+        if (mSetting.isRefreshWhenStart() || android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            initNoReadNum();
         }
     }
 
-
+    //初始化
     public void init() {
         initBook();
+        mSetting = SysManager.getSetting();
         if (mBooks.size() == 0) {
             mBookcaseFragment.getGvBook().setVisibility(View.GONE);
             mBookcaseFragment.getLlNoDataTips().setVisibility(View.VISIBLE);
@@ -273,16 +289,21 @@ public class BookcasePresenter implements BasePresenter {
             if (mBookcaseAdapter == null || isBookcaseStyleChange) {
                 switch (mSetting.getBookcaseStyle()) {
                     case listMode:
-                        mBookcaseAdapter = new BookcaseDetailedAdapter(mBookcaseFragment.getContext(), R.layout.gridview_book_detailed_item, mBooks, false, this);
+                        mBookcaseAdapter = new BookcaseDetailedAdapter(mBookcaseFragment.getContext(), R.layout.gridview_book_detailed_item, mBooks, false, this, isGroup);
                         mBookcaseFragment.getGvBook().setNumColumns(1);
                         break;
                     case threePalaceMode:
-                        mBookcaseAdapter = new BookcaseDragAdapter(mBookcaseFragment.getContext(), R.layout.gridview_book_item, mBooks, false, this);
+                        mBookcaseAdapter = new BookcaseDragAdapter(mBookcaseFragment.getContext(), R.layout.gridview_book_item, mBooks, false, this, isGroup);
                         mBookcaseFragment.getGvBook().setNumColumns(3);
                         break;
                 }
+                mBookcaseAdapter.setOnBookCheckedListener(isChecked -> {
+                    changeCheckedAllStatus();
+                    //设置删除和加入分组按钮是否可用
+                    setBtnClickable(mBookcaseAdapter.getmCheckedCount() > 0);
+                });
                 mBookcaseFragment.getGvBook().setDragModel(-1);
-                mBookcaseFragment.getGvBook().setTouchClashparent(((MainActivity) (mBookcaseFragment.getActivity())).getVpContent());
+                mBookcaseFragment.getGvBook().setTouchClashparent(((MainActivity) (mBookcaseFragment.getActivity())).getViewPagerMain());
                 mBookcaseFragment.getGvBook().setAdapter(mBookcaseAdapter);
                 isBookcaseStyleChange = false;
             } else {
@@ -293,25 +314,43 @@ public class BookcasePresenter implements BasePresenter {
         }
     }
 
-
-    public void getData() {
-        init();
-        if (mSetting.isRefreshWhenStart() || android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            initNoReadNum();
-        }
-    }
-
+    //初始化书籍
     private void initBook() {
         mBooks.clear();
-        mBooks.addAll(mBookService.getAllBooks());
+        String curBookGroupId = SharedPreUtils.getInstance().getString("curBookGroupId", "");
+        isGroup = !"".equals(curBookGroupId);
+        if (mBookcaseAdapter != null) {
+            mBookcaseAdapter.setGroup(isGroup);
+        }
+        mBooks.addAll(mBookService.getGroupBooks(curBookGroupId));
         for (int i = 0; i < mBooks.size(); i++) {
-            if (mBooks.get(i).getSortCode() != i + 1) {
-                mBooks.get(i).setSortCode(i + 1);
+            int sort = !isGroup ? mBooks.get(i).getSortCode() : mBooks.get(i).getGroupSort();
+            if (sort != i + 1) {
+                if (!isGroup) {
+                    mBooks.get(i).setSortCode(i + 1);
+                }else {
+                    mBooks.get(i).setGroupSort(i + 1);
+                }
                 mBookService.updateEntity(mBooks.get(i));
             }
         }
     }
 
+    //初始化书籍分组
+    private void initBookGroups(boolean isAdd) {
+        mBookGroups.clear();
+        mBookGroups.addAll(mBookGroupService.getAllGroups());
+        mGroupNames = new CharSequence[isAdd ? mBookGroups.size() + 1 : mBookGroups.size()];
+        for (int i = 0; i < mBookGroups.size(); i++) {
+            String groupName = mBookGroups.get(i).getName();
+            mGroupNames[i] = groupName.getBytes().length > 20 ? groupName.substring(0, 8) + "···" : groupName;
+        }
+        if (isAdd) {
+            mGroupNames[mBookGroups.size()] = "添加分组";
+        }
+    }
+
+    //检查书籍更新
     private void initNoReadNum() {
         errorLoadingBooks.clear();
         finishLoadBookCount = 0;
@@ -364,15 +403,6 @@ public class BookcasePresenter implements BasePresenter {
         });
     }
 
-
-    private void setThemeColor(int colorPrimary, int colorPrimaryDark) {
-//        mToolbar.setBackgroundResource(colorPrimary);
-        mBookcaseFragment.getSrlContent().setPrimaryColorsId(colorPrimary, android.R.color.white);
-        if (Build.VERSION.SDK_INT >= 21) {
-            mBookcaseFragment.getActivity().getWindow().setStatusBarColor(ContextCompat.getColor(mBookcaseFragment.getContext(), colorPrimaryDark));
-        }
-    }
-
     /**
      * 显示更新失败的书籍信息
      */
@@ -389,224 +419,233 @@ public class BookcasePresenter implements BasePresenter {
         }
     }
 
-    /**
-     * 创建菜单栏
-     */
-    private void createMenu() {
-        //如果菜单栏已经创建直接show
-        if (pm != null) {
-            pm.show();
-            return;
-        }
-        pm = new PopupMenu(mMainActivity, mMainActivity.getIvMore());
-        pm.getMenuInflater().inflate(R.menu.menu_book, pm.getMenu());
-        setIconEnable(pm.getMenu(), true);
-        if (MyApplication.isApkInDebug(mMainActivity)) {
-            pm.getMenu().getItem(5).setVisible(true);
-        }
-        pm.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.action_edit:
-                    editBookcase(true);
-                    return true;
-                case R.id.action_styleChange:
-                    mBookcaseFragment.getGvBook().getmScrollView().setScrollY(0);
-                    if (mSetting.getBookcaseStyle().equals(BookcaseStyle.listMode)) {
-                        mSetting.setBookcaseStyle(BookcaseStyle.threePalaceMode);
-                        ToastUtils.show("已切换为三列网格视图！");
-                    } else {
-                        mSetting.setBookcaseStyle(BookcaseStyle.listMode);
-                        ToastUtils.show("已切换为列表视图！");
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_edit:
+                editBookcase(true);
+                return true;
+            case R.id.action_styleChange:
+                mBookcaseFragment.getGvBook().getmScrollView().setScrollY(0);
+                if (mSetting.getBookcaseStyle().equals(BookcaseStyle.listMode)) {
+                    mSetting.setBookcaseStyle(BookcaseStyle.threePalaceMode);
+                    ToastUtils.show("已切换为三列网格视图！");
+                } else {
+                    mSetting.setBookcaseStyle(BookcaseStyle.listMode);
+                    ToastUtils.show("已切换为列表视图！");
+                }
+                isBookcaseStyleChange = true;
+                SysManager.saveSetting(mSetting);
+                init();
+                return true;
+            case R.id.action_group_man:
+                showGroupManDia();
+                return true;
+            case R.id.action_addLocalBook:
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                    if (mPermissionsChecker == null) {
+                        mPermissionsChecker = new PermissionsChecker(mMainActivity);
                     }
-                    isBookcaseStyleChange = true;
-                    SysManager.saveSetting(mSetting);
-                    init();
-                    return true;
-                case R.id.action_addLocalBook:
-                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                        if (mPermissionsChecker == null) {
-                            mPermissionsChecker = new PermissionsChecker(mMainActivity);
-                        }
 
-                        //获取读取和写入SD卡的权限
-                        if (mPermissionsChecker.lacksPermissions(PERMISSIONS)) {
-                            //请求权限
-                            ActivityCompat.requestPermissions(mMainActivity, PERMISSIONS, APPCONST.PERMISSIONS_REQUEST_STORAGE);
-                            return true;
-                        }
-                    }
-                    Intent intent = new Intent(mMainActivity, FileSystemActivity.class);
-                    mMainActivity.startActivity(intent);
-                    break;
-                case R.id.action_syn:
-                    if (!UserService.isLogin()) {
-                        ToastUtils.showWarring("请先登录！");
-                        Intent loginIntent = new Intent(mMainActivity, LoginActivity.class);
-                        mMainActivity.startActivity(loginIntent);
+                    //获取读取和写入SD卡的权限
+                    if (mPermissionsChecker.lacksPermissions(PERMISSIONS)) {
+                        //请求权限
+                        ActivityCompat.requestPermissions(mMainActivity, PERMISSIONS, APPCONST.PERMISSIONS_REQUEST_STORAGE);
                         return true;
                     }
-                    if (mSetting.isAutoSyn()) {
-                        webSynMenu[2] = MyApplication.getmContext().getString(R.string.menu_backup_autoSyn) + "已开启";
-                    } else {
-                        webSynMenu[2] = MyApplication.getmContext().getString(R.string.menu_backup_autoSyn) + "已关闭";
-                    }
-                    new AlertDialog.Builder(mMainActivity)
-                            .setTitle(mMainActivity.getString(R.string.menu_bookcase_syn))
-                            .setAdapter(new ArrayAdapter<>(mMainActivity,
-                                            android.R.layout.simple_list_item_1, webSynMenu),
-                                    (dialog, which) -> {
-                                        switch (which) {
-                                            case 0:
-                                                synBookcaseToWeb(false);
-                                                break;
-                                            case 1:
-                                                webRestore();
-                                                break;
-                                            case 2:
-                                                String tip = "";
-                                                if (mSetting.isAutoSyn()) {
-                                                    mSetting.setAutoSyn(false);
-                                                    tip = "每日自动同步已关闭！";
-                                                } else {
-                                                    mSetting.setAutoSyn(true);
-                                                    tip = "每日自动同步已开启！";
-                                                }
-                                                SysManager.saveSetting(mSetting);
-                                                ToastUtils.showSuccess(tip);
-                                                break;
-                                        }
-                                    })
-                            .setNegativeButton(null, null)
-                            .setPositiveButton(null, null)
-                            .show();
-                    break;
-                case R.id.action_download_all:
-                    if (!SharedPreUtils.getInstance().getBoolean("isReadDownloadAllTip")) {
-                        DialogCreator.createCommonDialog(mMainActivity, "一键缓存",
-                                mMainActivity.getString(R.string.all_cathe_tip), true,
-                                (dialog, which) -> {
-                                    downloadAll(true);
-                                    SharedPreUtils.getInstance().putBoolean("isReadDownloadAllTip", true);
-                                }, null);
-                    }else {
-                        downloadAll(true);
-                    }
+                }
+                Intent fileSystemIntent = new Intent(mMainActivity, FileSystemActivity.class);
+                mMainActivity.startActivity(fileSystemIntent);
+                break;
+            case R.id.action_download_all:
+                if (!SharedPreUtils.getInstance().getBoolean("isReadDownloadAllTip")) {
+                    DialogCreator.createCommonDialog(mMainActivity, "一键缓存",
+                            mMainActivity.getString(R.string.all_cathe_tip), true,
+                            (dialog, which) -> {
+                                downloadAll(true);
+                                SharedPreUtils.getInstance().putBoolean("isReadDownloadAllTip", true);
+                            }, null);
+                } else {
+                    downloadAll(true);
+                }
+                return true;
 
-                    return true;
-                case R.id.action_backup:
-                    AlertDialog bookDialog = new AlertDialog.Builder(mMainActivity)
-                            .setTitle(mMainActivity.getResources().getString(R.string.menu_bookcase_backup))
-                            .setAdapter(new ArrayAdapter<>(mMainActivity,
-                                            android.R.layout.simple_list_item_1, backupMenu),
-                                    (dialog, which) -> {
-                                        switch (which) {
-                                            case 0:
-                                                mHandler.sendMessage(mHandler.obtainMessage(5));
-                                                break;
-                                            case 1:
-                                                mHandler.sendMessage(mHandler.obtainMessage(6));
-                                                break;
-                                        }
-                                    })
-                            .setNegativeButton(null, null)
-                            .setPositiveButton(null, null)
-                            .create();
-                    bookDialog.show();
-                    return true;
-                case R.id.action_setting:
-                    Intent settingIntent = new Intent(mMainActivity, MoreSettingActivity.class);
-                    mMainActivity.startActivity(settingIntent);
-                    return true;
-                case R.id.action_about:
-                    Intent aboutIntent = new Intent(mMainActivity, AboutActivity.class);
-                    mMainActivity.startActivity(aboutIntent);
-                    return true;
+        }
+        return false;
+    }
+
+    //显示书籍分组菜单
+    public void showBookGroupMenu(View view, MainActivity.OnGroupChangeListener ogcl) {
+        initBookGroups(false);
+        PopupMenu popupMenu = new PopupMenu(mMainActivity, view, Gravity.END);
+        popupMenu.getMenu().add(0, 0, 0, "所有书籍");
+        for (int i = 0; i < mGroupNames.length; i++) {
+            popupMenu.getMenu().add(0, 0, i + 1, mGroupNames[i]);
+        }
+        popupMenu.setOnMenuItemClickListener(menuItem -> {
+            String curBookGroupId = "";
+            String curBookGroupName = "";
+            if (menuItem.getOrder() > 0) {
+                curBookGroupId = mBookGroups.get(menuItem.getOrder() - 1).getId();
+                curBookGroupName = mBookGroups.get(menuItem.getOrder() - 1).getName();
             }
-            return false;
+            SharedPreUtils.getInstance().putString("curBookGroupId", curBookGroupId);
+            SharedPreUtils.getInstance().putString("curBookGroupName", curBookGroupName);
+            ogcl.onChange();
+            init();
+            return true;
         });
-        pm.show();
+        popupMenu.show();
     }
 
     /**
-     * 显示菜单图标
+     * 编辑书架
      *
-     * @param menu   菜单
-     * @param enable 是否显示图标
+     * @param isEdit
      */
-    private void setIconEnable(Menu menu, boolean enable) {
-        try {
-            Class<?> clazz = Class.forName("com.android.internal.view.menu.MenuBuilder");
-            Method m = clazz.getDeclaredMethod("setOptionalIconsVisible", boolean.class);
-            m.setAccessible(true);
-            //MenuBuilder实现Menu接口，创建菜单时，传进来的menu其实就是MenuBuilder对象(java的多态特征)
-            m.invoke(menu, enable);
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void editBookcase(boolean isEdit) {
+        if (isEdit) {
+            if (mBooks.size() > 0) {
+                mBookcaseFragment.getSrlContent().setEnableRefresh(false);
+                mBookcaseAdapter.setmEditState(true);
+                mBookcaseFragment.getGvBook().setDragModel(DragSortGridView.DRAG_BY_LONG_CLICK);
+
+                mBookcaseFragment.getRlBookEdit().setVisibility(View.VISIBLE);
+                setBtnClickable(false);
+                changeCheckedAllStatus();
+                mBookcaseAdapter.notifyDataSetChanged();
+            } else {
+                ToastUtils.showWarring("当前无任何书籍，无法编辑书架!");
+            }
+        } else {
+            if (mBookcaseFragment.getGvBook().getmScrollView().getScrollY() == 0
+                    && android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mBookcaseFragment.getSrlContent().setEnableRefresh(true);
+            }
+            mBookcaseFragment.getGvBook().setDragModel(-1);
+            mBookcaseAdapter.setmEditState(false);
+            mBookcaseFragment.getRlBookEdit().setVisibility(View.GONE);
+            mBookcaseAdapter.notifyDataSetChanged();
         }
     }
 
     /**
-     * 备份
+     * 分组管理对话框
      */
-    private void backup() {
-        if (mBooks.size() == 0){
-            ToastUtils.showWarring("当前书架无任何书籍，无法备份！");
-            return;
-        }
-        DialogCreator.createCommonDialog(mMainActivity, "确认备份吗?", "新备份会替换原有备份！", true,
-                (dialogInterface, i) -> {
-                    dialogInterface.dismiss();
-                    if (mBackupAndRestore.backup("localBackup")) {
-                        DialogCreator.createTipDialog(mMainActivity, "备份成功，备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
-                    } else {
-                        DialogCreator.createTipDialog(mMainActivity, "未给予储存权限，备份失败！");
+    private void showGroupManDia() {
+        MyAlertDialog.build(mMainActivity)
+                .setTitle("分组管理")
+                .setItems(mMainActivity.getResources().getStringArray(R.array.group_man)
+                        , (dialog, which) -> {
+                            initBookGroups(false);
+                    switch (which){
+                        case 0:
+                            showAddOrRenameGroupDia(false, 0);
+                            break;
+                        case 1:
+                            showSelectGroupDia((dialog1, which1) -> {
+                                showAddOrRenameGroupDia(true, which1);
+                            });
+                            break;
+                        case 2:
+                            showDeleteGroupDia();
+                            break;
                     }
-                }, (dialogInterface, i) -> dialogInterface.dismiss());
-    }
-
-    /**
-     * 恢复
-     */
-    private void restore() {
-        DialogCreator.createCommonDialog(mMainActivity, "确认恢复吗?", "恢复书架会覆盖原有书架！", true,
-                (dialogInterface, i) -> {
-                    dialogInterface.dismiss();
-                    if (mBackupAndRestore.restore("localBackup")) {
-                        mHandler.sendMessage(mHandler.obtainMessage(7));
-//                            DialogCreator.createTipDialog(mMainActivity,
-//                                    "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");
-                        mSetting = SysManager.getSetting();
-                        ToastUtils.showSuccess("书架恢复成功！");
-                    } else {
-                        DialogCreator.createTipDialog(mMainActivity, "未找到备份文件或未给予储存权限，恢复失败！");
-                    }
-                }, (dialogInterface, i) -> dialogInterface.dismiss());
+                }).show();
     }
 
 
     /**
-     * 恢复
+     * 添加/重命名分组对话框
      */
-    private void webRestore() {
-        if (!NetworkUtils.isNetWorkAvailable()) {
-            ToastUtils.showWarring("无网络连接！");
-            return;
+    private void showAddOrRenameGroupDia(boolean isRename, int groupNum){
+        View view = LayoutInflater.from(mMainActivity).inflate(R.layout.edit_dialog, null);
+        TextInputLayout textInputLayout = view.findViewById(R.id.text_input_lay);
+        EditText editText = textInputLayout.getEditText();
+        editText.setHint("请输入分组名");
+        BookGroup bookGroup = !isRename ? new BookGroup() : mBookGroups.get(groupNum);
+        String oldName = bookGroup.getName();
+        if (isRename) {
+            editText.setText(oldName);
         }
-        DialogCreator.createCommonDialog(mMainActivity, "确认同步吗?", "将书架从网络同步至本地会覆盖原有书架！", true,
-                (dialogInterface, i) -> {
-                    dialogInterface.dismiss();
-                    MyApplication.getApplication().newThread(() -> {
-                        if (UserService.webRestore()) {
-                            mHandler.sendMessage(mHandler.obtainMessage(7));
-//                                    DialogCreator.createTipDialog(mMainActivity,
-//                                            "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");、
-                            mSetting = SysManager.getSetting();
-                            ToastUtils.showSuccess("成功将书架从网络同步至本地！");
-                        } else {
-                            DialogCreator.createTipDialog(mMainActivity, "未找到同步文件，同步失败！");
+        editText.requestFocus();
+        mHandler.postDelayed(() ->{
+            InputMethodManager imm = (InputMethodManager) mMainActivity
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+        }, 220);
+        AlertDialog newGroupDia = MyAlertDialog.build(mMainActivity)
+                .setTitle(!isRename ? "新建分组" : "重命名分组")
+                .setView(view)
+                .setCancelable(false)
+                .setPositiveButton("确认", null)
+                .setNegativeButton("取消", null)
+                .show();
+        Button posBtn = newGroupDia.getButton(AlertDialog.BUTTON_POSITIVE);
+        posBtn.setEnabled(false);
+        posBtn.setOnClickListener(v1 -> {
+            bookGroup.setName(editText.getText().toString());
+            if (!isRename) {
+                mBookGroupService.addBookGroup(bookGroup);
+            }else {
+                mBookGroupService.updateEntity(bookGroup);
+            }
+            ToastUtils.showSuccess("成功" +
+                    (!isRename ? "添加分组[" : "成功将[" + oldName + "]重命名为[")
+                    + bookGroup.getName() + "]");
+            newGroupDia.dismiss();
+        });
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String text = editText.getText().toString();
+                if (editText.getText().length() > 0 && editText.getText().length() <= 10 && !text.equals(oldName)) {
+                    posBtn.setEnabled(true);
+                } else {
+                    posBtn.setEnabled(false);
+                }
+            }
+        });
+    }
+
+    /**
+     * 删除分组对话框
+     */
+    private void showDeleteGroupDia() {
+        boolean[] checkedItems = new boolean[mGroupNames.length];
+        new MultiChoiceDialog().create(mMainActivity, "删除分组", mGroupNames
+                , checkedItems, 0, (dialog, which) -> {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < checkedItems.length; i++) {
+                        if (checkedItems[i]) {
+                            mBookGroupService.deleteEntity(mBookGroups.get(i));
+                            sb.append(mBookGroups.get(i).getName()).append("、");
                         }
-                    });
-                }, (dialogInterface, i) -> dialogInterface.dismiss());
+                    }
+                    if (sb.length() > 0){
+                        sb.deleteCharAt(sb.lastIndexOf("、"));
+                    }
+                    ToastUtils.showSuccess("分组[" + sb.toString() + "]删除成功！");
+                }, null, null);
+    }
+
+    //显示选择书籍对话框
+    private void showSelectGroupDia(DialogInterface.OnClickListener onClickListener){
+        MyAlertDialog.build(mMainActivity)
+                .setTitle("选择分组")
+                .setItems(mGroupNames, onClickListener)
+                .setCancelable(false)
+                .setPositiveButton("取消", null)
+                .show();
     }
 
 /**********************************************缓存书籍***************************************************************/
@@ -618,7 +657,7 @@ public class BookcasePresenter implements BasePresenter {
             ToastUtils.showWarring("无网络连接！");
             return;
         }
-        if (mBooks.size() == 0){
+        if (mBooks.size() == 0) {
             ToastUtils.showWarring("当前书架没有任何书籍，无法一键缓存！");
             return;
         }
@@ -626,16 +665,16 @@ public class BookcasePresenter implements BasePresenter {
             ArrayList<Book> needDownloadBooks = new ArrayList<>();
             for (Book book : mBooks) {
                 if (!BookSource.pinshu.toString().equals(book.getSource()) && !"本地书籍".equals(book.getType())
-                && book.getIsDownLoadAll()) {
+                        && book.getIsDownLoadAll()) {
                     needDownloadBooks.add(book);
                 }
             }
-            if(needDownloadBooks.size() == 0){
+            if (needDownloadBooks.size() == 0) {
                 ToastUtils.showWarring("当前书架书籍不支持/已关闭(可在设置开启)一键缓存！");
                 return;
             }
             if (isDownloadAllChapters) {
-                mHandler.sendEmptyMessage(12);
+                mHandler.sendEmptyMessage(11);
             }
             downloadFor:
             for (final Book book : needDownloadBooks) {
@@ -702,7 +741,7 @@ public class BookcasePresenter implements BasePresenter {
             }
             return;
         }
-        if (SysManager.getSetting().getCatheGap() != 0){
+        if (SysManager.getSetting().getCatheGap() != 0) {
             downloadInterval = SysManager.getSetting().getCatheGap();
         }
         //取消之前下载
@@ -735,7 +774,7 @@ public class BookcasePresenter implements BasePresenter {
         }
         needCacheChapterNum = needDownloadChapters.size();
         if (!isDownloadAll && needCacheChapterNum > 0) {
-            mHandler.sendEmptyMessage(12);
+            mHandler.sendEmptyMessage(11);
         }
         mHandler.postDelayed(sendDownloadNotification, 2 * downloadInterval);
         for (Chapter chapter : needDownloadChapters) {
@@ -839,36 +878,6 @@ public class BookcasePresenter implements BasePresenter {
         }
     }
 
-    /**
-     * 添加本地书籍
-     *
-     * @param path
-     */
-    public void addLocalBook(String path) {
-        File file = new File(path);
-        if (!file.exists()) {
-            return;
-        }
-        Book book = new Book();
-        book.setName(file.getName().replace(".txt", ""));
-        book.setChapterUrl(path);
-        book.setType("本地书籍");
-        book.setHistoryChapterId("未开始阅读");
-        book.setNewestChapterTitle("未拆分章节");
-        book.setAuthor("本地书籍");
-        book.setSource(BookSource.local.toString());
-        book.setDesc("");
-
-        //判断书籍是否已经添加
-        Book existsBook = mBookService.findBookByAuthorAndName(book.getName(), book.getAuthor());
-        if (book.equals(existsBook)) {
-            ToastUtils.showWarring("该书籍已存在，请勿重复添加！");
-            return;
-        }
-        mBookService.addBook(book);
-        ToastUtils.showSuccess("本地书籍添加成功");
-        init();
-    }
 
     /**
      * 同步书架
@@ -880,7 +889,7 @@ public class BookcasePresenter implements BasePresenter {
             }
             return;
         }
-        if (mBooks.size() == 0){
+        if (mBooks.size() == 0) {
             if (!isAutoSyn) {
                 ToastUtils.showWarring("当前书架无任何书籍，无法同步！");
             }
@@ -928,7 +937,7 @@ public class BookcasePresenter implements BasePresenter {
     }
 
     /**
-     *
+     * 销毁
      */
     public void destroy() {
         notificationUtil.cancelAll();
@@ -939,28 +948,30 @@ public class BookcasePresenter implements BasePresenter {
     }
 
 
-    /*class NotificationService extends Service{
+    /********************************编辑状态下下方按钮********************************************/
+    private void setBtnClickable(boolean isClickable) {
+        mBookcaseFragment.getmBtnDelete().setEnabled(isClickable);
+        mBookcaseFragment.getmBtnDelete().setClickable(isClickable);
+        mBookcaseFragment.getmBtnAddGroup().setEnabled(isClickable);
+        mBookcaseFragment.getmBtnAddGroup().setClickable(isClickable);
+    }
 
-        @Nullable
-        @Override
-        public IBinder onBind(Intent intent) {
-            return null;
+    /**
+     * 改变全选按钮的状态
+     */
+    private void changeCheckedAllStatus() {
+        //设置是否全选
+        if (mBookcaseAdapter.getmCheckedCount() == mBookcaseAdapter.getmCheckableCount()) {
+            mBookcaseAdapter.setIsCheckedAll(true);
+        } else if (mBookcaseAdapter.isCheckedAll()) {
+            mBookcaseAdapter.setIsCheckedAll(false);
         }
-        public void sendNotification(Book book, String chapterTitle){
-            //创建 Notification.Builder 对象
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(mMainActivity, "channel_download")
-                    .setSmallIcon(R.drawable.ic_download)
-                    //通知栏大图标
-                    .setLargeIcon(BitmapFactory.decodeResource(mMainActivity.getResources(), R.mipmap.ic_launcher))
-                    //点击通知后自动清除
-                    .setAutoCancel(true)
-                    .setContentTitle("正在下载：" + book.getName())
-                    .setContentText(chapterTitle);
-            builder.addAction(R.drawable.ic_stop_black_24dp, "取消", null);
-            //发送通知
-            startForeground(1, builder.build());
+        mBookcaseFragment.getmCbSelectAll().setChecked(mBookcaseAdapter.isCheckedAll());
+        //重置全选的文字
+        if (mBookcaseAdapter.isCheckedAll()) {
+            mBookcaseFragment.getmCbSelectAll().setText("取消");
+        } else {
+            mBookcaseFragment.getmCbSelectAll().setText("全选");
         }
-    }*/
-
-
+    }
 }

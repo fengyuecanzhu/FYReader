@@ -65,7 +65,8 @@ public class SysManager {
         setting.setMatchChapter(true);
         setting.setMatchChapterSuitability(0.7f);
         setting.setCatheGap(150);
-        setting.setRefreshWhenStart(false);
+        setting.setRefreshWhenStart(true);
+        setting.setOpenBookStore(true);
         setting.setSettingVersion(APPCONST.SETTING_VERSION);
         return setting;
     }
@@ -79,6 +80,8 @@ public class SysManager {
         Setting setting = getSetting();
         setting.setVolumeTurnPage(true);
         setting.setMatchChapter(true);
+        setting.setRefreshWhenStart(true);
+        setting.setOpenBookStore(true);
         setting.setResetScreen(3);
         setting.setSettingVersion(APPCONST.SETTING_VERSION);
         saveSetting(setting);

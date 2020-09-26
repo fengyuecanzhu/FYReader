@@ -17,8 +17,6 @@ import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +28,10 @@ import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
+import xyz.fycz.myreader.creator.MyAlertDialog;
+import xyz.fycz.myreader.ui.activity.*;
 import xyz.fycz.myreader.util.*;
+import xyz.fycz.myreader.util.utils.ColorUtil;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.creator.DialogCreator;
@@ -45,9 +45,6 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.BookMarkService;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
-import xyz.fycz.myreader.ui.activity.FontsActivity;
-import xyz.fycz.myreader.ui.activity.ReadActivity;
-import xyz.fycz.myreader.ui.activity.CatalogActivity;
 import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
 import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -214,6 +211,9 @@ public class ReadPresenter implements BasePresenter {
 
     @Override
     public void start() {
+        if (SharedPreUtils.getInstance().getBoolean("isNightFS", false)) {
+            mSetting.setDayStyle(!ColorUtil.isColorLight(mReadActivity.getColor(R.color.textPrimary)));
+        }
         //息屏时间
         screenTimeOut = mSetting.getResetScreen() * 60;
 
@@ -237,22 +237,18 @@ public class ReadPresenter implements BasePresenter {
             BrightUtil.setBrightness(mReadActivity, BrightUtil.progressToBright(mSetting.getBrightProgress()));
         }
 
-        //是否直接打开本地txt文件
-        String path = null;
-        if (Intent.ACTION_VIEW.equals(mReadActivity.getIntent().getAction())) {
-            Uri uri = mReadActivity.getIntent().getData();
-            path = getPath(mReadActivity, uri);
+        if (!loadBook()){
+            mReadActivity.finish();
+            return;
         }
-        if (!StringHelper.isEmpty(path)) {
-            //本地txt文件路径不为空，添加书籍
-            addLocalBook(path);
-        } else {
-            //路径为空，说明不是直接打开txt文件
-            mBook = (Book) mReadActivity.getIntent().getSerializableExtra(APPCONST.BOOK);
-        }
-
 
         isCollected = mReadActivity.getIntent().getBooleanExtra("isCollected", true);
+
+        //当书籍Collected且书籍id不为空的时候保存上次阅读信息
+        if (isCollected && !StringHelper.isEmpty(mBook.getId())) {
+            //保存上次阅读信息
+            SharedPreUtils.getInstance().putString("lastRead", mBook.getId());
+        }
 
         mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
 
@@ -263,6 +259,47 @@ public class ReadPresenter implements BasePresenter {
         initListener();
 
         getData();
+    }
+    /**
+     * 进入阅读书籍有三种方式：
+     *      1、直接从书架进入，这种方式书籍一定Collected
+     *      2、从外部打开txt文件，这种方式会添加进书架
+     *      3、从快捷图标打开上次阅读书籍
+     * @return 是否加载成功
+     */
+    private boolean loadBook() {
+        //是否直接打开本地txt文件
+        String path = null;
+        if (Intent.ACTION_VIEW.equals(mReadActivity.getIntent().getAction())) {
+            Uri uri = mReadActivity.getIntent().getData();
+            if (uri != null) {
+                path = getPath(mReadActivity, uri);
+            }
+        }
+        if (!StringHelper.isEmpty(path)) {
+            //本地txt文件路径不为空，添加书籍
+            addLocalBook(path);
+        } else {
+            //路径为空，说明不是直接打开txt文件
+            mBook = (Book) mReadActivity.getIntent().getSerializableExtra(APPCONST.BOOK);
+            //mBook为空，说明是从快捷方式启动
+            if (mBook == null){
+                String bookId = SharedPreUtils.getInstance().getString("lastRead", "");
+                if ("".equals(bookId)){//没有上次阅读信息
+                    ToastUtils.showWarring("当前没有阅读任何书籍，无法加载上次阅读书籍！");
+                    mReadActivity.finish();
+                    return false;
+                }else {//有信息
+                    mBook = mBookService.getBookById(bookId);
+                    if (mBook == null){//上次阅读的书籍不存在
+                        ToastUtils.showWarring("上次阅读书籍已不存在/移除书架，无法加载！");
+                        mReadActivity.finish();
+                        return false;
+                    }//存在就继续执行
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -342,6 +379,7 @@ public class ReadPresenter implements BasePresenter {
                     intent.putExtra(APPCONST.BOOK, mBook);
                     mReadActivity.startActivityForResult(intent, APPCONST.REQUEST_CHAPTER_PAGE);
                 }, (dialog, view, isDayStyle) -> {//日夜切换
+                    dialog.dismiss();
                     changeNightAndDaySetting(isDayStyle);
                 }, view -> {//设置
                     showSettingDetailView();
@@ -477,7 +515,7 @@ public class ReadPresenter implements BasePresenter {
                 default:
                     checkedItem = 0;
             }
-            mPageModeDialog = new AlertDialog.Builder(mReadActivity)
+            mPageModeDialog = MyAlertDialog.build(mReadActivity)
                     .setTitle("翻页模式")
                     .setSingleChoiceItems(pageMode, checkedItem, (dialog, which) -> {
                         switch (which) {
@@ -770,7 +808,7 @@ public class ReadPresenter implements BasePresenter {
             return;
         }
         MyApplication.runOnUiThread(() -> {
-            new AlertDialog.Builder(mReadActivity)
+            MyAlertDialog.build(mReadActivity)
                     .setTitle("缓存书籍")
                     .setSingleChoiceItems(APPCONST.DIALOG_DOWNLOAD, selectedIndex, (dialog, which) -> selectedIndex = which).setNegativeButton("取消", ((dialog, which) -> dialog.dismiss())).setPositiveButton("确定",
                     (dialog, which) -> {
@@ -957,8 +995,9 @@ public class ReadPresenter implements BasePresenter {
     private void changeNightAndDaySetting(boolean isCurDayStyle) {
         mSetting.setDayStyle(!isCurDayStyle);
         SysManager.saveSetting(mSetting);
+        MyApplication.getApplication().setNightTheme(isCurDayStyle);
         settingChange = true;
-        mPageLoader.setPageStyle(!isCurDayStyle);
+        //mPageLoader.setPageStyle(!isCurDayStyle);
     }
 
     /**
@@ -992,11 +1031,14 @@ public class ReadPresenter implements BasePresenter {
      */
     private void changeStyle(ReadStyle readStyle) {
         settingChange = true;
-        if (!mSetting.isDayStyle()) {
-            mSetting.setDayStyle(true);
-        }
         mSetting.setReadStyle(readStyle);
         SysManager.saveSetting(mSetting);
+        if (!mSetting.isDayStyle()) {
+            DialogCreator.createCommonDialog(mReadActivity, "提示", "是否希望切换为日间模式？",
+                    false, "确定", "取消", (dialog, which) -> {
+                        changeNightAndDaySetting(false);
+                    }, null);
+        }
         MyApplication.runOnUiThread(() -> mPageLoader.setPageStyle(true));
     }
 
@@ -1083,7 +1125,6 @@ public class ReadPresenter implements BasePresenter {
         book.setSource(BookSource.local.toString());
         book.setDesc("无");
         book.setIsCloseUpdate(true);
-
         //判断书籍是否已经添加
         Book existsBook = mBookService.findBookByAuthorAndName(book.getName(), book.getAuthor());
         if (book.equals(existsBook)) {
@@ -1220,7 +1261,9 @@ public class ReadPresenter implements BasePresenter {
         for (int i = 0; i < 9; i++) {
             mHandler.removeMessages(i + 1);
         }
-        mPageLoader.closeBook();
-        mPageLoader = null;
+        if (mPageLoader != null) {
+            mPageLoader.closeBook();
+            mPageLoader = null;
+        }
     }
 }

@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">风月读书</string>
     <string name="app_name_debug">风月读书.debug</string>
+    <string name="bookshelf">书架</string>
+    <string name="last_read">上次阅读</string>
 
     <string name="anti_hijacking_tips_home">风月读书切换至后台运行</string>
     <string name="anti_hijacking_tips">风月读书切换至后台运行，当前风月读书所有，请注意！</string>
@@ -52,12 +54,14 @@
         \n\n注：软件提供了智能匹配历史章节功能，您可在设置界面开启！
     </string>
 
+    <string name="top_sort_tip">"%1$s数据来自非书源网站，进入书籍详情时需要从书源搜索，部分书籍(特别是新书)可能无法搜索到！\n注：初次加载时速度可能较慢，请耐心等待！"</string>
+
     <!--menu-->
     <string name="menu_book_Top">移至顶部</string>
     <string name="menu_book_detail">书籍详情</string>
     <string name="menu_book_download">缓存书籍</string>
     <string name="menu_book_cache">导出缓存</string>
-    <string name="menu_book_delete">删除书籍</string>
+    <string name="menu_book_delete">删除/移除书籍</string>
 
     <string name="menu_bookcase_edit">编辑书架</string>
     <string name="menu_bookcase_style">切换布局</string>
@@ -129,6 +133,23 @@
     <string name="download_all">一键缓存</string>
     <string name="close_refresh">禁用更新</string>
     <string name="close_refresh_tip">选择禁用更新的书籍</string>
+    <string name="other_setting">其他设置</string>
+    <string name="open_store">开启书城</string>
+    <string name="open_bookstore_tip">打开软件时开启书城</string>
+    <string name="search_setting">搜索设置</string>
+    <string name="disable_source">禁用书源</string>
+    <string name="disable_source_tip">选择搜索时禁用的书源</string>
+    <string name="loading_tip">正在加载...</string>
+    <string name="loading_error">加载失败</string>
+    <string name="menu_bookcase_search">搜索</string>
+    <string name="novel_boy">男生小说</string>
+    <string name="novel_girl">女生小说</string>
+    <string name="common_search">搜索</string>
+    <string name="theme_mode">主题模式</string>
+    <string name="join_qq_group">加入QQ群</string>
+    <string name="mine_feedback">问题反馈</string>
+    <string name="menu_change_group">分组切换</string>
+    <string name="menu_group_man">分组管理</string>
 
 
     <string-array name="reset_screen_time">
@@ -152,5 +173,16 @@
         <item>150ms</item>
         <item>200ms</item>
         <item>250ms</item>
+    </string-array>
+
+    <string-array name="theme_mode_arr">
+        <item>跟随系统</item>
+        <item>日间模式</item>
+        <item>夜间模式</item>
+    </string-array>
+    <string-array name="group_man">
+        <item>添加分组</item>
+        <item>重命名分组</item>
+        <item>删除分组</item>
     </string-array>
 </resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#212121</color>
+    <color name="colorPrimaryDark">#161616</color>
+    <color name="colorAccent">#90cbf6</color>
+    <!--    <color name="colorAccent">#009386</color>-->
+    <!--界面底色-->
+    <color name="colorBackground">#202020</color>
+    <!--界面底色-->
+    <color name="colorForeground">#303030</color>
+    <!-- 分割线颜色-->
+    <color name="colorDivider">#000000</color>
+    <!--    卡片颜色-->
+    <color name="background_card">#353535</color>
+    <!--text-->
+
+    <!--用于重要级文字信息，如标题，子模块功能文字等-->
+    <color name="textPrimary">#d9ffffff</color>
+    <!--用于普通级信息-->
+    <color name="textSecondary">#8affffff</color>
+    <!--用于普通级信息、引导词,如昵正文、弹层文案、查看更多之类-->
+    <color name="textAssist">#43ffffff</color>
+    <!--用于辅助、次要的文字信息、普通按钮描边,如时间、来自等补充信息文案-->
+    <color name="textAssistSecondary">#808080</color>
+    <color name="textPrimaryInverted">#d9ffffff</color>
+    <color name="textSecondaryInverted">#8affffff</color>
+    <color name="textAssistInverted">#43ffffff</color>
+    <color name="textError">#ffe7492e</color>
+
+    <!--menu-->
+    <color name="menu_color_default">#b7b7b7</color>
+    <color name="background_menu">#282828</color>
+
+    <!--button-->
+    <color name="widget_button_normal">@color/colorForeground</color>
+    <color name="widget_button_selected">@color/colorBackground</color>
+
+    <!--  书籍更新强调色  -->
+    <color name="highlight">#d3321b</color>
+<!--    <color name="highlight">@color/colorAccent</color>-->
+
+</resources>

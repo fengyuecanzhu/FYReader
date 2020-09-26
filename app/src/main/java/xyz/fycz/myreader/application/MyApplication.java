@@ -18,8 +18,10 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 
+import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -43,8 +45,10 @@ import xyz.fycz.myreader.creator.APPDownloadTip;
 import xyz.fycz.myreader.creator.DialogCreator;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.entity.UpdateInfo;
+import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
 import xyz.fycz.myreader.util.*;
+import xyz.fycz.myreader.util.utils.NetworkUtils;
 
 
 public class MyApplication extends Application {
@@ -66,7 +70,39 @@ public class MyApplication extends Application {
         mFixedThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());//初始化线程池
 
         BaseActivity.setCloseAntiHijacking(true);
+        initNightTheme();
+    }
 
+    public void initNightTheme() {
+        if (isNightFS()){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        }else {
+            if (isNightTheme()) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+        }
+    }
+
+    protected boolean isNightTheme() {
+        return !SysManager.getSetting().isDayStyle();
+    }
+
+    public boolean isNightFS() {
+        return SharedPreUtils.getInstance().getBoolean("isNightFS", false);
+    }
+
+    /**
+     * 设置夜间模式
+     * @param isNightMode
+     */
+    public void setNightTheme(boolean isNightMode) {
+        SharedPreUtils.getInstance().putBoolean("isNightFS", false);
+        Setting setting = SysManager.getSetting();
+        setting.setDayStyle(!isNightMode);
+        SysManager.saveSetting(setting);
+        MyApplication.getApplication().initNightTheme();
     }
 
     @SuppressLint("TrulyRandom")
@@ -109,7 +145,7 @@ public class MyApplication extends Application {
         try {
             mFixedThreadPool.execute(runnable);
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             mFixedThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());//初始化线程池
             mFixedThreadPool.execute(runnable);
         }
@@ -244,7 +280,7 @@ public class MyApplication extends Application {
             }
         });
     }*/
-    public static void checkVersionByServer(final BaseActivity activity, final boolean isManualCheck,
+    public static void checkVersionByServer(final AppCompatActivity activity, final boolean isManualCheck,
                                             final BookcaseFragment mBookcaseFragment) {
         MyApplication.getApplication().newThread(() -> {
             Document doc = null;
@@ -256,7 +292,9 @@ public class MyApplication extends Application {
                 doc = Jsoup.connect(url).get();
                 String content = doc.getElementsByClass("ql-editor").text();
                 if (StringHelper.isEmpty(content)) {
-                    ToastUtils.showError("检查更新失败！");
+                    if (isManualCheck || NetworkUtils.isNetWorkAvailable()) {
+                        ToastUtils.showError("检查更新失败！");
+                    }
                     return;
                 }
                 String[] contents = content.split(";");
@@ -282,6 +320,7 @@ public class MyApplication extends Application {
                     s.append("\n");
                 }
                 int versionCode = getVersionCode();
+                Log.i("检查更新，最新版本", newestVersion + "");
                 if (newestVersion > versionCode) {
                     MyApplication m = new MyApplication();
                     Setting setting = SysManager.getSetting();
@@ -296,7 +335,10 @@ public class MyApplication extends Application {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                ToastUtils.showError("检查更新失败！");
+                Log.e("检查更新失败！", e.getLocalizedMessage());
+                if (isManualCheck || NetworkUtils.isNetWorkAvailable()) {
+                    ToastUtils.showError("检查更新失败！");
+                }
             }
         });
     }
@@ -307,7 +349,7 @@ public class MyApplication extends Application {
      * @param activity
      * @param versionCode
      */
-    public void updateApp(final BaseActivity activity, final String url, final int versionCode, String message,
+    public void updateApp(final AppCompatActivity activity, final String url, final int versionCode, String message,
                           final boolean isForceUpdate, final BookcaseFragment mBookcaseFragment) {
         //String version = (versionCode / 100 % 10) + "." + (versionCode / 10 % 10) + "." + (versionCode % 10);
         String cancelTitle;
@@ -328,6 +370,10 @@ public class MyApplication extends Application {
                         activity.finish();
                     }
                 }, (dialog, which) -> {
+                    if (activity instanceof MainActivity){
+                        MainActivity mainActivity = (MainActivity) activity;
+                        mainActivity.getViewPagerMain().setCurrentItem(0);
+                    }
                     if (url == null || "".equals(url)) {
                         ToastUtils.showError("获取链接失败，请前往浏览器下载！");
                         Intent intent = new Intent();
@@ -381,4 +427,25 @@ public class MyApplication extends Application {
         return mActivity == null || mActivity.isFinishing() || mActivity.isDestroyed();
     }
 
+
+    /****************
+     *
+     * 发起添加群流程。群号：风月读书交流群(1085028304) 的 key 为： 8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn
+     * 调用 joinQQGroup(8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn) 即可发起手Q客户端申请加群 风月读书交流群(1085028304)
+     *
+     * @param key 由官网生成的key
+     * @return 返回true表示呼起手Q成功，返回false表示呼起失败
+     ******************/
+    public static boolean joinQQGroup(Context context, String key) {
+        Intent intent = new Intent();
+        intent.setData(Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26jump_from%3Dwebapi%26k%3D" + key));
+        // 此Flag可根据具体产品需要自定义，如设置，则在加群界面按返回，返回手Q主界面，不设置，按返回会返回到呼起产品界面    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            context.startActivity(intent);
+            return true;
+        } catch (Exception e) {
+            // 未安装手Q或安装的版本不支持
+            return false;
+        }
+    }
 }

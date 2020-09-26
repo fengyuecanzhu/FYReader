@@ -9,6 +9,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookMark;
 import xyz.fycz.myreader.greendao.service.BookMarkService;
+import xyz.fycz.myreader.ui.activity.CatalogActivity;
 import xyz.fycz.myreader.ui.adapter.BookMarkAdapter;
 import xyz.fycz.myreader.ui.fragment.BookMarkFragment;
 
@@ -32,10 +33,7 @@ public class BookMarkPresenter implements BasePresenter {
 
     @Override
     public void start() {
-        mBook = (Book) mBookMarkFragment.getActivity().getIntent().getSerializableExtra(APPCONST.BOOK);
-        if (!SysManager.getSetting().isDayStyle()) {
-            mBookMarkFragment.getLvBookmarkList().setBackground(mBookMarkFragment.getActivity().getDrawable(R.color.sys_dialog_setting_bg));
-        }
+        mBook = ((CatalogActivity) mBookMarkFragment.getActivity()).getmBook();;
         initBookMarkList();
         mBookMarkFragment.getLvBookmarkList().setOnItemClickListener((parent, view, position, id) -> {
             BookMark bookMark = mBookMarks.get(position);

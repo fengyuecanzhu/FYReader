@@ -31,27 +31,6 @@ public class BookMarkService extends BaseService {
         }
         return sInstance;
     }
-    private ArrayList<BookMark> findBookMarks(String sql, String[] selectionArgs) {
-        ArrayList<BookMark> bookMarks = new ArrayList<>();
-        try {
-            Cursor cursor = selectBySql(sql, selectionArgs);
-            if (cursor == null) return bookMarks;
-            while (cursor.moveToNext()) {
-                BookMark bookMark = new BookMark();
-                bookMark.setId(cursor.getString(0));
-                bookMark.setBookId(cursor.getString(1));
-                bookMark.setNumber(cursor.getInt(2));
-                bookMark.setTitle(cursor.getString(3));
-                bookMark.setBookMarkChapterNum(cursor.getInt(4));
-                bookMark.setBookMarkReadPosition(cursor.getInt(5));
-                bookMarks.add(bookMark);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return bookMarks;
-        }
-        return bookMarks;
-    }
 
     /**
      * 通过ID查书签
@@ -69,20 +48,10 @@ public class BookMarkService extends BaseService {
      * @return
      */
     public BookMark findBookMarkByTitle(String title){
-        BookMark bookMark = null;
-        String sql = "select * from book_mark where title = ?";
-        Cursor cursor = selectBySql(sql,new String[]{title});
-        if (cursor == null) return null;
-        if (cursor.moveToNext()){
-            bookMark = new BookMark();
-            bookMark.setId(cursor.getString(0));
-            bookMark.setBookId(cursor.getString(1));
-            bookMark.setNumber(cursor.getInt(2));
-            bookMark.setTitle(cursor.getString(3));
-            bookMark.setBookMarkChapterNum(cursor.getInt(4));
-            bookMark.setBookMarkReadPosition(cursor.getInt(5));
-        }
-        return bookMark;
+        return GreenDaoManager.getInstance().getSession().getBookMarkDao()
+                .queryBuilder()
+                .where(BookMarkDao.Properties.Title.eq(title))
+                .unique();
     }
     /**
      * 获取书的所有书签
@@ -90,12 +59,11 @@ public class BookMarkService extends BaseService {
      * @return
      */
     public List<BookMark> findBookAllBookMarkByBookId(String bookId) {
-
-        if (StringHelper.isEmpty(bookId)) return new ArrayList<>();
-
-        String sql = "select * from book_mark where book_id = ? order by number";
-
-        return findBookMarks(sql, new String[]{bookId});
+        return GreenDaoManager.getInstance().getSession().getBookMarkDao()
+                .queryBuilder()
+                .where(BookMarkDao.Properties.BookId.eq(bookId))
+                .orderAsc(BookMarkDao.Properties.Number)
+                .list();
     }
 
 
@@ -155,7 +123,7 @@ public class BookMarkService extends BaseService {
      * @return
      */
     public int countBookMarkTotalNumByBookId(String bookId){
-        int num = 0;
+        /*int num = 0;
         try {
             Cursor cursor = selectBySql("select count(*) n from book where book_id = " + bookId,null);
             if (cursor.moveToNext()){
@@ -163,8 +131,12 @@ public class BookMarkService extends BaseService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        return num;
+        }*/
+
+        return (int) GreenDaoManager.getInstance().getSession().getBookMarkDao()
+                .queryBuilder()
+                .where(BookMarkDao.Properties.BookId.eq(bookId))
+                .count();
     }
 
     /**

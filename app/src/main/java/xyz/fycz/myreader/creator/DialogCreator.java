@@ -18,6 +18,7 @@ import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.appcompat.widget.AppCompatImageView;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
@@ -115,12 +116,7 @@ public class DialogCreator {
                 ivLastSelectd = ivBlueDeepStyle;
                 break;
         }
-        ivCommonStyle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedStyle(ivCommonStyle, common, onReadStyleChangeListener);
-            }
-        });
+        ivCommonStyle.setOnClickListener(v -> selectedStyle(ivCommonStyle, common, onReadStyleChangeListener));
         ivLeatherStyle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -371,7 +367,7 @@ public class DialogCreator {
         Window window = dialog.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         if (Build.VERSION.SDK_INT >= 21) {
-            window.setStatusBarColor(dialog.getContext().getResources().getColor(R.color.sys_dialog_setting_bg));
+            window.setStatusBarColor(dialog.getContext().getColor(R.color.sys_dialog_setting_bg));
         }
 
         view.setOnTouchListener(new View.OnTouchListener() {
@@ -452,7 +448,7 @@ public class DialogCreator {
                 tvNightAndDay.setText(context.getString(R.string.day));
             }
             if (onClickNightAndDayListener != null) {
-                onClickNightAndDayListener.onClick(dialog, view1, isDay);
+                onClickNightAndDayListener.onClick(dialog, view, isDay);
             }
         });
 
@@ -486,7 +482,7 @@ public class DialogCreator {
     public static AlertDialog createCommonDialog(Context context, String title, String mesage, boolean isCancelable,
                                                                         DialogInterface.OnClickListener positiveListener, DialogInterface.OnClickListener negativeListener) {
 
-        final AlertDialog.Builder normalDialog = new AlertDialog.Builder(context);
+        final AlertDialog.Builder normalDialog = MyAlertDialog.build(context);
 //        normalDialog.setIcon(R.drawable.icon_dialog);
         normalDialog.setTitle(title);
         normalDialog.setCancelable(isCancelable);
@@ -518,35 +514,32 @@ public class DialogCreator {
      * @param mesage
      * @param key1
      * @param key2
-     * @param positiveListener key1按键动作
-     * @param negativeListener key2按键动作
+     * @param key1Listener key1按键动作
+     * @param key2Listener key2按键动作
      */
     public static void createCommonDialog(Context context, String title, String mesage, boolean isCancelable,
                                           String key1, String key2,
-                                          DialogInterface.OnClickListener positiveListener,
-                                          DialogInterface.OnClickListener negativeListener) {
+                                          DialogInterface.OnClickListener key1Listener,
+                                          DialogInterface.OnClickListener key2Listener) {
         try {
 
-            final AlertDialog.Builder normalDialog = new AlertDialog.Builder(context);
+            final AlertDialog.Builder normalDialog = MyAlertDialog.build(context);
 //        normalDialog.setIcon(R.drawable.icon_dialog);
             normalDialog.setTitle(title);
             normalDialog.setCancelable(isCancelable);
             if (mesage != null) {
                 normalDialog.setMessage(mesage);
             }
-            normalDialog.setPositiveButton(key1, positiveListener);
-            normalDialog.setNegativeButton(key2, negativeListener);
+            normalDialog.setPositiveButton(key1, key1Listener);
+            normalDialog.setNegativeButton(key2, key2Listener);
             // 显示
-//        final AlertDialog alertDialog = normalDialog.create();
-            MyApplication.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-//                    final AlertDialog alertDialog = normalDialog.create();
-                        normalDialog.show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+//        final MyAlertDialog alertDialog = normalDialog.create();
+            MyApplication.runOnUiThread(() -> {
+                try {
+//                    final MyAlertDialog alertDialog = normalDialog.create();
+                    normalDialog.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         } catch (Exception e) {
@@ -568,7 +561,7 @@ public class DialogCreator {
                                           String key, DialogInterface.OnClickListener positiveListener
     ) {
         try {
-            final AlertDialog.Builder normalDialog = new AlertDialog.Builder(context);
+            final AlertDialog.Builder normalDialog = MyAlertDialog.build(context);
 //        normalDialog.setIcon(R.drawable.icon_dialog);
             normalDialog.setTitle(title);
             normalDialog.setCancelable(isCancelable);
@@ -578,12 +571,12 @@ public class DialogCreator {
             normalDialog.setPositiveButton(key, positiveListener);
 
             // 显示
-//        final AlertDialog alertDialog = normalDialog.create();
+//        final MyAlertDialog alertDialog = normalDialog.create();
             MyApplication.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     try {
-//                    final AlertDialog alertDialog = normalDialog.create();
+//                    final MyAlertDialog alertDialog = normalDialog.create();
                         normalDialog.show();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -609,7 +602,7 @@ public class DialogCreator {
     (Context context, String title, String message/*,
              DialogInterface.OnClickListener positiveListener,DialogInterface.OnClickListener negativeListener*/) {
 
-        final ProgressDialog progressDialog = new ProgressDialog(context);
+        final ProgressDialog progressDialog = new ProgressDialog(context, R.style.alertDialogTheme);
 //        normalDialog.setIcon(R.drawable.icon_dialog);
         if (!StringHelper.isEmpty(title)) {
             progressDialog.setTitle(title);
@@ -654,7 +647,7 @@ public class DialogCreator {
                                                       DialogInterface.OnClickListener positiveListener) {
       /*  final EditText et = new EditText(context);*/
         try {
-            final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+            final AlertDialog.Builder dialog = MyAlertDialog.build(context);
             dialog.setTitle(title);
             if (!StringHelper.isEmpty(msg)) {
                 dialog.setMessage(msg);
@@ -670,7 +663,7 @@ public class DialogCreator {
                 @Override
                 public void run() {
                     try {
-//                    final AlertDialog alertDialog = normalDialog.create();
+//                    final MyAlertDialog alertDialog = normalDialog.create();
                         dialog.show();
                     } catch (Exception e) {
                         e.printStackTrace();

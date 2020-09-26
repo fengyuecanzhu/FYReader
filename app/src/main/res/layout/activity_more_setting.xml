@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+              xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
@@ -28,7 +28,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
-                        android:textColor="@color/btn_black"
+                        android:textColor="@color/textPrimary"
                         android:text="@string/read_setting"/>
 
             </RelativeLayout>
@@ -45,7 +45,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:textColor="@color/title_black"
+                        android:textColor="@color/textSecondary"
                         android:textSize="@dimen/text_normal_size"
                         android:text="@string/volume_turn_page"/>
 
@@ -71,7 +71,7 @@
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/title_black"
+                        android:textColor="@color/textSecondary"
                         android:layout_centerVertical="true"
                         android:textSize="@dimen/text_normal_size"
                         android:text="@string/reset_screen_time"/>
@@ -98,7 +98,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
-                        android:textColor="@color/btn_black"
+                        android:textColor="@color/textPrimary"
                         android:text="@string/bookcase_setting"/>
             </RelativeLayout>
             <RelativeLayout
@@ -120,13 +120,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/text_normal_size"
-                            android:textColor="@color/title_black"
+                            android:textColor="@color/textSecondary"
                             android:text="@string/auto_refresh"/>
                     <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:textColor="@color/gray"
+                            android:textColor="@color/textAssist"
                             android:text="@string/auto_refresh_tip"/>
                 </LinearLayout>
 
@@ -153,16 +153,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="@dimen/text_normal_size"
-                        android:textColor="@color/title_black"
+                        android:textColor="@color/textSecondary"
                         android:text="@string/close_refresh"/>
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="5dp"
-                        android:textColor="@color/gray"
+                        android:textColor="@color/textAssist"
                         android:text="@string/close_refresh_tip"/>
             </LinearLayout>
-
             <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="25dp"
@@ -174,7 +173,43 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
-                        android:textColor="@color/btn_black"
+                        android:textColor="@color/textPrimary"
+                        android:text="@string/search_setting"/>
+            </RelativeLayout>
+            <LinearLayout
+                    android:id="@+id/more_setting_ll_disable_source"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:paddingTop="8dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/selector_common_bg">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_normal_size"
+                        android:textColor="@color/textSecondary"
+                        android:text="@string/disable_source"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="5dp"
+                        android:textColor="@color/textAssist"
+                        android:text="@string/disable_source_tip"/>
+            </LinearLayout>
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/textPrimary"
                         android:text="@string/change_source_setting"/>
                 <ImageView
                         android:id="@+id/more_setting_iv_match_chapter_tip"
@@ -182,7 +217,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:src="@drawable/ic_question"
-                        android:tint="@color/grey"/>
+                        app:tint="@color/textAssist"/>
 
             </RelativeLayout>
 
@@ -199,7 +234,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:textColor="@color/title_black"
+                        android:textColor="@color/textSecondary"
                         android:textSize="@dimen/text_normal_size"
                         android:text="@string/match_chapters"/>
 
@@ -227,7 +262,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:textSize="@dimen/text_normal_size"
-                        android:textColor="@color/title_black"
+                        android:textColor="@color/textSecondary"
                         android:text="@string/match_chapters_sui"/>
 
                 <androidx.appcompat.widget.AppCompatSpinner
@@ -238,7 +273,7 @@
                         android:layout_alignParentEnd="true"
                         android:gravity="center"
                         android:dropDownWidth="60dp"
-                        android:textColor="@color/title_black"
+                        android:textColor="@color/textSecondary"
                         android:clickable="false"
                         android:longClickable="false"/>
             </RelativeLayout>
@@ -254,7 +289,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
-                        android:textColor="@color/btn_black"
+                        android:textColor="@color/textPrimary"
                         android:text="@string/cathe_setting"/>
 
             </RelativeLayout>
@@ -272,7 +307,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:textColor="@color/title_black"
+                        android:textColor="@color/textSecondary"
                         android:textSize="@dimen/text_normal_size"
                         android:text="@string/cathe_gap"/>
 
@@ -284,7 +319,7 @@
                         android:layout_alignParentEnd="true"
                         android:gravity="center"
                         android:dropDownWidth="75dp"
-                        android:textColor="@color/title_black"
+                        android:textColor="@color/textSecondary"
                         android:clickable="false"
                         android:longClickable="false"/>
             </RelativeLayout>
@@ -302,13 +337,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="@dimen/text_normal_size"
-                        android:textColor="@color/title_black"
+                        android:textColor="@color/textSecondary"
                         android:text="@string/download_all"/>
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="5dp"
-                        android:textColor="@color/gray"
+                        android:textColor="@color/textAssist"
                         android:text="@string/download_all_tip"/>
             </LinearLayout>
             <RelativeLayout
@@ -323,11 +358,65 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:textColor="@color/title_black"
+                        android:textColor="@color/textSecondary"
                         android:textSize="@dimen/text_normal_size"
                         android:text="@string/clear_cathe"/>
 
             </RelativeLayout>
+
+            <!--<RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/btn_black"
+                        android:text="@string/other_setting"/>
+
+            </RelativeLayout>
+            <RelativeLayout
+                    android:id="@+id/more_setting_rl_bookstore"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:background="@drawable/selector_common_bg">
+
+                <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/selector_common_bg">
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/text_normal_size"
+                            android:textColor="@color/title_black"
+                            android:text="@string/open_store"/>
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:textColor="@color/gray"
+                            android:text="@string/open_bookstore_tip"/>
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/more_setting_sc_bookstore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:clickable="false"
+                        android:longClickable="false"/>
+            </RelativeLayout>-->
 
         </LinearLayout>
     </ScrollView>

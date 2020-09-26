@@ -81,7 +81,7 @@ public class FileSystemActivity extends BaseTabActivity {
     @Override
     protected void setUpToolbar(Toolbar toolbar) {
         super.setUpToolbar(toolbar);
-        setStatusBarColor(R.color.white, false);
+        setStatusBarColor(R.color.colorPrimary, true);
         getSupportActionBar().setTitle("添加本地");
     }
 

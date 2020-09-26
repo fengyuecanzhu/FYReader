@@ -1,13 +1,29 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppDayTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="MAppTheme" parent="Base.AppTheme">
         <!-- Customize your theme here. -->
+    </style>
+
+    <!-- Base application theme. -->
+    <style name="Base.AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/colorBackground</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionOverflowMenuStyle">@style/PopupMenu</item>
+        <item name="android:itemTextAppearance">@style/MenuItemTextStyle</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
+        <item name="actionBarStyle">@style/AppTheme.AppBarOverlay.Dark</item>
     </style>
 
+    <style name="MenuItemTextStyle" parent="@android:style/TextAppearance.Widget.IconMenu.Item">
+        <item name="android:textColor">@color/menu_color_default</item>
+        <item name="android:textSize">@dimen/text_normal_size</item>
+    </style>
+
+    <style name="PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@color/background_menu</item>
+    </style>
 
 
     <style name="TabLayoutTextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse">
@@ -62,9 +78,9 @@
     <!--Toolbar-->
     <style name="Theme.ToolBar.Menu" parent="ThemeOverlay.AppCompat.ActionBar">
         <!-- 设置-弹窗的背景-颜色-->
-        <item name="android:colorBackground">@color/white</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
         <!-- 字体的颜色-->
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/textPrimary</item>
         <!-- 字体大小-->
         <item name="android:textSize">16sp</item>
         <item name="android:gravity">center_vertical</item>
@@ -76,7 +92,23 @@
         <item name="android:dropDownListViewStyle">@style/dropDownStyle</item>
         <item name="dropDownListViewStyle">@style/dropDownStyle</item>
     </style>
-
+    <!--Toolbar-->
+    <style name="Theme.ToolBar.Dark.Menu" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <!-- 设置-弹窗的背景-颜色-->
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <!-- 字体的颜色-->
+        <item name="android:textColor">@color/textPrimary</item>
+        <!-- 字体大小-->
+        <item name="android:textSize">16sp</item>
+        <item name="android:gravity">center_vertical</item>
+        <!-- 用于替换菜单的三个小白点，换成自已的图片-->
+        <!--        <item name="actionOverflowButtonStyle">@style/ActionButton.Overflow.Menu</item>-->
+        <!--用于控制menu弹出的位置，位于toolbar的下面，而不是上面-->
+        <item name="actionOverflowMenuStyle">@style/OverflowMenuStyle</item>
+        <!-- 用于修改item默认的分割线-->
+        <item name="android:dropDownListViewStyle">@style/dropDownStyle</item>
+        <item name="dropDownListViewStyle">@style/dropDownStyle</item>
+    </style>
     <style name="ActionButton.Overflow.Menu" parent="android:style/Widget.Holo.Light.ActionButton.Overflow">
         <item name="android:src">@drawable/ic_menu_overflow</item>
     </style>
@@ -87,7 +119,7 @@
 
     <!--用于修改popmenu的分割线-->
     <style name="dropDownStyle" parent="android:style/Widget.Holo.ListView.DropDown">
-        <item name="android:listSelector">@drawable/selector_common_bg</item>
+        <item name="android:listSelector">@drawable/selector_menu_bg</item>
 <!--        <item name="android:divider">@color/divider_common</item>-->
 <!--        <item name="android:dividerHeight">0.5dp</item>-->
     </style>
@@ -130,5 +162,34 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="toolbar_title_textStyle">
+        <item name="android:textSize">@dimen/text_normal_size</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="toolbar_subtitle_textStyle">
+        <item name="android:textSize">@dimen/text_default_size</item>
+        <item name="android:textColor">@color/md_dark_secondary</item>
+    </style>
 
+    <style name="WindowAnimationFadeInOut">
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_out</item>
+    </style>
+
+    <style name="alertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert" >
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="NoPaddingToolbar" parent="Base.Widget.AppCompat.Toolbar">
+        <item name="contentInsetStartWithNavigation">0dp</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay.Dark" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="overlapAnchor">false</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 </resources>

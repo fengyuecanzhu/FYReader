@@ -4,7 +4,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white">
+        android:background="@color/colorBackground">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
@@ -29,17 +29,26 @@
                     app:expandedTitleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
                     app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
+
+                <!--<androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/book_detail_iv_blur_cover"
+                        android:layout_width="match_parent"
+                        android:layout_height="190dp"
+                        android:scaleType="centerCrop"/>-->
+
                 <include layout="@layout/layout_book_detail_header"/>
 
                 <androidx.appcompat.widget.Toolbar
                         android:id="@+id/toolbar"
+                        app:title="@string/novel_girl"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
                         app:layout_collapseMode="pin"
-                        app:popupTheme="@style/Theme.ToolBar.Menu"/>
+                        app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
         </com.google.android.material.appbar.AppBarLayout>
+
 
         <!--详情简介-->
         <androidx.core.widget.NestedScrollView

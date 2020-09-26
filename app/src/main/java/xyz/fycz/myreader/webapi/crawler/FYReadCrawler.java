@@ -26,6 +26,7 @@ public class FYReadCrawler implements ReadCrawler{
     public static final String NOVEL_SEARCH  = "https://novel.fycz.xyz/search.html";
     public static final String SEARCH_KEY = "keyword";
     public static final String CHARSET = "utf-8";
+    public static final String SEARCH_CHARSET = "utf-8";
     @Override
     public String getSearchLink() {
         return NOVEL_SEARCH;
@@ -43,6 +44,11 @@ public class FYReadCrawler implements ReadCrawler{
     @Override
     public String getSearchKey() {
         return SEARCH_KEY;
+    }
+
+    @Override
+    public String getSearchCharset() {
+        return SEARCH_CHARSET;
     }
 
     /**

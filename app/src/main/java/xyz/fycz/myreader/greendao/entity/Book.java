@@ -60,14 +60,19 @@ public class Book implements Serializable {
     @Nullable
     private boolean isDownLoadAll = true;//是否一键缓存
 
-    @Generated(hash = 1839780644)
+    private String groupId;//分组id
+
+    private int groupSort;//分组排序
+
+    @Generated(hash = 1308680987)
     public Book(String id, String name, String chapterUrl, String imgUrl,
             String desc, String author, String type, String updateDate,
             String newestChapterId, String newestChapterTitle,
             String newestChapterUrl, String historyChapterId,
             int histtoryChapterNum, int sortCode, int noReadNum,
             int chapterTotalNum, int lastReadPosition, String source,
-            boolean isCloseUpdate, boolean isDownLoadAll) {
+            boolean isCloseUpdate, boolean isDownLoadAll, String groupId,
+            int groupSort) {
         this.id = id;
         this.name = name;
         this.chapterUrl = chapterUrl;
@@ -88,6 +93,8 @@ public class Book implements Serializable {
         this.source = source;
         this.isCloseUpdate = isCloseUpdate;
         this.isDownLoadAll = isDownLoadAll;
+        this.groupId = groupId;
+        this.groupSort = groupSort;
     }
 
     public Book(Book book) {
@@ -111,6 +118,7 @@ public class Book implements Serializable {
         this.source = book.source;
         this.isCloseUpdate = book.isCloseUpdate;
         this.isDownLoadAll = book.isDownLoadAll;
+        this.groupId = book.groupId;
     }
 
     @Generated(hash = 1839243756)
@@ -236,6 +244,21 @@ public class Book implements Serializable {
         this.isCloseUpdate = isCloseUpdate;
     }
 
+    public boolean getIsDownLoadAll() {
+        return this.isDownLoadAll;
+    }
+
+    public void setIsDownLoadAll(boolean isDownLoadAll) {
+        this.isDownLoadAll = isDownLoadAll;
+    }
+    public String getGroupId() {
+        return this.groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
 
     @Override
     public String toString() {
@@ -260,6 +283,7 @@ public class Book implements Serializable {
                 ",\nsource='" + source + '\'' +
                 ",\nisCloseUpdate='" + isCloseUpdate + '\'' +
                 ",\nisDownLoadAll='" + isDownLoadAll + '\'' +
+                ",\ngroupId='" + groupId + '\'' +
                 "\n}";
     }
 
@@ -279,13 +303,16 @@ public class Book implements Serializable {
         return Objects.hash(name, chapterUrl, author, source);
     }
 
-    public boolean getIsDownLoadAll() {
-        return this.isDownLoadAll;
+    public int getGroupSort() {
+        return this.groupSort;
     }
 
-    public void setIsDownLoadAll(boolean isDownLoadAll) {
-        this.isDownLoadAll = isDownLoadAll;
+    public void setGroupSort(int groupSort) {
+        this.groupSort = groupSort;
     }
+
+
+
 
 
 

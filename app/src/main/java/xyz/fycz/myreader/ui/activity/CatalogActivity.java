@@ -1,77 +1,117 @@
 package xyz.fycz.myreader.ui.activity;
 
 import android.os.Bundle;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import com.google.android.material.tabs.TabLayout;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.base.BaseActivity;
-import xyz.fycz.myreader.ui.presenter.CatalogActivityPresenter;
+import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.ui.adapter.TabFragmentPageAdapter;
+import xyz.fycz.myreader.ui.fragment.BookMarkFragment;
+import xyz.fycz.myreader.ui.fragment.CatalogFragment;
 
 /**
- * @author fengyue
- * @date 2020/7/22 8:04
+ * 书籍目录activity
  */
-public class CatalogActivity extends BaseActivity {
-    @BindView(R.id.tl_tab_menu)
-    TabLayout tlTabMenu;
-    @BindView(R.id.iv_search)
-    ImageView ivSearch;
-    @BindView(R.id.rl_common_title)
-    RelativeLayout rlCommonTitle;
-    @BindView(R.id.vp_content)
-    ViewPager vpContent;
-    @BindView(R.id.iv_back)
-    ImageView tvBack;
-
-    @BindView(R.id.et_search)
-    EditText etSearch;
-    @BindView(R.id.iv_cancel)
-    ImageView ivCancel;
+public class CatalogActivity extends BaseActivity2 {
 
 
-    private CatalogActivityPresenter mCatalogPresenter;
+    @BindView(R.id.catalog_tab)
+    TabLayout catalogTab;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.catalog_vp)
+    ViewPager viewPager;
+    private SearchView searchView;
+
+    private Book mBook;
+
+    private TabFragmentPageAdapter tabAdapter;
+
+    /*******************Public**********************************/
+
+    public Book getmBook() {
+        return mBook;
+    }
+
+    /*********************Initialization****************************/
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_catalog);
-        ButterKnife.bind(this);
-        setStatusBar(0, false);
-        mCatalogPresenter = new CatalogActivityPresenter(this);
-        mCatalogPresenter.start();
+    protected void initData(Bundle savedInstanceState) {
+        super.initData(savedInstanceState);
+        mBook = (Book) getIntent().getSerializableExtra(APPCONST.BOOK);
     }
 
-    public TabLayout getTlTabMenu() {
-        return tlTabMenu;
+    @Override
+    protected int getContentId() {
+        return R.layout.activity_catalog;
     }
 
-    public ImageView getIvSearch() {
-        return ivSearch;
+    @Override
+    protected void setUpToolbar(Toolbar toolbar) {
+        super.setUpToolbar(toolbar);
+        setStatusBarColor(R.color.colorPrimary, true);
+        tabAdapter = new TabFragmentPageAdapter(getSupportFragmentManager());
+        tabAdapter.addFragment(new CatalogFragment(), "目录");
+        tabAdapter.addFragment(new BookMarkFragment(), "书签");
     }
 
-    public RelativeLayout getRlCommonTitle() {
-        return rlCommonTitle;
-    }
-
-    public ViewPager getVpContent() {
-        return vpContent;
-    }
-
-    public ImageView getTvBack() {
-        return tvBack;
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        viewPager.setAdapter(tabAdapter);
+        viewPager.setOffscreenPageLimit(2);
+        catalogTab.setupWithViewPager(viewPager);
     }
 
 
-    public EditText getEtSearch() {
-        return etSearch;
+    /*************************************************************************/
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_view_search, menu);
+        MenuItem search = menu.findItem(R.id.action_search);
+        searchView = (SearchView) search.getActionView();
+        searchView.setMaxWidth(getResources().getDisplayMetrics().widthPixels);
+        searchView.onActionViewCollapsed();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                switch (viewPager.getCurrentItem()){
+                    case 0:
+                        ((CatalogFragment) tabAdapter.getItem(0)).getmCatalogPresent().startSearch(newText);
+                        break;
+                    case 1:
+                        ((BookMarkFragment) tabAdapter.getItem(1)).getmBookMarkPresenter().startSearch(newText);
+                        break;
+                }
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
-    public ImageView getIvCancel() {
-        return ivCancel;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.home:
+
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
+
 }

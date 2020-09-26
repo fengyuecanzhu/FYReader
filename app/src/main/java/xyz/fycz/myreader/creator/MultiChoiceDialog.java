@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.widget.Button;
 import android.widget.ListView;
 import androidx.appcompat.app.AlertDialog;
+import xyz.fycz.myreader.R;
 
 /**
  * @author fengyue
@@ -22,10 +23,13 @@ public class MultiChoiceDialog {
                               DialogCreator.OnMultiDialogListener onMultiDialogListener) {
         this.checkedCount = checkedCount;
         int itemsCount = checkedItems.length;
-        AlertDialog multiChoiceDialog = new AlertDialog.Builder(context)
+        AlertDialog multiChoiceDialog = MyAlertDialog.build(context)
                 .setTitle(title)
+                .setCancelable(false)
                 .setMultiChoiceItems(items, checkedItems, (dialog, which, isChecked) -> {
-                    onMultiDialogListener.onItemClick(dialog, which, isChecked);
+                    if (onMultiDialogListener != null) {
+                        onMultiDialogListener.onItemClick(dialog, which, isChecked);
+                    }
                     if(isChecked){
                         this.checkedCount++;
                     }else {
@@ -57,7 +61,9 @@ public class MultiChoiceDialog {
                     checkedItems[i] = false;
                     itemList.setItemChecked(i, false);
                 }
-                onMultiDialogListener.onSelectAll(false);
+                if (onMultiDialogListener != null) {
+                    onMultiDialogListener.onSelectAll(false);
+                }
             } else {
                 this.checkedCount = itemsCount;
                 selectAll.setText("取消全选");
@@ -65,7 +71,9 @@ public class MultiChoiceDialog {
                     checkedItems[i] = true;
                     itemList.setItemChecked(i, true);
                 }
-                onMultiDialogListener.onSelectAll(true);
+                if (onMultiDialogListener != null) {
+                    onMultiDialogListener.onSelectAll(true);
+                }
             }
         });
 

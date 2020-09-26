@@ -10,6 +10,7 @@
     <ImageView
         android:layout_width="20dp"
         android:layout_height="20dp"
+        app:tint="@color/textPrimary"
         app:srcCompat="@drawable/ic_history_black_24dp" />
 
 
@@ -20,7 +21,7 @@
         android:layout_centerInParent="true"
         android:layout_marginLeft="5dp"
         android:text="chapter"
-        android:textColor="@color/sys_protect_eye_word"
+        android:textColor="@color/textPrimary"
         android:textSize="16sp" />
 
 

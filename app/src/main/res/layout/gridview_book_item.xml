@@ -25,9 +25,10 @@
             android:id="@+id/tv_book_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxLines="2"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:text="bookname"
-            android:textColor="@color/black"/>
+            android:textColor="@color/textPrimary"/>
 
     </LinearLayout>
 
@@ -53,19 +54,18 @@
             style="?android:attr/progressBarStyleSmall"
     />
 
-    <ImageView
-        android:id="@+id/iv_delete"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-       android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="10dp"
-        app:srcCompat="@mipmap/delete"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-
-      />
-
+    <CheckBox
+            android:id="@+id/cb_book_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:enabled="true"
+            android:clickable="false"
+            android:focusable="true"
+            android:layout_margin="5dp"
+            android:paddingEnd="2dp"
+            android:theme="@style/MyCheckBox"
+            android:visibility="visible"/>
 
 
 </RelativeLayout>

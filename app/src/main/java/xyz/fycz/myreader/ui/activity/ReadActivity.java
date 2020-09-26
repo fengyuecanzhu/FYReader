@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
+import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
@@ -24,7 +25,6 @@ import xyz.fycz.myreader.ui.presenter.ReadPresenter;
 import xyz.fycz.myreader.widget.page.PageView;
 
 public class ReadActivity extends BaseActivity {
-
 
     @BindView(R.id.pb_loading)
     ProgressBar pbLoading;
@@ -117,8 +117,13 @@ public class ReadActivity extends BaseActivity {
             result.putExtra(APPCONST.RESULT_HISTORY_CHAPTER, mReadPresenter.getmPageLoader().getChapterPos());
         }
         setResult(AppCompatActivity.RESULT_OK, result);
+        if (!ActivityManage.isExist(MainActivity.class)) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
         super.onBackPressed();
     }
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

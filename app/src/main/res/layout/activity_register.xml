@@ -6,7 +6,7 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <include layout="@layout/title_base" />
+    <include layout="@layout/toolbar" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text=""
-                android:textColor="@color/sys_red"
+                android:textColor="@color/textError"
                 android:visibility="gone" />
             <!--添加输入框-->
             <com.google.android.material.textfield.TextInputLayout
@@ -181,7 +181,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/text_agreement_tip"
-                    android:textColor="@color/little_black_white"
+                    android:textColor="@color/textSecondaryInverted"
                     android:theme="@style/MyCheckBox" />
 
                 <TextView
@@ -196,7 +196,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="》"
-                    android:textColor="@color/little_black_white" />
+                    android:textColor="@color/textSecondaryInverted" />
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

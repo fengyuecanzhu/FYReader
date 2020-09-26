@@ -17,6 +17,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.creator.MyAlertDialog;
 import xyz.fycz.myreader.greendao.service.BookMarkService;
 
 import java.lang.reflect.Field;
@@ -144,7 +145,7 @@ public class NotificationUtil {
 
     public void requestNotificationPermissionDialog(Context context){
         if (!isNotificationEnabled(context)) {
-            new AlertDialog.Builder(context)
+            MyAlertDialog.build(context)
                     .setTitle("开启通知")
                     .setMessage("检测到未开启通知权限，无法在通知栏查看缓存进度，是否前往开启？")
                     .setCancelable(true)

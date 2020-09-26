@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@color/white"
+    android:background="@color/colorBackground"
     android:padding="5dp">
 
     <ImageView
@@ -37,7 +37,7 @@
                         android:text="bookname"
                         android:maxLength="15"
                         android:textSize="16sp"
-                        android:textColor="@color/black"/>
+                        android:textColor="@color/textPrimary"/>
 
                 <TextView
                         android:id="@+id/tv_book_author"
@@ -48,7 +48,7 @@
                         android:text="author"
                         android:maxLines="1"
                         android:textSize="13sp"
-                        android:textColor="@color/title_black"/>
+                        android:textColor="@color/textSecondary"/>
 
             </LinearLayout>
             <TextView
@@ -59,7 +59,7 @@
                     android:text="newest_chapter"
                     android:maxLines="1"
                     android:textSize="13sp"
-                    android:textColor="@color/title_black"/>
+                    android:textColor="@color/textSecondary"/>
             <TextView
                 android:id="@+id/tv_book_desc"
                 android:layout_width="wrap_content"
@@ -79,7 +79,7 @@
                 android:text="type"
                 android:maxLines="1"
                 android:textSize="13sp"
-                android:textColor="@color/title_black"/>
+                android:textColor="@color/textSecondary"/>
         <TextView
                 android:id="@+id/tv_book_source"
                 android:layout_width="wrap_content"
@@ -90,7 +90,7 @@
                 android:text="book source"
                 android:maxLines="1"
                 android:textSize="13sp"
-                android:textColor="@color/title_black"/>
+                android:textColor="@color/textSecondary"/>
     </RelativeLayout>
 
 </LinearLayout>

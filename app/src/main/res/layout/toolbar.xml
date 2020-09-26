@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.Toolbar
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/toolbar"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/colorPrimary"
-    android:minHeight="?attr/actionBarSize"
-    android:fitsSystemWindows="true"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
->
+    <androidx.appcompat.widget.Toolbar
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/toolbar"
+            style="@style/NoPaddingToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:gravity="center_vertical"
+            android:theme="?attr/actionBarStyle"
+            android:transitionName="sharedView"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:titleTextAppearance="@style/toolbar_title_textStyle"
+            app:subtitleTextAppearance="@style/toolbar_subtitle_textStyle"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
     <!--    android:theme="@style/Theme.ToolBar.Menu"-->
 </androidx.appcompat.widget.Toolbar>

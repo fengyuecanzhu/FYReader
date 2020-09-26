@@ -1,80 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:fitsSystemWindows="true"
-              android:orientation="vertical"
-              tools:context="xyz.fycz.myreader.ui.activity.CatalogActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <RelativeLayout
-            android:id="@+id/rl_common_title"
-            android:layout_width="match_parent"
-            android:layout_height="45dp">
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <ImageView
-                android:id="@+id/iv_back"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:paddingTop="4dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_alignParentStart="true"
-                android:layout_centerInParent="true"
-                android:layout_margin="5dip"
-                app:srcCompat="@mipmap/larrow_black"/>
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@color/colorPrimary"
+                android:minHeight="?attr/actionBarSize"
+                android:fitsSystemWindows="true"
+                app:titleTextAppearance="@style/toolbar_title_textStyle"
+                app:subtitleTextAppearance="@style/toolbar_subtitle_textStyle"
+                android:theme="@style/Theme.ToolBar.Dark.Menu">
 
-        <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tl_tab_menu"
-                android:layout_width="wrap_content"
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/catalog_tab"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                app:tabBackground="@color/nothing"
-                app:tabIndicatorColor="@color/sys_home_tab_select"
-                app:tabIndicatorHeight="1dp"
-                app:tabSelectedTextColor="@color/sys_home_tab_select"
-                app:tabTextColor="@color/sys_word_little"
-                app:tabTextAppearance="@style/TabLayoutTextStyle">
-        </com.google.android.material.tabs.TabLayout>
+                android:layout_weight="9"
+                app:tabIndicatorColor="@color/colorAccent"
+                app:tabIndicatorHeight="2dp"
+                app:tabIndicatorFullWidth="true"
+                app:tabSelectedTextColor="@color/textPrimaryInverted"
+                app:tabTextColor="@color/translucent_text"
+                app:tabTextAppearance="@style/TabLayoutTextStyle"/>
+        </androidx.appcompat.widget.Toolbar>
 
-        <ImageView
-                android:id="@+id/iv_search"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:padding="10dp"
-                app:srcCompat="@mipmap/search"
-                android:layout_alignParentEnd="true"/>
-
-        <EditText
-                android:layout_width="285dp"
-                android:hint="搜索..."
-                android:layout_height="match_parent"
-                android:id="@+id/et_search"
-                android:textColor="@color/black"
-                android:textColorHint="@color/little_black_white"
-                android:layout_centerInParent="true"
-                android:singleLine="true"
-                android:visibility="gone"/>
-
-        <ImageView
-                android:id="@+id/iv_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:padding="10dp"
-                app:srcCompat="@mipmap/ic_cha_white"
-                android:layout_alignParentEnd="true"
-                android:visibility="gone"/>
-    </RelativeLayout>
-
-    <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            app:srcCompat="@color/sys_line"/>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager.widget.ViewPager
-            android:id="@+id/vp_content"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-    </androidx.viewpager.widget.ViewPager>
-
+        android:id="@+id/catalog_vp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </LinearLayout>

@@ -1,129 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical"
-    tools:context="xyz.fycz.myreader.ui.activity.MainActivity">
-
-    <RelativeLayout
-        android:id="@+id/rl_common_title"
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:background="@color/white">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
-        <xyz.fycz.myreader.custom.CircleImageView
-            android:id="@+id/civ_avatar"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:src="@mipmap/avatar" />
+    <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tl_tab_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            app:tabBackground="@color/nothing"
-            app:tabIndicatorColor="@color/sys_home_tab_select"
-            app:tabIndicatorHeight="1dp"
-            app:tabSelectedTextColor="@color/sys_home_tab_select"
-            app:tabTextColor="@color/sys_word_little"
-            app:tabTextAppearance="@style/TabLayoutTextStyle">
-        </com.google.android.material.tabs.TabLayout>
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                style="@style/NoPaddingToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="?attr/colorPrimary"
+                android:minHeight="?attr/actionBarSize"
+                android:gravity="center_vertical"
+                android:theme="?attr/actionBarStyle"
+                android:transitionName="sharedView"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:titleTextAppearance="@style/toolbar_title_textStyle"
+                app:subtitleTextAppearance="@style/toolbar_subtitle_textStyle"
+                app:popupTheme="@style/AppTheme.PopupOverlay">
 
-        <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true">
-            <ImageView
-                    android:id="@+id/iv_search"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:padding="10dp"
-                    app:srcCompat="@mipmap/search" />
-            <ImageView
-                    android:id="@+id/iv_more"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    app:srcCompat="@mipmap/more" />
-        </LinearLayout>
+            <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/bookcase_tab"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="9"
+                    android:visibility="gone"
+                    app:tabIndicatorColor="@color/colorAccent"
+                    app:tabIndicatorHeight="2dp"
+                    app:tabIndicatorFullWidth="true"
+                    app:tabSelectedTextColor="@color/textPrimaryInverted"
+                    app:tabTextColor="@color/translucent_text"
+                    app:tabTextAppearance="@style/TabLayoutTextStyle"/>
+        </androidx.appcompat.widget.Toolbar>
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rl_edit_titile"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:background="@color/white"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="编辑"
-            android:layout_centerInParent="true"
-            android:textSize="18sp"/>
-
-       <TextView
-           android:id="@+id/tv_edit_finish"
-           android:layout_width="50dp"
-           android:layout_height="match_parent"
-           android:gravity="center"
-           android:layout_centerInParent="true"
-           android:layout_alignParentRight="true"
-           android:textSize="16sp"
-           android:text="完成"
-           android:textColor="@color/black"/>
-
-
-    </RelativeLayout>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        app:srcCompat="@color/sys_line" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager.widget.ViewPager
-        android:id="@+id/vp_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </androidx.viewpager.widget.ViewPager>
-    <RelativeLayout
-            android:id="@+id/rl_download_tip"
+            android:id="@+id/view_pager_main"
             android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:layout_alignParentBottom="true"
-            android:background="@color/sys_dialog_setting_line"
-            android:visibility="visible">
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
+            app:layout_constraintTop_toBottomOf="@id/app_bar"/>
 
-        <TextView
-                android:id="@+id/tv_download_tip"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textColor="@color/sys_dialog_setting_word_bright"
-                android:text="正在下载：大主宰"
-                android:gravity="center_vertical|start"
-                android:maxLines="1"
-                android:textSize="14sp"
-                android:paddingStart="15dp"/>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation_view"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:elevation="10dp"
+            android:background="@color/colorForeground"
+            app:labelVisibilityMode="unlabeled"
+            app:itemIconTint="@color/selector_bn"
+            app:menu="@menu/main_bnv"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <TextView
-                android:id="@+id/tv_stop_download"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textColor="@color/colorAccent"
-                android:textSize="14sp"
-                android:text="@string/stop_download_tip"
-                android:layout_alignParentEnd="true"
-                android:gravity="center_vertical"
-                android:paddingEnd="15dp"
-                android:paddingStart="15dp"
-        />
-    </RelativeLayout>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import okhttp3.*;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.TrustAllCerts;
 import xyz.fycz.myreader.callback.HttpCallback;
@@ -21,30 +22,16 @@ import java.net.URLConnection;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
 import static java.lang.String.valueOf;
-
 
 
 public class HttpUtil {
@@ -67,32 +54,30 @@ public class HttpUtil {
         return ssfFactory;
     }
 
-    private static synchronized OkHttpClient getOkHttpClient(){
-        if (mClient == null){
+    private static synchronized OkHttpClient getOkHttpClient() {
+        if (mClient == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.connectTimeout(30000, TimeUnit.SECONDS);
+            builder.connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS);
             builder.sslSocketFactory(createSSLSocketFactory());
-            builder.hostnameVerifier(new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            });
-           mClient = builder
+            builder.hostnameVerifier((hostname, session) -> true);
+            mClient = builder
                     .build();
         }
         return mClient;
 
     }
 
+
     /**
      * 图片发送
+     *
      * @param address
      * @param callback
      */
     public static void sendBitmapGetRequest(final String address, final HttpCallback callback) {
         new Thread(new Runnable() {
             HttpURLConnection connection = null;
+
             @Override
             public void run() {
                 try {
@@ -131,12 +116,14 @@ public class HttpUtil {
 
     /**
      * get请求
+     *
      * @param address
      * @param callback
      */
     public static void sendGetRequest(final String address, final HttpCallback callback) {
         new Thread(new Runnable() {
             HttpURLConnection connection = null;
+
             @Override
             public void run() {
                 try {
@@ -175,6 +162,7 @@ public class HttpUtil {
 
     /**
      * 网络通信测试请求
+     *
      * @param address
      * @param callback
      */
@@ -219,7 +207,7 @@ public class HttpUtil {
     }
 
     public static void sendGetRequest_okHttp(final String address, final HttpCallback callback) {
-       MyApplication.getApplication().newThread(() -> {
+        MyApplication.getApplication().newThread(() -> {
         /*   HttpURLConnection connection = null;
            try {
                URL url = new URL(address);
@@ -251,23 +239,57 @@ public class HttpUtil {
                    connection.disconnect();
                }
            }*/
-           try{
-               OkHttpClient client = getOkHttpClient();
-               Request request = new Request.Builder()
-                       .addHeader("User-Agent","Mozilla/4.0 (compatible; MSIE 7.0; Windows 7)")
-                       .url(address)
-                       .build();
-               Response response = client.newCall(request).execute();
-               callback.onFinish(response.body().byteStream());
-           }catch(Exception e){
-               e.printStackTrace();
-               callback.onError(e);
-           }
-       });
+            try {
+                OkHttpClient client = getOkHttpClient();
+                /*HashMap<String, List<Cookie>> cookieStore = new HashMap<>();
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .cookieJar(new CookieJar() {
+                            @Override
+                            public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
+                                StringBuilder sb = new StringBuilder();
+                                for (Cookie cookie : list){
+                                    sb.append(cookie.name()).append("=").append(cookie.value()).append("; ");
+                                }
+                                if (list.size() > 0){
+                                    sb.deleteCharAt(sb.lastIndexOf("; "));
+                                }
+                                Log.i("CookieStr", sb.toString());
+                                cookieStore.put(httpUrl.host(), list);
+                            }
+
+                            @Override
+                            public List<Cookie> loadForRequest(HttpUrl httpUrl) {
+                                List<Cookie> cookies = cookieStore.get(httpUrl.host());
+                                return cookies != null ? cookies : new ArrayList<>();
+                            }
+                        })
+                        .build();*/
+                Request.Builder requestBuilder = new Request.Builder()
+                        .addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+                        .addHeader("accept-language", "zh-CN,zh;q=0.9")
+                        .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36");
+                if (address.contains("qidian.com")) {
+                    SharedPreUtils spu = SharedPreUtils.getInstance();
+                    String cookie = spu.getString("qdCookie", "");
+                    if (cookie.equals("")) {
+                        requestBuilder.addHeader("cookie", "_csrfToken=eXRDlZxmRDLvFAmdgzqvwWAASrxxp2WkVlH4ZM7e; newstatisticUUID=1595991935_2026387981");
+                    }else {
+                        requestBuilder.addHeader("cookie", cookie);
+                    }
+                }
+                requestBuilder.url(address);
+                Response response = client.newCall(requestBuilder.build()).execute();
+                callback.onFinish(response.body().byteStream());
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onError(e);
+            }
+        });
     }
 
     /**
      * post请求
+     *
      * @param address
      * @param output
      * @param callback
@@ -315,6 +337,7 @@ public class HttpUtil {
 
     /**
      * post请求 获取蓝奏云直链
+     *
      * @param address
      * @param output
      * @param callback
@@ -360,10 +383,11 @@ public class HttpUtil {
     public static void sendPostRequest_okHttp(final String address, final String output, final HttpCallback callback) {
         new Thread(new Runnable() {
             HttpURLConnection connection = null;
+
             @Override
             public void run() {
                 try {
-                    MediaType contentType  = MediaType.parse("charset=utf-8");
+                    MediaType contentType = MediaType.parse("charset=utf-8");
                     OkHttpClient client = new OkHttpClient();
                     RequestBody body = RequestBody.create(contentType, output);
                     Request request = new Request.Builder()
@@ -387,17 +411,18 @@ public class HttpUtil {
 
     /**
      * 多文件上传请求
+     *
      * @param url
      * @param files
      * @param params
      * @param callback
      */
-    public static void uploadFile(String url, ArrayList<File> files, Map<String, Object> params, final HttpCallback callback){
+    public static void uploadFile(String url, ArrayList<File> files, Map<String, Object> params, final HttpCallback callback) {
         OkHttpClient client = new OkHttpClient();
         // form 表单形式上传
         MultipartBody.Builder requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
-        for(File file : files){
-            if(file != null){
+        for (File file : files) {
+            if (file != null) {
                 // MediaType.parse() 里面是上传的文件类型。
                 RequestBody body = RequestBody.create(MediaType.parse("*/*"), file);
                 String filename = file.getName();
@@ -418,7 +443,7 @@ public class HttpUtil {
             @Override
             public void onFailure(Call call, IOException e) {
                 callback.onError(e);
-                Log.i("Http" ,"onFailure");
+                Log.i("Http", "onFailure");
             }
 
             @Override
@@ -432,7 +457,7 @@ public class HttpUtil {
                     jsonModel.setSuccess(false);
 //                    jsonModel.setResult(response.body().string());
                     callback.onFinish(new Gson().toJson(jsonModel));
-                    Log.i("Http" ,response.message() + " error : body " + response.body().string());
+                    Log.i("Http", response.message() + " error : body " + response.body().string());
                 }
             }
 
@@ -443,6 +468,7 @@ public class HttpUtil {
 
     /**
      * 生成URL
+     *
      * @param p_url
      * @param params
      * @return
@@ -484,6 +510,7 @@ public class HttpUtil {
 
     /**
      * 生成URL（不加密）
+     *
      * @param p_url
      * @param params
      * @return
@@ -513,6 +540,7 @@ public class HttpUtil {
 
     /**
      * 生成post输出参数串
+     *
      * @param params
      * @return
      */
@@ -570,10 +598,11 @@ public class HttpUtil {
 
     /**
      * 测试URL可连接性
+     *
      * @param url
      * @param connectionCallback
      */
-    public static void isURLConnection(String url, final URLConnectionCallback connectionCallback){
+    public static void isURLConnection(String url, final URLConnectionCallback connectionCallback) {
         sendTestGetRequest(url, new HttpCallback() {
             @Override
             public void onFinish(String response) {
@@ -667,11 +696,11 @@ public class HttpUtil {
                 }
                 Log.i("http", "文件的大小：" + total);
                 ds.writeBytes(end);
-               /* close streams */
+                /* close streams */
                 fStream.close();
             }
             ds.writeBytes(twoHyphens + boundary + twoHyphens + end);
-           /* close streams */
+            /* close streams */
             ds.flush();
             if (httpURLConnection.getResponseCode() >= 300) {
                 callback.onError(new Exception(
@@ -734,17 +763,16 @@ public class HttpUtil {
     }
 
 
-
     /**
      * Trust every server - dont check for any certificate
      */
     public static void trustAllHosts() {
         final String TAG = "trustAllHosts";
         // Create a trust manager that does not validate certificate chains
-        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
 
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return new java.security.cert.X509Certificate[] {};
+                return new java.security.cert.X509Certificate[]{};
             }
 
             public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
@@ -754,7 +782,7 @@ public class HttpUtil {
             public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
                 Log.i(TAG, "checkServerTrusted");
             }
-        } };
+        }};
 
         // Install the all-trusting trust manager
         try {
@@ -765,8 +793,6 @@ public class HttpUtil {
             e.printStackTrace();
         }
     }
-
-
 
 
 }

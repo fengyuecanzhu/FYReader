@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -118,6 +117,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
         //viewHolder.tvExample.setTypeface(typeFace);
 //        viewHolder.tvExample.setTypeface(mTypefaceMap.get(font));
         viewHolder.tvFontName.setText(font.toString());
+        viewHolder.tvFontName.setTextColor(mFontsActivity.getColor(R.color.textPrimary));
         File fontFile = new File(APPCONST.FONT_BOOK_DIR + font.fileName);
         if (font == Font.本地字体) {
             if (setting.getFont() == Font.本地字体) {
@@ -145,7 +145,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
                             checkedItem = i;
                         }
                     }
-                    AlertDialog dialog = new AlertDialog.Builder(getContext())
+                    MyAlertDialog dialog = new MyAlertDialog.Builder(getContext())
                             .setTitle(getContext().getString(R.string.font_select))
                             .setCancelable(true)
                             .setSingleChoiceItems(fontNames, checkedItem, new DialogInterface.OnClickListener() {

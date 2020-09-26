@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
+import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.crawler.*;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -30,21 +32,33 @@ public class ChangeSourceDialog {
     private boolean isSearchSuccess;
     private int threadCount;
     private ResultCallback rc;
+    private boolean isGetOneBook = false;
+    private Book oneBook;
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    if (threadCount == 0) {
-                        createaBooks();
+                    if (isGetOneBook){
+                        rc.onFinish(oneBook, 0);
+                    }else {
+                        if (threadCount == 0) {
+                            createaBooks();
+                        }
                     }
                     break;
                 case 2:
                     if (!isSearchSuccess && threadCount == 0) {
-                        rc.onError(new Exception());
+                        if (!isGetOneBook|| oneBook == null) {
+                            rc.onError(new Exception());
+                        }
                     }else if (threadCount == 0){
-                        createaBooks();
+                        if (isGetOneBook){
+                            rc.onFinish(oneBook, 0);
+                        }else {
+                            createaBooks();
+                        }
                     }
                     break;
             }
@@ -62,17 +76,32 @@ public class ChangeSourceDialog {
         getData();
     }
 
+    public void initOneBook(ResultCallback rc){
+        this.rc = rc;
+        getData();
+        isGetOneBook = true;
+    }
+
     /**
      * 获取搜索数据
      */
     private void getData() {
         mBooks.clear();
-        threadCount = 4;
+        ArrayList<ReadCrawler> readCrawlers = ReadCrawlerUtil.getReadCrawlers();
+        threadCount = readCrawlers.size();
+        if (threadCount == 0){
+            if (isGetOneBook){
+                ToastUtils.showWarring("当前书源已全部禁用，无法搜索！");
+            }else {
+                ToastUtils.showWarring("当前书源已全部禁用，无法换源！");
+            }
+            rc.onError(new Exception());
+            return;
+        }
         isSearchSuccess = false;
-        searchBookByCrawler(new BiQuGe44ReadCrawler(), "");
-        searchBookByCrawler(new TianLaiReadCrawler(), "");
-        searchBookByCrawler(new BiQuGeReadCrawler(), "gbk");
-        searchBookByCrawler(new PinShuReadCrawler(), "gbk");
+        for (ReadCrawler readCrawler : readCrawlers){
+            searchBookByCrawler(readCrawler, readCrawler.getSearchCharset());
+        }
     }
 
     private void searchBookByCrawler(final ReadCrawler rc, String charset) {
@@ -89,6 +118,16 @@ public class ChangeSourceDialog {
             public void onFinish(Object o, int code) {
                 final ConcurrentMultiValueMap<SearchBookBean, Book> cmvm =
                         (ConcurrentMultiValueMap<SearchBookBean, Book>) o;
+                if (isGetOneBook){
+                    if (oneBook != null){
+                        return;
+                    }
+                    oneBook = cmvm.getValue(sbb, 0);
+                    threadCount--;
+                    mHandler.sendMessage(mHandler.obtainMessage(1));
+                    MyApplication.getApplication().shutdownThreadPool();
+                    return;
+                }
                 if (rc instanceof BookInfoCrawler) {
                     BookInfoCrawler bic = (BookInfoCrawler) rc;
                     final List<Book> aBooks = cmvm.getValues(sbb);
@@ -140,4 +179,5 @@ public class ChangeSourceDialog {
         aBooks = (ArrayList<Book>) mBooks.getValues(sbb);
         rc.onFinish(aBooks, 1);
     }
+
 }

@@ -23,6 +23,7 @@ public class PinShuReadCrawler implements ReadCrawler, BookInfoCrawler {
     public static final String NOVEL_SEARCH = "https://www.vodtw.com/Book/Search.aspx";
     public static final String SEARCH_KEY = "SearchKey";
     public static final String CHARSET = "gbk";
+    public static final String SEARCH_CHARSET = "gbk";
 
     @Override
     public String getSearchLink() {
@@ -43,7 +44,10 @@ public class PinShuReadCrawler implements ReadCrawler, BookInfoCrawler {
     public String getSearchKey() {
         return SEARCH_KEY;
     }
-
+    @Override
+    public String getSearchCharset() {
+        return SEARCH_CHARSET;
+    }
     /**
      * 从html中获取章节正文
      *

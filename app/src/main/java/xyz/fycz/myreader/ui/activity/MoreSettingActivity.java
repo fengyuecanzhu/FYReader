@@ -18,12 +18,20 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.creator.DialogCreator;
 import xyz.fycz.myreader.creator.MultiChoiceDialog;
 import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+
+import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
 
 /**
  * Created by newbiechen on 17-6-6.
@@ -45,6 +53,8 @@ public class MoreSettingActivity extends BaseActivity2 {
     SwitchCompat mScAutoRefresh;
     @BindView(R.id.more_setting_ll_close_refresh)
     LinearLayout mLlCloseRefresh;
+    @BindView(R.id.more_setting_ll_disable_source)
+    LinearLayout mLlDisableSource;
     @BindView(R.id.more_setting_iv_match_chapter_tip)
     ImageView mIvMatchChapterTip;
     @BindView(R.id.more_setting_rl_match_chapter)
@@ -63,11 +73,16 @@ public class MoreSettingActivity extends BaseActivity2 {
     RelativeLayout mRlDeleteCathe;
     @BindView(R.id.more_setting_ll_download_all)
     LinearLayout mLlDownloadAll;
+    /*@BindView(R.id.more_setting_rl_bookstore)
+    RelativeLayout mRlBookstore;
+    @BindView(R.id.more_setting_sc_bookstore)
+    SwitchCompat mScBookstore;*/
     private Setting mSetting;
     private boolean isVolumeTurnPage;
     private int resetScreenTime;
     private boolean autoRefresh;
     private boolean isMatchChapter;
+    private boolean openBookStore;
     private float matchChapterSuitability;
     private int catheCap;
 
@@ -77,8 +92,12 @@ public class MoreSettingActivity extends BaseActivity2 {
 
     //选择禁用更新书籍对话框
     private AlertDialog mCloseRefreshDia;
+    //选择禁用更新书源对话框
+    private AlertDialog mDisableSourceDia;
     //选择一键缓存书籍对话框
     private AlertDialog mDownloadAllDia;
+    //选择清除缓存对话框
+    private AlertDialog mDeleteCatheDia;
 
     @Override
     protected int getContentId() {
@@ -95,6 +114,7 @@ public class MoreSettingActivity extends BaseActivity2 {
         matchChapterSuitability = mSetting.getMatchChapterSuitability();
         catheCap = mSetting.getCatheGap();
         autoRefresh = mSetting.isRefreshWhenStart();
+        openBookStore = mSetting.isOpenBookStore();
     }
 
     @Override
@@ -119,6 +139,7 @@ public class MoreSettingActivity extends BaseActivity2 {
         mScVolume.setChecked(isVolumeTurnPage);
         mScMatchChapter.setChecked(isMatchChapter);
         mScAutoRefresh.setChecked(autoRefresh);
+        //mScBookstore.setChecked(openBookStore);
     }
 
     @Override
@@ -151,14 +172,14 @@ public class MoreSettingActivity extends BaseActivity2 {
 
         mLlCloseRefresh.setOnClickListener(v -> {
             MyApplication.runOnUiThread(() -> {
-                if (mCloseRefreshDia != null){
+                if (mCloseRefreshDia != null) {
                     mCloseRefreshDia.show();
                     return;
                 }
 
                 initmBooks();
 
-                if (mBooks.size() == 0){
+                if (mBooks.size() == 0) {
                     ToastUtils.showWarring("当前书架没有支持禁用更新的书籍！");
                     return;
                 }
@@ -169,7 +190,7 @@ public class MoreSettingActivity extends BaseActivity2 {
                 for (int i = 0; i < booksCount; i++) {
                     Book book = mBooks.get(i);
                     isCloseRefresh[i] = book.getIsCloseUpdate();
-                    if (isCloseRefresh[i]){
+                    if (isCloseRefresh[i]) {
                         crBookCount++;
                     }
                 }
@@ -185,13 +206,59 @@ public class MoreSettingActivity extends BaseActivity2 {
 
                             @Override
                             public void onSelectAll(boolean isSelectAll) {
-                                for (Book book : mBooks){
+                                for (Book book : mBooks) {
                                     book.setIsCloseUpdate(isSelectAll);
                                 }
                             }
                         });
 
             });
+        });
+
+        mLlDisableSource.setOnClickListener(v -> {
+            if (mDisableSourceDia != null) {
+                mDisableSourceDia.show();
+                return;
+            }
+
+            HashMap<CharSequence, Boolean> mSources = ReadCrawlerUtil.getDisableSources();
+            CharSequence[] mSourcesName = new CharSequence[mSources.keySet().size()];
+            boolean[] isDisables = new boolean[mSources.keySet().size()];
+            int dSourceCount = 0;
+            int i = 0;
+            for (CharSequence sourceName : mSources.keySet()) {
+                mSourcesName[i] = sourceName;
+                Boolean isDisable = mSources.get(sourceName);
+                if (isDisable == null) isDisable = false;
+                if (isDisable) dSourceCount++;
+                isDisables[i++] = isDisable;
+            }
+
+            mDisableSourceDia = new MultiChoiceDialog().create(this, "选择禁用的书源",
+                    mSourcesName, isDisables, dSourceCount, (dialog, which) -> {
+                        SharedPreUtils spu = SharedPreUtils.getInstance();
+                        StringBuilder sb = new StringBuilder();
+                        for (CharSequence sourceName : mSources.keySet()) {
+                            if (!mSources.get(sourceName)) {
+                                sb.append(BookSource.getFromName(String.valueOf(sourceName)));
+                                sb.append(",");
+                            }
+                        }
+                        if (sb.lastIndexOf(",") >= 0) sb.deleteCharAt(sb.lastIndexOf(","));
+                        spu.putString("searchSource", sb.toString());
+                    }, null, new DialogCreator.OnMultiDialogListener() {
+                        @Override
+                        public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
+                            mSources.put(mSourcesName[which], isChecked);
+                        }
+
+                        @Override
+                        public void onSelectAll(boolean isSelectAll) {
+                            for (CharSequence sourceName : mSources.keySet()) {
+                                mSources.put(sourceName, isSelectAll);
+                            }
+                        }
+                    });
         });
 
         mRlMatchChapter.setOnClickListener(
@@ -212,14 +279,14 @@ public class MoreSettingActivity extends BaseActivity2 {
 
         mLlDownloadAll.setOnClickListener(v -> {
             MyApplication.runOnUiThread(() -> {
-                if (mDownloadAllDia != null){
+                if (mDownloadAllDia != null) {
                     mDownloadAllDia.show();
                     return;
                 }
 
                 initmBooks();
 
-                if (mBooks.size() == 0){
+                if (mBooks.size() == 0) {
                     ToastUtils.showWarring("当前书架没有支持缓存的书籍！");
                     return;
                 }
@@ -232,7 +299,7 @@ public class MoreSettingActivity extends BaseActivity2 {
                     Book book = mBooks.get(i);
                     mBooksName[i] = book.getName();
                     isDownloadAll[i] = book.getIsDownLoadAll();
-                    if (isDownloadAll[i]){
+                    if (isDownloadAll[i]) {
                         daBookCount++;
                     }
                 }
@@ -248,7 +315,7 @@ public class MoreSettingActivity extends BaseActivity2 {
 
                             @Override
                             public void onSelectAll(boolean isSelectAll) {
-                                for (Book book : mBooks){
+                                for (Book book : mBooks) {
                                     book.setIsDownLoadAll(isSelectAll);
                                 }
                             }
@@ -264,12 +331,52 @@ public class MoreSettingActivity extends BaseActivity2 {
         mRlCatheGap.setOnClickListener(v -> mScCatheGap.performClick());
 
         mRlDeleteCathe.setOnClickListener(v -> {
-            DialogCreator.createCommonDialog(this, "清除缓存", "确定要清除全部书籍缓存吗？",
-                    true, (dialog, which) -> {
-                        BookService.getInstance().deleteAllBookCathe();
-                        ToastUtils.showSuccess("清除缓存成功！");
-                    }, null);
+            MyApplication.runOnUiThread(() -> {
+                File catheFile = getCacheDir();
+                String catheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(catheFile));
+
+                File eCatheFile = new File(BOOK_CACHE_PATH);
+                String eCatheFileSize;
+                if (eCatheFile.exists() && eCatheFile.isDirectory()) {
+                    eCatheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(eCatheFile));
+                }else {
+                    eCatheFileSize = "0";
+                }
+                CharSequence[] cathes = {"章节缓存：" + eCatheFileSize, "图片缓存：" + catheFileSize};
+                boolean[] catheCheck = {true, true};
+                mDeleteCatheDia = new MultiChoiceDialog().create(this, "清除缓存", cathes, catheCheck, 2,
+                        (dialog, which) -> {
+                            String tip = "";
+                            if (catheCheck[0]) {
+                                BookService.getInstance().deleteAllBookCathe();
+                                tip += "章节缓存 ";
+                            }
+                            if (catheCheck[1]) {
+                                FileUtils.deleteFile(catheFile.getAbsolutePath());
+                                tip += "图片缓存 ";
+                            }
+                            if (tip.length() > 0) {
+                                tip += "清除成功";
+                                ToastUtils.showSuccess(tip);
+                            }
+                        }, null, null);
+            });
         });
+
+
+        /*mRlBookstore.setOnClickListener(
+                (v) -> {
+                    if (openBookStore) {
+                        openBookStore = false;
+                    } else {
+                        openBookStore = true;
+                    }
+                    mScBookstore.setChecked(openBookStore);
+                    mSetting.setOpenBookStore(openBookStore);
+                    SysManager.saveSetting(mSetting);
+                    ToastUtils.showInfo("重启后生效！");
+                }
+        );*/
     }
 
     @Override
@@ -281,8 +388,8 @@ public class MoreSettingActivity extends BaseActivity2 {
     private void initSpinner() {
         // initSwitchStatus() be called earlier than onCreate(), so setSelection() won't work
         ArrayAdapter<CharSequence> resetScreenAdapter = ArrayAdapter.createFromResource(this,
-                R.array.reset_screen_time, android.R.layout.simple_spinner_item);
-        resetScreenAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.array.reset_screen_time, R.layout.spinner);
+        resetScreenAdapter.setDropDownViewResource(R.layout.spinner_item);
         mScResetScreen.setAdapter(resetScreenAdapter);
 
         int resetScreenSelection = 0;
@@ -332,8 +439,8 @@ public class MoreSettingActivity extends BaseActivity2 {
 
 
         ArrayAdapter<CharSequence> matchSuiAdapter = ArrayAdapter.createFromResource(this,
-                R.array.match_chapter_suitability, android.R.layout.simple_spinner_item);
-        matchSuiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.array.match_chapter_suitability, R.layout.spinner);
+        matchSuiAdapter.setDropDownViewResource(R.layout.spinner_item);
         mScMatchChapterSuitability.setAdapter(matchSuiAdapter);
 
         if (matchChapterSuitability == 0.0) {
@@ -360,8 +467,8 @@ public class MoreSettingActivity extends BaseActivity2 {
 
 
         ArrayAdapter<CharSequence> catheGapAdapter = ArrayAdapter.createFromResource(this,
-                R.array.cathe_chapter_gap, android.R.layout.simple_spinner_item);
-        catheGapAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.array.cathe_chapter_gap, R.layout.spinner);
+        catheGapAdapter.setDropDownViewResource(R.layout.spinner_item);
         mScCatheGap.setAdapter(catheGapAdapter);
 
         if (catheCap == 0) {
@@ -387,14 +494,14 @@ public class MoreSettingActivity extends BaseActivity2 {
         });
     }
 
-    private void initmBooks(){
+    private void initmBooks() {
         if (mBooks != null) {
             return;
         }
         mBooks = (ArrayList<Book>) BookService.getInstance().getAllBooks();
 
         Iterator<Book> mBooksIter = mBooks.iterator();
-        while (mBooksIter.hasNext()){
+        while (mBooksIter.hasNext()) {
             Book book = mBooksIter.next();
             if ("本地书籍".equals(book.getType())) {
                 mBooksIter.remove();
