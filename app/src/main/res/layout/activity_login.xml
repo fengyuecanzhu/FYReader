@@ -6,7 +6,7 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <include layout="@layout/title_base" />
+    <include layout="@layout/toolbar" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -115,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/text_login"
                 android:textAlignment="center"
-                android:textColor="@color/sys_word_little"
+                android:textColor="@color/textSecondary"
                 android:textSize="20dp" />
 
             <!--添加输入框-->
@@ -224,7 +224,7 @@
                 android:enabled="false"
                 android:text="@string/text_login"
                 android:textAlignment="center"
-                android:textColor="#ffffff"
+                android:textColor="@color/textPrimaryInverted"
                 android:textSize="25dp" />
 
             <TextView

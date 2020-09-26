@@ -1,0 +1,23 @@
+<resources>
+
+    <style name="MAppTheme.Translucent" />
+
+    <style name="MAppTheme.Translucent.StateBar" />
+
+    <!-- 启动界面style -->
+    <style name="AppBaseTheme.Launcher" parent="MAppTheme.Translucent">
+        <item name="android:windowBackground">@color/colorPrimary</item>
+    </style>
+
+    <style name="BottomNavigationViewTheme" parent="MAppTheme">
+        <item name="colorPrimary">@color/colorAccent</item>
+    </style>
+
+    <style name="alertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert" >
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="overlapAnchor">false</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+</resources>

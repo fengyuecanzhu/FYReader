@@ -51,6 +51,8 @@ public class Setting implements Serializable {
 
     private boolean refreshWhenStart;//打开软件自动更新书籍
 
+    private boolean openBookStore;//是否开启书城
+
     private int settingVersion;//设置版本号
 
     public int getAutoScrollSpeed() {
@@ -211,5 +213,13 @@ public class Setting implements Serializable {
 
     public void setRefreshWhenStart(boolean refreshWhenStart) {
         this.refreshWhenStart = refreshWhenStart;
+    }
+
+    public boolean isOpenBookStore() {
+        return openBookStore;
+    }
+
+    public void setOpenBookStore(boolean openBookStore) {
+        this.openBookStore = openBookStore;
     }
 }

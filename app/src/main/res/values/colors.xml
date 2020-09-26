@@ -4,6 +4,68 @@
     <color name="colorPrimaryDark">#3F51B5</color>
     <color name="colorAccent">#90cbf6</color>
 
+    <!--界面底色-->
+    <color name="colorBackground">@color/md_grey_100</color>
+    <!--界面前景色-->
+    <color name="colorForeground">@color/md_white_1000</color>
+    <!-- 分割线颜色-->
+    <color name="colorDivider">#ffe0e0e0</color>
+
+    <color name="background_card">#dedede</color>
+    <!--text-->
+    <!--用于重要级文字信息，如标题，子模块功能文字等-->
+    <color name="textPrimary">#212121</color>
+    <!--用于普通级信息-->
+    <color name="textSecondary">#757575</color>
+    <!--用于普通级信息、引导词,如昵正文、弹层文案、查看更多之类-->
+    <color name="textAssist">#9e9e9e</color>
+    <!--用于辅助、次要的文字信息、普通按钮描边,如时间、来自等补充信息文案-->
+    <color name="textAssistSecondary">#B0B0B0</color>
+    <color name="textPrimaryInverted">#ffffff</color>
+    <color name="textSecondaryInverted">#c8ffffff</color>
+    <color name="textAssistInverted">#8affffff</color>
+
+    <color name="textError">#ffe7492e</color>
+    <color name="textTranslucent">#96ffffff</color>
+
+    <!--menu-->
+    <color name="menu_color_default">#383838</color>
+    <color name="background_menu">#fcfcfc</color>
+    <!--list-->
+
+    <!--通用分割线-->
+    <color name="divider">#727272</color>
+    <color name="divider_dash">@color/colorDivider</color>
+    <!--通用分割线细-->
+    <color name="divider_narrow">@color/colorDivider</color>
+    <!--通用分割线粗-->
+    <color name="divider_wide">@color/colorDivider</color>
+
+    <!--scroll-->
+    <color name="scroll_refresh_tip">#88303F9F</color>
+
+    <!--downlaod-->
+    <color name="download_loading">#8bd715</color>
+    <color name="download_pause">#f3aa41</color>
+    <color name="download_wait">#afafad</color>
+    <color name="download_error">#e33a35</color>
+    <color name="download_finish">#8bd715</color>
+
+    <!--read-->
+    <color name="read_bg_night">#000000</color>
+    <color name="read_font_night">#99ffffff</color>
+
+    <color name="read_menu_bg">#191919</color>
+    <color name="read_menu_text">#CBCBCB</color>
+    <color name="read_bar_translucent">#88000000</color>
+
+    <!--button-->
+    <color name="widget_button_normal">@color/colorForeground</color>
+    <color name="widget_button_selected">@color/colorBackground</color>
+
+    <!--  书籍更新强调色  -->
+    <color name="highlight">@color/colorAccent</color>
+    <color name="darker_gray">#aaaaaaaa</color>
 
     <!-- 黑色 -->
     <color name="black">#000000</color>
@@ -11,6 +73,7 @@
     <color name="little_gray">#b8b8b8</color>
     <color name="title_black">#585858</color>
     <color name="btn_black">#454444</color>
+
 
     <!-- 灰色 -->
 
@@ -49,7 +112,6 @@
     <color name="little_grey">#f1f1f1</color>
 
     <color name="origin">#ff9602</color>
-    <color name="md_orange_800">#EF6C00</color>
 
     <!-- 透明 -->
     <color name="nothing">#00000000</color>
@@ -141,8 +203,7 @@
 
     <color name="sys_book_type_bg">#F7F7F7</color>
 
-    <color name="highlight">#d3321b</color>
-    <color name="darker_gray">#aaaaaaaa</color>
+
 
 
     <!--通用一级标题的颜色-->
@@ -152,12 +213,6 @@
     <!--通用三级标题的颜色-->
     <color name="text_common_h3">#B2B2B2</color>
 
-    <!--通用分割线细-->
-    <color name="divider_narrow">#E3E3E3</color>
-
-    <!--button-->
-    <color name="widget_button_normal">@color/white</color>
-    <color name="widget_button_selected">#E3E3E3</color>
 
     <color name="divider_common">#727272</color>
 
@@ -169,5 +224,6 @@
     <color name="toast_blue">#FF87CEFA</color>
     <color name="toast_yellow">#FFFFE284</color>
     <color name="toast_red">#FFE75B76</color>
+
 
 </resources>

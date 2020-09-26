@@ -12,11 +12,21 @@ public enum BookSource {
     biquge44("笔趣阁44"),
     pinshu("品书网"),
     biquge("笔趣阁"),
+    qb5("全本小说"),
     local("本地书籍");
     public String text;
 
     BookSource(String text) {
         this.text = text;
+    }
+
+    public static String getFromName(String name){
+        for (BookSource bookSource : BookSource.values()){
+            if (bookSource.text.equals(name)){
+                return bookSource.toString();
+            }
+        }
+        return null;
     }
 
     public static BookSource get(int var0) {

@@ -34,7 +34,7 @@ public class MySQLiteOpenHelper extends DaoMaster.OpenHelper {
                         DaoMaster.dropAllTables(db, ifExists);
                     }
                 },
-                BookDao.class, ChapterDao.class, SearchHistoryDao.class, BookMarkDao.class
+                BookDao.class, ChapterDao.class, SearchHistoryDao.class, BookMarkDao.class, BookGroupDao.class
         );
     }
 

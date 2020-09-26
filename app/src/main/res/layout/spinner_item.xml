@@ -1,0 +1,10 @@
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+          android:id="@android:id/text1"
+          android:gravity="center"
+          android:textColor="@color/textPrimary"
+          android:background="@drawable/selector_common_bg"
+          android:textSize="@dimen/text_normal_size"
+          android:singleLine="true"
+          android:layout_width="match_parent"
+          android:layout_height="45dp"
+          android:ellipsize="marquee" />

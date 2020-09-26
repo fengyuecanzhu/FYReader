@@ -10,7 +10,7 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:drawableLeft="@drawable/selector_category_unload"
-            android:textColor="@color/sys_protect_eye_word"
+            android:textColor="@color/textSecondary"
             android:text="chapter"
             android:drawablePadding="10dp"
             android:padding="13dp"
@@ -23,6 +23,6 @@
             android:layout_gravity="bottom"
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp"
-            android:background="@color/sys_line"
+            android:background="@color/colorDivider"
             android:layerType="software" />
 </LinearLayout>

@@ -23,6 +23,7 @@ public class PinShuReadCrawler2 implements ReadCrawler, BookInfoCrawler {
     public static final String NOVEL_SEARCH = "https://www.vodtw.la/search.html";
     public static final String SEARCH_KEY = "q";
     public static final String CHARSET = "UTF-8";
+    public static final String SEARCH_CHARSET = "UTF-8";
 
     @Override
     public String getSearchLink() {
@@ -42,6 +43,11 @@ public class PinShuReadCrawler2 implements ReadCrawler, BookInfoCrawler {
     @Override
     public String getSearchKey() {
         return SEARCH_KEY;
+    }
+
+    @Override
+    public String getSearchCharset() {
+        return SEARCH_CHARSET;
     }
 
     /**

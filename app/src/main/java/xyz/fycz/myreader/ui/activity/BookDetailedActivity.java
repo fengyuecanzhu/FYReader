@@ -2,6 +2,7 @@ package xyz.fycz.myreader.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,6 +10,7 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -17,7 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.OnClick;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
@@ -25,7 +29,9 @@ import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity2;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.creator.MyAlertDialog;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.BlurTransformation;
 import xyz.fycz.myreader.webapi.crawler.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -50,6 +56,8 @@ import java.util.ArrayList;
 public class BookDetailedActivity extends BaseActivity2 {
     @BindView(R.id.book_detail_iv_cover)
     ImageView mIvCover;
+   /* @BindView(R.id.book_detail_iv_blur_cover)
+    ImageView mIvBlurCover;*/
     @BindView(R.id.book_detail_tv_author)
     TextView mTvAuthor;
     @BindView(R.id.book_detail_tv_type)
@@ -108,6 +116,7 @@ public class BookDetailedActivity extends BaseActivity2 {
                     DialogCreator.createTipDialog(BookDetailedActivity.this, "未搜索到该书籍，书源加载失败！");
                     break;
                 case 4:
+                    pbLoading.setVisibility(View.GONE);
                     initOtherInfo();
                     break;
             }
@@ -139,6 +148,7 @@ public class BookDetailedActivity extends BaseActivity2 {
     @Override
     protected void setUpToolbar(Toolbar toolbar) {
         super.setUpToolbar(toolbar);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         setStatusBarColor(R.color.colorPrimary, true);
         getSupportActionBar().setTitle(mBook.getName());
     }
@@ -230,22 +240,29 @@ public class BookDetailedActivity extends BaseActivity2 {
         }
         assert mBook.getNewestChapterTitle() != null;
         mTvDesc.setText("");
-        mTvType.setText("");
+        if (mBook.getType() != null) {
+            mTvType.setText(mBook.getType());
+        } else {
+            mTvType.setText("");
+        }
         if (!"null".equals(mBook.getSource())) {
             mTvSource.setText("书源：" + BookSource.fromString(mBook.getSource()).text);
         }
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
         if (rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) {
+            pbLoading.setVisibility(View.VISIBLE);
             BookInfoCrawler bic = (BookInfoCrawler) rc;
             CommonApi.getBookInfo(mBook, bic, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
-                    mHandler.sendMessage(mHandler.obtainMessage(4));
+                    if (!MyApplication.isDestroy(BookDetailedActivity.this)) {
+                        mHandler.sendMessage(mHandler.obtainMessage(4));
+                    }
                 }
 
                 @Override
                 public void onError(Exception e) {
-
+                    ToastUtils.showError("书籍详情加载失败！");
                 }
             });
         } else {
@@ -267,7 +284,20 @@ public class BookDetailedActivity extends BaseActivity2 {
                     //设置圆角
                     .apply(RequestOptions.bitmapTransform(new RoundedCorners(8)))
                     .into(mIvCover);
+            /*Glide.with(this)
+                    .load(mBook.getImgUrl())
+                    .transition(DrawableTransitionOptions.withCrossFade(1500))
+                    .thumbnail(defaultCover())
+                    .centerCrop()
+                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(this, 25)))
+                    .into(mIvBlurCover);*/
         }
+    }
+
+    private RequestBuilder<Drawable> defaultCover() {
+        return Glide.with(this)
+                .load(R.mipmap.no_image)
+                .apply(RequestOptions.bitmapTransform(new BlurTransformation(this, 25)));
     }
 
     /**
@@ -290,7 +320,7 @@ public class BookDetailedActivity extends BaseActivity2 {
             }
         }
         final int finalCheckedItem = checkedItem;
-        AlertDialog dialog = new AlertDialog.Builder(this)
+        AlertDialog dialog = MyAlertDialog.build(this)
                 .setTitle("切换书源")
                 .setCancelable(true)
                 .setSingleChoiceItems(sources, checkedItem, (dialog1, which) -> {
@@ -314,7 +344,7 @@ public class BookDetailedActivity extends BaseActivity2 {
                         String tip = null;
                         if (SysManager.getSetting().isMatchChapter()) {
                             tip = getString(R.string.change_source_tip1);
-                        }else {
+                        } else {
                             tip = getString(R.string.change_source_tip2);
                         }
                         DialogCreator.createTipDialog(this, tip);

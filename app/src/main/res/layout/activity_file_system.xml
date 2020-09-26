@@ -32,7 +32,7 @@
 				android:layout_marginStart="15dp"
 				android:text="全选"
 				android:textSize="15dp"
-				android:textColor="@color/selector_cb_file"
+				android:textColor="@color/textSecondary"
 				android:theme="@style/MyCheckBox" />
 
 		<Button

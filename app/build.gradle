@@ -99,9 +99,10 @@ dependencies {
 
     implementation 'org.jsoup:jsoup:1.11.3'
 
+    //SmartRefreshLayout
     implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.2'
-
     implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.2'
+
 
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
 
@@ -124,10 +125,12 @@ dependencies {
 
     //字符串比较
     implementation 'net.ricecode:string-similarity:1.0.0'
+
+    implementation 'com.jayway.jsonpath:json-path:2.4.0'
 }
 
 greendao {
-    schemaVersion 11
+    schemaVersion 14
     daoPackage 'xyz.fycz.myreader.greendao.gen'
 //    targetGenDir 'src/main/java'
 }

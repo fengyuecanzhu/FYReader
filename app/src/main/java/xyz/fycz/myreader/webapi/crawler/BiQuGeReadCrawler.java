@@ -24,6 +24,8 @@ public class BiQuGeReadCrawler implements ReadCrawler, BookInfoCrawler {
     private static final String NOVEL_SEARCH = "https://www.52bqg.net/modules/article/search.php";
     private static final String SEARCH_KEY = "searchkey";
     private static final String CHARSET = "GBK";
+    public static final String SEARCH_CHARSET = "GBK";
+
     private ReadCrawler rc = new TianLaiReadCrawler();
 
     @Override
@@ -44,6 +46,11 @@ public class BiQuGeReadCrawler implements ReadCrawler, BookInfoCrawler {
     @Override
     public String getCharset() {
         return CHARSET;
+    }
+
+    @Override
+    public String getSearchCharset() {
+        return SEARCH_CHARSET;
     }
 
     /**
@@ -108,6 +115,34 @@ public class BiQuGeReadCrawler implements ReadCrawler, BookInfoCrawler {
 
     }
 
+    public static List<Book> getLatestBookList(String html) {
+        List<Book> books = new ArrayList<>();
+        Document doc = Jsoup.parse(html);
+        Element div = doc.getElementById("newscontent");
+        Elements uls = div.getElementsByTag("ul");
+        if (uls.size() > 0) {
+            for (Element li : uls.get(0).children()) {
+                Book book = new Book();
+                Element scanS1 = li.getElementsByClass("s1").get(0);
+                Element scanS2 = li.getElementsByClass("s2").get(0);
+                Element scanS3 = li.getElementsByClass("s3").get(0);
+                Element scanS4 = li.getElementsByClass("s4").get(0);
+                Element scanS5 = li.getElementsByClass("s5").get(0);
+                book.setType(scanS1.text().replace("[", "").replace("]", ""));
+                Element a = scanS2.getElementsByTag("a").get(0);
+                book.setName(a.attr("title"));
+                book.setChapterUrl(a.attr("href"));
+                book.setNewestChapterTitle(scanS3.text());
+                book.setAuthor(scanS4.text());
+                book.setUpdateDate(scanS5.text());
+                book.setSource(BookSource.biquge.toString());
+                books.add(book);
+            }
+        }
+
+        return books;
+
+    }
 
     @Override
     public String getContentFormHtml(String html) {

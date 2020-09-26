@@ -10,6 +10,7 @@ import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.gen.BookDao;
+import xyz.fycz.myreader.greendao.gen.ChapterDao;
 import xyz.fycz.myreader.util.*;
 import xyz.fycz.myreader.greendao.GreenDaoManager;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -50,39 +51,6 @@ public class BookService extends BaseService {
         return sInstance;
     }
 
-    private List<Book> findBooks(String sql, String[] selectionArgs) {
-        ArrayList<Book> books = new ArrayList<>();
-        try {
-            Cursor cursor = selectBySql(sql, selectionArgs);
-            while (cursor.moveToNext()) {
-                Book book = new Book();
-                book.setId(cursor.getString(0));
-                book.setName(cursor.getString(1));
-                book.setChapterUrl(cursor.getString(2));
-                book.setImgUrl(cursor.getString(3));
-                book.setDesc(cursor.getString(4));
-                book.setAuthor(cursor.getString(5));
-                book.setType(cursor.getString(6));
-                book.setUpdateDate(cursor.getString(7));
-                book.setNewestChapterId(cursor.getString(8));
-                book.setNewestChapterTitle(cursor.getString(9));
-                book.setNewestChapterUrl(cursor.getString(10));
-                book.setHistoryChapterId(cursor.getString(11));
-                book.setHisttoryChapterNum(cursor.getInt(12));
-                book.setSortCode(cursor.getInt(13));
-                book.setNoReadNum(cursor.getInt(14));
-                book.setChapterTotalNum(cursor.getInt(15));
-                book.setLastReadPosition(cursor.getInt(16));
-                book.setSource(cursor.getString(17));
-                book.setIsCloseUpdate(cursor.getShort(18) != 0);
-                book.setIsDownLoadAll(cursor.getShort(19) != 0);
-                books.add(book);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return books;
-    }
 
     /**
      * 通过ID查书
@@ -101,8 +69,26 @@ public class BookService extends BaseService {
      * @return
      */
     public List<Book> getAllBooks() {
-        String sql = "select * from book order by sort_code";
-        return findBooks(sql, null);
+        return GreenDaoManager.getInstance().getSession().getBookDao()
+                .queryBuilder()
+                .orderAsc(BookDao.Properties.SortCode)
+                .list();
+    }
+
+    /**
+     * 获取特定分组的书
+     *
+     * @return
+     */
+    public List<Book> getGroupBooks(String groupId) {
+        if (StringHelper.isEmpty(groupId)){
+            return getAllBooks();
+        }
+        return GreenDaoManager.getInstance().getSession().getBookDao()
+                .queryBuilder()
+                .where(BookDao.Properties.GroupId.eq(groupId))
+                .orderAsc(BookDao.Properties.GroupSort)
+                .list();
     }
 
     /**
@@ -112,7 +98,9 @@ public class BookService extends BaseService {
      */
     public void addBook(Book book) {
 //        book.setSortCode(countBookTotalNum() + 1);
+
         book.setSortCode(0);
+        book.setGroupSort(0);
         if (StringHelper.isEmpty(book.getId())) {
             book.setId(StringHelper.getStringRandom(25));
         }
@@ -138,17 +126,10 @@ public class BookService extends BaseService {
      * @return
      */
     public Book findBookByAuthorAndName(String bookName, String author) {
-        Book book = null;
-        try {
-            Cursor cursor = selectBySql("select id from book where author = ? and name = ?", new String[]{author, bookName});
-            if (cursor.moveToNext()) {
-                String id = cursor.getString(0);
-                book = getBookById(id);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return book;
+        return GreenDaoManager.getInstance().getSession().getBookDao()
+                .queryBuilder()
+                .where(BookDao.Properties.Name.eq(bookName), BookDao.Properties.Author.eq(author))
+                .unique();
     }
 
     /**
@@ -158,17 +139,10 @@ public class BookService extends BaseService {
      * @return
      */
     public Book findBookByPath(String path) {
-        Book book = null;
-        try {
-            Cursor cursor = selectBySql("select id from book where CHAPTER_URL = ?", new String[]{path});
-            if (cursor.moveToNext()) {
-                String id = cursor.getString(0);
-                book = getBookById(id);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return book;
+        return GreenDaoManager.getInstance().getSession().getBookDao()
+                .queryBuilder()
+                .where(BookDao.Properties.ChapterUrl.eq(path))
+                .unique();
     }
 
     /**

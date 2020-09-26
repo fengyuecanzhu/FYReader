@@ -25,6 +25,8 @@ public class TianLaiReadCrawler implements ReadCrawler{
     public static final String NOVEL_SEARCH = "https://www.23txt.com/search.php";
     public static final String SEARCH_KEY = "q";
     public static final String CHARSET = "GBK";
+    public static final String SEARCH_CHARSET = "utf-8";
+
     @Override
     public String getSearchLink() {
         return NOVEL_SEARCH;
@@ -42,6 +44,11 @@ public class TianLaiReadCrawler implements ReadCrawler{
     @Override
     public String getSearchKey() {
         return SEARCH_KEY;
+    }
+
+    @Override
+    public String getSearchCharset() {
+        return SEARCH_CHARSET;
     }
 
     /**

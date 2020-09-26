@@ -2,14 +2,13 @@ package xyz.fycz.myreader.creator;
 
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import androidx.appcompat.app.AppCompatActivity;
 import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.MainActivity;
@@ -38,7 +37,7 @@ public class APPDownloadTip {
     private MainActivity activity;
     private boolean isForceUpdate;
 
-    public APPDownloadTip(String url, BookcaseFragment mBookcaseFragment, BaseActivity activity, boolean isForceUpdate) {
+    public APPDownloadTip(String url, BookcaseFragment mBookcaseFragment, AppCompatActivity activity, boolean isForceUpdate) {
         this.url = url;
         this.mBookcaseFragment = mBookcaseFragment;
         this.activity = (MainActivity) activity;
@@ -49,25 +48,27 @@ public class APPDownloadTip {
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-                    mBookcaseFragment.getTvDownloadTip().setText("获取下载链接失败，请前往浏览器下载！");
-                    mBookcaseFragment.getRlDownloadTip().setVisibility(View.GONE);
-                    break;
-                case 2:
-                    mBookcaseFragment.getTvDownloadTip().setText("连接中...");
-                    break;
-                case 3:
-                    updateDownloadPro((double) msg.obj);
-                    break;
-                case 4:
-                    mBookcaseFragment.getRlDownloadTip().setVisibility(View.GONE);
-                    break;
+            if (!MyApplication.isDestroy(activity)) {
+                switch (msg.what) {
+                    case 1:
+                        mBookcaseFragment.getTvDownloadTip().setText("获取下载链接失败，请前往浏览器下载！");
+                        mBookcaseFragment.getRlDownloadTip().setVisibility(View.GONE);
+                        break;
+                    case 2:
+                        mBookcaseFragment.getTvDownloadTip().setText("连接中...");
+                        break;
+                    case 3:
+                        updateDownloadPro((double) msg.obj);
+                        break;
+                    case 4:
+                        mBookcaseFragment.getRlDownloadTip().setVisibility(View.GONE);
+                        break;
+                }
             }
         }
     };
 
-    public void downloadApp(){
+    public void downloadApp() {
         mBookcaseFragment.getTvStopDownload().setVisibility(View.GONE);
         mBookcaseFragment.getRlDownloadTip().setVisibility(View.VISIBLE);
         mBookcaseFragment.getPbDownload().setProgress(0);
@@ -108,20 +109,20 @@ public class APPDownloadTip {
                         if (fileLength == appFile.length()) {
                             String newPath = filePath.replace(".temp", "");
                             final File newFile = new File(newPath);
-                            if (appFile.renameTo(newFile)){
+                            if (appFile.renameTo(newFile)) {
                                 mHandler.sendMessage(mHandler.obtainMessage(4));
                                 DialogCreator.createCommonDialog(activity, "提示", "风月读书下载完成，安装包路径：" + newPath,
                                         !isForceUpdate, "取消", "立即安装", (dialog, which) -> {
-                                            if (isForceUpdate){
+                                            if (isForceUpdate) {
                                                 activity.finish();
                                             }
                                         }, (dialog, which) -> activity.installProcess(newFile, isForceUpdate));
                                 activity.installProcess(newFile, isForceUpdate);
-                            }else {
+                            } else {
                                 appFile.delete();
                                 error();
                             }
-                        }else {
+                        } else {
                             appFile.delete();
                             error();
                         }
@@ -148,7 +149,7 @@ public class APPDownloadTip {
     }
 
 
-    private void error(){
+    private void error() {
         mHandler.sendMessage(mHandler.obtainMessage(1));
         ToastUtils.showError("获取下载链接失败，请前往浏览器下载！");
         Intent intent = new Intent();
@@ -159,6 +160,7 @@ public class APPDownloadTip {
             activity.finish();
         }
     }
+
     @SuppressLint({"SetTextI18n"})
     private void updateDownloadPro(double progress) {
         mBookcaseFragment.getPbDownload().setProgress((int) progress);

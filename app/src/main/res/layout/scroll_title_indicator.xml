@@ -6,12 +6,13 @@
             android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/white"
-                android:theme="@style/Theme.ToolBar.Menu"
+                android:layout_height="45dp"
+                android:background="@color/colorPrimary"
+                android:theme="@style/Theme.ToolBar.Dark.Menu"
+                app:titleTextAppearance="@style/toolbar_title_textStyle"
+                app:subtitleTextAppearance="@style/toolbar_subtitle_textStyle"
                 app:layout_scrollFlags="scroll|enterAlways">
         </androidx.appcompat.widget.Toolbar>
 
@@ -19,9 +20,9 @@
                 android:id="@+id/tab_tl_indicator"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:background="@color/white"
-                app:tabTextColor="@color/title_black"
-                app:tabSelectedTextColor="@color/colorAccent"
+                android:background="@color/colorPrimary"
+                app:tabSelectedTextColor="@color/white"
+                app:tabTextColor="@color/translucent_text"
                 app:tabIndicatorColor="@color/colorAccent">
         </com.google.android.material.tabs.TabLayout>
     </com.google.android.material.appbar.AppBarLayout>

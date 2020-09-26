@@ -3,17 +3,16 @@ package xyz.fycz.myreader.ui.fragment;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.*;
 
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.custom.DragSortGridView;
 
 import butterknife.ButterKnife;
@@ -39,6 +38,14 @@ public class BookcaseFragment extends Fragment {
     TextView tvStopDownload;
     @BindView(R.id.pb_download)
     ProgressBar pbDownload;
+    @BindView(R.id.rl_book_edit)
+    RelativeLayout rlBookEdit;
+    @BindView(R.id.book_selected_all)
+    CheckBox mCbSelectAll;
+    @BindView(R.id.book_btn_delete)
+    Button mBtnDelete;
+    @BindView(R.id.book_add_group)
+    Button mBtnAddGroup;
 
     Unbinder unbinder;
 
@@ -107,5 +114,25 @@ public class BookcaseFragment extends Fragment {
 
     public BookcasePresenter getmBookcasePresenter() {
         return mBookcasePresenter;
+    }
+
+    public boolean isRecreate() {
+        return unbinder == null;
+    }
+
+    public RelativeLayout getRlBookEdit() {
+        return rlBookEdit;
+    }
+
+    public CheckBox getmCbSelectAll() {
+        return mCbSelectAll;
+    }
+
+    public Button getmBtnDelete() {
+        return mBtnDelete;
+    }
+
+    public Button getmBtnAddGroup() {
+        return mBtnAddGroup;
     }
 }

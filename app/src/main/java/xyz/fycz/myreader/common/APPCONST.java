@@ -10,10 +10,10 @@ import java.io.File;
 
 public class APPCONST {
 
-    public static String publicKey = "fyds1.0";//服务端公钥
+    public static String publicKey = "";//服务端公钥
     public static String privateKey;//app私钥
     public final static String s = "11940364935628058505";
-    public static final String KEY = "readerByFengyue";
+    public static final String KEY = "";
 
     public static final String ALARM_SCHEDULE_MSG = "alarm_schedule_msg";
 
@@ -33,6 +33,8 @@ public class APPCONST {
     public static final int exitConfirmTime = 2000;
 
     public static final String BOOK = "book";
+    public static final String TITLE = "title";
+    public static final String FIND_CRAWLER = "findCrawler";
     public static final String CHAPTER_PAGE = "chapter_page";
     public static final String SETTING = "setting";
     public static final String SEARCH_BOOK_BEAN = "SearchBookBean";
@@ -57,6 +59,7 @@ public class APPCONST {
     public static final int REQUEST_FONT = 1001;
     public static final int REQUEST_CHAPTER_PAGE = 1002;
     public static final int REQUEST_RESET_SCREEN_TIME = 1003;
+    public static final int REQUEST_LOGIN = 1004;
 
 
     public static final int REQUEST_READ = 1;

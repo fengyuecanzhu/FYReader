@@ -12,6 +12,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -20,6 +21,9 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.SysManager;
+import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.util.StatusBarUtil;
 
 import java.lang.reflect.Method;
@@ -37,6 +41,8 @@ public abstract class BaseActivity2 extends AppCompatActivity {
     private Toolbar mToolbar;
 
     private Unbinder unbinder;
+
+    private int curNightMode;
     /****************************abstract area*************************************/
 
     @LayoutRes
@@ -75,12 +81,32 @@ public abstract class BaseActivity2 extends AppCompatActivity {
      */
     protected void processLogic(){
     }
+    /**
+     * @return 是否夜间模式
+     */
+    protected boolean isNightTheme() {
+        return !SysManager.getSetting().isDayStyle();
+    }
+
+    /**
+     * 设置夜间模式
+     * @param isNightMode
+     */
+    protected void setNightTheme(boolean isNightMode) {
+        Setting setting = SysManager.getSetting();
+        setting.setDayStyle(!isNightMode);
+        MyApplication.getApplication().initNightTheme();
+    }
+
+
+
 
     /*************************lifecycle area*****************************************************/
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initTheme();
         ActivityManage.addActivity(this);
         setContentView(getContentId());
         initData(savedInstanceState);
@@ -100,6 +126,13 @@ public abstract class BaseActivity2 extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isThemeChange()){
+            recreate();
+        }
+    }
 
     @Override
     protected void onDestroy() {
@@ -110,7 +143,22 @@ public abstract class BaseActivity2 extends AppCompatActivity {
             mDisposable.dispose();
         }
     }
+    /**
+     * 初始化主题
+     */
+    public void initTheme() {
+        //if (isNightTheme()) {
+            //setTheme(R.style.AppNightTheme);
+        curNightMode = AppCompatDelegate.getDefaultNightMode();
+        /*} else {
+            //curNightMode = false;
+            //setTheme(R.style.AppDayTheme);
+        }*/
+    }
 
+    protected boolean isThemeChange(){
+        return curNightMode != AppCompatDelegate.getDefaultNightMode();
+    }
     /**************************used method area*******************************************/
 
     protected void startActivity(Class<? extends AppCompatActivity> activity){
@@ -148,6 +196,19 @@ public abstract class BaseActivity2 extends AppCompatActivity {
                 StatusBarUtil.setStatusBarColor(this, 0x55000000);
             }
         }
+    } /**
+     * 设置MENU图标颜色
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        for (int i = 0; i < menu.size(); i++) {
+            Drawable drawable = menu.getItem(i).getIcon();
+            if (drawable != null) {
+                drawable.mutate();
+                drawable.setColorFilter(getColor(R.color.textPrimary), PorterDuff.Mode.SRC_ATOP);
+            }
+        }
+        return super.onCreateOptionsMenu(menu);
     }
 
     @SuppressLint("PrivateApi")
@@ -168,7 +229,7 @@ public abstract class BaseActivity2 extends AppCompatActivity {
                             Drawable drawable = menuItem.getIcon();
                             if (drawable != null) {
                                 drawable.mutate();
-                                drawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_ATOP);
+                                drawable.setColorFilter(getResources().getColor(R.color.textPrimary), PorterDuff.Mode.SRC_ATOP);
                             }
                         }
                     }

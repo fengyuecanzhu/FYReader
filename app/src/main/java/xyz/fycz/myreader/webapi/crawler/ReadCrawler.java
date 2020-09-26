@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public interface ReadCrawler {
     String getSearchLink();
     String getCharset();
+    String getSearchCharset();
     String getNameSpace();
     String getSearchKey();
     String getContentFormHtml(String html);

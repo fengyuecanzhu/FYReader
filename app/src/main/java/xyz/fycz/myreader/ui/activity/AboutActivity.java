@@ -1,25 +1,28 @@
 package xyz.fycz.myreader.ui.activity;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.base.BaseActivity;
-import xyz.fycz.myreader.ui.presenter.AboutPresenter;
+import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.util.ShareUtils;
+import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.ToastUtils;
 
 /**
  * @author fengyue
- * @date 2020/7/31 11:32
+ * @date 2020/9/18 22:21
  */
-public class AboutActivity extends BaseActivity {
-
-    @BindView(R.id.ll_title_back)
-    LinearLayout llTitleBack;
-    @BindView(R.id.tv_title_text)
-    TextView tvTitleText;
+public class AboutActivity extends BaseActivity2 {
     @BindView(R.id.tv_version_name)
     TextView tvVersionName;
     @BindView(R.id.vm_author)
@@ -30,57 +33,72 @@ public class AboutActivity extends BaseActivity {
     CardView vmUpdate;
     @BindView(R.id.vw_update_log)
     CardView vmUpdateLog;
+    @BindView(R.id.vw_qq)
+    CardView vmQQ;
     @BindView(R.id.vw_git)
     CardView vmGit;
     @BindView(R.id.vw_disclaimer)
     CardView vmDisclaimer;
 
-    private AboutPresenter mAboutPresenter;
+    @Override
+    protected int getContentId() {
+        return R.layout.activity_about;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about);
-        ButterKnife.bind(this);
-        setStatusBar(R.color.white, false);
-        mAboutPresenter = new AboutPresenter(this);
-        mAboutPresenter.start();
+    protected void setUpToolbar(Toolbar toolbar) {
+        super.setUpToolbar(toolbar);
+        setStatusBarColor(R.color.colorPrimary, true);
+        getSupportActionBar().setTitle("关于");
     }
 
 
-    public LinearLayout getLlTitleBack() {
-        return llTitleBack;
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        tvVersionName.setText("风月读书v" + MyApplication.getStrVersionName());
     }
 
-    public TextView getTvTitleText() {
-        return tvTitleText;
+    @Override
+    protected void initClick() {
+        super.initClick();
+        ClipboardManager mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        vmAuthor.setOnClickListener(v -> {
+            //数据
+            ClipData mClipData = ClipData.newPlainText("Label", "fy@fycz.xyz");
+            //把数据设置到剪切板上
+            assert mClipboardManager != null;
+            mClipboardManager.setPrimaryClip(mClipData);
+            ToastUtils.showSuccess("邮箱复制成功！");
+        });
+        vmShare.setOnClickListener(v -> ShareUtils.share(this, getString(R.string.share_text) +
+                SharedPreUtils.getInstance().getString("downloadLink")));
+        vmUpdate.setOnClickListener(v -> MyApplication.checkVersionByServer(this, true, null));
+        vmUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));
+        vmQQ.setOnClickListener(v -> {
+            if (!MyApplication.joinQQGroup(this,"8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")){
+                //数据
+                ClipData mClipData = ClipData.newPlainText("Label", "1085028304");
+                //把数据设置到剪切板上
+                assert mClipboardManager != null;
+                mClipboardManager.setPrimaryClip(mClipData);
+                ToastUtils.showError("未安装手Q或安装的版本不支持！\n已复制QQ群号，您可自行前往QQ添加！");
+            }
+        });
+        vmGit.setOnClickListener(v -> openIntent(Intent.ACTION_VIEW, getString(R.string.this_github_url)));
+        vmDisclaimer.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "免责声明", "disclaimer.fy"));
+
     }
 
-    public TextView getTvVersionName() {
-        return tvVersionName;
+    void openIntent(String intentName, String address) {
+        try {
+            Intent intent = new Intent(intentName);
+            intent.setData(Uri.parse(address));
+            startActivity(intent);
+        } catch (Exception e) {
+            ToastUtils.showError(e.getLocalizedMessage());
+        }
     }
 
-    public CardView getVmAuthor() {
-        return vmAuthor;
-    }
 
-    public CardView getVmShare() {
-        return vmShare;
-    }
-
-    public CardView getVmUpdate() {
-        return vmUpdate;
-    }
-
-    public CardView getVmUpdateLog() {
-        return vmUpdateLog;
-    }
-
-    public CardView getVmGit() {
-        return vmGit;
-    }
-
-    public CardView getVmDisclaimer() {
-        return vmDisclaimer;
-    }
 }

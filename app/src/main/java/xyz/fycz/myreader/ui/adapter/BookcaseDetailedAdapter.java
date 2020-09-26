@@ -22,6 +22,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.creator.MyAlertDialog;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
@@ -39,8 +40,8 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
     ViewHolder viewHolder = null;
 
     public BookcaseDetailedAdapter(Context context, int textViewResourceId, ArrayList<Book> objects,
-                                   boolean editState, BookcasePresenter bookcasePresenter) {
-        super(context, textViewResourceId, objects, editState, bookcasePresenter);
+                                   boolean editState, BookcasePresenter bookcasePresenter, boolean isGroup) {
+        super(context, textViewResourceId, objects, editState, bookcasePresenter, isGroup);
     }
 
     @Override
@@ -48,10 +49,10 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
         if (convertView == null || convertView.getTag() instanceof BookcaseDragAdapter.ViewHolder) {
             viewHolder = new ViewHolder();
             convertView = LayoutInflater.from(mContext).inflate(mResourceId, null);
+            viewHolder.cbBookChecked = convertView.findViewById(R.id.cb_book_select);
             viewHolder.ivBookImg = convertView.findViewById(R.id.iv_book_img);
             viewHolder.tvBookName = convertView.findViewById(R.id.tv_book_name);
             viewHolder.tvNoReadNum = convertView.findViewById(R.id.tv_no_read_num);
-            viewHolder.ivDelete = convertView.findViewById(R.id.iv_delete);
             viewHolder.tvBookAuthor = convertView.findViewById(R.id.tv_book_author);
             viewHolder.tvHistoryChapter = convertView.findViewById(R.id.tv_book_history_chapter);
             viewHolder.tvNewestChapter = convertView.findViewById(R.id.tv_book_newest_chapter);
@@ -79,7 +80,6 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
                 .into(viewHolder.ivBookImg);
 
         viewHolder.tvBookName.setText(book.getName());
-        viewHolder.ivDelete.setOnClickListener(v -> showDeleteBookDialog(book));
 
         viewHolder.tvBookAuthor.setText(book.getAuthor());
         viewHolder.tvHistoryChapter.setText(book.getHistoryChapterId());
@@ -88,21 +88,34 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
 
         if (mEditState) {
             viewHolder.tvNoReadNum.setVisibility(View.GONE);
-            viewHolder.ivDelete.setVisibility(View.VISIBLE);
             viewHolder.ivBookImg.setOnClickListener(null);
             viewHolder.llBookRead.setOnClickListener(null);
             viewHolder.pbLoading.setVisibility(View.GONE);
+            viewHolder.cbBookChecked.setVisibility(View.VISIBLE);
+            viewHolder.cbBookChecked.setChecked(getBookIsChecked(book.getId()));
+            viewHolder.llBookRead.setOnClickListener(v -> {
+                setCheckedBook(book.getId());
+                mListener.onItemCheckedChange(getBookIsChecked(book.getId()));
+            });
+            viewHolder.ivBookImg.setOnClickListener(v -> {
+                setCheckedBook(book.getId());
+                mListener.onItemCheckedChange(getBookIsChecked(book.getId()));
+            });
+            viewHolder.cbBookChecked.setOnClickListener(v -> {
+                setCheckedBook(book.getId());
+                mListener.onItemCheckedChange(getBookIsChecked(book.getId()));
+            });
         } else {
-            viewHolder.ivDelete.setVisibility(View.GONE);
+            viewHolder.cbBookChecked.setVisibility(View.GONE);
             boolean isLoading = false;
             try {
                 isLoading = isBookLoading(book.getId());
-            }catch (Exception ignored){
+            } catch (Exception ignored) {
             }
-            if (isLoading){
+            if (isLoading) {
                 viewHolder.pbLoading.setVisibility(View.VISIBLE);
                 viewHolder.tvNoReadNum.setVisibility(View.GONE);
-            }else {
+            } else {
                 viewHolder.pbLoading.setVisibility(View.GONE);
                 int notReadNum = book.getChapterTotalNum() - book.getHisttoryChapterNum() + book.getNoReadNum() - 1;
                 if (notReadNum != 0) {
@@ -133,44 +146,46 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
             });
             viewHolder.llBookRead.setOnLongClickListener(v -> {
                 if (!ismEditState()) {
-                    AlertDialog bookDialog = new AlertDialog.Builder(mContext)
+                    AlertDialog bookDialog = MyAlertDialog.build(mContext)
                             .setTitle(book.getName())
-                            .setAdapter(new ArrayAdapter<>(mContext,
-                                            android.R.layout.simple_list_item_1, menu),
-                                    (dialog, which) -> {
-                                        switch (which) {
-                                            case 0:
-                                                book.setSortCode(0);
-                                                mBookService.updateEntity(book);
-                                                mBookcasePresenter.init();
-                                                ToastUtils.showSuccess("书籍《" + book.getName() + "》移至顶部成功！");
-                                                break;
-                                            case 1:
-                                                downloadBook(book);
-                                                break;
-                                            case 2:
-                                                MyApplication.getApplication().newThread(() -> {
-                                                    try {
-                                                        if (unionChapterCathe(book)) {
-                                                            DialogCreator.createTipDialog(mContext,
-                                                                    "缓存导出成功，导出目录："
-                                                                            + APPCONST.TXT_BOOK_DIR);
-                                                        } else {
-                                                            DialogCreator.createTipDialog(mContext,
-                                                                    "章节目录为空或未找到缓存文件，缓存导出失败！");
-                                                        }
-                                                    } catch (IOException e) {
-                                                        e.printStackTrace();
-                                                        DialogCreator.createTipDialog(mContext,
-                                                                "章节目录为空或未找到缓存文件，缓存导出失败！");
-                                                    }
-                                                });
-                                                break;
-                                            case 3:
-                                                showDeleteBookDialog(book);
-                                                break;
+                            .setItems(menu, (dialog, which) -> {
+                                switch (which) {
+                                    case 0:
+                                        if (!isGroup) {
+                                            book.setSortCode(0);
+                                        }else {
+                                            book.setGroupSort(0);
                                         }
-                                    })
+                                        mBookService.updateEntity(book);
+                                        mBookcasePresenter.init();
+                                        ToastUtils.showSuccess("书籍《" + book.getName() + "》移至顶部成功！");
+                                        break;
+                                    case 1:
+                                        downloadBook(book);
+                                        break;
+                                    case 2:
+                                        MyApplication.getApplication().newThread(() -> {
+                                            try {
+                                                if (unionChapterCathe(book)) {
+                                                    DialogCreator.createTipDialog(mContext,
+                                                            "缓存导出成功，导出目录："
+                                                                    + APPCONST.TXT_BOOK_DIR);
+                                                } else {
+                                                    DialogCreator.createTipDialog(mContext,
+                                                            "章节目录为空或未找到缓存文件，缓存导出失败！");
+                                                }
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                                DialogCreator.createTipDialog(mContext,
+                                                        "章节目录为空或未找到缓存文件，缓存导出失败！");
+                                            }
+                                        });
+                                        break;
+                                    case 3:
+                                        showDeleteBookDialog(book);
+                                        break;
+                                }
+                            })
                             .setNegativeButton(null, null)
                             .setPositiveButton(null, null)
                             .create();
@@ -181,7 +196,7 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
             });
         }
     }
-    
+
 
     static class ViewHolder extends BookcaseAdapter.ViewHolder {
         TextView tvBookAuthor;

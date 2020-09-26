@@ -85,6 +85,8 @@ public class CommonApi extends BaseApi {
         params.put(rc.getSearchKey(), key);
         if (rc instanceof PinShuReadCrawler) {
             params.put("SearchClass", 1);
+        }else if (rc instanceof QB5ReadCrawler){
+            params.put("submit", "%CB%D1%CB%F7");
         }
         getCommonReturnHtmlStringApi(rc.getSearchLink(), params, charset, new ResultCallback() {
             @Override

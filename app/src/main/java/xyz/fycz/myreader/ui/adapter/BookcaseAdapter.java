@@ -2,9 +2,7 @@ package xyz.fycz.myreader.ui.adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.*;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -14,14 +12,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.creator.MyAlertDialog;
 import xyz.fycz.myreader.custom.DragAdapter;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -40,6 +37,10 @@ import xyz.fycz.myreader.widget.BadgeView;
 public abstract class BookcaseAdapter extends DragAdapter {
 
     private final Map<String, Boolean> isLoading = new HashMap<>();
+    private final Map<String, Boolean> mCheckMap = new LinkedHashMap<>();
+    private int mCheckedCount = 0;
+    protected OnBookCheckedListener mListener;
+    protected boolean isCheckedAll;
     protected int mResourceId;
     protected ArrayList<Book> list;
     protected Context mContext;
@@ -47,6 +48,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
     protected BookService mBookService;
     protected ChapterService mChapterService;
     protected BookcasePresenter mBookcasePresenter;
+    protected boolean isGroup;
     protected String[] menu = {
             MyApplication.getmContext().getResources().getString(R.string.menu_book_Top),
             MyApplication.getmContext().getResources().getString(R.string.menu_book_download),
@@ -56,7 +58,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
 
 
     public BookcaseAdapter(Context context, int textViewResourceId, ArrayList<Book> objects
-            , boolean editState, BookcasePresenter bookcasePresenter) {
+            , boolean editState, BookcasePresenter bookcasePresenter, boolean isGroup) {
         mContext = context;
         mResourceId = textViewResourceId;
         list = objects;
@@ -64,6 +66,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
         mBookService = BookService.getInstance();
         mChapterService = ChapterService.getInstance();
         mBookcasePresenter = bookcasePresenter;
+        this.isGroup = isGroup;
     }
 
 
@@ -72,7 +75,11 @@ public abstract class BookcaseAdapter extends DragAdapter {
         Book b = list.remove(from);
         list.add(to, b);
         for (int i = 0; i < list.size(); i++) {
-            list.get(i).setSortCode(i);
+            if (!isGroup) {
+                list.get(i).setSortCode(i);
+            }else {
+                list.get(i).setGroupSort(i);
+            }
         }
         mBookService.updateBooks(list);
     }
@@ -89,7 +96,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
 
     @Override
     public long getItemId(int position) {
-        return list.get(position).getSortCode();
+        return !isGroup ? list.get(position).getSortCode() : list.get(position).getGroupSort();
     }
 
 
@@ -104,19 +111,43 @@ public abstract class BookcaseAdapter extends DragAdapter {
         notifyDataSetChanged();
         mBookService.addBook(item);
     }
-    protected void showDeleteBookDialog(final Book book){
-        DialogCreator.createCommonDialog(mContext, "删除书籍", "确定删除《" + book.getName() + "》及其所有缓存吗？",
-                true, (dialogInterface, i) -> {
-                    remove(book);
-                    dialogInterface.dismiss();
-                }, (dialogInterface, i) -> dialogInterface.dismiss());
+
+    protected void showDeleteBookDialog(final Book book) {
+        if (!isGroup) {
+            DialogCreator.createCommonDialog(mContext, "删除书籍", "确定删除《" + book.getName() + "》及其所有缓存吗？",
+                    true, (dialogInterface, i) -> {
+                        remove(book);
+                        ToastUtils.showSuccess("书籍删除成功！");
+                        mBookcasePresenter.init();
+                    }, null);
+        }else {
+            DialogCreator.createCommonDialog(mContext, "删除/移除书籍", "您是希望删除《" + book.getName() + "》及其所有缓存还是从分组中移除该书籍(不会删除书籍)呢？",
+                    true, "删除书籍", "从分组中移除书籍",(dialogInterface, i) -> {
+                        remove(book);
+                        ToastUtils.showSuccess("书籍删除成功！");
+                        mBookcasePresenter.init();
+                    }, (dialog, which) -> {
+                        book.setGroupId("");
+                        mBookService.updateEntity(book);
+                        ToastUtils.showSuccess("书籍已从分组中移除！");
+                        mBookcasePresenter.init();
+                    });
+        }
     }
 
     /**
      * 设置是否处于编辑状态
+     *
      * @param mEditState
      */
     public void setmEditState(boolean mEditState) {
+        if (mEditState) {
+            mCheckMap.clear();
+            for (Book book : list) {
+                mCheckMap.put(book.getId(), false);
+            }
+            mCheckedCount = 0;
+        }
         this.mEditState = mEditState;
         notifyDataSetChanged();
     }
@@ -124,15 +155,17 @@ public abstract class BookcaseAdapter extends DragAdapter {
     public boolean ismEditState() {
         return mEditState;
     }
+
     /**
      * getter方法
+     *
      * @return
      */
     public Map<String, Boolean> getIsLoading() {
         return isLoading;
     }
 
-    public boolean isBookLoading(String bookID){
+    public boolean isBookLoading(String bookID) {
         return isLoading.get(bookID);
     }
 
@@ -141,21 +174,21 @@ public abstract class BookcaseAdapter extends DragAdapter {
         BufferedReader br = null;
         BufferedWriter bw = null;
         bw = new BufferedWriter(new FileWriter(FileUtils.getFile(APPCONST.TXT_BOOK_DIR + book.getName() + ".txt")));
-        if (chapters.size() == 0){
+        if (chapters.size() == 0) {
             return false;
         }
         File bookFile = new File(APPCONST.BOOK_CACHE_PATH + book.getId());
-        if (!bookFile.exists()){
+        if (!bookFile.exists()) {
             return false;
         }
-        for (Chapter chapter : chapters){
-            if(ChapterService.isChapterCached(chapter.getBookId(), chapter.getTitle())){
+        for (Chapter chapter : chapters) {
+            if (ChapterService.isChapterCached(chapter.getBookId(), chapter.getTitle())) {
                 bw.write("\t" + chapter.getTitle());
                 bw.newLine();
                 br = new BufferedReader(new FileReader(APPCONST.BOOK_CACHE_PATH + book.getId()
                         + File.separator + chapter.getTitle() + FileUtils.SUFFIX_FY));
                 String line = null;
-                while ((line = br.readLine()) != null){
+                while ((line = br.readLine()) != null) {
                     bw.write(line);
                     bw.newLine();
                 }
@@ -167,6 +200,68 @@ public abstract class BookcaseAdapter extends DragAdapter {
         return true;
     }
 
+
+    //设置点击切换
+    public void setCheckedBook(String bookId) {
+        boolean isSelected = mCheckMap.get(bookId);
+        if (isSelected) {
+            mCheckMap.put(bookId, false);
+            --mCheckedCount;
+        } else {
+            mCheckMap.put(bookId, true);
+            ++mCheckedCount;
+        }
+        notifyDataSetChanged();
+    }
+
+    //全选
+    public void setCheckedAll(boolean isChecked) {
+        mCheckedCount = isChecked ? mCheckMap.size() : 0;
+        for (String bookId : mCheckMap.keySet()) {
+            mCheckMap.put(bookId, isChecked);
+        }
+        mListener.onItemCheckedChange(true);
+        notifyDataSetChanged();
+    }
+
+    public boolean getBookIsChecked(String bookId) {
+        return mCheckMap.get(bookId);
+    }
+
+    public int getmCheckedCount() {
+        return mCheckedCount;
+    }
+
+    public int getmCheckableCount() {
+        return mCheckMap.size();
+    }
+
+    public boolean isCheckedAll() {
+        return isCheckedAll;
+    }
+
+    public void setIsCheckedAll(boolean isCheckedAll) {
+        this.isCheckedAll = isCheckedAll;
+    }
+
+    public List<Book> getSelectBooks() {
+        List<Book> mSelectBooks = new ArrayList<>();
+        for (String bookId : mCheckMap.keySet()) {
+            if (mCheckMap.get(bookId)) {
+                mSelectBooks.add(mBookService.getBookById(bookId));
+            }
+        }
+        return mSelectBooks;
+    }
+
+    public boolean isGroup() {
+        return isGroup;
+    }
+
+    public void setGroup(boolean group) {
+        isGroup = group;
+    }
+
     /*******************************************缓存书籍*********************************************************/
     private int selectedIndex;//对话框选择下标
 
@@ -175,13 +270,13 @@ public abstract class BookcaseAdapter extends DragAdapter {
             ToastUtils.showWarring("无网络连接！");
             return;
         }
-        if ("本地书籍".equals(book.getType())){
+        if ("本地书籍".equals(book.getType())) {
             ToastUtils.showWarring("《" + book.getName() + "》是本地书籍，不能缓存");
             return;
         }
         final int[] begin = new int[1];
         final int[] end = new int[1];
-        new AlertDialog.Builder(mContext)
+        MyAlertDialog.build(mContext)
                 .setTitle("缓存书籍")
                 .setSingleChoiceItems(APPCONST.DIALOG_DOWNLOAD, selectedIndex, new DialogInterface.OnClickListener() {
                     @Override
@@ -192,7 +287,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
                 (dialog, which) -> {
                     switch (selectedIndex) {
                         case 0:
-                            begin[0] =  book.getHisttoryChapterNum();
+                            begin[0] = book.getHisttoryChapterNum();
                             end[0] = book.getHisttoryChapterNum() + 50;
                             break;
                         case 1:
@@ -217,10 +312,19 @@ public abstract class BookcaseAdapter extends DragAdapter {
     }
 
     static class ViewHolder {
+        CheckBox cbBookChecked;
         ImageView ivBookImg;
         TextView tvBookName;
         BadgeView tvNoReadNum;
-        ImageView ivDelete;
         ProgressBar pbLoading;
+    }
+
+    public void setOnBookCheckedListener(OnBookCheckedListener listener) {
+        mListener = listener;
+    }
+
+    //书籍点击监听器
+    public interface OnBookCheckedListener {
+        void onItemCheckedChange(boolean isChecked);
     }
 }

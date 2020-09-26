@@ -4,7 +4,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/sys_bg2"
+                android:background="@color/colorBackground"
                 android:fitsSystemWindows="true"
                 tools:context="xyz.fycz.myreader.ui.activity.SearchBookActivity">
 
@@ -14,8 +14,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-        <include layout="@layout/title_base"></include>
-
+        <include layout="@layout/toolbar"/>
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -34,6 +33,7 @@
                     android:background="@drawable/search_et_backcolor"
                     android:hint="输入关键词"
                     android:paddingLeft="10dp"
+                    android:textColor="@color/textPrimary"
                     android:imeOptions="actionSearch"
             />
 
@@ -46,7 +46,7 @@
                     android:background="@drawable/search_btn_backcolor"
                     android:gravity="center"
                     android:text="搜索"
-                    android:textColor="@color/white"
+                    android:textColor="@color/textPrimaryInverted"
                     android:textSize="18sp"/>
 
 
@@ -56,7 +56,7 @@
                 android:id="@+id/ll_suggest_books_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
+                android:background="@color/colorForeground"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="10dp">
@@ -65,9 +65,11 @@
                     android:id="@+id/tg_suggest_book"
                     style="@style/TagGroup"
                     android:layout_marginTop="10dp"
-                    app:atg_borderColor="@color/sys_suggest_line"
+                    app:atg_pressedBackgroundColor="@color/colorForeground"
+                    app:atg_backgroundColor="@color/background_card"
+                    app:atg_borderColor="@color/background_card"
                     app:atg_horizontalPadding="10dp"
-                    app:atg_textColor="@color/black"
+                    app:atg_textColor="@color/textPrimary"
                     app:atg_textSize="14sp"
                     app:atg_verticalSpacing="10dp"/>
 
@@ -83,14 +85,15 @@
                         android:id="@+id/renew_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_refresh_black_24dp"/>
+                        app:srcCompat="@drawable/ic_refresh"
+                        app:tint="@color/textPrimary"/>
 
                 <TextView
                         android:id="@+id/renew_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="换一批"
-                        android:textColor="@color/black"
+                        android:textColor="@color/textPrimary"
                         android:textSize="14sp"/>
 
 
@@ -103,7 +106,7 @@
                 android:id="@+id/ll_history_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
+                android:background="@color/colorForeground"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="10dp">
@@ -129,13 +132,14 @@
                 <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        app:srcCompat="@mipmap/clear"/>
+                        app:tint="@color/textPrimary"
+                        app:srcCompat="@drawable/ic_clear"/>
 
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="清空历史记录"
-                        android:textColor="@color/black"
+                        android:textColor="@color/textPrimary"
                         android:textSize="14sp"/>
 
 

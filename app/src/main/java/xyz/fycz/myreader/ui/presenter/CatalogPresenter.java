@@ -9,6 +9,7 @@ import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.ui.activity.CatalogActivity;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -42,11 +43,7 @@ public class CatalogPresenter implements BasePresenter {
 
     @Override
     public void start() {
-        mBook = (Book) mCatalogFragment.getActivity().getIntent().getSerializableExtra(APPCONST.BOOK);
-        isDayStyle = SysManager.getSetting().isDayStyle();
-        if (!isDayStyle) {
-            mCatalogFragment.getLvChapterList().setBackground(mCatalogFragment.getActivity().getDrawable(R.color.sys_dialog_setting_bg));
-        }
+        mBook = ((CatalogActivity) mCatalogFragment.getActivity()).getmBook();
         mCatalogFragment.getFcChangeSort().setOnClickListener(view -> {
             if (curSortflag == 0) {//当前正序
                 curSortflag = 1;

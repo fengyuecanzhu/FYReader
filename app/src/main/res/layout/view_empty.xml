@@ -39,6 +39,6 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:text="暂无数据"
-            android:textColor="@color/text_common_h1" />
+            android:textColor="@color/textPrimary" />
     </LinearLayout>
 </RelativeLayout>

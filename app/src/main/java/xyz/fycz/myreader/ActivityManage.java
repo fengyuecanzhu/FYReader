@@ -1,7 +1,9 @@
 package xyz.fycz.myreader;
 
+import android.app.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
@@ -9,7 +11,7 @@ import java.util.ArrayList;
  */
 public class ActivityManage {
 
-    private static ArrayList<AppCompatActivity> activities = new ArrayList<AppCompatActivity>();
+    private static ArrayList<AppCompatActivity> activities = new ArrayList<>();
 
     public static void addActivity(AppCompatActivity activity){
         activities.add(activity);
@@ -34,6 +36,18 @@ public class ActivityManage {
         return activities.get(activities.size() - 1);
     }
 
-
+    /**
+     * 判断指定Activity是否存在
+     */
+    public static Boolean isExist(Class<?> activityClass) {
+        boolean result = false;
+        for (AppCompatActivity item : activities) {
+            if (null != item && item.getClass() == activityClass) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
 
 }

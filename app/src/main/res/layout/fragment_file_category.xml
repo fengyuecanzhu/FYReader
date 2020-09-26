@@ -18,7 +18,7 @@
 			android:gravity="center_vertical"
 			android:padding="10dp"
 			android:textSize="12dp"
-			android:textColor="@color/text_common_h2"
+			android:textColor="@color/textSecondary"
 			tools:text="存储卡:/"/>
 		
 		<View
@@ -26,7 +26,7 @@
 			android:layout_height="match_parent"
 			android:layout_marginTop="5dp"
 			android:layout_marginBottom="5dp"
-			android:background="@color/divider_narrow"/>
+			android:background="@color/colorDivider"/>
 		
 		<TextView
 			android:id="@+id/file_category_tv_back_last"
@@ -36,7 +36,7 @@
 			android:text="上一级"
 			android:textSize="12dp"
 			android:drawableLeft="@drawable/ic_back_last"
-			android:textColor="@color/text_common_h2"/>
+			android:textColor="@color/textSecondary"/>
 	</LinearLayout>
 	
 	<androidx.recyclerview.widget.RecyclerView

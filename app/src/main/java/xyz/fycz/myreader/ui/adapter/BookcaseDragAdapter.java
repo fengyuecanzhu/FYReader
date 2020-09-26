@@ -21,6 +21,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.creator.MyAlertDialog;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
@@ -39,8 +40,8 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
             MyApplication.getmContext().getResources().getString(R.string.menu_book_delete)
     };
     public BookcaseDragAdapter(Context context, int textViewResourceId, ArrayList<Book> objects,
-                               boolean editState, BookcasePresenter bookcasePresenter) {
-        super(context, textViewResourceId, objects, editState, bookcasePresenter);
+                               boolean editState, BookcasePresenter bookcasePresenter, boolean isGroup) {
+        super(context, textViewResourceId, objects, editState, bookcasePresenter, isGroup);
     }
 
 
@@ -49,10 +50,10 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
         if (convertView == null || convertView.getTag() instanceof BookcaseDetailedAdapter.ViewHolder) {
             viewHolder = new ViewHolder();
             convertView = LayoutInflater.from(mContext).inflate(mResourceId, null);
+            viewHolder.cbBookChecked = convertView.findViewById(R.id.cb_book_select);
             viewHolder.ivBookImg = convertView.findViewById(R.id.iv_book_img);
             viewHolder.tvBookName = convertView.findViewById(R.id.tv_book_name);
             viewHolder.tvNoReadNum = convertView.findViewById(R.id.tv_no_read_num);
-            viewHolder.ivDelete = convertView.findViewById(R.id.iv_delete);
             viewHolder.pbLoading = convertView.findViewById(R.id.pb_loading);
             convertView.setTag(viewHolder);
         } else {
@@ -77,16 +78,18 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
                 .into(viewHolder.ivBookImg);
 
         viewHolder.tvBookName.setText(book.getName());
-        viewHolder.ivDelete.setOnClickListener(v -> showDeleteBookDialog(book));
-
 
         if (mEditState) {
             viewHolder.tvNoReadNum.setVisibility(View.GONE);
-            viewHolder.ivDelete.setVisibility(View.VISIBLE);
             viewHolder.pbLoading.setVisibility(View.GONE);
-            viewHolder.ivBookImg.setOnClickListener(null);
+            viewHolder.ivBookImg.setOnClickListener(v -> {
+                setCheckedBook(book.getId());
+                mListener.onItemCheckedChange(getBookIsChecked(book.getId()));
+            });
+            viewHolder.cbBookChecked.setVisibility(View.VISIBLE);
+            viewHolder.cbBookChecked.setChecked(getBookIsChecked(book.getId()));
         } else {
-            viewHolder.ivDelete.setVisibility(View.GONE);
+            viewHolder.cbBookChecked.setVisibility(View.GONE);
             boolean isLoading = false;
             try {
                 isLoading = isBookLoading(book.getId());
@@ -121,11 +124,9 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
             });
             viewHolder.ivBookImg.setOnLongClickListener(v -> {
                 if (!ismEditState()) {
-                    AlertDialog bookDialog = new AlertDialog.Builder(mContext)
+                    AlertDialog bookDialog = MyAlertDialog.build(mContext)
                             .setTitle(book.getName())
-                            .setAdapter(new ArrayAdapter<>(mContext,
-                                            android.R.layout.simple_list_item_1, menu),
-                                    (dialog, which) -> {
+                            .setItems(menu, (dialog, which) -> {
                                         switch (which) {
                                             case 0:
                                                 Intent intent = new Intent(mContext, BookDetailedActivity.class);
@@ -133,7 +134,11 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
                                                 mContext.startActivity(intent);
                                                 break;
                                             case 1:
-                                                book.setSortCode(0);
+                                                if (!isGroup) {
+                                                    book.setSortCode(0);
+                                                }else {
+                                                    book.setGroupSort(0);
+                                                }
                                                 mBookService.updateEntity(book);
                                                 mBookcasePresenter.init();
                                                 ToastUtils.showSuccess("书籍《" + book.getName() + "》移至顶部成功！");

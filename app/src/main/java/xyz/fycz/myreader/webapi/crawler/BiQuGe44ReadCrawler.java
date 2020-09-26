@@ -20,6 +20,7 @@ public class BiQuGe44ReadCrawler implements ReadCrawler, BookInfoCrawler{
     public static final String NOVEL_SEARCH = "https://www.wqge.cc/modules/article/search.php";
     public static final String SEARCH_KEY = "searchkey";
     public static final String CHARSET = "GBK";
+    public static final String SEARCH_CHARSET = "utf-8";
     @Override
     public String getSearchLink() {
         return NOVEL_SEARCH;
@@ -38,6 +39,11 @@ public class BiQuGe44ReadCrawler implements ReadCrawler, BookInfoCrawler{
     @Override
     public String getSearchKey() {
         return SEARCH_KEY;
+    }
+
+    @Override
+    public String getSearchCharset() {
+        return SEARCH_CHARSET;
     }
 
     /**

@@ -2,8 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/BottomNavigation.GroupView"
-    android:background="@color/white">
-
+    android:background="@color/colorBackground">
 
 
     <FrameLayout
@@ -18,7 +17,7 @@
             android:id="@+id/book_detail_tv_add"
             style="@style/BottomNavigation.ItemView.Title"
             android:text="加入书架"
-            android:textColor="@color/black"/>
+            android:textColor="@color/textPrimary"/>
 
     </FrameLayout>
 
@@ -35,7 +34,7 @@
             android:id="@+id/book_detail_tv_open"
             style="@style/BottomNavigation.ItemView.Title"
             android:text="开始阅读"
-            android:textColor="@color/white"/>
+            android:textColor="@color/textPrimaryInverted"/>
 
     </FrameLayout>
 

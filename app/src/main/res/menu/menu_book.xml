@@ -3,53 +3,50 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent">
     <item
-            android:id="@+id/action_edit"
-            android:icon="@drawable/ic_arrange"
-            android:title="@string/menu_bookcase_edit"
-            app:showAsAction="never"/>
-    <item
-            android:id="@+id/action_styleChange"
-            android:icon="@drawable/ic_view_quilt"
-            android:title="@string/menu_bookcase_style"
-            app:showAsAction="never"/>
-    <item
-            android:id="@+id/action_addLocalBook"
-            android:icon="@drawable/ic_add"
-            android:title="@string/menu_bookcase_add"
-            app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_backup"
-        android:icon="@drawable/ic_backup"
-        android:title="@string/menu_bookcase_backup"
-        app:showAsAction="never"/>
+            android:id="@+id/action_finish"
+            android:title="完成"
+            app:showAsAction="always"
+            android:visible="false"/>
 
-    <item
-            android:id="@+id/action_syn"
-            android:icon="@drawable/ic_online_syn"
-            android:title="@string/menu_bookcase_syn"
-            app:showAsAction="never"/>
-    <!--<item
-            android:id="@+id/action_webBackup"
-            android:icon="@drawable/ic_backup"
-            android:title="@string/menu_bookcase_webBackup"
-            app:showAsAction="never"/>-->
-    <item
-            android:id="@+id/action_download_all"
-            android:icon="@drawable/ic_download_line"
-            android:title="@string/menu_bookcase_download_all"
-            app:showAsAction="never"
-            android:visible="true"/>
+    <group android:id="@+id/bookcase_menu">
 
-    <item
-            android:id="@+id/action_setting"
-            android:icon="@drawable/ic_settings"
-            android:title="@string/menu_settings"
-            app:showAsAction="never"
-            android:visible="true"/>
-    <item
-            android:id="@+id/action_about"
-            android:icon="@drawable/ic_about"
-            android:title="@string/menu_bookcase_about"
-            app:showAsAction="never"/>
+        <item
+                android:id="@+id/action_search"
+                android:icon="@drawable/ic_search"
+                android:title="@string/menu_bookcase_search"
+                app:showAsAction="always"/>
+        <item
+                android:id="@+id/action_change_group"
+                android:icon="@drawable/ic_change_source"
+                android:title="@string/menu_change_group"
+                app:showAsAction="always"/>
+        <item
+                android:id="@+id/action_edit"
+                android:icon="@drawable/ic_arrange"
+                android:title="@string/menu_bookcase_edit"
+                app:showAsAction="never"/>
+        <item
+                android:id="@+id/action_styleChange"
+                android:icon="@drawable/ic_view_quilt"
+                android:title="@string/menu_bookcase_style"
+                app:showAsAction="never"/>
+        <item
+                android:id="@+id/action_group_man"
+                android:icon="@drawable/ic_group"
+                android:title="@string/menu_group_man"
+                app:showAsAction="never"/>
+        <item
+                android:id="@+id/action_addLocalBook"
+                android:icon="@drawable/ic_add"
+                android:title="@string/menu_bookcase_add"
+                app:showAsAction="never"/>
 
+        <item
+                android:id="@+id/action_download_all"
+                android:icon="@drawable/ic_download_line"
+                android:title="@string/menu_bookcase_download_all"
+                app:showAsAction="never"
+                android:visible="true"/>
+
+    </group>
 </menu>
