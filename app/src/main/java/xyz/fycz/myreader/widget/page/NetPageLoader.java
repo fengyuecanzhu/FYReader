@@ -1,13 +1,13 @@
 package xyz.fycz.myreader.widget.page;
 
 
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.ChapterService;
-import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 

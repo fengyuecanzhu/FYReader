@@ -22,6 +22,8 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.appcompat.app.AppCompatDelegate;
+import io.reactivex.internal.functions.Functions;
+import io.reactivex.plugins.RxJavaPlugins;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -41,8 +43,8 @@ import javax.net.ssl.X509TrustManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.creator.APPDownloadTip;
-import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.APPDownloadTip;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.entity.UpdateInfo;
 import xyz.fycz.myreader.ui.activity.MainActivity;
@@ -63,15 +65,18 @@ public class MyApplication extends Application {
         super.onCreate();
         application = this;
         HttpUtil.trustAllHosts();//信任所有证书
+        RxJavaPlugins.setErrorHandler(Functions.emptyConsumer());
 //        handleSSLHandshake();
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
         }
         mFixedThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());//初始化线程池
-
         BaseActivity.setCloseAntiHijacking(true);
         initNightTheme();
+
     }
+
+
 
     public void initNightTheme() {
         if (isNightFS()){

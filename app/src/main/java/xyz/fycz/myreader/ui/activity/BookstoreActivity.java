@@ -17,10 +17,10 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseActivity2;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.creator.ChangeSourceDialog;
-import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.entity.bookstore.QDBook;
 import xyz.fycz.myreader.entity.bookstore.RankBook;
@@ -32,8 +32,8 @@ import xyz.fycz.myreader.ui.adapter.BookStoreBookTypeAdapter;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.BookStoreApi;
-import xyz.fycz.myreader.webapi.crawler.FindCrawler;
-import xyz.fycz.myreader.webapi.crawler.find.ABC;
+import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
+import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
 import xyz.fycz.myreader.widget.RefreshLayout;
 
 import java.util.ArrayList;
@@ -62,6 +62,7 @@ public class BookstoreActivity extends BaseActivity2 {
 
     private BookStoreBookAdapter mBookStoreBookAdapter;
     private List<Book> bookList = new ArrayList<>();
+    private SourceExchangeDialog mSourceDia;
 
     private BookType curType;
 
@@ -166,7 +167,16 @@ public class BookstoreActivity extends BaseActivity2 {
                     goToBookDetail(book);
                     return;
                 }
-                mHandler.sendMessage(mHandler.obtainMessage(3));
+                mSourceDia = new SourceExchangeDialog(this, book);
+                mSourceDia.setOnSourceChangeListener((bean, pos1) -> {
+                    Intent intent = new Intent(this, BookDetailedActivity.class);
+                    intent.putExtra(APPCONST.SEARCH_BOOK_BEAN, (ArrayList<Book>) mSourceDia.getaBooks());
+                    intent.putExtra(APPCONST.SOURCE_INDEX, pos1);
+                    BookstoreActivity.this.startActivity(intent);
+                    mSourceDia.dismiss();
+                });
+                mSourceDia.show();
+                /*mHandler.sendMessage(mHandler.obtainMessage(3));
                 ChangeSourceDialog csd = new ChangeSourceDialog(this, book);
                 csd.initOneBook(new ResultCallback() {
                     @Override
@@ -183,7 +193,7 @@ public class BookstoreActivity extends BaseActivity2 {
                         DialogCreator.createTipDialog(BookstoreActivity.this, "未搜索到该书籍，无法进入书籍详情！");
                         mHandler.sendMessage(mHandler.obtainMessage(4));
                     }
-                });
+                });*/
             }
         });
     }
@@ -207,14 +217,14 @@ public class BookstoreActivity extends BaseActivity2 {
      * 获取页面数据
      */
     private void getData() {
-        if (findCrawler instanceof ABC) {
+        if (findCrawler instanceof QiDianMobileRank) {
             SharedPreUtils spu = SharedPreUtils.getInstance();
             if (spu.getString("qdCookie", "").equals("")) {
-                ((ABC) findCrawler).initCookie(this, new ResultCallback() {
+                ((QiDianMobileRank) findCrawler).initCookie(this, new ResultCallback() {
                     @Override
                     public void onFinish(Object o, int code) {
                         spu.putString("qdCookie", (String) o);
-                        mBookTypes = ((ABC) findCrawler).getRankTypes();
+                        mBookTypes = ((QiDianMobileRank) findCrawler).getRankTypes();
                         curType = mBookTypes.get(0);
                         mHandler.sendMessage(mHandler.obtainMessage(1));
                         page = 1;
@@ -228,7 +238,7 @@ public class BookstoreActivity extends BaseActivity2 {
                     }
                 });
             } else {
-                mBookTypes = ((ABC) findCrawler).getRankTypes();
+                mBookTypes = ((QiDianMobileRank) findCrawler).getRankTypes();
                 curType = mBookTypes.get(0);
                 mHandler.sendMessage(mHandler.obtainMessage(1));
                 page = 1;
@@ -265,8 +275,8 @@ public class BookstoreActivity extends BaseActivity2 {
         }
 
         mHandler.sendEmptyMessage(3);
-        if (findCrawler instanceof ABC) {
-            ((ABC) findCrawler).getRankBooks(curType, new ResultCallback() {
+        if (findCrawler instanceof QiDianMobileRank) {
+            ((QiDianMobileRank) findCrawler).getRankBooks(curType, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
                     List<Book> books = new ArrayList<>();

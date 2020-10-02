@@ -27,4 +27,10 @@
             android:checkable="true"
             android:checked="true"
             app:showAsAction="never"/>
+    <item
+            android:id="@+id/action_group_setting"
+            android:title="@string/menu_group_setting"
+            android:icon="@drawable/ic_group"
+            app:showAsAction="never"
+            android:visible="false"/>
 </menu>

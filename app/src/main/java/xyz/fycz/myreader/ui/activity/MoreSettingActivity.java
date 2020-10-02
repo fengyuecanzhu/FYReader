@@ -3,6 +3,7 @@ package xyz.fycz.myreader.ui.activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
@@ -15,8 +16,9 @@ import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity2;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.creator.DialogCreator;
-import xyz.fycz.myreader.creator.MultiChoiceDialog;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -55,6 +57,10 @@ public class MoreSettingActivity extends BaseActivity2 {
     LinearLayout mLlCloseRefresh;
     @BindView(R.id.more_setting_ll_disable_source)
     LinearLayout mLlDisableSource;
+    @BindView(R.id.more_setting_ll_thread_num)
+    LinearLayout mLlThreadNum;
+    @BindView(R.id.more_setting_tv_thread_num)
+    TextView mTvThreadNum;
     @BindView(R.id.more_setting_iv_match_chapter_tip)
     ImageView mIvMatchChapterTip;
     @BindView(R.id.more_setting_rl_match_chapter)
@@ -89,15 +95,19 @@ public class MoreSettingActivity extends BaseActivity2 {
     private ArrayList<Book> mBooks;
     int booksCount;
     CharSequence[] mBooksName;
+    int threadNum;
 
     //选择禁用更新书籍对话框
     private AlertDialog mCloseRefreshDia;
     //选择禁用更新书源对话框
     private AlertDialog mDisableSourceDia;
+    //线程选择
+    private AlertDialog mThreadSelectDia;
     //选择一键缓存书籍对话框
     private AlertDialog mDownloadAllDia;
     //选择清除缓存对话框
     private AlertDialog mDeleteCatheDia;
+
 
     @Override
     protected int getContentId() {
@@ -115,6 +125,7 @@ public class MoreSettingActivity extends BaseActivity2 {
         catheCap = mSetting.getCatheGap();
         autoRefresh = mSetting.isRefreshWhenStart();
         openBookStore = mSetting.isOpenBookStore();
+        threadNum = SharedPreUtils.getInstance().getInt("threadNum", 8);
     }
 
     @Override
@@ -133,6 +144,7 @@ public class MoreSettingActivity extends BaseActivity2 {
         } else {
             mRlMatchChapterSuitability.setVisibility(View.GONE);
         }
+        mTvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
     }
 
     private void initSwitchStatus() {
@@ -261,6 +273,26 @@ public class MoreSettingActivity extends BaseActivity2 {
                     });
         });
 
+        mLlThreadNum.setOnClickListener(v -> {
+            View view = LayoutInflater.from(this).inflate(R.layout.dialog_number_picker, null);
+            NumberPicker threadPick = view.findViewById(R.id.number_picker);
+            threadPick.setMaxValue(1024);
+            threadPick.setMinValue(1);
+            threadPick.setValue(threadNum);
+            threadPick.setOnScrollListener((view1, scrollState) -> {
+
+            });
+            mThreadSelectDia = MyAlertDialog.build(this)
+                    .setTitle("搜索线程数")
+                    .setView(view)
+                    .setPositiveButton("确定", (dialog, which) -> {
+                        threadNum = threadPick.getValue();
+                        SharedPreUtils.getInstance().putInt("threadNum", threadNum);
+                        mTvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
+                    }).setNegativeButton("取消", null)
+                    .show();
+        });
+
         mRlMatchChapter.setOnClickListener(
                 (v) -> {
                     if (isMatchChapter) {
@@ -363,20 +395,6 @@ public class MoreSettingActivity extends BaseActivity2 {
             });
         });
 
-
-        /*mRlBookstore.setOnClickListener(
-                (v) -> {
-                    if (openBookStore) {
-                        openBookStore = false;
-                    } else {
-                        openBookStore = true;
-                    }
-                    mScBookstore.setChecked(openBookStore);
-                    mSetting.setOpenBookStore(openBookStore);
-                    SysManager.saveSetting(mSetting);
-                    ToastUtils.showInfo("重启后生效！");
-                }
-        );*/
     }
 
     @Override
@@ -388,8 +406,8 @@ public class MoreSettingActivity extends BaseActivity2 {
     private void initSpinner() {
         // initSwitchStatus() be called earlier than onCreate(), so setSelection() won't work
         ArrayAdapter<CharSequence> resetScreenAdapter = ArrayAdapter.createFromResource(this,
-                R.array.reset_screen_time, R.layout.spinner);
-        resetScreenAdapter.setDropDownViewResource(R.layout.spinner_item);
+                R.array.reset_screen_time, android.R.layout.simple_spinner_item);
+        resetScreenAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mScResetScreen.setAdapter(resetScreenAdapter);
 
         int resetScreenSelection = 0;
@@ -439,8 +457,8 @@ public class MoreSettingActivity extends BaseActivity2 {
 
 
         ArrayAdapter<CharSequence> matchSuiAdapter = ArrayAdapter.createFromResource(this,
-                R.array.match_chapter_suitability, R.layout.spinner);
-        matchSuiAdapter.setDropDownViewResource(R.layout.spinner_item);
+                R.array.match_chapter_suitability, android.R.layout.simple_spinner_item);
+        matchSuiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mScMatchChapterSuitability.setAdapter(matchSuiAdapter);
 
         if (matchChapterSuitability == 0.0) {
@@ -467,8 +485,8 @@ public class MoreSettingActivity extends BaseActivity2 {
 
 
         ArrayAdapter<CharSequence> catheGapAdapter = ArrayAdapter.createFromResource(this,
-                R.array.cathe_chapter_gap, R.layout.spinner);
-        catheGapAdapter.setDropDownViewResource(R.layout.spinner_item);
+                R.array.cathe_chapter_gap, android.R.layout.simple_spinner_item);
+        catheGapAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mScCatheGap.setAdapter(catheGapAdapter);
 
         if (catheCap == 0) {

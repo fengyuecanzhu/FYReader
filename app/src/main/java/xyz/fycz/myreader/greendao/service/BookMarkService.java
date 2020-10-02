@@ -59,6 +59,9 @@ public class BookMarkService extends BaseService {
      * @return
      */
     public List<BookMark> findBookAllBookMarkByBookId(String bookId) {
+        if (bookId == null) {
+            return new ArrayList<>();
+        }
         return GreenDaoManager.getInstance().getSession().getBookMarkDao()
                 .queryBuilder()
                 .where(BookMarkDao.Properties.BookId.eq(bookId))

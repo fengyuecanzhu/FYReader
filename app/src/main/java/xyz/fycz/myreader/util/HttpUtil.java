@@ -8,9 +8,9 @@ import com.google.gson.Gson;
 import okhttp3.*;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.TrustAllCerts;
-import xyz.fycz.myreader.callback.HttpCallback;
-import xyz.fycz.myreader.callback.JsonCallback;
-import xyz.fycz.myreader.callback.URLConnectionCallback;
+import xyz.fycz.myreader.webapi.callback.HttpCallback;
+import xyz.fycz.myreader.webapi.callback.JsonCallback;
+import xyz.fycz.myreader.webapi.callback.URLConnectionCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.JsonModel;
@@ -43,7 +43,6 @@ public class HttpUtil {
 
     private static SSLSocketFactory createSSLSocketFactory() {
         SSLSocketFactory ssfFactory = null;
-
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, new TrustManager[]{new TrustAllCerts()}, new SecureRandom());
@@ -54,10 +53,12 @@ public class HttpUtil {
         return ssfFactory;
     }
 
-    private static synchronized OkHttpClient getOkHttpClient() {
+    public static synchronized OkHttpClient getOkHttpClient() {
         if (mClient == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS);
+            builder.connectTimeout(5, TimeUnit.SECONDS)
+                    .readTimeout(15, TimeUnit.SECONDS)
+                    .writeTimeout(15, TimeUnit.SECONDS);
             builder.sslSocketFactory(createSSLSocketFactory());
             builder.hostnameVerifier((hostname, session) -> true);
             mClient = builder
@@ -206,7 +207,7 @@ public class HttpUtil {
         }).start();
     }
 
-    public static void sendGetRequest_okHttp(final String address, final HttpCallback callback) {
+    public static void sendGetRequest_okHttp(final String address, boolean isRefresh, final HttpCallback callback) {
         MyApplication.getApplication().newThread(() -> {
         /*   HttpURLConnection connection = null;
            try {

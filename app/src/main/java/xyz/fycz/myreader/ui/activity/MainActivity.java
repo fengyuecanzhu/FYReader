@@ -6,13 +6,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -25,12 +23,10 @@ import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity2;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.creator.DialogCreator;
-import xyz.fycz.myreader.ui.fragment.BookStoreFragment;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
 import xyz.fycz.myreader.ui.fragment.FindFragment;
 import xyz.fycz.myreader.ui.fragment.MineFragment;
-import xyz.fycz.myreader.ui.presenter.BookcasePresenter;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 
@@ -39,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT;
-import static xyz.fycz.myreader.application.MyApplication.checkVersionByServer;
 
 /**
  * @author fengyue
@@ -237,12 +232,14 @@ public class MainActivity extends BaseActivity2 {
                 mBookcaseFragment.getmBookcasePresenter().cancelEdit();
                 invalidateOptionsMenu();
                 return true;
-            case R.id.action_change_group:
-                mBookcaseFragment.getmBookcasePresenter()
-                        .showBookGroupMenu(findViewById(R.id.action_change_group), () -> {
-                            groupName = SharedPreUtils.getInstance().getString("curBookGroupName", "所有书籍");
-                            getSupportActionBar().setSubtitle(groupName);
-                        });
+            case R.id.action_change_group: case R.id.action_group_man:
+                if (!mBookcaseFragment.getmBookcasePresenter().hasOnGroupChangeListener()) {
+                    mBookcaseFragment.getmBookcasePresenter().addOnGroupChangeListener(() -> {
+                        groupName = SharedPreUtils.getInstance().getString("curBookGroupName", "所有书籍");
+                        getSupportActionBar().setSubtitle(groupName);
+                    });
+                }
+                break;
             case R.id.action_edit:
                 invalidateOptionsMenu();
                 break;

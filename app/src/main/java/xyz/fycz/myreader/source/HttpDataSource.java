@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
 
-import xyz.fycz.myreader.callback.JsonCallback;
+import xyz.fycz.myreader.webapi.callback.JsonCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.JsonModel;
@@ -13,8 +13,8 @@ import xyz.fycz.myreader.util.HttpUtil;
 import xyz.fycz.myreader.util.RSAUtilV2;
 import xyz.fycz.myreader.util.StringHelper;
 import com.google.gson.Gson;
-import xyz.fycz.myreader.callback.HttpCallback;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.HttpCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,9 +34,9 @@ public class HttpDataSource {
      * @param url
      * @param callback
      */
-    public static void httpGet_html(String url, final String charsetName, final ResultCallback callback){
+    public static void httpGet_html(String url, final String charsetName,  boolean isRefresh, final ResultCallback callback){
         Log.d("HttpGet URl", url);
-        HttpUtil.sendGetRequest_okHttp(url, new HttpCallback() {
+        HttpUtil.sendGetRequest_okHttp(url, isRefresh, new HttpCallback() {
             @Override
             public void onFinish(Bitmap bm) {
 
@@ -63,7 +63,8 @@ public class HttpDataSource {
 
             @Override
             public void onFinish(String response) {
-
+                Log.d("Local", "read finish：" + response);
+                callback.onFinish(response, 0);
             }
 
             @Override

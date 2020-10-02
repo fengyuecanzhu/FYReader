@@ -42,7 +42,7 @@
                     android:textSize="16sp"/>
         </LinearLayout>
 
-        <xyz.fycz.myreader.custom.DragSortGridView
+        <xyz.fycz.myreader.widget.custom.DragSortGridView
                 android:id="@+id/gv_book"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,9 +51,9 @@
                 android:listSelector="@android:color/transparent"
                 android:numColumns="auto_fit"
                 android:scrollbars="none"
-                android:padding="10dp"
+                android:padding="5dp"
                 android:verticalSpacing="10dp">
-        </xyz.fycz.myreader.custom.DragSortGridView>
+        </xyz.fycz.myreader.widget.custom.DragSortGridView>
 
         <RelativeLayout
                 android:id="@+id/rl_download_tip"
@@ -120,7 +120,7 @@
 
             <Button
                     android:id="@+id/book_add_group"
-                    android:layout_width="wrap_content"
+                    android:layout_width="90dp"
                     android:layout_height="35dp"
                     android:minWidth="110dp"
                     android:layout_alignParentRight="true"
@@ -133,7 +133,7 @@
 
             <Button
                     android:id="@+id/book_btn_delete"
-                    android:layout_width="70dp"
+                    android:layout_width="90dp"
                     android:layout_height="35dp"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="15dp"
@@ -142,7 +142,7 @@
                     android:background="@drawable/selector_btn_add"
                     android:textColor="@color/selector_btn_file_add"
                     android:layout_toLeftOf="@id/book_add_group"
-                    android:text="删除"/>
+                    android:text="删除/移除"/>
         </RelativeLayout>
     </RelativeLayout>
 </com.scwang.smartrefresh.layout.SmartRefreshLayout>

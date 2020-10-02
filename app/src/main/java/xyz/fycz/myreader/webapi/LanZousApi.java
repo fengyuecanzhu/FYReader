@@ -3,7 +3,7 @@ package xyz.fycz.myreader.webapi;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
@@ -28,7 +28,7 @@ public class LanZousApi {
      * @param callback
      */
     public static void getUrl1(String lanZouUrl, final ResultCallback callback) {
-        getCommonReturnHtmlStringApi(lanZouUrl, null, "utf-8", new ResultCallback() {
+        getCommonReturnHtmlStringApi(lanZouUrl, null, "utf-8", true, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
                 callback.onFinish(getUrl1((String) o), code);
@@ -48,7 +48,7 @@ public class LanZousApi {
      * @param callback
      */
     public static void getKey(String url, final ResultCallback callback) {
-        getCommonReturnHtmlStringApi(url, null, "utf-8", new ResultCallback() {
+        getCommonReturnHtmlStringApi(url, null, "utf-8", true, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
                 callback.onFinish(getKey((String) o), code);

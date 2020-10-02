@@ -27,6 +27,8 @@ public class APPCONST {
     //BookCachePath (因为getCachePath引用了Context，所以必须是静态变量，不能够是静态常量)
     public static String BOOK_CACHE_PATH = FileUtils.getCachePath() + File.separator
             + "book_cache"+ File.separator ;
+    public static String HTML_CACHE_PATH = FileUtils.getCachePath() + File.separator
+            + "html_cache"+ File.separator ;
     public static final String LOADING_ERROR = "\t\t \t\t\t\t\n\n　　章节内容转码失败！\n\n\t\t \t\t\t\n\n";
 
     public static long exitTime;
@@ -38,6 +40,7 @@ public class APPCONST {
     public static final String CHAPTER_PAGE = "chapter_page";
     public static final String SETTING = "setting";
     public static final String SEARCH_BOOK_BEAN = "SearchBookBean";
+    public static final String SOURCE_INDEX = "sourceIndex";
     public static final String FONT = "font";
     public static final String RESULT_RESET_SCREEN = "result_reset_screen";
     public static final String RESULT_IS_COLLECTED = "result_is_collected";
@@ -76,7 +79,7 @@ public class APPCONST {
     public static final int PERMISSIONS_REQUEST_STORAGE = 10001;
 
     //设置版本号
-    public static final int SETTING_VERSION = 3;
+    public static final int SETTING_VERSION = 5;
 
     public static final String FORMAT_FILE_DATE = "yyyy-MM-dd";
 

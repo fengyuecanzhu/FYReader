@@ -9,7 +9,7 @@ import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseTabActivity;
-import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;

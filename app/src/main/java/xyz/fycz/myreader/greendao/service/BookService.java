@@ -101,6 +101,7 @@ public class BookService extends BaseService {
 
         book.setSortCode(0);
         book.setGroupSort(0);
+        book.setGroupId(SharedPreUtils.getInstance().getString("curBookGroupId", ""));
         if (StringHelper.isEmpty(book.getId())) {
             book.setId(StringHelper.getStringRandom(25));
         }

@@ -26,6 +26,7 @@ public class Book implements Serializable {
 
     private String name;//书名
     private String chapterUrl;//书目Url(本地书籍为：本地书籍地址)
+    private String infoUrl;//书目详情Url
     private String imgUrl;//封面图片url
     private String desc;//简介
     private String author;//作者
@@ -64,10 +65,10 @@ public class Book implements Serializable {
 
     private int groupSort;//分组排序
 
-    @Generated(hash = 1308680987)
-    public Book(String id, String name, String chapterUrl, String imgUrl,
-            String desc, String author, String type, String updateDate,
-            String newestChapterId, String newestChapterTitle,
+    @Generated(hash = 170911086)
+    public Book(String id, String name, String chapterUrl, String infoUrl,
+            String imgUrl, String desc, String author, String type,
+            String updateDate, String newestChapterId, String newestChapterTitle,
             String newestChapterUrl, String historyChapterId,
             int histtoryChapterNum, int sortCode, int noReadNum,
             int chapterTotalNum, int lastReadPosition, String source,
@@ -76,6 +77,7 @@ public class Book implements Serializable {
         this.id = id;
         this.name = name;
         this.chapterUrl = chapterUrl;
+        this.infoUrl = infoUrl;
         this.imgUrl = imgUrl;
         this.desc = desc;
         this.author = author;
@@ -101,6 +103,7 @@ public class Book implements Serializable {
         this.id = book.id;
         this.name = book.name;
         this.chapterUrl = book.chapterUrl;
+        this.infoUrl = book.infoUrl;
         this.imgUrl = book.imgUrl;
         this.desc = book.desc;
         this.author = book.author;
@@ -119,6 +122,7 @@ public class Book implements Serializable {
         this.isCloseUpdate = book.isCloseUpdate;
         this.isDownLoadAll = book.isDownLoadAll;
         this.groupId = book.groupId;
+        this.groupSort = book.groupSort;
     }
 
     @Generated(hash = 1839243756)
@@ -309,6 +313,14 @@ public class Book implements Serializable {
 
     public void setGroupSort(int groupSort) {
         this.groupSort = groupSort;
+    }
+
+    public String getInfoUrl() {
+        return this.infoUrl;
+    }
+
+    public void setInfoUrl(String infoUrl) {
+        this.infoUrl = infoUrl;
     }
 
 

@@ -1,12 +1,21 @@
 package xyz.fycz.myreader.webapi;
 
+import io.reactivex.Observable;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.webapi.crawler.*;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.entity.SearchBookBean;
+import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.read.FYReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.read.TianLaiReadCrawler;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 
 
 public class CommonApi extends BaseApi {
@@ -17,9 +26,9 @@ public class CommonApi extends BaseApi {
      * @param url
      * @param callback
      */
-    public static void getBookChapters(String url, final ReadCrawler rc, final ResultCallback callback) {
+    public static void getBookChapters(String url, final ReadCrawler rc,  boolean isRefresh, final ResultCallback callback) {
         String charset = rc.getCharset();
-        getCommonReturnHtmlStringApi(url, null, charset, new ResultCallback() {
+        getCommonReturnHtmlStringApi(url, null, charset, isRefresh, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
                 callback.onFinish(rc.getChaptersFromHtml((String) o), 0);
@@ -53,7 +62,7 @@ public class CommonApi extends BaseApi {
                 url = URLCONST.nameSpace_FY + url;
             }
         }
-        getCommonReturnHtmlStringApi(url, null, charset, new ResultCallback() {
+        getCommonReturnHtmlStringApi(url, null, charset, true, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
                 callback.onFinish(rc.getContentFormHtml((String) o), 0);
@@ -75,20 +84,13 @@ public class CommonApi extends BaseApi {
      */
 
     public static void search(String key, final ReadCrawler rc, final ResultCallback callback) {
-        Map<String, Object> params = new HashMap<>();
         String charset = "utf-8";
         if (rc instanceof TianLaiReadCrawler) {
             charset = "utf-8";
         } else {
             charset = rc.getCharset();
         }
-        params.put(rc.getSearchKey(), key);
-        if (rc instanceof PinShuReadCrawler) {
-            params.put("SearchClass", 1);
-        }else if (rc instanceof QB5ReadCrawler){
-            params.put("submit", "%CB%D1%CB%F7");
-        }
-        getCommonReturnHtmlStringApi(rc.getSearchLink(), params, charset, new ResultCallback() {
+        getCommonReturnHtmlStringApi(makeSearchUrl(rc.getSearchLink(), key), null, charset, false, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
                 callback.onFinish(rc.getBooksFromSearchHtml((String) o), code);
@@ -102,13 +104,74 @@ public class CommonApi extends BaseApi {
     }
 
     /**
+     * 搜索小说
+     *
+     * @param key
+     */
+
+    public static Observable<ConcurrentMultiValueMap<SearchBookBean, Book>> search(String key, final ReadCrawler rc) {
+        String charset = "utf-8";
+        if (rc instanceof TianLaiReadCrawler) {
+            charset = "utf-8";
+        } else {
+            charset = rc.getCharset();
+        }
+        String finalCharset = charset;
+        return Observable.create(emitter -> {
+            try {
+                if (rc.isPost()){
+                    String url = rc.getSearchLink();
+                    String[] urlInfo = url.split(",");
+                    url = urlInfo[0];
+                    String body = makeSearchUrl(urlInfo[1], key);
+                    MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+                    RequestBody requestBody = RequestBody.create(mediaType, body);
+                    emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset)));
+                }else {
+                    emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(makeSearchUrl(rc.getSearchLink(), key), finalCharset)));
+                }
+                emitter.onComplete();
+            } catch (IOException e) {
+                e.printStackTrace();
+                emitter.onError(e);
+            }
+        });
+    }
+
+    public static String makeSearchUrl(String url, String key){
+        return url.replace("{key}", key);
+    }
+
+    /**
+     * 获取小说详细信息
+     *
+     * @param book
+     */
+    public static Observable<Book> getBookInfo(final Book book, final BookInfoCrawler bic) {
+        String url;
+        if (StringHelper.isEmpty(book.getInfoUrl())){
+            url = book.getChapterUrl();
+        }else {
+            url = book.getInfoUrl();
+        }
+        return Observable.create(emitter -> {
+            emitter.onNext(bic.getBookInfo(OkHttpUtils.getHtml(url, bic.getCharset()), book));
+            emitter.onComplete();
+        });
+    }
+
+    /**
      * 获取小说详细信息
      *
      * @param book
      * @param callback
      */
     public static void getBookInfo(final Book book, final BookInfoCrawler bic, final ResultCallback callback) {
-        getCommonReturnHtmlStringApi(book.getChapterUrl(), null, bic.getCharset(), new ResultCallback() {
+        String url = book.getInfoUrl();
+        if (StringHelper.isEmpty(url)){
+            url = book.getChapterUrl();
+        }
+        getCommonReturnHtmlStringApi(url, null, bic.getCharset(), false, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
                 callback.onFinish(bic.getBookInfo((String) o, book), 0);

@@ -25,16 +25,17 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BasePresenter;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.creator.MyAlertDialog;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
+import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.ui.activity.*;
 import xyz.fycz.myreader.util.*;
 import xyz.fycz.myreader.util.utils.ColorUtil;
-import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
-import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.enums.Font;
@@ -115,6 +116,10 @@ public class ReadPresenter implements BasePresenter {
     private final CharSequence[] pageMode = {
             "覆盖", "仿真", "滑动", "滚动", "无动画"
     };
+
+    private SourceExchangeDialog mSourceDialog;
+
+    private boolean hasChangeSource;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -214,6 +219,7 @@ public class ReadPresenter implements BasePresenter {
         if (SharedPreUtils.getInstance().getBoolean("isNightFS", false)) {
             mSetting.setDayStyle(!ColorUtil.isColorLight(mReadActivity.getColor(R.color.textPrimary)));
         }
+
         //息屏时间
         screenTimeOut = mSetting.getResetScreen() * 60;
 
@@ -225,6 +231,7 @@ public class ReadPresenter implements BasePresenter {
         upHpbNextPage = this::upHpbNextPage;
 
         sendDownloadNotification = this::sendNotification;
+
         notificationUtil = NotificationUtil.getInstance();
 
         //注册广播
@@ -237,18 +244,21 @@ public class ReadPresenter implements BasePresenter {
             BrightUtil.setBrightness(mReadActivity, BrightUtil.progressToBright(mSetting.getBrightProgress()));
         }
 
-        if (!loadBook()){
+        if (!loadBook()) {
             mReadActivity.finish();
             return;
         }
 
         isCollected = mReadActivity.getIntent().getBooleanExtra("isCollected", true);
 
+        hasChangeSource = mReadActivity.getIntent().getBooleanExtra("hasChangeSource", false);
+
         //当书籍Collected且书籍id不为空的时候保存上次阅读信息
         if (isCollected && !StringHelper.isEmpty(mBook.getId())) {
             //保存上次阅读信息
             SharedPreUtils.getInstance().putString("lastRead", mBook.getId());
         }
+
 
         mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
 
@@ -257,14 +267,45 @@ public class ReadPresenter implements BasePresenter {
         mReadActivity.getPbLoading().setVisibility(View.VISIBLE);
 
         initListener();
+        //Dialog
+        mSourceDialog = new SourceExchangeDialog(mReadActivity, mBook);
 
+        mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
+            Book bookTem = new Book(mBook);
+            bookTem.setChapterUrl(bean.getChapterUrl());
+            bookTem.setSource(bean.getSource());
+            if (!StringHelper.isEmpty(bean.getImgUrl())) {
+                bookTem.setImgUrl(bean.getImgUrl());
+            }
+            if (!StringHelper.isEmpty(bean.getType())) {
+                bookTem.setType(bean.getType());
+            }
+            if (!StringHelper.isEmpty(bean.getDesc())){
+                bookTem.setDesc(bean.getDesc());
+            }
+            if (isCollected) {
+                mBookService.updateBook(mBook, bookTem);
+            }
+            mBook = bookTem;
+            mSettingDialog.dismiss();
+            Intent intent = new Intent(mReadActivity, ReadActivity.class)
+                    .putExtra(APPCONST.BOOK, mBook)
+                    .putExtra("hasChangeSource", true);
+            if (!isCollected){
+                intent.putExtra("isCollected", false);
+            }
+            mReadActivity.finish();
+            mReadActivity.startActivity(intent);
+        });
         getData();
     }
+
     /**
      * 进入阅读书籍有三种方式：
-     *      1、直接从书架进入，这种方式书籍一定Collected
-     *      2、从外部打开txt文件，这种方式会添加进书架
-     *      3、从快捷图标打开上次阅读书籍
+     * 1、直接从书架进入，这种方式书籍一定Collected
+     * 2、从外部打开txt文件，这种方式会添加进书架
+     * 3、从快捷图标打开上次阅读书籍
+     *
      * @return 是否加载成功
      */
     private boolean loadBook() {
@@ -283,15 +324,15 @@ public class ReadPresenter implements BasePresenter {
             //路径为空，说明不是直接打开txt文件
             mBook = (Book) mReadActivity.getIntent().getSerializableExtra(APPCONST.BOOK);
             //mBook为空，说明是从快捷方式启动
-            if (mBook == null){
+            if (mBook == null) {
                 String bookId = SharedPreUtils.getInstance().getString("lastRead", "");
-                if ("".equals(bookId)){//没有上次阅读信息
+                if ("".equals(bookId)) {//没有上次阅读信息
                     ToastUtils.showWarring("当前没有阅读任何书籍，无法加载上次阅读书籍！");
                     mReadActivity.finish();
                     return false;
-                }else {//有信息
+                } else {//有信息
                     mBook = mBookService.getBookById(bookId);
-                    if (mBook == null){//上次阅读的书籍不存在
+                    if (mBook == null) {//上次阅读的书籍不存在
                         ToastUtils.showWarring("上次阅读书籍已不存在/移除书架，无法加载！");
                         mReadActivity.finish();
                         return false;
@@ -324,6 +365,7 @@ public class ReadPresenter implements BasePresenter {
                     mSettingDialog.dismiss();
                     mReadActivity.onBackPressed();
                 }, v -> {//换源
+                    mSourceDialog.show();
                 }, v -> {//刷新
                     isPrev = false;
                     if (!"本地书籍".equals(mBook.getType())) {
@@ -718,7 +760,7 @@ public class ReadPresenter implements BasePresenter {
                     }
                 });
             } else {
-                CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler, new ResultCallback() {
+                CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler,false, new ResultCallback() {
                     @Override
                     public void onFinish(Object o, int code) {
                         ArrayList<Chapter> chapters = (ArrayList<Chapter>) o;
@@ -761,6 +803,9 @@ public class ReadPresenter implements BasePresenter {
             if ("本地书籍".equals(mBook.getType())) {
                 mHandler.sendMessage(mHandler.obtainMessage(1));
                 return;
+            }
+            if (hasChangeSource){
+                mBookService.matchHistoryChapterPos(mBook, mChapters);
             }
             getChapterContent(mChapters.get(mBook.getHisttoryChapterNum()), new ResultCallback() {
                 @Override
@@ -840,7 +885,7 @@ public class ReadPresenter implements BasePresenter {
                 e.printStackTrace();
             }
         }*/
-        if (SysManager.getSetting().getCatheGap() != 0){
+        if (SysManager.getSetting().getCatheGap() != 0) {
             downloadInterval = SysManager.getSetting().getCatheGap();
         }
         //计算断点章节

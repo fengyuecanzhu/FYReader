@@ -8,6 +8,7 @@ import xyz.fycz.myreader.enums.ReadStyle;
 import xyz.fycz.myreader.util.CacheHelper;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.widget.page.PageMode;
 
 import static xyz.fycz.myreader.application.MyApplication.getVersionCode;
@@ -78,11 +79,12 @@ public class SysManager {
 
     public static void resetSetting(){
         Setting setting = getSetting();
-        setting.setVolumeTurnPage(true);
+        /*setting.setVolumeTurnPage(true);
         setting.setMatchChapter(true);
         setting.setRefreshWhenStart(true);
         setting.setOpenBookStore(true);
-        setting.setResetScreen(3);
+        setting.setResetScreen(3);*/
+        ReadCrawlerUtil.resetReaderCrawlers();
         setting.setSettingVersion(APPCONST.SETTING_VERSION);
         saveSetting(setting);
     }

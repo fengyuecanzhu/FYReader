@@ -1,12 +1,10 @@
 package xyz.fycz.myreader.ui.adapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -20,8 +18,8 @@ import java.util.ArrayList;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.creator.DialogCreator;
-import xyz.fycz.myreader.creator.MyAlertDialog;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
 import xyz.fycz.myreader.ui.activity.ReadActivity;

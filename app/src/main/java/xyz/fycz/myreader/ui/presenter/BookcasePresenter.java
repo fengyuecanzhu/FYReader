@@ -22,9 +22,7 @@ import android.widget.EditText;
 import android.widget.PopupMenu;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,25 +30,24 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
-import xyz.fycz.myreader.backup.BackupAndRestore;
-import xyz.fycz.myreader.backup.UserService;
 import xyz.fycz.myreader.base.BasePresenter;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.creator.MultiChoiceDialog;
-import xyz.fycz.myreader.creator.MyAlertDialog;
+import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
+import xyz.fycz.myreader.model.backup.BackupAndRestore;
+import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.ui.activity.*;
-import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
-import xyz.fycz.myreader.creator.DialogCreator;
-import xyz.fycz.myreader.custom.DragSortGridView;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.widget.custom.DragSortGridView;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.enums.BookcaseStyle;
@@ -109,6 +106,7 @@ public class BookcasePresenter implements BasePresenter {
     private Runnable sendDownloadNotification;//发送通知的线程
     private boolean isFirstRefresh = true;//是否首次进入刷新
     private boolean isGroup;
+    private MainActivity.OnGroupChangeListener ogcl;
 
     public static final String CANCEL_ACTION = "cancelAction";
 
@@ -236,14 +234,33 @@ public class BookcasePresenter implements BasePresenter {
 
         //删除监听器
         mBookcaseFragment.getmBtnDelete().setOnClickListener(v -> {
-            DialogCreator.createCommonDialog(mMainActivity, "批量删除书籍",
-                    "确定要删除这些书籍吗？", true, (dialog, which) -> {
-                        for (Book book : mBookcaseAdapter.getSelectBooks()) {
-                            mBookService.deleteBook(book);
-                        }
-                        ToastUtils.showSuccess("书籍删除成功！");
-                        init();
-                    }, null);
+            if (!isGroup) {
+                DialogCreator.createCommonDialog(mMainActivity, "批量删除书籍",
+                        "确定要删除这些书籍吗？", true, (dialog, which) -> {
+                            for (Book book : mBookcaseAdapter.getSelectBooks()) {
+                                mBookService.deleteBook(book);
+                            }
+                            ToastUtils.showSuccess("书籍删除成功！");
+                            init();
+                        }, null);
+            }else {
+                DialogCreator.createCommonDialog(mMainActivity, "批量删除/移除书籍",
+                        "您是希望是要删除这些书籍及其所有缓存还是从分组中移除(不会删除书籍)呢？", true,
+                        "删除书籍", "从分组中移除" ,(dialog, which) -> {
+                            for (Book book : mBookcaseAdapter.getSelectBooks()) {
+                                mBookService.deleteBook(book);
+                            }
+                            ToastUtils.showSuccess("书籍删除成功！");
+                            init();
+                        }, (dialog, which) -> {
+                            for (Book book : mBookcaseAdapter.getSelectBooks()) {
+                                book.setGroupId("");
+                                mBookService.updateEntity(book);
+                            }
+                            ToastUtils.showSuccess("书籍已从分组中移除！");
+                            init();
+                        });
+            }
         });
 
         //加入分组监听器
@@ -254,7 +271,10 @@ public class BookcasePresenter implements BasePresenter {
                     BookGroup bookGroup = mBookGroups.get(which);
                     ArrayList<Book> mSelectBooks = (ArrayList<Book>) mBookcaseAdapter.getSelectBooks();
                     for (Book book : mSelectBooks) {
-                        book.setGroupId(bookGroup.getId());
+                        if (!bookGroup.getId().equals(book.getGroupId())) {
+                            book.setGroupId(bookGroup.getId());
+                            book.setGroupSort(0);
+                        }
                     }
                     mBookService.updateBooks(mSelectBooks);
                     ToastUtils.showSuccess("成功将《" + mSelectBooks.get(0).getName() + "》"
@@ -262,7 +282,7 @@ public class BookcasePresenter implements BasePresenter {
                             + "加入[" + bookGroup.getName() + "]分组");
                     init();
                 } else if (which == mBookGroups.size()) {
-                    showAddOrRenameGroupDia(false, 0);
+                    showAddOrRenameGroupDia(false, true, 0);
                 }
             });
         });
@@ -272,9 +292,8 @@ public class BookcasePresenter implements BasePresenter {
     //获取数据
     public void getData() {
         init();
-        initBookGroups(true);
         if (mSetting.isRefreshWhenStart() || android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            initNoReadNum();
+            mHandler.postDelayed(this::initNoReadNum, 500);
         }
     }
 
@@ -343,7 +362,8 @@ public class BookcasePresenter implements BasePresenter {
         mGroupNames = new CharSequence[isAdd ? mBookGroups.size() + 1 : mBookGroups.size()];
         for (int i = 0; i < mBookGroups.size(); i++) {
             String groupName = mBookGroups.get(i).getName();
-            mGroupNames[i] = groupName.getBytes().length > 20 ? groupName.substring(0, 8) + "···" : groupName;
+//            mGroupNames[i] = groupName.getBytes().length > 20 ? groupName.substring(0, 8) + "···" : groupName;
+            mGroupNames[i] = groupName;
         }
         if (isAdd) {
             mGroupNames[mBookGroups.size()] = "添加分组";
@@ -369,7 +389,7 @@ public class BookcasePresenter implements BasePresenter {
             Thread update = new Thread(() -> {
                 final ArrayList<Chapter> mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
                 final ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(book.getSource());
-                CommonApi.getBookChapters(book.getChapterUrl(), mReadCrawler, new ResultCallback() {
+                CommonApi.getBookChapters(book.getChapterUrl(), mReadCrawler, true, new ResultCallback() {
                     @Override
                     public void onFinish(Object o, int code) {
                         ArrayList<Chapter> chapters = (ArrayList<Chapter>) o;
@@ -421,6 +441,10 @@ public class BookcasePresenter implements BasePresenter {
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_change_group:
+                mBookcaseFragment.getmBookcasePresenter()
+                        .showBookGroupMenu(mMainActivity.findViewById(R.id.action_change_group));
+                return true;
             case R.id.action_edit:
                 editBookcase(true);
                 return true;
@@ -473,8 +497,11 @@ public class BookcasePresenter implements BasePresenter {
         return false;
     }
 
-    //显示书籍分组菜单
-    public void showBookGroupMenu(View view, MainActivity.OnGroupChangeListener ogcl) {
+    /**
+     * 显示书籍分组菜单
+     *
+     */
+    public void showBookGroupMenu(View view) {
         initBookGroups(false);
         PopupMenu popupMenu = new PopupMenu(mMainActivity, view, Gravity.END);
         popupMenu.getMenu().add(0, 0, 0, "所有书籍");
@@ -539,11 +566,11 @@ public class BookcasePresenter implements BasePresenter {
                             initBookGroups(false);
                     switch (which){
                         case 0:
-                            showAddOrRenameGroupDia(false, 0);
+                            showAddOrRenameGroupDia(false, false,0);
                             break;
                         case 1:
                             showSelectGroupDia((dialog1, which1) -> {
-                                showAddOrRenameGroupDia(true, which1);
+                                showAddOrRenameGroupDia(true,false, which1);
                             });
                             break;
                         case 2:
@@ -557,7 +584,7 @@ public class BookcasePresenter implements BasePresenter {
     /**
      * 添加/重命名分组对话框
      */
-    private void showAddOrRenameGroupDia(boolean isRename, int groupNum){
+    private void showAddOrRenameGroupDia(boolean isRename, boolean isAddGroup, int groupNum){
         View view = LayoutInflater.from(mMainActivity).inflate(R.layout.edit_dialog, null);
         TextInputLayout textInputLayout = view.findViewById(R.id.text_input_lay);
         EditText editText = textInputLayout.getEditText();
@@ -568,9 +595,8 @@ public class BookcasePresenter implements BasePresenter {
             editText.setText(oldName);
         }
         editText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) mMainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
         mHandler.postDelayed(() ->{
-            InputMethodManager imm = (InputMethodManager) mMainActivity
-                    .getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
         }, 220);
         AlertDialog newGroupDia = MyAlertDialog.build(mMainActivity)
@@ -583,16 +609,32 @@ public class BookcasePresenter implements BasePresenter {
         Button posBtn = newGroupDia.getButton(AlertDialog.BUTTON_POSITIVE);
         posBtn.setEnabled(false);
         posBtn.setOnClickListener(v1 -> {
-            bookGroup.setName(editText.getText().toString());
+            CharSequence newGroupName = editText.getText().toString();
+            for (CharSequence oldGroupName : mGroupNames){
+                if (oldGroupName.equals(newGroupName)){
+                    ToastUtils.showWarring("分组[" + newGroupName + "]已存在，无法" + (!isRename ? "添加！" : "重命名！"));
+                    return;
+                }
+            }
+            bookGroup.setName(newGroupName.toString());
             if (!isRename) {
                 mBookGroupService.addBookGroup(bookGroup);
             }else {
                 mBookGroupService.updateEntity(bookGroup);
+                SharedPreUtils spu = SharedPreUtils.getInstance();
+                if (spu.getString("curBookGroupName", "").equals(oldName)){
+                    spu.putString("curBookGroupName", newGroupName.toString());
+                    ogcl.onChange();
+                }
             }
             ToastUtils.showSuccess("成功" +
                     (!isRename ? "添加分组[" : "成功将[" + oldName + "]重命名为[")
                     + bookGroup.getName() + "]");
+            imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
             newGroupDia.dismiss();
+            if (isAddGroup){
+                mBookcaseFragment.getmBtnAddGroup().performClick();
+            }
         });
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -634,6 +676,13 @@ public class BookcasePresenter implements BasePresenter {
                     if (sb.length() > 0){
                         sb.deleteCharAt(sb.lastIndexOf("、"));
                     }
+                    SharedPreUtils spu = SharedPreUtils.getInstance();
+                    if (mBookGroupService.getGroupById(spu.getString("curBookGroupId", "")) == null){
+                        spu.putString("curBookGroupId", "");
+                        spu.putString("curBookGroupName", "");
+                        ogcl.onChange();
+                        init();
+                    }
                     ToastUtils.showSuccess("分组[" + sb.toString() + "]删除成功！");
                 }, null, null);
     }
@@ -646,6 +695,16 @@ public class BookcasePresenter implements BasePresenter {
                 .setCancelable(false)
                 .setPositiveButton("取消", null)
                 .show();
+    }
+
+    //分组切换监听器
+    public void addOnGroupChangeListener(MainActivity.OnGroupChangeListener ogcl){
+        this.ogcl = ogcl;
+    }
+
+    //是否有分组切换监听器
+    public boolean hasOnGroupChangeListener(){
+        return this.ogcl != null;
     }
 
 /**********************************************缓存书籍***************************************************************/
@@ -889,6 +948,7 @@ public class BookcasePresenter implements BasePresenter {
             }
             return;
         }
+        ArrayList<Book> mBooks = (ArrayList<Book>) BookService.getInstance().getAllBooks();
         if (mBooks.size() == 0) {
             if (!isAutoSyn) {
                 ToastUtils.showWarring("当前书架无任何书籍，无法同步！");

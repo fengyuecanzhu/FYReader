@@ -20,7 +20,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.presenter.ReadPresenter;
 import xyz.fycz.myreader.widget.page.PageView;
 

@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 
 import static android.app.DownloadManager.Request.VISIBILITY_HIDDEN;
 

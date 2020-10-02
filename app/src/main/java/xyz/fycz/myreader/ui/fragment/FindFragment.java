@@ -7,9 +7,9 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.BookstoreActivity;
-import xyz.fycz.myreader.webapi.crawler.FindCrawler;
-import xyz.fycz.myreader.webapi.crawler.QB5ReadCrawler;
-import xyz.fycz.myreader.webapi.crawler.find.ABC;
+import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
+import xyz.fycz.myreader.webapi.crawler.read.QB5ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
 
 /**
  * @author fengyue
@@ -37,10 +37,10 @@ public class FindFragment extends BaseFragment {
     @Override
     protected void initClick() {
         super.initClick();
-        mRlQiDianTop.setOnClickListener(v -> comeToBookstore(new ABC(false)));
-        mRlQiDianNSTop.setOnClickListener(v -> comeToBookstore(new ABC(true)));
-        mRlQiDianSort.setOnClickListener(v -> comeToBookstore(new ABC(false, true)));
-        mRlQiDianNSSort.setOnClickListener(v -> comeToBookstore(new ABC(true, true)));
+        mRlQiDianTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false)));
+        mRlQiDianNSTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(true)));
+        mRlQiDianSort.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false, true)));
+        mRlQiDianNSSort.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(true, true)));
         mRlQB5Store.setOnClickListener(v -> comeToBookstore(new QB5ReadCrawler()));
     }
 

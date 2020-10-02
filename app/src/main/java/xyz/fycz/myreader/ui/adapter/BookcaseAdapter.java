@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.*;
 
-import androidx.appcompat.app.AlertDialog;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,9 +15,9 @@ import java.util.*;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.creator.DialogCreator;
-import xyz.fycz.myreader.creator.MyAlertDialog;
-import xyz.fycz.myreader.custom.DragAdapter;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
+import xyz.fycz.myreader.widget.custom.DragAdapter;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.BookService;
@@ -122,7 +120,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
                     }, null);
         }else {
             DialogCreator.createCommonDialog(mContext, "删除/移除书籍", "您是希望删除《" + book.getName() + "》及其所有缓存还是从分组中移除该书籍(不会删除书籍)呢？",
-                    true, "删除书籍", "从分组中移除书籍",(dialogInterface, i) -> {
+                    true, "删除书籍", "从分组中移除",(dialogInterface, i) -> {
                         remove(book);
                         ToastUtils.showSuccess("书籍删除成功！");
                         mBookcasePresenter.init();
