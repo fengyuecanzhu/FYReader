@@ -6,8 +6,8 @@ package xyz.fycz.myreader.enums;
 
 public enum BookSource {
 
-    tianlai("天籁小说"),
     fynovel("风月小说"),
+    tianlai("天籁小说"),
     biquge44("笔趣阁44"),
     pinshu("品书网"),
     biquge("笔趣阁"),
