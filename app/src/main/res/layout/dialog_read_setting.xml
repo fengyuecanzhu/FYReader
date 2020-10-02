@@ -63,25 +63,24 @@
                     android:paddingRight="10dp">
                 <ImageView
                         android:id="@+id/iv_change_source"
-                        android:layout_width="33dp"
+                        android:layout_width="30dp"
                         android:layout_height="match_parent"
-                        android:tint="@color/little_black_white"
                         android:src="@drawable/ic_change_source"
-                        android:visibility="gone"/>
+                        app:tint="@color/little_black_white"/>
                 <ImageView
                         android:id="@+id/iv_refresh"
                         android:layout_marginLeft="15dp"
                         android:layout_width="30dp"
                         android:layout_height="match_parent"
-                        android:tint="@color/little_black_white"
-                        android:src="@drawable/ic_refresh"/>
+                        android:src="@drawable/ic_refresh"
+                        app:tint="@color/little_black_white"/>
                 <ImageView
                         android:id="@+id/iv_book_mark"
                         android:layout_marginLeft="12dp"
                         android:layout_width="33dp"
                         android:layout_height="match_parent"
-                        android:tint="@color/little_black_white"
-                        android:src="@drawable/ic_bookmark"/>
+                        android:src="@drawable/ic_bookmark"
+                        app:tint="@color/little_black_white"/>
                 <ImageView
                         android:id="@+id/iv_voice_read"
                         android:layout_width="25dp"

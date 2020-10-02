@@ -4,7 +4,7 @@ import android.util.Log;
 import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.entity.Void;
@@ -19,7 +19,6 @@ import xyz.fycz.myreader.util.utils.RxUtils;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

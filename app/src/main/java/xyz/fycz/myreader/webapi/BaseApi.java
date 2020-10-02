@@ -6,8 +6,8 @@ import xyz.fycz.myreader.entity.JsonModel;
 import xyz.fycz.myreader.util.HttpUtil;
 import xyz.fycz.myreader.util.JsonArrayToObjectArray;
 import com.google.gson.Gson;
-import xyz.fycz.myreader.callback.JsonCallback;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.JsonCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.source.HttpDataSource;
 import xyz.fycz.myreader.util.ToastUtils;
 
@@ -156,8 +156,8 @@ public class BaseApi {
      * @param params
      * @param callback
      */
-    public static void getCommonReturnHtmlStringApi(String url, Map<String, Object> params, String charsetName, final ResultCallback callback) {
-        HttpDataSource.httpGet_html(HttpUtil.makeURL(url, params), charsetName, new ResultCallback() {
+    public static void getCommonReturnHtmlStringApi(String url, Map<String, Object> params, String charsetName,  boolean isRefresh, final ResultCallback callback) {
+        HttpDataSource.httpGet_html(HttpUtil.makeURL(url, params), charsetName, isRefresh ,new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
                 callback.onFinish(o,code);

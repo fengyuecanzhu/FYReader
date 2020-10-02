@@ -3,7 +3,8 @@ package xyz.fycz.myreader.webapi.crawler;
 
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.read.FYReadCrawler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class ReadCrawlerUtil {
         if (searchSource == null) {
             StringBuilder sb = new StringBuilder();
             for (BookSource bookSource : BookSource.values()) {
-                if (bookSource.equals(BookSource.fynovel) || bookSource.equals(BookSource.local) || bookSource.equals(BookSource.biquge))
+                if (bookSource.equals(BookSource.fynovel) || bookSource.equals(BookSource.local))
                     continue;
                 sb.append(bookSource.toString());
                 sb.append(",");
@@ -49,10 +50,6 @@ public class ReadCrawlerUtil {
         if (searchSource == null) {
             for (BookSource bookSource : BookSource.values()) {
                 if (bookSource.equals(BookSource.fynovel) || bookSource.equals(BookSource.local)) continue;
-                if (bookSource.equals(BookSource.biquge)) {
-                    mSources.put(bookSource.text, true);
-                    continue;
-                }
                 mSources.put(bookSource.text, false);
             }
         } else {
@@ -71,6 +68,18 @@ public class ReadCrawlerUtil {
         }
         return mSources;
 
+    }
+
+    public static void resetReaderCrawlers(){
+        StringBuilder sb = new StringBuilder();
+        for (BookSource bookSource : BookSource.values()) {
+            if (bookSource.equals(BookSource.fynovel) || bookSource.equals(BookSource.local))
+                continue;
+            sb.append(bookSource.toString());
+            sb.append(",");
+        }
+        sb.deleteCharAt(sb.lastIndexOf(","));
+        SharedPreUtils.getInstance().putString("searchSource", sb.toString());
     }
 
     public static ReadCrawler getReadCrawler(String bookSource) {

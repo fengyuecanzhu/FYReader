@@ -3,7 +3,6 @@ package xyz.fycz.myreader.ui.fragment;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +11,7 @@ import android.widget.*;
 import androidx.fragment.app.Fragment;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.custom.DragSortGridView;
+import xyz.fycz.myreader.widget.custom.DragSortGridView;
 
 import butterknife.ButterKnife;
 import butterknife.BindView;

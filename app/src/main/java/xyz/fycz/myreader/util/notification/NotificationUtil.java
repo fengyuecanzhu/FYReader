@@ -4,24 +4,17 @@ import android.annotation.TargetApi;
 import android.app.*;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.creator.DialogCreator;
-import xyz.fycz.myreader.creator.MyAlertDialog;
-import xyz.fycz.myreader.greendao.service.BookMarkService;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 
 import static xyz.fycz.myreader.util.notification.NotificationClickReceiver.CANCEL_ACTION;
 

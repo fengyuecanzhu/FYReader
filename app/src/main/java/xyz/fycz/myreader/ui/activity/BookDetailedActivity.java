@@ -10,9 +10,7 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.*;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,22 +19,20 @@ import butterknife.OnClick;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity2;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.creator.MyAlertDialog;
+import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.BlurTransformation;
-import xyz.fycz.myreader.webapi.crawler.BookInfoCrawler;
-import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
-import xyz.fycz.myreader.creator.ChangeSourceDialog;
-import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -93,6 +89,8 @@ public class BookDetailedActivity extends BaseActivity2 {
     private ArrayList<Chapter> mChapters = new ArrayList<>();
     private ArrayList<Chapter> mNewestChapters = new ArrayList<>();
     private boolean isCollected;
+    private SourceExchangeDialog mSourceDialog;
+    private int sourceIndex;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -134,8 +132,9 @@ public class BookDetailedActivity extends BaseActivity2 {
         mBookService = BookService.getInstance();
         mChapterService = ChapterService.getInstance();
         aBooks = (ArrayList<Book>) getIntent().getSerializableExtra(APPCONST.SEARCH_BOOK_BEAN);
+        sourceIndex = getIntent().getIntExtra(APPCONST.SOURCE_INDEX, 0);
         if (aBooks != null) {
-            mBook = aBooks.get(0);
+            mBook = aBooks.get(sourceIndex);
         } else {
             mBook = (Book) getIntent().getSerializableExtra(APPCONST.BOOK);
         }
@@ -177,6 +176,24 @@ public class BookDetailedActivity extends BaseActivity2 {
             bookDetailTvOpen.setText("继续阅读");
         }
 
+        //Dialog
+        mSourceDialog = new SourceExchangeDialog(this, mBook);
+        if (aBooks != null && aBooks.size() > 0) {
+            if (isCollected) {
+                for (int i = 0; i < aBooks.size(); i++) {
+                    Book book = aBooks.get(i);
+                    if (book.getSource().equals(mBook.getSource())) {
+                        book.setNewestChapterId("true");
+                        sourceIndex = i;
+                        break;
+                    }
+                }
+            }else {
+                aBooks.get(sourceIndex).setNewestChapterId("true");
+            }
+        }
+        mSourceDialog.setABooks(aBooks);
+        mSourceDialog.setSourceIndex(sourceIndex);
     }
 
     @Override
@@ -208,6 +225,35 @@ public class BookDetailedActivity extends BaseActivity2 {
         });
         flOpenBook.setOnClickListener(view -> goReadActivity());
 
+        //换源对话框
+        mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
+            Book bookTem = new Book(mBook);
+            bookTem.setChapterUrl(bean.getChapterUrl());
+            if (!StringHelper.isEmpty(bean.getImgUrl())) {
+                bookTem.setImgUrl(bean.getImgUrl());
+            }
+            if (!StringHelper.isEmpty(bean.getType())) {
+                bookTem.setType(bean.getType());
+            }
+            if (!StringHelper.isEmpty(bean.getDesc())){
+                bookTem.setDesc(bean.getDesc());
+            }
+            bookTem.setSource(bean.getSource());
+            if (isCollected) {
+                mBookService.updateBook(mBook, bookTem);
+            }
+            mBook = bookTem;
+            mHandler.sendMessage(mHandler.obtainMessage(1));
+            if (isCollected) {
+                String tip = null;
+                if (SysManager.getSetting().isMatchChapter()) {
+                    tip = getString(R.string.change_source_tip1);
+                } else {
+                    tip = getString(R.string.change_source_tip2);
+                }
+                DialogCreator.createTipDialog(this, tip);
+            }
+        });
     }
 
     @Override
@@ -308,7 +354,7 @@ public class BookDetailedActivity extends BaseActivity2 {
             mHandler.sendMessage(mHandler.obtainMessage(3));
             return;
         }
-        pbLoading.setVisibility(View.GONE);
+        /*pbLoading.setVisibility(View.GONE);
         CharSequence[] sources = new CharSequence[aBooks.size()];
         int checkedItem = 0;
         for (int i = 0; i < sources.length; i++) {
@@ -351,7 +397,8 @@ public class BookDetailedActivity extends BaseActivity2 {
                     }
                     dialog1.dismiss();
                 }).create();
-        dialog.show();
+        dialog.show();*/
+
     }
 
     /**
@@ -363,14 +410,14 @@ public class BookDetailedActivity extends BaseActivity2 {
             if (isCollected) {
                 mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
             }
-            CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler, new ResultCallback() {
+            CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler, isChangeSource, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
                     ArrayList<Chapter> chapters = (ArrayList<Chapter>) o;
+                    mBook.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
                     if (isCollected) {
                         int noReadNum = chapters.size() - mBook.getChapterTotalNum();
                         mBook.setNoReadNum(Math.max(noReadNum, 0));
-                        mBook.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
                         mChapterService.updateAllOldChapterData(mChapters, chapters, mBook.getId());
                         mBookService.updateEntity(mBook);
                         if (isChangeSource && SysManager.getSetting().isMatchChapter()) {
@@ -435,11 +482,14 @@ public class BookDetailedActivity extends BaseActivity2 {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem isUpdate = menu.findItem(R.id.action_is_update);
+        MenuItem groupSetting = menu.findItem(R.id.action_group_setting);
         if (isCollected) {
             isUpdate.setVisible(true);
+            //groupSetting.setVisible(true);
             isUpdate.setChecked(!mBook.getIsCloseUpdate());
         } else {
             isUpdate.setVisible(false);
+            groupSetting.setVisible(false);
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -458,7 +508,7 @@ public class BookDetailedActivity extends BaseActivity2 {
                     ToastUtils.showWarring("无网络连接！");
                     return true;
                 }
-                pbLoading.setVisibility(View.VISIBLE);
+                /*pbLoading.setVisibility(View.VISIBLE);
                 if (aBooks == null) {
                     ChangeSourceDialog csd = new ChangeSourceDialog(this, mBook);
                     csd.init(new ResultCallback() {
@@ -475,13 +525,11 @@ public class BookDetailedActivity extends BaseActivity2 {
                     });
                 } else {
                     createChangeSourceDia();
-                }
+                }*/
+                mSourceDialog.show();
                 break;
             case R.id.action_reload:  //重新加载
-                mChapters.clear();
-                mNewestChapters.clear();
-                initWidget();
-                processLogic();
+                mHandler.sendEmptyMessage(1);
                 break;
             case R.id.action_is_update://是否更新
                 mBook.setIsCloseUpdate(!mBook.getIsCloseUpdate());
@@ -491,6 +539,8 @@ public class BookDetailedActivity extends BaseActivity2 {
                 Uri uri = Uri.parse(mBook.getChapterUrl());
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
+                break;
+            case R.id.action_group_setting:
                 break;
             default:
                 break;

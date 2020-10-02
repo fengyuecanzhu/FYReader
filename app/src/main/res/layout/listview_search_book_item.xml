@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/iv_book_img"
-        android:layout_width="80dp"
-        android:layout_height="120dp"
+        android:layout_width="64dp"
+        android:layout_height="88dp"
         android:scaleType="fitXY"
         app:srcCompat="@mipmap/no_image" />
 
@@ -35,7 +35,7 @@
                         android:layout_height="24dp"
                         android:layout_marginTop="5dp"
                         android:text="bookname"
-                        android:maxLength="15"
+                        android:maxLength="12"
                         android:textSize="16sp"
                         android:textColor="@color/textPrimary"/>
 
@@ -66,9 +66,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:text="book desc"
-                android:maxLines="3"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textSize="13sp"
-                android:textColor="@color/title_black"/>
+                android:textColor="@color/textSecondary"/>
         </LinearLayout>
         <TextView
                 android:id="@+id/tv_book_type"

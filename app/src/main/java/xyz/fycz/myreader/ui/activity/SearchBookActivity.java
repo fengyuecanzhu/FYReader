@@ -3,7 +3,6 @@ package xyz.fycz.myreader.ui.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,33 +14,38 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import me.gujun.android.taggroup.TagGroup;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseActivity2;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.custom.DragSortGridView;
+import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.SearchHistory;
 import xyz.fycz.myreader.greendao.service.SearchHistoryService;
-import xyz.fycz.myreader.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.ui.adapter.SearchBookAdapter;
 import xyz.fycz.myreader.ui.adapter.SearchHistoryAdapter;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
-import xyz.fycz.myreader.webapi.crawler.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
+import xyz.fycz.myreader.widget.RefreshProgressBar;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author fengyue
@@ -54,12 +58,12 @@ public class SearchBookActivity extends BaseActivity2 {
     TextView tvSearchConform;
     @BindView(R.id.ll_refresh_suggest_books)
     LinearLayout llRefreshSuggestBooks;
-    @BindView(R.id.gv_search_books_list)
-    DragSortGridView gvSearchBooksList;
+    @BindView(R.id.rv_search_books_list)
+    RecyclerView rvSearchBooksList;
     @BindView(R.id.ll_suggest_books_view)
     LinearLayout llSuggestBooksView;
-    @BindView(R.id.pb_loading)
-    ProgressBar pbLoading;
+    @BindView(R.id.rpb)
+    RefreshProgressBar rpb;
     @BindView(R.id.lv_history_list)
     ListView lvHistoryList;
     @BindView(R.id.ll_clear_history)
@@ -74,13 +78,14 @@ public class SearchBookActivity extends BaseActivity2 {
     TextView renewByText;
     @BindView(R.id.srl_search_book_list)
     SmartRefreshLayout srlSearchBookList;
+    @BindView(R.id.fabSearchStop)
+    FloatingActionButton fabSearchStop;
 
 
     private SearchBookAdapter mSearchBookAdapter;
     private String searchKey;//搜索关键字
     private ArrayList<SearchBookBean> mBooksBean = new ArrayList<>();
     private ConcurrentMultiValueMap<SearchBookBean, Book> mBooks = new ConcurrentMultiValueMap<>();
-    private ArrayList<Book> mAdapterBooks = new ArrayList<>();
     private ArrayList<SearchHistory> mSearchHistories = new ArrayList<>();
     private ArrayList<String> mSuggestions = new ArrayList<>();
 
@@ -97,6 +102,8 @@ public class SearchBookActivity extends BaseActivity2 {
     private int inputConfirm = 0;//搜索输入确认
     private int confirmTime = 1000;//搜索输入确认时间（毫秒）
 
+    private SearchEngine searchEngine;
+
     private static String[] suggestion = {"第一序列", "大道朝天", "伏天氏", "终极斗罗", "我师兄实在太稳健了", "烂柯棋缘", "诡秘之主"};
     private static String[] suggestion2 = {"不朽凡人", "圣墟", "我是至尊", "龙王传说", "太古神王", "一念永恒", "雪鹰领主", "大主宰"};
 
@@ -109,18 +116,21 @@ public class SearchBookActivity extends BaseActivity2 {
                     search();
                     break;
                 case 2:
-                    if (curThreadCount == 0 && !isStopSearch) {
-                        initSearchList();
+                    if (srlSearchBookList != null) {
                         srlSearchBookList.finishRefresh();
-                        pbLoading.setVisibility(View.GONE);
-                    }/*else {
-                        notifyDataSetChanged();
-                        mSearchBookActivity.getSrlSearchBookList().finishRefresh();
-                    }*/
+                    }
+                    if (curThreadCount == 0 && !isStopSearch) {
+                        rpb.setIsAutoLoading(false);
+                    }
+                    break;
+                case 3:
+                    fabSearchStop.setVisibility(View.GONE);
                     break;
             }
         }
     };
+
+
     @Override
     protected int getContentId() {
         return R.layout.activity_search_book;
@@ -140,6 +150,36 @@ public class SearchBookActivity extends BaseActivity2 {
         for (int i = 0; i < suggestion.length; i++) {
             mSuggestions.add(suggestion[i]);
         }
+
+        searchEngine = new SearchEngine();
+        searchEngine.setOnSearchListener(new SearchEngine.OnSearchListener() {
+            @Override
+            public void loadMoreFinish(Boolean isAll) {
+                if (rpb != null) {
+                    rpb.setIsAutoLoading(false);
+                }
+                mHandler.sendEmptyMessage(3);
+            }
+
+            @Override
+            public void loadMoreSearchBook(ConcurrentMultiValueMap<SearchBookBean, Book> items) {
+                mBooks.addAll(items);
+                curThreadCount--;
+                mSearchBookAdapter.addAll(new ArrayList<>(items.keySet()), searchKey);
+                mHandler.sendMessage(mHandler.obtainMessage(2));
+            }
+
+            @Override
+            public void loadMoreSearchBook(List<Book> items) {
+
+            }
+
+            @Override
+            public void searchBookError(Throwable throwable) {
+                curThreadCount = 0;
+                mHandler.sendMessage(mHandler.obtainMessage(2));
+            }
+        });
     }
 
     @Override
@@ -177,11 +217,13 @@ public class SearchBookActivity extends BaseActivity2 {
             }
 
         });
+        rvSearchBooksList.setLayoutManager(new LinearLayoutManager(this));
+
         //上拉刷新
-        srlSearchBookList.setOnRefreshListener(refreshLayout -> mHandler.sendMessage(mHandler.obtainMessage(1)));
-        srlSearchBookList.setEnableRefresh(false);
-        gvSearchBooksList.setNumColumns(1);
-        gvSearchBooksList.setDragModel(-1);
+        srlSearchBookList.setOnRefreshListener(refreshLayout -> {
+            stopSearch();
+            mHandler.sendMessage(mHandler.obtainMessage(1));
+        });
         initSuggestionBook();
         initHistoryList();
     }
@@ -194,12 +236,7 @@ public class SearchBookActivity extends BaseActivity2 {
         renewByImage.setOnClickListener(new RenewSuggestionBook());
         //换一批点击事件
         renewByText.setOnClickListener(new RenewSuggestionBook());
-        //进入书籍详情页
-        gvSearchBooksList.setOnItemClickListener((adapterView, view, i, l) -> {
-            Intent intent = new Intent(this, BookDetailedActivity.class);
-            intent.putExtra(APPCONST.SEARCH_BOOK_BEAN, new ArrayList<>(mBooks.getValues(mBooksBean.get(i))));
-            startActivity(intent);
-        });
+
         //搜索按钮点击事件
         tvSearchConform.setOnClickListener(view -> mHandler.sendMessage(mHandler.obtainMessage(1)));
         //suggestion搜索事件
@@ -227,6 +264,10 @@ public class SearchBookActivity extends BaseActivity2 {
             }
             return true;
         });
+
+        fabSearchStop.setOnClickListener(v -> {
+            stopSearch();
+        });
     }
 
 
@@ -244,7 +285,7 @@ public class SearchBookActivity extends BaseActivity2 {
             if (Arrays.equals(s, suggestion)) {
                 tgSuggestBook.setTags(suggestion2);
             } else {
-               tgSuggestBook.setTags(suggestion);
+                tgSuggestBook.setTags(suggestion);
             }
         }
     }
@@ -267,111 +308,80 @@ public class SearchBookActivity extends BaseActivity2 {
      * 初始化搜索列表
      */
     private void initSearchList() {
-        initmBooksBean();
-        mSearchBookAdapter = new SearchBookAdapter(this,
-                R.layout.listview_search_book_item, mBooksBean, mBooks);
-        gvSearchBooksList.setAdapter(mSearchBookAdapter);
-        gvSearchBooksList.setVisibility(View.VISIBLE);
+        //initmBooksBean();
+        rvSearchBooksList.setVisibility(View.VISIBLE);
         llSuggestBooksView.setVisibility(View.GONE);
         llSuggestBooksView.setVisibility(View.GONE);
     }
 
-    /**
-     * 更新搜索列表
-     */
-    private void notifyDataSetChanged() {
-        if (curThreadCount == 0) {
-            pbLoading.setVisibility(View.GONE);
-        }
-        initmBooksBean();
-    }
 
-    /**
-     * 初始化mBooksBean
-     */
-    private void initmBooksBean() {
-        synchronized (this) {
-            mBooksBean.clear();
-            mBooksBean.addAll(mBooks.keySet());
-            //排序，基于最符合关键字的搜书结果应该是最短的
-            //TODO ;这里只做了简单的比较排序，还需要继续完善
-            Collections.sort(mBooksBean, (o1, o2) -> {
-                if (searchKey.equals(o1.getName()))
-                    return -1;
-                if (searchKey.equals(o2.getName()))
-                    return 1;
-                if (searchKey.equals(o1.getAuthor()))
-                    return -1;
-                if (searchKey.equals(o2.getAuthor()))
-                    return 1;
-                if (o1.getName().length() < o2.getName().length())
-                    return -1;
-                if (o1.getName().length() == o2.getName().length())
-                    return 0;
-                return 1;
-            });
-            /*MyApplication.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSearchBookAdapter.notifyDataSetChanged();
-                }
-            });*/
-        }
-    }
+
 
     /**
      * 获取搜索数据
      */
     private void getData() {
+        initSearchList();
         mBooksBean.clear();
         mBooks.clear();
         ArrayList<ReadCrawler> readCrawlers = ReadCrawlerUtil.getReadCrawlers();
         allThreadCount = readCrawlers.size();
-        if (allThreadCount == 0){
+        if (allThreadCount == 0) {
             ToastUtils.showWarring("当前书源已全部禁用，无法搜索！");
-            pbLoading.setVisibility(View.GONE);
+            rpb.setIsAutoLoading(false);
             return;
         }
         curThreadCount = allThreadCount;
-        for (ReadCrawler readCrawler : readCrawlers){
+        /*for (ReadCrawler readCrawler : readCrawlers) {
             searchBookByCrawler(readCrawler, readCrawler.getSearchCharset());
-        }
+        }*/
+        searchEngine.initSearchEngine(ReadCrawlerUtil.getReadCrawlers());
+        searchEngine.search(searchKey);
     }
 
     /**
      * 搜索
      */
     private void search() {
-        pbLoading.setVisibility(View.VISIBLE);
+        rpb.setIsAutoLoading(true);
+        fabSearchStop.setVisibility(View.VISIBLE);
         if (StringHelper.isEmpty(searchKey)) {
             isStopSearch = true;
-            pbLoading.setVisibility(View.GONE);
-            gvSearchBooksList.setVisibility(View.GONE);
+            stopSearch();
+            rpb.setIsAutoLoading(false);
+            rvSearchBooksList.setVisibility(View.GONE);
             llSuggestBooksView.setVisibility(View.VISIBLE);
             initHistoryList();
-            gvSearchBooksList.setAdapter(null);
+            rvSearchBooksList.setAdapter(null);
             srlSearchBookList.setEnableRefresh(false);
         } else {
             isStopSearch = false;
-            gvSearchBooksList.setVisibility(View.VISIBLE);
+
+            mSearchBookAdapter = new SearchBookAdapter(mBooks);
+
+            rvSearchBooksList.setAdapter(mSearchBookAdapter);
+            //进入书籍详情页
+            mSearchBookAdapter.setOnItemClickListener((view, pos) -> {
+                Intent intent = new Intent(this, BookDetailedActivity.class);
+                intent.putExtra(APPCONST.SEARCH_BOOK_BEAN, new ArrayList<>(mBooks.getValues(mSearchBookAdapter.getItem(pos))));
+                startActivity(intent);
+            });
+            srlSearchBookList.setEnableRefresh(true);
+            rvSearchBooksList.setVisibility(View.VISIBLE);
             llSuggestBooksView.setVisibility(View.GONE);
             llHistoryView.setVisibility(View.GONE);
             getData();
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (gvSearchBooksList.getmScrollView().getScrollY() == 0){
-                    srlSearchBookList.setEnableRefresh(true);
-                }
-                //滑动监听器
-                gvSearchBooksList.getmScrollView().setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                    srlSearchBookList.setEnableRefresh(scrollY == 0);
-                });
-            }
             mSearchHistoryService.addOrUpadteHistory(searchKey);
             //收起软键盘
             InputMethodManager imm = (InputMethodManager) MyApplication.getmContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             assert imm != null;
             imm.hideSoftInputFromWindow(etSearchKey.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
+    }
+
+    private void stopSearch() {
+        searchEngine.stopSearch();
+        mHandler.sendEmptyMessage(3);
     }
 
     @Override
@@ -413,7 +423,11 @@ public class SearchBookActivity extends BaseActivity2 {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         isStopSearch = true;
+        stopSearch();
+        for (int i = 0; i < 9; i++) {
+            mHandler.removeMessages(i + 1);
+        }
+        super.onDestroy();
     }
 }

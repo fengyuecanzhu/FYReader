@@ -7,10 +7,10 @@ import android.os.Message;
 import android.view.View;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import xyz.fycz.myreader.base.BasePresenter;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.creator.ChangeSourceDialog;
-import xyz.fycz.myreader.creator.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.ChangeSourceDialog;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.entity.bookstore.RankBook;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -20,7 +20,7 @@ import xyz.fycz.myreader.ui.adapter.BookStoreBookAdapter;
 import xyz.fycz.myreader.ui.adapter.BookStoreBookTypeAdapter;
 import xyz.fycz.myreader.ui.fragment.BookStoreFragment;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.webapi.crawler.find.ABC;
+import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
 
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class BookStorePresenter implements BasePresenter {
     private List<Book> bookList = new ArrayList<>();
 
     private BookType curType;
-    private ABC findCrawler;
+    private QiDianMobileRank findCrawler;
 
     private int page = 1;
 
@@ -86,7 +86,7 @@ public class BookStorePresenter implements BasePresenter {
     public void start() {
         mBookStoreFragment.getSrlBookList().setEnableRefresh(false);
         mBookStoreFragment.getSrlBookList().setEnableLoadMore(false);
-        findCrawler = new ABC(true);
+        findCrawler = new QiDianMobileRank(true);
         //小说列表下拉加载更多事件
         mBookStoreFragment.getSrlBookList().setOnLoadMoreListener(refreshLayout -> {
             page++;

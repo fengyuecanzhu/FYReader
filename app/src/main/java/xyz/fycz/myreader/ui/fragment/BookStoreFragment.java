@@ -2,13 +2,9 @@ package xyz.fycz.myreader.ui.fragment;
 
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.CookieManager;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,10 +13,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.custom.DragSortGridView;
 import xyz.fycz.myreader.ui.presenter.BookStorePresenter;
-import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.widget.RefreshLayout;
 
 /**

@@ -5,9 +5,8 @@ import android.content.Intent;
 import android.view.View;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BasePresenter;
-import xyz.fycz.myreader.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.CatalogActivity;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -63,7 +62,7 @@ public class CatalogPresenter implements BasePresenter {
                 return;
             }
             mCatalogFragment.getPbLoading().setVisibility(View.VISIBLE);
-            CommonApi.getBookChapters(mBook.getChapterUrl(), ReadCrawlerUtil.getReadCrawler(mBook.getSource()),
+            CommonApi.getBookChapters(mBook.getChapterUrl(), ReadCrawlerUtil.getReadCrawler(mBook.getSource()),false,
                     new ResultCallback() {
                         @Override
                         public void onFinish(Object o, int code) {
