@@ -78,11 +78,8 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
             book.setImgUrl("");
         }
         tvBookName.setText(book.getName());
-        tvNewestChapter.setText(getContext().getString(R.string.newest_chapter, book.getNewestChapterTitle()));
         tvAuthor.setText(book.getAuthor());
         tvSource.setText(getContext().getString(R.string.source_title_num, BookSource.fromString(book.getSource()).text, bookCount));
-        tvDesc.setText("");
-        tvType.setText("");
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(book.getSource());
         if (rc instanceof BookInfoCrawler){
             if (tvBookName.getTag() == null || !(Boolean) tvBookName.getTag()) {
@@ -110,6 +107,15 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
     }
 
     private void initOtherInfo(Book book){
+        //简介
+        if (book.getDesc() == null) {
+            tvDesc.setText("");
+        }else {
+            tvDesc.setText("简介:" + book.getDesc());
+        }
+        tvType.setText(book.getType());
+        tvNewestChapter.setText(getContext().getString(R.string.newest_chapter, book.getNewestChapterTitle()));
+        tvAuthor.setText(book.getAuthor());
         //图片
         if (!MyApplication.isDestroy((Activity) getContext())) {
             Glide.with(getContext())
@@ -121,14 +127,6 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
                     .apply(RequestOptions.bitmapTransform(new RoundedCorners(8)))
                     .into(ivBookImg);
         }
-        //简介
-        if (book.getDesc() == null) {
-            tvDesc.setText("");
-        }else {
-            tvDesc.setText("简介:" + book.getDesc());
-        }
-        tvType.setText(book.getType());
-        tvNewestChapter.setText("最新章节:" + book.getNewestChapterTitle());
-        tvAuthor.setText(book.getAuthor());
+
     }
 }

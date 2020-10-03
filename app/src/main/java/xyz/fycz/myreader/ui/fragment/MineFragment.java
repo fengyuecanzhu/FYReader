@@ -56,6 +56,8 @@ public class MineFragment extends BaseFragment {
     RelativeLayout mRlThemeMode;
     @BindView(R.id.tv_theme_mode_select)
     TextView tvThemeModeSelect;
+    @BindView(R.id.mine_rl_feedback)
+    RelativeLayout mRlFeedback;
     @BindView(R.id.mine_rl_about)
     RelativeLayout mRlAbout;
 
@@ -250,6 +252,20 @@ public class MineFragment extends BaseFragment {
             startActivity(aboutIntent);
         });
 
+        mRlFeedback.setOnClickListener(v -> {
+            DialogCreator.createCommonDialog(getContext(), "问题反馈", "请加入QQ群(1085028304)反馈问题!", true,
+                    "加入QQ群", "取消", (dialog, which) -> {
+                        if (!MyApplication.joinQQGroup(getContext(),"8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")){
+                            ClipboardManager mClipboardManager = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                            //数据
+                            ClipData mClipData = ClipData.newPlainText("Label", "1085028304");
+                            //把数据设置到剪切板上
+                            assert mClipboardManager != null;
+                            mClipboardManager.setPrimaryClip(mClipData);
+                            ToastUtils.showError("未安装手Q或安装的版本不支持！\n已复制QQ群号，您可自行前往QQ添加！");
+                        }
+                    }, null);
+        });
     }
 
     @Override
