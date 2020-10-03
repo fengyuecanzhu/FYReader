@@ -230,7 +230,36 @@
                     android:text="其他"/>
 
         </RelativeLayout>
+        <RelativeLayout
+                android:id="@+id/mine_rl_feedback"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/selector_common_bg">
 
+            <ImageView
+                    android:layout_marginStart="3dp"
+                    android:id="@+id/iv_feedback"
+                    android:layout_alignParentStart="true"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_centerVertical="true"
+                    app:tint="@color/textPrimary"
+                    android:src="@drawable/ic_feedback"
+            />
+            <TextView
+                    android:id="@+id/tv_feedback"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="18dp"
+                    android:layout_toEndOf="@id/iv_feedback"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_normal_size"
+                    android:text="@string/mine_feedback"/>
+
+        </RelativeLayout>
         <RelativeLayout
                 android:id="@+id/mine_rl_about"
                 android:layout_width="match_parent"
