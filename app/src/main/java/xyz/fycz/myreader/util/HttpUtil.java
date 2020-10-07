@@ -1,11 +1,13 @@
 package xyz.fycz.myreader.util;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import okhttp3.*;
+import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.TrustAllCerts;
 import xyz.fycz.myreader.webapi.callback.HttpCallback;
@@ -53,14 +55,51 @@ public class HttpUtil {
         return ssfFactory;
     }
 
+    public static X509TrustManager createTrustAllManager() {
+        X509TrustManager tm = null;
+        try {
+            tm = new X509TrustManager() {
+                @SuppressLint("TrustAllX509TrustManager")
+                public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                    //do nothing，接受任意客户端证书
+                }
+
+                @SuppressLint("TrustAllX509TrustManager")
+                public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                    //do nothing，接受任意服务端证书
+                }
+
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+            };
+        } catch (Exception ignored) {
+        }
+        return tm;
+    }
+
+    private static Interceptor getHeaderInterceptor() {
+        return chain -> {
+            Request request = chain.request()
+                    .newBuilder()
+                    .addHeader("Keep-Alive", "300")
+                    .addHeader("Connection", "Keep-Alive")
+                    .addHeader("Cache-Control", "no-cache")
+                    .build();
+            return chain.proceed(request);
+        };
+    }
+
     public static synchronized OkHttpClient getOkHttpClient() {
         if (mClient == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
             builder.connectTimeout(5, TimeUnit.SECONDS)
                     .readTimeout(15, TimeUnit.SECONDS)
-                    .writeTimeout(15, TimeUnit.SECONDS);
-            builder.sslSocketFactory(createSSLSocketFactory());
-            builder.hostnameVerifier((hostname, session) -> true);
+                    .writeTimeout(15, TimeUnit.SECONDS)
+                    .sslSocketFactory(createSSLSocketFactory(), createTrustAllManager())
+                    .hostnameVerifier((hostname, session) -> true)
+                    .protocols(Collections.singletonList(Protocol.HTTP_1_1))
+                    .addInterceptor(getHeaderInterceptor());
             mClient = builder
                     .build();
         }
@@ -271,10 +310,10 @@ public class HttpUtil {
                         .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36");
                 if (address.contains("qidian.com")) {
                     SharedPreUtils spu = SharedPreUtils.getInstance();
-                    String cookie = spu.getString("qdCookie", "");
+                    String cookie = spu.getString(MyApplication.getmContext().getString(R.string.qdCookie), "");
                     if (cookie.equals("")) {
                         requestBuilder.addHeader("cookie", "_csrfToken=eXRDlZxmRDLvFAmdgzqvwWAASrxxp2WkVlH4ZM7e; newstatisticUUID=1595991935_2026387981");
-                    }else {
+                    } else {
                         requestBuilder.addHeader("cookie", cookie);
                     }
                 }

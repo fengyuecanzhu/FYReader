@@ -13,12 +13,12 @@
         android:orientation="vertical"
         android:padding="10dp" >
 
-        <ImageView
-            android:id="@+id/iv_book_img"
-            android:layout_width="80dp"
-            android:layout_height="110dp"
-            android:scaleType="fitXY"
-            app:srcCompat="@mipmap/default_cover"/>
+        <xyz.fycz.myreader.widget.CoverImageView
+                android:id="@+id/iv_book_img"
+                android:layout_width="80dp"
+                android:layout_height="110dp"
+                android:scaleType="fitXY"
+                app:srcCompat="@mipmap/default_cover" />
 
         <TextView
             android:layout_marginTop="5dp"

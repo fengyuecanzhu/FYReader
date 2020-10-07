@@ -3,6 +3,8 @@ package xyz.fycz.myreader.ui.activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
@@ -11,11 +13,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
+import com.google.android.material.textfield.TextInputLayout;
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.model.storage.BackupRestoreUi;
+import xyz.fycz.myreader.model.storage.WebDavHelp;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -23,6 +33,7 @@ import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -41,6 +52,8 @@ import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
  */
 
 public class MoreSettingActivity extends BaseActivity2 {
+    @BindView(R.id.more_setting_ll_webdav)
+    LinearLayout mLlWebdav;
     @BindView(R.id.more_setting_rl_volume)
     RelativeLayout mRlVolume;
     @BindView(R.id.more_setting_sc_volume)
@@ -83,6 +96,8 @@ public class MoreSettingActivity extends BaseActivity2 {
     RelativeLayout mRlBookstore;
     @BindView(R.id.more_setting_sc_bookstore)
     SwitchCompat mScBookstore;*/
+
+
     private Setting mSetting;
     private boolean isVolumeTurnPage;
     private int resetScreenTime;
@@ -125,7 +140,7 @@ public class MoreSettingActivity extends BaseActivity2 {
         catheCap = mSetting.getCatheGap();
         autoRefresh = mSetting.isRefreshWhenStart();
         openBookStore = mSetting.isOpenBookStore();
-        threadNum = SharedPreUtils.getInstance().getInt("threadNum", 8);
+        threadNum = SharedPreUtils.getInstance().getInt(getString(R.string.threadNum), 8);
     }
 
     @Override
@@ -147,6 +162,7 @@ public class MoreSettingActivity extends BaseActivity2 {
         mTvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
     }
 
+
     private void initSwitchStatus() {
         mScVolume.setChecked(isVolumeTurnPage);
         mScMatchChapter.setChecked(isMatchChapter);
@@ -157,6 +173,8 @@ public class MoreSettingActivity extends BaseActivity2 {
     @Override
     protected void initClick() {
         super.initClick();
+        mLlWebdav.setOnClickListener(v -> startActivity(WebDavSettingActivity.class));
+
         mRlVolume.setOnClickListener(
                 (v) -> {
                     if (isVolumeTurnPage) {
@@ -257,7 +275,7 @@ public class MoreSettingActivity extends BaseActivity2 {
                             }
                         }
                         if (sb.lastIndexOf(",") >= 0) sb.deleteCharAt(sb.lastIndexOf(","));
-                        spu.putString("searchSource", sb.toString());
+                        spu.putString(getString(R.string.searchSource), sb.toString());
                     }, null, new DialogCreator.OnMultiDialogListener() {
                         @Override
                         public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
@@ -287,7 +305,7 @@ public class MoreSettingActivity extends BaseActivity2 {
                     .setView(view)
                     .setPositiveButton("确定", (dialog, which) -> {
                         threadNum = threadPick.getValue();
-                        SharedPreUtils.getInstance().putInt("threadNum", threadNum);
+                        SharedPreUtils.getInstance().putInt(getString(R.string.threadNum), threadNum);
                         mTvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
                     }).setNegativeButton("取消", null)
                     .show();
@@ -371,7 +389,7 @@ public class MoreSettingActivity extends BaseActivity2 {
                 String eCatheFileSize;
                 if (eCatheFile.exists() && eCatheFile.isDirectory()) {
                     eCatheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(eCatheFile));
-                }else {
+                } else {
                     eCatheFileSize = "0";
                 }
                 CharSequence[] cathes = {"章节缓存：" + eCatheFileSize, "图片缓存：" + catheFileSize};
@@ -396,6 +414,7 @@ public class MoreSettingActivity extends BaseActivity2 {
         });
 
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -533,4 +552,6 @@ public class MoreSettingActivity extends BaseActivity2 {
             mBooksName[i] = book.getName();
         }
     }
+
+
 }

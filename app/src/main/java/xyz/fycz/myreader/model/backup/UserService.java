@@ -1,6 +1,9 @@
 package xyz.fycz.myreader.model.backup;
 
+import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.model.storage.Backup;
+import xyz.fycz.myreader.model.storage.Restore;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
@@ -190,68 +193,80 @@ public class UserService {
      * 网络备份
      * @return
      */
-    public static boolean webBackup(){
+    public static void webBackup(ResultCallback rc){
         Map<String,String> userInfo = readConfig();
         if (userInfo == null){
-            return false;
+            rc.onFinish(false, 0);
         }
-        BackupAndRestore bar = new BackupAndRestore();
-        bar.backup("webBackup");
-        File inputFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup");
-        if (!inputFile.exists()) {
-            return false;
-        }
-        File zipFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup.zip");
-        FileInputStream fis = null;
-        HttpURLConnection conn = null;
-        try {
-            //压缩文件
-            ZipUtils.zipFile(inputFile, zipFile);
-            fis = new FileInputStream(zipFile);
-            URL url = new URL(URLCONST.APP_WEB_URL + "bak?username=" + userInfo.get("userName") +
-                    makeSignalParam());
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-type", "multipart/form-data");
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-            OutputStream out = conn.getOutputStream();
-            byte[] bytes = new byte[1024];
-            int len = -1;
-            while ((len = fis.read(bytes)) != -1){
-                out.write(bytes, 0, len);
+        Backup.INSTANCE.backup(MyApplication.getmContext(), APPCONST.FILE_DIR + "webBackup/", new Backup.CallBack() {
+            @Override
+            public void backupSuccess() {
+                MyApplication.getApplication().newThread(() ->{
+                    File inputFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup");
+                    if (!inputFile.exists()) {
+                        rc.onFinish(false, 0);
+                    }
+                    File zipFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup.zip");
+                    FileInputStream fis = null;
+                    HttpURLConnection conn = null;
+                    try {
+                        //压缩文件
+                        ZipUtils.zipFile(inputFile, zipFile);
+                        fis = new FileInputStream(zipFile);
+                        URL url = new URL(URLCONST.APP_WEB_URL + "bak?username=" + userInfo.get("userName") +
+                                makeSignalParam());
+                        conn = (HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("POST");
+                        conn.setRequestProperty("Content-type", "multipart/form-data");
+                        conn.setDoInput(true);
+                        conn.setDoOutput(true);
+                        OutputStream out = conn.getOutputStream();
+                        byte[] bytes = new byte[1024];
+                        int len = -1;
+                        while ((len = fis.read(bytes)) != -1){
+                            out.write(bytes, 0, len);
+                        }
+                        out.flush();
+                        zipFile.delete();
+                        BufferedReader bw = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+                        StringBuilder sb = new StringBuilder();
+                        String line = bw.readLine();
+                        while (line != null) {
+                            sb.append(line);
+                            line = bw.readLine();
+                        }
+                        String[] info = sb.toString().split(":");
+                        int code = Integer.parseInt(info[0].trim());
+                        rc.onFinish(code == 104, 0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        rc.onError(e);
+                    } finally {
+                        IOUtils.close(fis);
+                        if (conn != null) {
+                            conn.disconnect();
+                        }
+                    }
+                });
             }
-            out.flush();
-            zipFile.delete();
-            BufferedReader bw = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
-            StringBuilder sb = new StringBuilder();
-            String line = bw.readLine();
-            while (line != null) {
-                sb.append(line);
-                line = bw.readLine();
+
+            @Override
+            public void backupError(@NonNull String msg) {
+                ToastUtils.showError(msg);
+                rc.onFinish(false, 0);
             }
-            String[] info = sb.toString().split(":");
-            int code = Integer.parseInt(info[0].trim());
-            return code == 104;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            IOUtils.close(fis);
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
+        }, false);
+
     }
 
     /**
      * 网络恢复
      * @return
      */
-    public static boolean webRestore(){
+    public static void webRestore(ResultCallback rc){
         Map<String,String> userInfo = readConfig();
         if (userInfo == null){
-            return false;
+            rc.onFinish(false, 0);
         }
         FileOutputStream fos = null;
         File zipFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup.zip");
@@ -274,16 +289,25 @@ public class UserService {
             fos.flush();
             if (zipFile.length() == 0){
                 zipFile.delete();
-                return false;
+                rc.onFinish(false, 0);
             }
             ZipUtils.unzipFile(zipFile.getAbsolutePath(), APPCONST.FILE_DIR);
-            BackupAndRestore bar = new BackupAndRestore();
-            bar.restore("webBackup");
-            zipFile.delete();
-            return true;
+            Restore.INSTANCE.restore(APPCONST.FILE_DIR + "webBackup/", new Restore.CallBack() {
+                @Override
+                public void restoreSuccess() {
+                    zipFile.delete();
+                    rc.onFinish(true, 0);
+                }
+
+                @Override
+                public void restoreError(@NonNull String msg) {
+                    ToastUtils.showError(msg);
+                    rc.onFinish(false, 0);
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            rc.onError(e);
         }finally {
             IOUtils.close(fos);
             if (conn != null) {

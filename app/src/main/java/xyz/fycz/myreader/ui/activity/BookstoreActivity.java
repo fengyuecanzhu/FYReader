@@ -204,11 +204,11 @@ public class BookstoreActivity extends BaseActivity2 {
         getData();
         if (findCrawler.hasImg()) {
             SharedPreUtils spu = SharedPreUtils.getInstance();
-            boolean isReadTopTip = spu.getBoolean("isReadTopTip", false);
+            boolean isReadTopTip = spu.getBoolean(getString(R.string.isReadTopTip), false);
             if (!isReadTopTip) {
                 DialogCreator.createCommonDialog(this, "提示", getResources().getString(R.string.top_sort_tip, title),
                         true, "知道了", "不再提示", null,
-                        (dialog, which) -> spu.putBoolean("isReadTopTip", true));
+                        (dialog, which) -> spu.putBoolean(getString(R.string.isReadTopTip), true));
             }
         }
     }
@@ -219,11 +219,11 @@ public class BookstoreActivity extends BaseActivity2 {
     private void getData() {
         if (findCrawler instanceof QiDianMobileRank) {
             SharedPreUtils spu = SharedPreUtils.getInstance();
-            if (spu.getString("qdCookie", "").equals("")) {
+            if (spu.getString(getString(R.string.qdCookie), "").equals("")) {
                 ((QiDianMobileRank) findCrawler).initCookie(this, new ResultCallback() {
                     @Override
                     public void onFinish(Object o, int code) {
-                        spu.putString("qdCookie", (String) o);
+                        spu.putString(getString(R.string.qdCookie), (String) o);
                         mBookTypes = ((QiDianMobileRank) findCrawler).getRankTypes();
                         curType = mBookTypes.get(0);
                         mHandler.sendMessage(mHandler.obtainMessage(1));

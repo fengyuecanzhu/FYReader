@@ -70,13 +70,7 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
         if (StringHelper.isEmpty(book.getImgUrl())) {
             book.setImgUrl("");
         }
-        Glide.with(mContext)
-                .load(book.getImgUrl())
-                .error(R.mipmap.no_image)
-                .placeholder(R.mipmap.no_image)
-                //设置圆角
-                .apply(RequestOptions.bitmapTransform(new RoundedCorners(8)))
-                .into(viewHolder.ivBookImg);
+        viewHolder.ivBookImg.load(book.getImgUrl(), book.getName(),book.getAuthor());
 
         viewHolder.tvBookName.setText(book.getName());
 

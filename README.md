@@ -8,9 +8,11 @@
     
     发现界面：排行榜、分类、书城
     
-    详细功能可查看图片或下载自行体验
+    详细功能可查看图片或下载自行体验或自行编译
     
 demo下载：https://fycz.lanzoui.com/iBofFh42pxg
+
+如有问题请加QQ群：1085028304
 
 ![Image](https://github.com/fengyuecanzhu/FYReader/tree/master/img/1.png)
 ![Image](https://github.com/fengyuecanzhu/FYReader/tree/master/img/2.png)

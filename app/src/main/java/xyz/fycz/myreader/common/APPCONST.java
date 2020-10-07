@@ -84,4 +84,7 @@ public class APPCONST {
     public static final String FORMAT_FILE_DATE = "yyyy-MM-dd";
 
     public final static String channelIdDownload = "channel_download";
+
+    public static final String DEFAULT_WEB_DAV_URL = "https://dav.jianguoyun.com/dav/";
+
 }

@@ -18,6 +18,9 @@ import xyz.fycz.myreader.model.backup.BackupAndRestore;
 import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.model.storage.Backup;
+import xyz.fycz.myreader.model.storage.Restore;
+import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.entity.Setting;
@@ -29,6 +32,7 @@ import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -150,15 +154,15 @@ public class MineFragment extends BaseFragment {
             AlertDialog bookDialog = MyAlertDialog.build(getContext())
                     .setTitle(getContext().getResources().getString(R.string.menu_bookcase_backup))
                     .setItems(backupMenu, (dialog, which) -> {
-                                switch (which) {
-                                    case 0:
-                                        mHandler.sendMessage(mHandler.obtainMessage(2));
-                                        break;
-                                    case 1:
-                                        mHandler.sendMessage(mHandler.obtainMessage(3));
-                                        break;
-                                }
-                            })
+                        switch (which) {
+                            case 0:
+                                mHandler.sendMessage(mHandler.obtainMessage(2));
+                                break;
+                            case 1:
+                                mHandler.sendMessage(mHandler.obtainMessage(3));
+                                break;
+                        }
+                    })
                     .setNegativeButton(null, null)
                     .setPositiveButton(null, null)
                     .create();
@@ -224,15 +228,15 @@ public class MineFragment extends BaseFragment {
                                 themeMode = which;
                                 switch (which) {
                                     case 0:
-                                        SharedPreUtils.getInstance().putBoolean("isNightFS", true);
+                                        SharedPreUtils.getInstance().putBoolean(getString(R.string.isNightFS), true);
                                         break;
                                     case 1:
-                                        SharedPreUtils.getInstance().putBoolean("isNightFS", false);
+                                        SharedPreUtils.getInstance().putBoolean(getString(R.string.isNightFS), false);
                                         mSetting.setDayStyle(true);
                                         SysManager.saveSetting(mSetting);
                                         break;
                                     case 2:
-                                        SharedPreUtils.getInstance().putBoolean("isNightFS", false);
+                                        SharedPreUtils.getInstance().putBoolean(getString(R.string.isNightFS), false);
                                         mSetting.setDayStyle(false);
                                         SysManager.saveSetting(mSetting);
                                         break;
@@ -255,7 +259,7 @@ public class MineFragment extends BaseFragment {
         mRlFeedback.setOnClickListener(v -> {
             DialogCreator.createCommonDialog(getContext(), "问题反馈", "请加入QQ群(1085028304)反馈问题!", true,
                     "加入QQ群", "取消", (dialog, which) -> {
-                        if (!MyApplication.joinQQGroup(getContext(),"8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")){
+                        if (!MyApplication.joinQQGroup(getContext(), "8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")) {
                             ClipboardManager mClipboardManager = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                             //数据
                             ClipData mClipData = ClipData.newPlainText("Label", "1085028304");
@@ -285,11 +289,22 @@ public class MineFragment extends BaseFragment {
         DialogCreator.createCommonDialog(getContext(), "确认备份吗?", "新备份会替换原有备份！", true,
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
-                    if (mBackupAndRestore.backup("localBackup")) {
+                    /*if (mBackupAndRestore.backup("localBackup")) {
                         DialogCreator.createTipDialog(getContext(), "备份成功，备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
                     } else {
                         DialogCreator.createTipDialog(getContext(), "未给予储存权限，备份失败！");
-                    }
+                    }*/
+                    Backup.INSTANCE.backup(MyApplication.getmContext(), APPCONST.BACKUP_FILE_DIR, new Backup.CallBack() {
+                        @Override
+                        public void backupSuccess() {
+                            DialogCreator.createTipDialog(getContext(), "备份成功，备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
+                        }
+
+                        @Override
+                        public void backupError(@io.reactivex.annotations.NonNull String msg) {
+                            DialogCreator.createTipDialog(getContext(), "未给予储存权限，备份失败！");
+                        }
+                    }, false);
                 }, (dialogInterface, i) -> dialogInterface.dismiss());
     }
 
@@ -300,7 +315,7 @@ public class MineFragment extends BaseFragment {
         DialogCreator.createCommonDialog(getContext(), "确认恢复吗?", "恢复书架会覆盖原有书架！", true,
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
-                    if (mBackupAndRestore.restore("localBackup")) {
+                    /*if (mBackupAndRestore.restore("localBackup")) {
                         mHandler.sendMessage(mHandler.obtainMessage(7));
 //                            DialogCreator.createTipDialog(mMainActivity,
 //                                    "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");
@@ -308,7 +323,22 @@ public class MineFragment extends BaseFragment {
                         ToastUtils.showSuccess("书架恢复成功！");
                     } else {
                         DialogCreator.createTipDialog(getContext(), "未找到备份文件或未给予储存权限，恢复失败！");
-                    }
+                    }*/
+                    Restore.INSTANCE.restore(APPCONST.BACKUP_FILE_DIR, new Restore.CallBack() {
+                        @Override
+                        public void restoreSuccess() {
+                            mHandler.sendMessage(mHandler.obtainMessage(7));
+//                            DialogCreator.createTipDialog(mMainActivity,
+//                                    "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");
+                            mSetting = SysManager.getSetting();
+                            ToastUtils.showSuccess("书架恢复成功！");
+                        }
+
+                        @Override
+                        public void restoreError(@io.reactivex.annotations.NonNull String msg) {
+                            DialogCreator.createTipDialog(getContext(), "未找到备份文件或未给予储存权限，恢复失败！");
+                        }
+                    });
                 }, (dialogInterface, i) -> dialogInterface.dismiss());
     }
 
@@ -333,17 +363,27 @@ public class MineFragment extends BaseFragment {
         SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
         String nowTimeStr = sdf.format(nowTime);
         SharedPreUtils spb = SharedPreUtils.getInstance();
-        String synTime = spb.getString("synTime");
+        String synTime = spb.getString(getString(R.string.synTime));
         if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
-            MyApplication.getApplication().newThread(() -> {
-                if (UserService.webBackup()) {
-                    spb.putString("synTime", nowTimeStr);
-                    if (!isAutoSyn) {
-                        DialogCreator.createTipDialog(getContext(), "成功将书架同步至网络！");
+            UserService.webBackup(new ResultCallback() {
+                @Override
+                public void onFinish(Object o, int code) {
+                    if ((boolean) o) {
+                        spb.putString(getString(R.string.synTime), nowTimeStr);
+                        if (!isAutoSyn) {
+                            DialogCreator.createTipDialog(getContext(), "成功将书架同步至网络！");
+                        }
+                    } else {
+                        if (!isAutoSyn) {
+                            DialogCreator.createTipDialog(getContext(), "同步失败，请重试！");
+                        }
                     }
-                } else {
+                }
+
+                @Override
+                public void onError(Exception e) {
                     if (!isAutoSyn) {
-                        DialogCreator.createTipDialog(getContext(), "同步失败，请重试！");
+                        DialogCreator.createTipDialog(getContext(), "同步失败，请重试！\n" + e.getLocalizedMessage());
                     }
                 }
             });
@@ -362,7 +402,7 @@ public class MineFragment extends BaseFragment {
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
                     MyApplication.getApplication().newThread(() -> {
-                        if (UserService.webRestore()) {
+                        /*if (UserService.webRestore()) {
                             mHandler.sendMessage(mHandler.obtainMessage(7));
 //                                    DialogCreator.createTipDialog(mMainActivity,
 //                                            "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");、
@@ -370,7 +410,26 @@ public class MineFragment extends BaseFragment {
                             ToastUtils.showSuccess("成功将书架从网络同步至本地！");
                         } else {
                             DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！");
-                        }
+                        }*/
+                        UserService.webRestore(new ResultCallback() {
+                            @Override
+                            public void onFinish(Object o, int code) {
+                                if ((boolean) o) {
+                                    mHandler.sendMessage(mHandler.obtainMessage(7));
+//                                    DialogCreator.createTipDialog(mMainActivity,
+//                                            "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");、
+                                    mSetting = SysManager.getSetting();
+                                    ToastUtils.showSuccess("成功将书架从网络同步至本地！");
+                                } else {
+                                    DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！");
+                                }
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！\n" + e.getLocalizedMessage());
+                            }
+                        });
                     });
                 }, (dialogInterface, i) -> dialogInterface.dismiss());
     }

@@ -336,7 +336,7 @@ public class BookcasePresenter implements BasePresenter {
     //初始化书籍
     private void initBook() {
         mBooks.clear();
-        String curBookGroupId = SharedPreUtils.getInstance().getString("curBookGroupId", "");
+        String curBookGroupId = SharedPreUtils.getInstance().getString(mMainActivity.getString(R.string.curBookGroupId), "");
         isGroup = !"".equals(curBookGroupId);
         if (mBookcaseAdapter != null) {
             mBookcaseAdapter.setGroup(isGroup);
@@ -481,12 +481,12 @@ public class BookcasePresenter implements BasePresenter {
                 mMainActivity.startActivity(fileSystemIntent);
                 break;
             case R.id.action_download_all:
-                if (!SharedPreUtils.getInstance().getBoolean("isReadDownloadAllTip")) {
+                if (!SharedPreUtils.getInstance().getBoolean(mMainActivity.getString(R.string.isReadDownloadAllTip), false)) {
                     DialogCreator.createCommonDialog(mMainActivity, "一键缓存",
                             mMainActivity.getString(R.string.all_cathe_tip), true,
                             (dialog, which) -> {
                                 downloadAll(true);
-                                SharedPreUtils.getInstance().putBoolean("isReadDownloadAllTip", true);
+                                SharedPreUtils.getInstance().putBoolean(mMainActivity.getString(R.string.isReadDownloadAllTip), true);
                             }, null);
                 } else {
                     downloadAll(true);
@@ -515,8 +515,8 @@ public class BookcasePresenter implements BasePresenter {
                 curBookGroupId = mBookGroups.get(menuItem.getOrder() - 1).getId();
                 curBookGroupName = mBookGroups.get(menuItem.getOrder() - 1).getName();
             }
-            SharedPreUtils.getInstance().putString("curBookGroupId", curBookGroupId);
-            SharedPreUtils.getInstance().putString("curBookGroupName", curBookGroupName);
+            SharedPreUtils.getInstance().putString(mMainActivity.getString(R.string.curBookGroupId), curBookGroupId);
+            SharedPreUtils.getInstance().putString(mMainActivity.getString(R.string.curBookGroupName), curBookGroupName);
             ogcl.onChange();
             init();
             return true;
@@ -587,6 +587,7 @@ public class BookcasePresenter implements BasePresenter {
     private void showAddOrRenameGroupDia(boolean isRename, boolean isAddGroup, int groupNum){
         View view = LayoutInflater.from(mMainActivity).inflate(R.layout.edit_dialog, null);
         TextInputLayout textInputLayout = view.findViewById(R.id.text_input_lay);
+        textInputLayout.setCounterMaxLength(10);
         EditText editText = textInputLayout.getEditText();
         editText.setHint("请输入分组名");
         BookGroup bookGroup = !isRename ? new BookGroup() : mBookGroups.get(groupNum);
@@ -622,8 +623,8 @@ public class BookcasePresenter implements BasePresenter {
             }else {
                 mBookGroupService.updateEntity(bookGroup);
                 SharedPreUtils spu = SharedPreUtils.getInstance();
-                if (spu.getString("curBookGroupName", "").equals(oldName)){
-                    spu.putString("curBookGroupName", newGroupName.toString());
+                if (spu.getString(mMainActivity.getString(R.string.curBookGroupName), "").equals(oldName)){
+                    spu.putString(mMainActivity.getString(R.string.curBookGroupName), newGroupName.toString());
                     ogcl.onChange();
                 }
             }
@@ -677,9 +678,9 @@ public class BookcasePresenter implements BasePresenter {
                         sb.deleteCharAt(sb.lastIndexOf("、"));
                     }
                     SharedPreUtils spu = SharedPreUtils.getInstance();
-                    if (mBookGroupService.getGroupById(spu.getString("curBookGroupId", "")) == null){
-                        spu.putString("curBookGroupId", "");
-                        spu.putString("curBookGroupName", "");
+                    if (mBookGroupService.getGroupById(spu.getString(mMainActivity.getString(R.string.curBookGroupId), "")) == null){
+                        spu.putString(mMainActivity.getString(R.string.curBookGroupId), "");
+                        spu.putString(mMainActivity.getString(R.string.curBookGroupName), "");
                         ogcl.onChange();
                         init();
                     }
@@ -959,20 +960,30 @@ public class BookcasePresenter implements BasePresenter {
         SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
         String nowTimeStr = sdf.format(nowTime);
         SharedPreUtils spb = SharedPreUtils.getInstance();
-        String synTime = spb.getString("synTime");
+        String synTime = spb.getString(mMainActivity.getString(R.string.synTime));
         if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
-            MyApplication.getApplication().newThread(() -> {
-                if (UserService.webBackup()) {
-                    spb.putString("synTime", nowTimeStr);
-                    if (!isAutoSyn) {
-                        DialogCreator.createTipDialog(mMainActivity, "成功将书架同步至网络！");
+                UserService.webBackup(new ResultCallback() {
+                    @Override
+                    public void onFinish(Object o, int code) {
+                        if ((boolean) o){
+                            spb.putString(mMainActivity.getString(R.string.synTime), nowTimeStr);
+                            if (!isAutoSyn) {
+                                DialogCreator.createTipDialog(mMainActivity, "成功将书架同步至网络！");
+                            }
+                        }else {
+                            if (!isAutoSyn) {
+                                DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！");
+                            }
+                        }
                     }
-                } else {
-                    if (!isAutoSyn) {
-                        DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！");
+
+                    @Override
+                    public void onError(Exception e) {
+                        if (!isAutoSyn) {
+                            DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！\n" + e.getLocalizedMessage());
+                        }
                     }
-                }
-            });
+                });
         }
     }
 

@@ -2,7 +2,10 @@ package xyz.fycz.myreader.widget.page;
 
 import android.util.Log;
 import io.reactivex.*;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
@@ -82,178 +85,197 @@ public class LocalPageLoader extends PageLoader {
      * 1. 序章的添加
      * 2. 章节存在的书本的虚拟分章效果
      */
-    public void loadChapters(final ResultCallback resultCallback) {
-        MyApplication.getApplication().newThread(() -> {
-            mBookFile = new File(mCollBook.getChapterUrl());
-            //获取文件编码
-            mCharset = FileUtils.getFileEncode(mBookFile.getAbsolutePath());
-            List<TxtChapter> chapters = new ArrayList<>();
-            RandomAccessFile bookStream = null;
-            boolean hasChapter = false;
-            try {
-                //获取文件流
-                bookStream = new RandomAccessFile(mBookFile, "r");
-                //寻找匹配文章标题的正则表达式，判断是否存在章节名
-                hasChapter = checkChapterType(bookStream);
-                //加载章节
-                byte[] buffer = new byte[BUFFER_SIZE];
-                //获取到的块起始点，在文件中的位置
-                long curOffset = 0;
-                //block的个数
-                int blockPos = 0;
-                //读取的长度
-                int length;
+    public List<TxtChapter> loadChapters() throws IOException {
+        mBookFile = new File(mCollBook.getChapterUrl());
+        //获取文件编码
+        mCharset = FileUtils.getFileEncode(mBookFile.getAbsolutePath());
+        List<TxtChapter> chapters = new ArrayList<>();
+        RandomAccessFile bookStream = null;
+        boolean hasChapter = false;
+        //获取文件流
+        bookStream = new RandomAccessFile(mBookFile, "r");
+        //寻找匹配文章标题的正则表达式，判断是否存在章节名
+        hasChapter = checkChapterType(bookStream);
+        //加载章节
+        byte[] buffer = new byte[BUFFER_SIZE];
+        //获取到的块起始点，在文件中的位置
+        long curOffset = 0;
+        //block的个数
+        int blockPos = 0;
+        //读取的长度
+        int length;
 
-                //获取文件中的数据到buffer，直到没有数据为止
-                while ((length = bookStream.read(buffer, 0, buffer.length)) > 0) {
-                    ++blockPos;
-                    //如果存在Chapter
-                    if (hasChapter) {
-                        //将数据转换成String
-                        String blockContent = new String(buffer, 0, length, mCharset);
-                        //当前Block下使过的String的指针
-                        int seekPos = 0;
-                        //进行正则匹配
-                        Matcher matcher = mChapterPattern.matcher(blockContent);
-                        //如果存在相应章节
-                        while (matcher.find()) {
-                            //获取匹配到的字符在字符串中的起始位置
-                            int chapterStart = matcher.start();
+        //获取文件中的数据到buffer，直到没有数据为止
+        while ((length = bookStream.read(buffer, 0, buffer.length)) > 0) {
+            ++blockPos;
+            //如果存在Chapter
+            if (hasChapter) {
+                //将数据转换成String
+                String blockContent = new String(buffer, 0, length, mCharset);
+                //当前Block下使过的String的指针
+                int seekPos = 0;
+                //进行正则匹配
+                Matcher matcher = mChapterPattern.matcher(blockContent);
+                //如果存在相应章节
+                while (matcher.find()) {
+                    //获取匹配到的字符在字符串中的起始位置
+                    int chapterStart = matcher.start();
 
-                            //如果 seekPos == 0 && nextChapterPos != 0 表示当前block处前面有一段内容
-                            //第一种情况一定是序章 第二种情况可能是上一个章节的内容
-                            if (seekPos == 0 && chapterStart != 0) {
-                                //获取当前章节的内容
-                                String chapterContent = blockContent.substring(seekPos, chapterStart);
-                                //设置指针偏移
-                                seekPos += chapterContent.length();
+                    //如果 seekPos == 0 && nextChapterPos != 0 表示当前block处前面有一段内容
+                    //第一种情况一定是序章 第二种情况可能是上一个章节的内容
+                    if (seekPos == 0 && chapterStart != 0) {
+                        //获取当前章节的内容
+                        String chapterContent = blockContent.substring(seekPos, chapterStart);
+                        //设置指针偏移
+                        seekPos += chapterContent.length();
 
-                                //如果当前对整个文件的偏移位置为0的话，那么就是序章
-                                if (curOffset == 0) {
-                                    //创建序章
-                                    TxtChapter preChapter = new TxtChapter();
-                                    preChapter.title = "序章";
-                                    preChapter.start = 0;
-                                    preChapter.end = chapterContent.getBytes(mCharset).length; //获取String的byte值,作为最终值
+                        //如果当前对整个文件的偏移位置为0的话，那么就是序章
+                        if (curOffset == 0) {
+                            //创建序章
+                            TxtChapter preChapter = new TxtChapter();
+                            preChapter.title = "序章";
+                            preChapter.start = 0;
+                            preChapter.end = chapterContent.getBytes(mCharset).length; //获取String的byte值,作为最终值
 
-                                    //如果序章大小大于30才添加进去
-                                    if (preChapter.end - preChapter.start > 30) {
-                                        chapters.add(preChapter);
-                                    }
-
-                                    //创建当前章节
-                                    TxtChapter curChapter = new TxtChapter();
-                                    curChapter.title = matcher.group();
-                                    curChapter.start = preChapter.end;
-                                    chapters.add(curChapter);
-                                }
-                                //否则就block分割之后，上一个章节的剩余内容
-                                else {
-                                    //获取上一章节
-                                    TxtChapter lastChapter = chapters.get(chapters.size() - 1);
-                                    //将当前段落添加上一章去
-                                    lastChapter.end += chapterContent.getBytes(mCharset).length;
-
-                                    //如果章节内容太小，则移除
-                                    if (lastChapter.end - lastChapter.start < 30) {
-                                        chapters.remove(lastChapter);
-                                    }
-
-                                    //创建当前章节
-                                    TxtChapter curChapter = new TxtChapter();
-                                    curChapter.title = matcher.group();
-                                    curChapter.start = lastChapter.end;
-                                    chapters.add(curChapter);
-                                }
-                            } else {
-                                //是否存在章节
-                                if (chapters.size() != 0) {
-                                    //获取章节内容
-                                    String chapterContent = blockContent.substring(seekPos, matcher.start());
-                                    seekPos += chapterContent.length();
-
-                                    //获取上一章节
-                                    TxtChapter lastChapter = chapters.get(chapters.size() - 1);
-                                    lastChapter.end = lastChapter.start + chapterContent.getBytes(mCharset).length;
-
-                                    //如果章节内容太小，则移除
-                                    if (lastChapter.end - lastChapter.start < 30) {
-                                        chapters.remove(lastChapter);
-                                    }
-
-                                    //创建当前章节
-                                    TxtChapter curChapter = new TxtChapter();
-                                    curChapter.title = matcher.group();
-                                    curChapter.start = lastChapter.end;
-                                    chapters.add(curChapter);
-                                }
-                                //如果章节不存在则创建章节
-                                else {
-                                    TxtChapter curChapter = new TxtChapter();
-                                    curChapter.title = matcher.group();
-                                    curChapter.start = 0;
-                                    chapters.add(curChapter);
-                                }
+                            //如果序章大小大于30才添加进去
+                            if (preChapter.end - preChapter.start > 30) {
+                                chapters.add(preChapter);
                             }
-                        }
-                    }
-                    //进行本地虚拟分章
-                    else {
-                        //章节在buffer的偏移量
-                        int chapterOffset = 0;
-                        //当前剩余可分配的长度
-                        int strLength = length;
-                        //分章的位置
-                        int chapterPos = 0;
 
-                        while (strLength > 0) {
-                            ++chapterPos;
-                            //是否长度超过一章
-                            if (strLength > MAX_LENGTH_WITH_NO_CHAPTER) {
-                                //在buffer中一章的终止点
-                                int end = length;
-                                //寻找换行符作为终止点
-                                for (int i = chapterOffset + MAX_LENGTH_WITH_NO_CHAPTER; i < length; ++i) {
-                                    if (buffer[i] == Charset.BLANK) {
-                                        end = i;
-                                        break;
-                                    }
-                                }
-                                TxtChapter chapter = new TxtChapter();
-                                chapter.title = "第" + blockPos + "章" + "(" + chapterPos + ")";
-                                chapter.start = curOffset + chapterOffset + 1;
-                                chapter.end = curOffset + end;
-                                chapters.add(chapter);
-                                //减去已经被分配的长度
-                                strLength = strLength - (end - chapterOffset);
-                                //设置偏移的位置
-                                chapterOffset = end;
-                            } else {
-                                TxtChapter chapter = new TxtChapter();
-                                chapter.title = "第" + blockPos + "章" + "(" + chapterPos + ")";
-                                chapter.start = curOffset + chapterOffset + 1;
-                                chapter.end = curOffset + length;
-                                chapters.add(chapter);
-                                strLength = 0;
+                            //创建当前章节
+                            TxtChapter curChapter = new TxtChapter();
+                            curChapter.title = matcher.group();
+                            curChapter.start = preChapter.end;
+                            chapters.add(curChapter);
+                        }
+                        //否则就block分割之后，上一个章节的剩余内容
+                        else {
+                            //获取上一章节
+                            TxtChapter lastChapter = chapters.get(chapters.size() - 1);
+                            //将当前段落添加上一章去
+                            lastChapter.end += chapterContent.getBytes(mCharset).length;
+
+                            //如果章节内容太小，则移除
+                            if (lastChapter.end - lastChapter.start < 30) {
+                                chapters.remove(lastChapter);
                             }
+
+                            //创建当前章节
+                            TxtChapter curChapter = new TxtChapter();
+                            curChapter.title = matcher.group();
+                            curChapter.start = lastChapter.end;
+                            chapters.add(curChapter);
                         }
-                    }
+                    } else {
+                        //是否存在章节
+                        if (chapters.size() != 0) {
+                            //获取章节内容
+                            String chapterContent = blockContent.substring(seekPos, matcher.start());
+                            seekPos += chapterContent.length();
 
-                    //block的偏移点
-                    curOffset += length;
+                            //获取上一章节
+                            TxtChapter lastChapter = chapters.get(chapters.size() - 1);
+                            lastChapter.end = lastChapter.start + chapterContent.getBytes(mCharset).length;
 
-                    if (hasChapter) {
-                        //设置上一章的结尾
-                        TxtChapter lastChapter = chapters.get(chapters.size() - 1);
-                        lastChapter.end = curOffset;
-                    }
+                            //如果章节内容太小，则移除
+                            if (lastChapter.end - lastChapter.start < 30) {
+                                chapters.remove(lastChapter);
+                            }
 
-                    //当添加的block太多的时候，执行GC
-                    if (blockPos % 15 == 0) {
-                        System.gc();
-                        System.runFinalization();
+                            //创建当前章节
+                            TxtChapter curChapter = new TxtChapter();
+                            curChapter.title = matcher.group();
+                            curChapter.start = lastChapter.end;
+                            chapters.add(curChapter);
+                        }
+                        //如果章节不存在则创建章节
+                        else {
+                            TxtChapter curChapter = new TxtChapter();
+                            curChapter.title = matcher.group();
+                            curChapter.start = 0;
+                            chapters.add(curChapter);
+                        }
                     }
                 }
+            }
+            //进行本地虚拟分章
+            else {
+                //章节在buffer的偏移量
+                int chapterOffset = 0;
+                //当前剩余可分配的长度
+                int strLength = length;
+                //分章的位置
+                int chapterPos = 0;
+
+                while (strLength > 0) {
+                    ++chapterPos;
+                    //是否长度超过一章
+                    if (strLength > MAX_LENGTH_WITH_NO_CHAPTER) {
+                        //在buffer中一章的终止点
+                        int end = length;
+                        //寻找换行符作为终止点
+                        for (int i = chapterOffset + MAX_LENGTH_WITH_NO_CHAPTER; i < length; ++i) {
+                            if (buffer[i] == Charset.BLANK) {
+                                end = i;
+                                break;
+                            }
+                        }
+                        TxtChapter chapter = new TxtChapter();
+                        chapter.title = "第" + blockPos + "章" + "(" + chapterPos + ")";
+                        chapter.start = curOffset + chapterOffset + 1;
+                        chapter.end = curOffset + end;
+                        chapters.add(chapter);
+                        //减去已经被分配的长度
+                        strLength = strLength - (end - chapterOffset);
+                        //设置偏移的位置
+                        chapterOffset = end;
+                    } else {
+                        TxtChapter chapter = new TxtChapter();
+                        chapter.title = "第" + blockPos + "章" + "(" + chapterPos + ")";
+                        chapter.start = curOffset + chapterOffset + 1;
+                        chapter.end = curOffset + length;
+                        chapters.add(chapter);
+                        strLength = 0;
+                    }
+                }
+            }
+
+            //block的偏移点
+            curOffset += length;
+
+            if (hasChapter) {
+                //设置上一章的结尾
+                TxtChapter lastChapter = chapters.get(chapters.size() - 1);
+                lastChapter.end = curOffset;
+            }
+
+            //当添加的block太多的时候，执行GC
+            if (blockPos % 15 == 0) {
+                System.gc();
+                System.runFinalization();
+            }
+        }
+
+        IOUtils.close(bookStream);
+        System.gc();
+        System.runFinalization();
+        return chapters;
+    }
+
+    public void loadChapters(final ResultCallback resultCallback) {
+        // 通过RxJava异步处理分章事件
+        Single.create((SingleOnSubscribe<List<TxtChapter>>) e -> {
+            e.onSuccess(loadChapters());
+        }).compose(RxUtils::toSimpleSingle).subscribe(new SingleObserver<List<TxtChapter>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                mChapterDisp = d;
+            }
+
+            @Override
+            public void onSuccess(List<TxtChapter> chapters) {
+                mChapterDisp = null;
+                isChapterListPrepare = true;
                 List<Chapter> mChapters = new ArrayList<>();
                 int i = 0;
                 for (TxtChapter txtChapter : chapters) {
@@ -272,17 +294,14 @@ public class LocalPageLoader extends PageLoader {
                 if (resultCallback != null) {
                     resultCallback.onFinish(mChapters, 1);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                if (resultCallback != null) {
-                    resultCallback.onError(e);
-                }
-            } finally {
-                IOUtils.close(bookStream);
-                System.gc();
-                System.runFinalization();
             }
 
+            @Override
+            public void onError(Throwable e) {
+                resultCallback.onError((Exception) e);
+                chapterError();
+                Log.d(TAG, "file load error:" + e.toString());
+            }
         });
 
     }
@@ -369,59 +388,6 @@ public class LocalPageLoader extends PageLoader {
 
             return;
         }
-
-        // 通过RxJava异步处理分章事件
-        Single.create((SingleOnSubscribe<Void>) e -> {
-            loadChapters(null);
-            e.onSuccess(new Void());
-        }).compose(RxUtils::toSimpleSingle).subscribe(new SingleObserver<Void>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                mChapterDisp = d;
-            }
-
-            @Override
-            public void onSuccess(Void value) {
-                mChapterDisp = null;
-                isChapterListPrepare = true;
-
-                // 提示目录加载完成
-                if (mPageChangeListener != null) {
-                    mPageChangeListener.onCategoryFinish(mChapterList);
-                }
-
-                mCollBook.setChapterTotalNum(mChapterList.size());
-
-                // 加载并显示当前章节
-                openChapter();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                chapterError();
-                Log.d(TAG, "file load error:" + e.toString());
-            }
-        });
-        /*loadChapters(new ResultCallback() {
-            @Override
-            public void onFinish(Object o, int code) {
-                isChapterListPrepare = true;
-
-                // 提示目录加载完成
-                if (mPageChangeListener != null) {
-                    mPageChangeListener.onCategoryFinish(mChapterList);
-                }
-
-                // 加载并显示当前章节
-                openChapter();
-            }
-
-            @Override
-            public void onError(Exception e) {
-                chapterError();
-                Log.d(TAG, "file load error:" + e.toString());
-            }
-        });*/
     }
 
     @Override

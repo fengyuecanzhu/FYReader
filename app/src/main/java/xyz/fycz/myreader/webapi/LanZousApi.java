@@ -2,6 +2,7 @@ package xyz.fycz.myreader.webapi;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.URLCONST;
@@ -93,7 +94,7 @@ public class LanZousApi {
         SharedPreUtils spu = SharedPreUtils.getInstance();
         String lanzousKeyStart = "var pposturl = '";
         try {
-            lanzousKeyStart = spu.getString("lanzousKeyStart");
+            lanzousKeyStart = spu.getString(MyApplication.getmContext().getString(R.string.lanzousKeyStart));
         }catch (Exception e){
             e.printStackTrace();
         }

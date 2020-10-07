@@ -16,6 +16,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
+import xyz.fycz.myreader.widget.CoverImageView;
 
 /**
  * @author fengyue
@@ -23,7 +24,7 @@ import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
  */
 public class BookStoreBookHolder extends ViewHolderImpl<Book> {
 
-    private ImageView tvBookImg;
+    private CoverImageView tvBookImg;
     private TextView tvBookName;
     private TextView tvBookAuthor;
     private TextView tvBookTime;
@@ -63,13 +64,7 @@ public class BookStoreBookHolder extends ViewHolderImpl<Book> {
         if (hasImg){
             tvBookImg.setVisibility(View.VISIBLE);
             if (!MyApplication.isDestroy(mActivity)) {
-                Glide.with(getContext())
-                        .load(data.getImgUrl())
-                        .error(R.mipmap.no_image)
-                        .placeholder(R.mipmap.no_image)
-                        //设置圆角
-                        .apply(RequestOptions.bitmapTransform(new RoundedCorners(8)))
-                        .into(tvBookImg);
+                tvBookImg.load(data.getImgUrl(), data.getName(), data.getAuthor());
             }
         }
         if (data.getSource() != null) {

@@ -76,7 +76,7 @@ public class MainActivity extends BaseActivity2 {
     @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
-        groupName = SharedPreUtils.getInstance().getString("curBookGroupName", "");
+        groupName = SharedPreUtils.getInstance().getString(getString(R.string.curBookGroupName), "");
         titles = new String[]{"书架", "发现", "我的"};
         mBookcaseFragment = new BookcaseFragment();
         mFindFragment = new FindFragment();
@@ -235,7 +235,7 @@ public class MainActivity extends BaseActivity2 {
             case R.id.action_change_group: case R.id.action_group_man:
                 if (!mBookcaseFragment.getmBookcasePresenter().hasOnGroupChangeListener()) {
                     mBookcaseFragment.getmBookcasePresenter().addOnGroupChangeListener(() -> {
-                        groupName = SharedPreUtils.getInstance().getString("curBookGroupName", "所有书籍");
+                        groupName = SharedPreUtils.getInstance().getString(getString(R.string.curBookGroupName), "所有书籍");
                         getSupportActionBar().setSubtitle(groupName);
                     });
                 }

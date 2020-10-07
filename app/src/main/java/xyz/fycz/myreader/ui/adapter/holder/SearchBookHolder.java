@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.ui.adapter.holder;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Handler;
 import android.util.Log;
@@ -11,6 +12,7 @@ import com.bumptech.glide.request.RequestOptions;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
+import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
@@ -21,6 +23,7 @@ import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.widget.CoverImageView;
 
 import java.util.List;
 
@@ -30,22 +33,25 @@ import java.util.List;
  */
 public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
     private ConcurrentMultiValueMap<SearchBookBean, Book> mBooks;
+    private SearchEngine searchEngine;
     private Handler mHandle = new Handler(message -> {
 
         switch (message.what) {
             case 1:
                 Book book = (Book) message.obj;
-                initOtherInfo(book);
+                int pos = message.arg1;
+                initOtherInfo(book, pos);
                 break;
         }
         return false;
     });
 
-    public SearchBookHolder(ConcurrentMultiValueMap<SearchBookBean, Book> mBooks) {
+    public SearchBookHolder(ConcurrentMultiValueMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine) {
         this.mBooks = mBooks;
+        this.searchEngine = searchEngine;
     }
 
-    ImageView ivBookImg;
+    CoverImageView ivBookImg;
     TextView tvBookName;
     TextView tvDesc;
     TextView tvAuthor;
@@ -69,6 +75,7 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
     }
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBind(SearchBookBean data, int pos) {
         List<Book> aBooks = mBooks.getValues(data);
@@ -77,56 +84,61 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
         if (StringHelper.isEmpty(book.getImgUrl())){
             book.setImgUrl("");
         }
+
+        if (!StringHelper.isEmpty(book.getDesc())) {
+            tvDesc.setText("简介:" + book.getDesc());
+        }
+        if (!StringHelper.isEmpty(book.getType())) {
+            tvType.setText(book.getType());
+        }
+        if (!StringHelper.isEmpty(book.getNewestChapterTitle())) {
+            tvNewestChapter.setText(getContext().getString(R.string.newest_chapter, book.getNewestChapterTitle()));
+        }
+        if (!StringHelper.isEmpty(book.getAuthor())) {
+            tvAuthor.setText(book.getAuthor());
+        }
         tvBookName.setText(book.getName());
-        tvAuthor.setText(book.getAuthor());
         tvSource.setText(getContext().getString(R.string.source_title_num, BookSource.fromString(book.getSource()).text, bookCount));
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(book.getSource());
         if (rc instanceof BookInfoCrawler){
             if (tvBookName.getTag() == null || !(Boolean) tvBookName.getTag()) {
                 tvBookName.setTag(true);
             } else {
-                initOtherInfo(book);
+                initOtherInfo(book, pos);
                 return;
             }
             Log.i(book.getName(), "initOtherInfo");
             BookInfoCrawler bic = (BookInfoCrawler) rc;
-            CommonApi.getBookInfo(book, bic, new ResultCallback() {
-                @Override
-                public void onFinish(Object o, int code) {
+            searchEngine.getBookInfo(book, bic, isSuccess -> {
+                if (isSuccess)
                     mHandle.sendMessage(mHandle.obtainMessage(1, pos, 0, book));
-                }
-
-                @Override
-                public void onError(Exception e) {
+                else
                     tvBookName.setTag(false);
-                }
             });
         }else {
-            initOtherInfo(book);
+            initOtherInfo(book, pos);
         }
     }
 
-    private void initOtherInfo(Book book){
+    private void initOtherInfo(Book book, int pos){
         //简介
-        if (book.getDesc() == null) {
-            tvDesc.setText("");
-        }else {
+        if (StringHelper.isEmpty(tvDesc.getText().toString())) {
             tvDesc.setText("简介:" + book.getDesc());
         }
-        tvType.setText(book.getType());
-        tvNewestChapter.setText(getContext().getString(R.string.newest_chapter, book.getNewestChapterTitle()));
-        tvAuthor.setText(book.getAuthor());
+        if (StringHelper.isEmpty(tvType.getText().toString())) {
+            tvType.setText(book.getType());
+        }
+        if (StringHelper.isEmpty(tvNewestChapter.getText().toString())) {
+            tvNewestChapter.setText(getContext().getString(R.string.newest_chapter, book.getNewestChapterTitle()));
+        }
+        if (StringHelper.isEmpty(tvAuthor.getText().toString())) {
+            tvAuthor.setText(book.getAuthor());
+        }
         //图片
         if (!MyApplication.isDestroy((Activity) getContext())) {
-            Glide.with(getContext())
-                    .load(book.getImgUrl())
-//                .override(DipPxUtil.dip2px(getContext(), 80), DipPxUtil.dip2px(getContext(), 150))
-                    .error(R.mipmap.no_image)
-                    .placeholder(R.mipmap.no_image)
-                    //设置圆角
-                    .apply(RequestOptions.bitmapTransform(new RoundedCorners(8)))
-                    .into(ivBookImg);
+            ivBookImg.load(book.getImgUrl(), book.getName(), book.getAuthor());
         }
 
     }
+
 }

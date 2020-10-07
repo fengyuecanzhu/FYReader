@@ -1,5 +1,7 @@
 package xyz.fycz.myreader.util;
 
+import xyz.fycz.myreader.util.utils.StringUtils;
+
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Random;
@@ -118,9 +120,9 @@ public class StringHelper {
 
     public static boolean isEmpty(String str){
         if (str != null){
-            str = str.replace(" ","");
+            str = StringUtils.deleteWhitespace(str);
         }
-        return str == null || str.equals("");
+        return str == null || str.equals("") || str.equals("null");
     }
 
     /**

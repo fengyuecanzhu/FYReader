@@ -19,13 +19,14 @@
         app:cardCornerRadius="0dp"
         app:cardElevation="2dp">
 
-        <ImageView
-            android:id="@+id/book_detail_iv_cover"
-            android:layout_width="82dp"
-            android:layout_height="110dp"
-            android:scaleType="centerCrop"
-            android:background="@color/colorPrimary"
-            android:src="@mipmap/no_image"/>
+
+        <xyz.fycz.myreader.widget.CoverImageView
+                android:id="@+id/book_detail_iv_cover"
+                android:layout_width="82dp"
+                android:layout_height="110dp"
+                android:scaleType="centerCrop"
+                android:background="@color/colorPrimary"
+                app:srcCompat="@mipmap/default_cover" />
 
     </androidx.cardview.widget.CardView>
 
