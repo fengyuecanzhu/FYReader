@@ -2,17 +2,17 @@
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="wrap_content" xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="horizontal"
         android:background="@color/colorBackground"
         android:padding="3dp">
 
-    <ImageView
+    <xyz.fycz.myreader.widget.CoverImageView
             android:id="@+id/iv_book_img"
             android:layout_width="42dp"
             android:layout_height="60dp"
             android:scaleType="fitXY"
-            android:src="@mipmap/no_image"
+            app:srcCompat="@mipmap/default_cover"
             android:visibility="gone"/>
 
     <LinearLayout

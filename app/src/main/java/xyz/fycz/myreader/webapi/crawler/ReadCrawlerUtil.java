@@ -1,6 +1,8 @@
 package xyz.fycz.myreader.webapi.crawler;
 
 
+import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
@@ -20,7 +22,7 @@ public class ReadCrawlerUtil {
 
     public static ArrayList<ReadCrawler> getReadCrawlers() {
         SharedPreUtils spu = SharedPreUtils.getInstance();
-        String searchSource = spu.getString("searchSource", null);
+        String searchSource = spu.getString(MyApplication.getmContext().getString(R.string.searchSource), null);
         ArrayList<ReadCrawler> readCrawlers = new ArrayList<>();
         if (searchSource == null) {
             StringBuilder sb = new StringBuilder();
@@ -33,7 +35,7 @@ public class ReadCrawlerUtil {
             }
             sb.deleteCharAt(sb.lastIndexOf(","));
             searchSource = sb.toString();
-            spu.putString("searchSource", searchSource);
+            spu.putString(MyApplication.getmContext().getString(R.string.searchSource), searchSource);
         } else if (!"".equals(searchSource)){
             String[] sources = searchSource.split(",");
             for (String source : sources) {
@@ -45,7 +47,7 @@ public class ReadCrawlerUtil {
 
     public static HashMap<CharSequence, Boolean> getDisableSources() {
         SharedPreUtils spu = SharedPreUtils.getInstance();
-        String searchSource = spu.getString("searchSource", null);
+        String searchSource = spu.getString(MyApplication.getmContext().getString(R.string.searchSource), null);
         HashMap<CharSequence, Boolean> mSources = new HashMap<>();
         if (searchSource == null) {
             for (BookSource bookSource : BookSource.values()) {
@@ -79,7 +81,7 @@ public class ReadCrawlerUtil {
             sb.append(",");
         }
         sb.deleteCharAt(sb.lastIndexOf(","));
-        SharedPreUtils.getInstance().putString("searchSource", sb.toString());
+        SharedPreUtils.getInstance().putString(MyApplication.getmContext().getString(R.string.searchSource), sb.toString());
     }
 
     public static ReadCrawler getReadCrawler(String bookSource) {

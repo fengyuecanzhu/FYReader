@@ -7,6 +7,7 @@ import xyz.fycz.myreader.base.adapter.BaseListAdapter;
 import xyz.fycz.myreader.base.adapter.IViewHolder;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.ui.adapter.holder.SearchBookHolder;
 
@@ -19,6 +20,12 @@ import java.util.List;
  */
 public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
     private ConcurrentMultiValueMap<SearchBookBean, Book> mBooks;
+    private SearchEngine searchEngine;
+
+    public SearchBookAdapter(ConcurrentMultiValueMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine) {
+        this.mBooks = mBooks;
+        this.searchEngine = searchEngine;
+    }
 
     public SearchBookAdapter(ConcurrentMultiValueMap<SearchBookBean, Book> mBooks) {
         this.mBooks = mBooks;
@@ -26,7 +33,7 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
 
     @Override
     protected IViewHolder<SearchBookBean> createViewHolder(int viewType) {
-        return new SearchBookHolder(mBooks);
+        return new SearchBookHolder(mBooks, searchEngine);
     }
 
     public synchronized void addAll(List<SearchBookBean> newDataS, String keyWord) {

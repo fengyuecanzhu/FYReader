@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import xyz.fycz.myreader.application.MyApplication;
 
+import java.util.Map;
+
 /**
  * SharedPreferences工具类
  */
@@ -38,17 +40,27 @@ public class SharedPreUtils {
 
     public void putString(String key,String value){
         sharedWritable.putString(key,value);
-        sharedWritable.commit();
+        sharedWritable.apply();
     }
 
     public void putInt(String key,int value){
         sharedWritable.putInt(key, value);
-        sharedWritable.commit();
+        sharedWritable.apply();
     }
 
     public void putBoolean(String key,boolean value){
         sharedWritable.putBoolean(key, value);
-        sharedWritable.commit();
+        sharedWritable.apply();
+    }
+
+    public void putFloat(String key,float value){
+        sharedWritable.putFloat(key, value);
+        sharedWritable.apply();
+    }
+
+    public void putLong(String key, long value){
+        sharedWritable.putLong(key, value);
+        sharedWritable.apply();
     }
 
     public String getString(String key){
@@ -74,4 +86,26 @@ public class SharedPreUtils {
     public boolean getBoolean(String key,boolean def){
         return sharedReadable.getBoolean(key, false);
     }
+
+    public float getFloat(String key){
+        return getFloat(key, 0);
+    }
+    public float getFloat(String key, float def){
+        return sharedReadable.getFloat(key, def);
+    }
+    public long getLong(String key){
+        return getLong(key, 0);
+    }
+    public long getLong(String key, long def){
+        return sharedReadable.getLong(key, def);
+    }
+
+    public void remove(String key){
+        sharedWritable.remove(key).apply();
+    }
+
+    public Map<String, ?> getAll(){
+        return sharedReadable.getAll();
+    }
+
 }

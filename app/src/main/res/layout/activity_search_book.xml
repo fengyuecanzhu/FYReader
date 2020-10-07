@@ -158,7 +158,8 @@
         <com.scwang.smartrefresh.layout.SmartRefreshLayout
                 android:id="@+id/srl_search_book_list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:descendantFocusability="blocksDescendants">
             <com.scwang.smartrefresh.header.MaterialHeader
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

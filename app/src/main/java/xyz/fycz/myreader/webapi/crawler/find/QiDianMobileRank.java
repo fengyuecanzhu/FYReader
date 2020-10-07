@@ -4,6 +4,7 @@ import android.content.Context;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.entity.bookstore.BookType;
@@ -136,7 +137,7 @@ public class QiDianMobileRank extends FindCrawler {
             }
             url = url.replace("{sex}", !isFemale ? sex[0] : sex[1]);
             SharedPreUtils spu = SharedPreUtils.getInstance();
-            String cookie = spu.getString("qdCookie", "");
+            String cookie = spu.getString(MyApplication.getmContext().getString(R.string.qdCookie), "");
             if (!cookie.equals("")) {
                 url = url.replace("{cookie}", StringHelper.getSubString(cookie, "_csrfToken=", ";"));
             } else {

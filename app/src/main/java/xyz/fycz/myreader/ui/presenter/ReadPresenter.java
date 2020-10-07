@@ -216,7 +216,7 @@ public class ReadPresenter implements BasePresenter {
 
     @Override
     public void start() {
-        if (SharedPreUtils.getInstance().getBoolean("isNightFS", false)) {
+        if (SharedPreUtils.getInstance().getBoolean(mReadActivity.getString(R.string.isNightFS), false)) {
             mSetting.setDayStyle(!ColorUtil.isColorLight(mReadActivity.getColor(R.color.textPrimary)));
         }
 
@@ -256,7 +256,7 @@ public class ReadPresenter implements BasePresenter {
         //当书籍Collected且书籍id不为空的时候保存上次阅读信息
         if (isCollected && !StringHelper.isEmpty(mBook.getId())) {
             //保存上次阅读信息
-            SharedPreUtils.getInstance().putString("lastRead", mBook.getId());
+            SharedPreUtils.getInstance().putString(mReadActivity.getString(R.string.lastRead), mBook.getId());
         }
 
 
@@ -325,7 +325,7 @@ public class ReadPresenter implements BasePresenter {
             mBook = (Book) mReadActivity.getIntent().getSerializableExtra(APPCONST.BOOK);
             //mBook为空，说明是从快捷方式启动
             if (mBook == null) {
-                String bookId = SharedPreUtils.getInstance().getString("lastRead", "");
+                String bookId = SharedPreUtils.getInstance().getString(mReadActivity.getString(R.string.lastRead), "");
                 if ("".equals(bookId)) {//没有上次阅读信息
                     ToastUtils.showWarring("当前没有阅读任何书籍，无法加载上次阅读书籍！");
                     mReadActivity.finish();

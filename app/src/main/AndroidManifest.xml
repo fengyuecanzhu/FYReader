@@ -122,6 +122,7 @@
 
         <activity android:name=".ui.activity.MoreSettingActivity"/>
         <activity android:name=".ui.activity.BookstoreActivity"/>
+        <activity android:name=".ui.activity.WebDavSettingActivity"/>
 
         <receiver android:name=".util.notification.NotificationClickReceiver"/>
         <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver"/>

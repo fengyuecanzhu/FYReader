@@ -17,6 +17,7 @@ import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
+import xyz.fycz.myreader.widget.CoverImageView;
 import xyz.fycz.myreader.widget.custom.DragAdapter;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -311,7 +312,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
 
     static class ViewHolder {
         CheckBox cbBookChecked;
-        ImageView ivBookImg;
+        CoverImageView ivBookImg;
         TextView tvBookName;
         BadgeView tvNoReadNum;
         ProgressBar pbLoading;

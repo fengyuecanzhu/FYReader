@@ -20,6 +20,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.presenter.ReadPresenter;
 import xyz.fycz.myreader.widget.page.PageView;
@@ -121,6 +122,7 @@ public class ReadActivity extends BaseActivity {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
+        Backup.INSTANCE.autoBack();
         super.onBackPressed();
     }
 

@@ -6,6 +6,8 @@ import android.text.TextUtils;
 import net.ricecode.similarity.JaroWinklerStrategy;
 import net.ricecode.similarity.StringSimilarityService;
 import net.ricecode.similarity.StringSimilarityServiceImpl;
+import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -101,7 +103,7 @@ public class BookService extends BaseService {
 
         book.setSortCode(0);
         book.setGroupSort(0);
-        book.setGroupId(SharedPreUtils.getInstance().getString("curBookGroupId", ""));
+        book.setGroupId(SharedPreUtils.getInstance().getString(MyApplication.getmContext().getString(R.string.curBookGroupId), ""));
         if (StringHelper.isEmpty(book.getId())) {
             book.setId(StringHelper.getStringRandom(25));
         }

@@ -7,13 +7,19 @@ import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.entity.Chapter;
+import xyz.fycz.myreader.greendao.service.BookMarkService;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
+import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 import java.io.UnsupportedEncodingException;
@@ -44,7 +50,7 @@ public class SearchEngine {
     private OnSearchListener searchListener;
 
     public SearchEngine() {
-        threadsNum = SharedPreUtils.getInstance().getInt("threadNum", 8);
+        threadsNum = SharedPreUtils.getInstance().getInt(MyApplication.getmContext().getString(R.string.threadNum), 8);
     }
 
     public void setOnSearchListener(OnSearchListener searchListener) {
@@ -237,6 +243,33 @@ public class SearchEngine {
 
     }
 
+    public synchronized void getBookInfo(Book book, BookInfoCrawler bic, OnGetBookInfoListener listener){
+        CommonApi.getBookInfo(book, bic)
+                .subscribeOn(scheduler)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Book>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.annotations.NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.annotations.NonNull Book book) {
+                        listener.loadFinish(true);
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.annotations.NonNull Throwable e) {
+                        listener.loadFinish(false);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
 
     /************************************************************************/
     public interface OnSearchListener {
@@ -249,5 +282,17 @@ public class SearchEngine {
 
         void searchBookError(Throwable throwable);
 
+    }
+
+    public interface OnGetBookInfoListener{
+        void loadFinish(Boolean isSuccess);
+    }
+
+    public interface OnGetBookChaptersListener{
+        void loadFinish(List<Chapter> chapters, Boolean isSuccess);
+    }
+
+    public interface OnGetChapterContentListener{
+        void loadFinish(String content, Boolean isSuccess);
     }
 }

@@ -1,10 +1,14 @@
 package xyz.fycz.myreader.webapi;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.SearchBookBean;
+import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
@@ -16,6 +20,7 @@ import xyz.fycz.myreader.webapi.crawler.read.FYReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.TianLaiReadCrawler;
 
 import java.io.IOException;
+import java.util.List;
 
 
 public class CommonApi extends BaseApi {
@@ -38,6 +43,27 @@ public class CommonApi extends BaseApi {
             public void onError(Exception e) {
                 callback.onError(e);
             }
+        });
+    }
+
+
+
+    /**
+     * 获取章节列表
+     *
+     * @param url
+     */
+    public static Observable<List<Chapter>> getBookChapters(String url, final ReadCrawler rc) {
+        String charset = rc.getCharset();
+
+        return Observable.create(emitter -> {
+            try {
+                emitter.onNext(rc.getChaptersFromHtml(OkHttpUtils.getHtml(url, charset)));
+            } catch (Exception e) {
+                e.printStackTrace();
+                emitter.onError(e);
+            }
+            emitter.onComplete();
         });
     }
 
@@ -75,6 +101,24 @@ public class CommonApi extends BaseApi {
         });
     }
 
+    /**
+     * 获取章节正文
+     *
+     * @param url
+     */
+
+    public static Observable<String> getChapterContent(String url, final ReadCrawler rc) {
+        String charset = rc.getCharset();
+        return Observable.create(emitter -> {
+            try {
+                emitter.onNext(rc.getContentFormHtml(OkHttpUtils.getHtml(url, charset)));
+            } catch (Exception e) {
+                e.printStackTrace();
+                emitter.onError(e);
+            }
+            emitter.onComplete();
+        });
+    }
 
     /**
      * 搜索小说
@@ -130,11 +174,11 @@ public class CommonApi extends BaseApi {
                 }else {
                     emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(makeSearchUrl(rc.getSearchLink(), key), finalCharset)));
                 }
-                emitter.onComplete();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 emitter.onError(e);
             }
+            emitter.onComplete();
         });
     }
 
@@ -155,7 +199,12 @@ public class CommonApi extends BaseApi {
             url = book.getInfoUrl();
         }
         return Observable.create(emitter -> {
-            emitter.onNext(bic.getBookInfo(OkHttpUtils.getHtml(url, bic.getCharset()), book));
+            try {
+                emitter.onNext(bic.getBookInfo(OkHttpUtils.getHtml(url, bic.getCharset()), book));
+            } catch (Exception e) {
+                e.printStackTrace();
+                emitter.onError(e);
+            }
             emitter.onComplete();
         });
     }
@@ -180,7 +229,6 @@ public class CommonApi extends BaseApi {
             @Override
             public void onError(Exception e) {
                 callback.onError(e);
-
             }
         });
     }

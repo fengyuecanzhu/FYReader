@@ -119,9 +119,9 @@ public class SearchBookActivity extends BaseActivity2 {
                     if (srlSearchBookList != null) {
                         srlSearchBookList.finishRefresh();
                     }
-                    if (curThreadCount == 0 && !isStopSearch) {
+                    /*if (curThreadCount == 0 && !isStopSearch) {
                         rpb.setIsAutoLoading(false);
-                    }
+                    }*/
                     break;
                 case 3:
                     fabSearchStop.setVisibility(View.GONE);
@@ -158,7 +158,7 @@ public class SearchBookActivity extends BaseActivity2 {
                 if (rpb != null) {
                     rpb.setIsAutoLoading(false);
                 }
-                mHandler.sendEmptyMessage(3);
+                fabSearchStop.setVisibility(View.GONE);
             }
 
             @Override
@@ -357,7 +357,7 @@ public class SearchBookActivity extends BaseActivity2 {
         } else {
             isStopSearch = false;
 
-            mSearchBookAdapter = new SearchBookAdapter(mBooks);
+            mSearchBookAdapter = new SearchBookAdapter(mBooks, searchEngine);
 
             rvSearchBooksList.setAdapter(mSearchBookAdapter);
             //进入书籍详情页

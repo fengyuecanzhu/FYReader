@@ -16,6 +16,28 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
+            <LinearLayout
+                    android:id="@+id/more_setting_ll_webdav"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:paddingTop="8dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/selector_common_bg">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_normal_size"
+                        android:textColor="@color/textSecondary"
+                        android:text="@string/webdav_setting"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="5dp"
+                        android:textColor="@color/textAssist"
+                        android:text="@string/webdav_setting_tip"/>
+            </LinearLayout>
 
             <RelativeLayout
                     android:layout_width="match_parent"

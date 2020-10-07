@@ -24,12 +24,13 @@
                 android:paddingEnd="2dp"
                 android:theme="@style/MyCheckBox"
                 android:visibility="gone"/>
-        <ImageView
+
+        <xyz.fycz.myreader.widget.CoverImageView
                 android:id="@+id/iv_book_img"
                 android:layout_width="64dp"
                 android:layout_height="88dp"
                 android:scaleType="fitXY"
-                app:srcCompat="@mipmap/default_cover"/>
+                app:srcCompat="@mipmap/default_cover" />
 
         <LinearLayout android:id="@+id/ll_book_read"
                       android:layout_width="match_parent"

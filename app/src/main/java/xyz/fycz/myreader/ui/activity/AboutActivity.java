@@ -12,6 +12,7 @@ import butterknife.BindView;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
@@ -71,7 +72,7 @@ public class AboutActivity extends BaseActivity2 {
             ToastUtils.showSuccess("邮箱复制成功！");
         });
         vmShare.setOnClickListener(v -> ShareUtils.share(this, getString(R.string.share_text) +
-                SharedPreUtils.getInstance().getString("downloadLink")));
+                SharedPreUtils.getInstance().getString(getString(R.string.downloadLink, URLCONST.LAN_ZOUS_URL))));
         vmUpdate.setOnClickListener(v -> MyApplication.checkVersionByServer(this, true, null));
         vmUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));
         vmQQ.setOnClickListener(v -> {

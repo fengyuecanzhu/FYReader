@@ -40,6 +40,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
@@ -95,7 +96,7 @@ public class MyApplication extends Application {
     }
 
     public boolean isNightFS() {
-        return SharedPreUtils.getInstance().getBoolean("isNightFS", false);
+        return SharedPreUtils.getInstance().getBoolean(getString(R.string.isNightFS), false);
     }
 
     /**
@@ -103,7 +104,7 @@ public class MyApplication extends Application {
      * @param isNightMode
      */
     public void setNightTheme(boolean isNightMode) {
-        SharedPreUtils.getInstance().putBoolean("isNightFS", false);
+        SharedPreUtils.getInstance().putBoolean(getmContext().getString(R.string.isNightFS), false);
         Setting setting = SysManager.getSetting();
         setting.setDayStyle(!isNightMode);
         SysManager.saveSetting(setting);
@@ -179,6 +180,10 @@ public class MyApplication extends Application {
      */
     public static void runOnUiThread(Runnable runnable) {
         handler.post(runnable);
+    }
+
+    public static Handler getHandler(){
+        return handler;
     }
 
     public static MyApplication getApplication() {
@@ -313,11 +318,11 @@ public class MyApplication extends Application {
                 downloadLink = contents[2].substring(contents[2].indexOf(":") + 1).trim();
                 updateContent = contents[3].substring(contents[3].indexOf(":") + 1);
                 SharedPreUtils spu = SharedPreUtils.getInstance();
-                spu.putString("lanzousKeyStart", contents[4].substring(contents[4].indexOf(":") + 1));
+                spu.putString(getmContext().getString(R.string.lanzousKeyStart), contents[4].substring(contents[4].indexOf(":") + 1));
                 if (!StringHelper.isEmpty(downloadLink)) {
-                    spu.putString("downloadLink", downloadLink);
+                    spu.putString(getmContext().getString(R.string.downloadLink), downloadLink);
                 } else {
-                    spu.putString("downloadLink", URLCONST.APP_DIR_UR);
+                    spu.putString(getmContext().getString(R.string.downloadLink), URLCONST.APP_DIR_UR);
                 }
                 String[] updateContents = updateContent.split("/");
                 for (String string : updateContents) {

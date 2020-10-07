@@ -42,6 +42,7 @@ import xyz.fycz.myreader.ui.adapter.DetailCatalogAdapter;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
+import xyz.fycz.myreader.widget.CoverImageView;
 
 import java.util.ArrayList;
 
@@ -51,7 +52,7 @@ import java.util.ArrayList;
  */
 public class BookDetailedActivity extends BaseActivity2 {
     @BindView(R.id.book_detail_iv_cover)
-    ImageView mIvCover;
+    CoverImageView mIvCover;
    /* @BindView(R.id.book_detail_iv_blur_cover)
     ImageView mIvBlurCover;*/
     @BindView(R.id.book_detail_tv_author)
@@ -323,13 +324,7 @@ public class BookDetailedActivity extends BaseActivity2 {
         mTvDesc.setText("\t\t\t\t" + mBook.getDesc());
         mTvType.setText(mBook.getType());
         if (!MyApplication.isDestroy(this)) {
-            Glide.with(this)
-                    .load(mBook.getImgUrl())
-                    .error(R.mipmap.no_image)
-                    .placeholder(R.mipmap.no_image)
-                    //设置圆角
-                    .apply(RequestOptions.bitmapTransform(new RoundedCorners(8)))
-                    .into(mIvCover);
+            mIvCover.load(mBook.getImgUrl(), mBook.getName(), mBook.getAuthor());
             /*Glide.with(this)
                     .load(mBook.getImgUrl())
                     .transition(DrawableTransitionOptions.withCrossFade(1500))

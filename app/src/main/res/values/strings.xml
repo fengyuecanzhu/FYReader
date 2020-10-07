@@ -156,6 +156,26 @@
     <string name="newest_chapter">最新章节:%1$s</string>
     <string name="source_title_num">书源:%1$s  共%2$d个源</string>
 
+    <!--SharedPre-->
+    <string name="lanzousKeyStart">lanzousKeyStart</string>
+    <string name="downloadLink">downloadLink</string>
+    <string name="qdCookie">qdCookie</string>
+    <string name="searchSource">searchSource</string>
+    <string name="synTime">synTime</string>
+    <string name="curBookGroupId">curBookGroupId</string>
+    <string name="curBookGroupName">curBookGroupName</string>
+    <string name="lastRead">lastRead</string>
+    <string name="threadNum">threadNum</string>
+    <string name="isNightFS">isNightFS</string>
+    <string name="isReadTopTip">isReadTopTip</string>
+    <string name="isReadDownloadAllTip">isReadDownloadAllTip</string>
+    <string name="webdav_url">WebDav 服务器地址</string>
+    <string name="webdav_account">WebDav 账号</string>
+    <string name="webdav_password">WebDav 密码</string>
+    <string name="webdav_restore_tip">从WebDav恢复</string>
+    <string name="webdav_setting">WebDav设置</string>
+    <string name="webdav_setting_tip">WebDav备份与恢复</string>
+
 
     <string-array name="reset_screen_time">
         <item>常亮</item>
