@@ -1,7 +1,7 @@
 # FYReader-master
 风月读书，一款开源、无广告的小说阅读软件。
 
-demo下载：https://fycz.lanzoui.com/iBofFh42pxg
+demo下载：https://fycz.lanzoui.com/iu3dBi0gnuh
 
 #### 一、关于书源
 
@@ -193,14 +193,12 @@ demo下载：https://fycz.lanzoui.com/iBofFh42pxg
   * 某点的排行榜、分类，全本小说网
   * 制作发现源方法与书源类似，在此不再赘述
 
-
-
-![Image](https://github.com/fengyuecanzhu/FYReader/tree/master/img/1.png)
-![Image](https://github.com/fengyuecanzhu/FYReader/tree/master/img/2.png)
-![Image](https://github.com/fengyuecanzhu/FYReader/tree/master/img/3.png)
-![Image](https://github.com/fengyuecanzhu/FYReader/tree/master/img/4.png)
-![Image](https://github.com/fengyuecanzhu/FYReader/tree/master/img/5.png)
-![Image](https://github.com/fengyuecanzhu/FYReader/tree/master/img/6.png)
-![Image](https://github.com/fengyuecanzhu/FYReader/tree/master/img/7.png)
-![Image](https://github.com/fengyuecanzhu/FYReader/tree/master/img/8.png)
-![Image](https://github.com/fengyuecanzhu/FYReader/tree/master/img/9.png)
+![Image](./img/1.png)
+![Image](./img/2.png)
+![Image](./img/3.png)
+![Image](./img/4.png)
+![Image](./img/5.png)
+![Image](./img/6.png)
+![Image](./img/7.png)
+![Image](./img/8.png)
+![Image](./img/9.png)
