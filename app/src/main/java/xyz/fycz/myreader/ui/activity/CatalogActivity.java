@@ -10,7 +10,7 @@ import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import com.google.android.material.tabs.TabLayout;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.adapter.TabFragmentPageAdapter;
@@ -20,7 +20,7 @@ import xyz.fycz.myreader.ui.fragment.CatalogFragment;
 /**
  * 书籍目录activity
  */
-public class CatalogActivity extends BaseActivity2 {
+public class CatalogActivity extends BaseActivity {
 
 
     @BindView(R.id.catalog_tab)

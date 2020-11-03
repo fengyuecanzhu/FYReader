@@ -8,14 +8,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.enums.Font;
 import xyz.fycz.myreader.ui.adapter.FontsAdapter;
@@ -35,7 +33,7 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
  * @author fengyue
  * @date 2020/9/19 12:04
  */
-public class FontsActivity extends BaseActivity2 {
+public class FontsActivity extends BaseActivity {
     @BindView(R.id.lv_fonts)
     ListView lvFonts;
     @BindView(R.id.pb_loading)

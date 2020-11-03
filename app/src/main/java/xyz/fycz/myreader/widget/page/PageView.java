@@ -11,6 +11,7 @@ import android.view.ViewConfiguration;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.ChapterService;
+import xyz.fycz.myreader.util.utils.SnackbarUtils;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.widget.animation.*;
 
@@ -251,7 +252,11 @@ public class PageView extends View {
      */
     private boolean hasPrevPage() {
         mTouchListener.prePage();
-        return mPageLoader.prev();
+        boolean hasPrevPage = mPageLoader.prev();
+        if (!hasPrevPage){
+            showSnackBar("已经是第一页了");
+        }
+        return hasPrevPage;
     }
 
     /**
@@ -262,6 +267,9 @@ public class PageView extends View {
     private boolean hasNextPage() {
         boolean hasNextPage = mPageLoader.next();
         mTouchListener.nextPage(hasNextPage);
+        if (!hasNextPage){
+            showSnackBar("已经是最后一页了");
+        }
         return hasNextPage;
     }
 
@@ -269,6 +277,16 @@ public class PageView extends View {
         mTouchListener.cancel();
         mPageLoader.pageCancel();
     }
+
+    /**
+     * 显示tips
+     *
+     * @param msg
+     */
+    public void showSnackBar(String msg) {
+        SnackbarUtils.show(this, msg);
+    }
+
 
     @Override
     public void computeScroll() {

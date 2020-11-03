@@ -22,7 +22,7 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import me.gujun.android.taggroup.TagGroup;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.model.SearchEngine;
@@ -44,14 +44,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author fengyue
  * @date 2020/9/18 21:58
  */
-public class SearchBookActivity extends BaseActivity2 {
+public class SearchBookActivity extends BaseActivity {
     @BindView(R.id.et_search_key)
     EditText etSearchKey;
     @BindView(R.id.tv_search_conform)

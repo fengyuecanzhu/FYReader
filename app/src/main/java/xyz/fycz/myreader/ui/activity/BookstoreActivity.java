@@ -16,7 +16,7 @@ import butterknife.BindView;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
@@ -43,7 +43,7 @@ import java.util.List;
  * @author fengyue
  * @date 2020/9/13 21:11
  */
-public class BookstoreActivity extends BaseActivity2 {
+public class BookstoreActivity extends BaseActivity {
     @BindView(R.id.refresh_layout)
     RefreshLayout mRlRefresh;
     @BindView(R.id.rv_type_list)

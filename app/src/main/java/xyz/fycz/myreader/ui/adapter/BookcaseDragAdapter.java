@@ -8,21 +8,17 @@ import android.view.ViewGroup;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
-import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.presenter.BookcasePresenter;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;

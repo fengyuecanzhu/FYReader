@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.ui.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -72,9 +73,11 @@ public class DialogCreator {
         dialog.setContentView(view);
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
+
         //触摸外部关闭
         view.findViewById(R.id.ll_bottom_view).setOnClickListener(null);
         view.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 dialog.dismiss();
@@ -84,7 +87,7 @@ public class DialogCreator {
         //设置全屏
         Window window = dialog.getWindow();
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+        window.setWindowAnimations(R.style.dialogWindowAnim);
         //阅读背景风格
         final ImageView ivCommonStyle = (ImageView) view.findViewById(R.id.iv_common_style);
         final ImageView ivLeatherStyle = (ImageView) view.findViewById(R.id.iv_leather_style);
@@ -305,168 +308,6 @@ public class DialogCreator {
             listener.onChange(readStyle);
         }
     }
-
-
-    /**
-     * 阅读设置对话框
-     *
-     * @param context
-     * @param isDayStyle
-     * @param chapterProgress
-     * @param backListener
-     * @param lastChapterListener
-     * @param nextChapterListener
-     * @param chapterListListener
-     * @param onClickNightAndDayListener
-     * @param settingListener
-     * @return
-     */
-    public static Dialog createReadSetting(final Context context, final boolean isDayStyle, int chapterProgress, int maxProcess, final Book mBook, Chapter mChapter,
-                                           View.OnClickListener backListener,
-                                           View.OnClickListener changeSourceListener,
-                                           View.OnClickListener refreshListener,
-                                           View.OnClickListener bookMarkListener,
-                                           final OnSkipChapterListener lastChapterListener,
-                                           final OnSkipChapterListener nextChapterListener,
-                                           View.OnClickListener chapterListListener,
-                                           final OnClickNightAndDayListener onClickNightAndDayListener,
-                                           View.OnClickListener settingListener,
-                                           SeekBar.OnSeekBarChangeListener onSeekBarChangeListener,
-                                           View.OnClickListener voiceOnClickListener,
-                                           final OnClickDownloadAllChapterListener onClickDownloadAllChapterListener) {
-        final Dialog dialog = new Dialog(context, R.style.jmui_default_dialog_style);
-        final View view = LayoutInflater.from(context).inflate(R.layout.dialog_read_setting, null);
-        dialog.setContentView(view);
-
-        LinearLayout llBack = (LinearLayout) view.findViewById(R.id.ll_title_back);
-        LinearLayout llBook = view.findViewById(R.id.ll_book_name);
-        TextView tvBookName = view.findViewById(R.id.tv_book_name_top);
-        ImageView ivChangeSource = view.findViewById(R.id.iv_change_source);
-        ImageView ivRefresh = view.findViewById(R.id.iv_refresh);
-        ImageView ivBookMark = view.findViewById(R.id.iv_book_mark);
-        ImageView ivMore = view.findViewById(R.id.iv_more);
-        LinearLayout llChapter = view.findViewById(R.id.ll_chapter_view);
-        final TextView tvChapterTitle = view.findViewById(R.id.tv_chapter_title_top);
-        final TextView tvChapterUrl = view.findViewById(R.id.tv_chapter_url);
-        TextView tvLastChapter = (TextView) view.findViewById(R.id.tv_last_chapter);
-        TextView tvNextChapter = (TextView) view.findViewById(R.id.tv_next_chapter);
-        final SeekBar sbChapterProgress = (SeekBar) view.findViewById(R.id.sb_read_chapter_progress);
-        LinearLayout llChapterList = (LinearLayout) view.findViewById(R.id.ll_chapter_list);
-        LinearLayout llNightAndDay = (LinearLayout) view.findViewById(R.id.ll_night_and_day);
-        LinearLayout llSetting = (LinearLayout) view.findViewById(R.id.ll_setting);
-        final ImageView ivNightAndDay = (ImageView) view.findViewById(R.id.iv_night_and_day);
-        final TextView tvNightAndDay = (TextView) view.findViewById(R.id.tv_night_and_day);
-        ImageView ivVoice  = (ImageView)view.findViewById(R.id.iv_voice_read);
-
-        view.findViewById(R.id.rl_title_view).setOnClickListener(null);
-        view.findViewById(R.id.ll_bottom_view).setOnClickListener(null);
-
-        Window window = dialog.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        if (Build.VERSION.SDK_INT >= 21) {
-            window.setStatusBarColor(dialog.getContext().getColor(R.color.sys_dialog_setting_bg));
-        }
-
-        view.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                dialog.dismiss();
-                return false;
-            }
-        });
-
-        tvBookName.setText(mBook.getName());
-        llBook.setOnClickListener(v -> {
-            /*Intent intent = new Intent(context, BookDetailedActivity.class);
-            intent.putExtra(APPCONST.BOOK, mBook);
-            context.startActivity(intent);*/
-        });
-        if ("本地书籍".equals(mBook.getType())){
-            ivChangeSource.setVisibility(View.GONE);
-        }
-        //换源
-        ivChangeSource.setOnClickListener(changeSourceListener);
-
-        //刷新
-        ivRefresh.setOnClickListener(refreshListener);
-        String url = mChapter.getUrl();
-        if ("null".equals(mBook.getSource()) || BookSource.fynovel.equals(mBook.getSource())) {
-            if (!url.contains("novel.fycz.xyz")) {
-                url = URLCONST.nameSpace_FY + url;
-            }
-        }
-
-        //书签
-        ivBookMark.setOnClickListener(bookMarkListener);
-
-        tvChapterTitle.setText(mChapter.getTitle());
-        tvChapterUrl.setText(StringHelper.isEmpty(url) ? mChapter.getId() : url);
-        //跳转对应章节
-        llChapter.setOnClickListener(v -> {
-            String url1 = tvChapterUrl.getText().toString();
-            if (!"本地书籍".equals(mBook.getType()) && !StringHelper.isEmpty(url1)) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                Uri uri = Uri.parse(url1);
-                intent.setData(uri);
-                context.startActivity(intent);
-            }
-        });
-
-
-        if (!isDayStyle) {
-            ivNightAndDay.setImageResource(R.mipmap.z4);
-            tvNightAndDay.setText(context.getString(R.string.day));
-        }
-
-        llBack.setOnClickListener(backListener);
-        tvLastChapter.setOnClickListener(v -> {
-            if (lastChapterListener != null){
-                lastChapterListener.onClick(tvChapterTitle, tvChapterUrl, sbChapterProgress);
-            }
-        });
-        tvNextChapter.setOnClickListener(v -> {
-            if (nextChapterListener != null){
-                nextChapterListener.onClick(tvChapterTitle, tvChapterUrl, sbChapterProgress);
-            }
-        });
-        sbChapterProgress.setProgress(chapterProgress);
-        sbChapterProgress.setMax(maxProcess);
-        llChapterList.setOnClickListener(chapterListListener);
-        llSetting.setOnClickListener(settingListener);
-        sbChapterProgress.setOnSeekBarChangeListener(onSeekBarChangeListener);
-        ivVoice.setOnClickListener(voiceOnClickListener);
-        //日夜切换
-        llNightAndDay.setOnClickListener(view1 -> {
-            boolean isDay;
-            if (tvNightAndDay.getText().toString().equals(context.getString(R.string.day))) {
-                isDay = false;
-                ivNightAndDay.setImageResource(R.mipmap.ao);
-                tvNightAndDay.setText(context.getString(R.string.night));
-            } else {
-                isDay = true;
-                ivNightAndDay.setImageResource(R.mipmap.z4);
-                tvNightAndDay.setText(context.getString(R.string.day));
-            }
-            if (onClickNightAndDayListener != null) {
-                onClickNightAndDayListener.onClick(dialog, view, isDay);
-            }
-        });
-
-        //缓存章节
-        final TextView tvDownloadProgress = view.findViewById(R.id.tv_download_progress);
-        LinearLayout llDonwloadCache = view.findViewById(R.id.ll_download_cache);
-        llDonwloadCache.setOnClickListener(v -> {
-            if (onClickDownloadAllChapterListener != null){
-                onClickDownloadAllChapterListener.onClick(dialog,v,tvDownloadProgress);
-            }
-        });
-
-        dialog.setCancelable(true);
-        dialog.setCanceledOnTouchOutside(true);
-        return dialog;
-    }
-
-
 
     /**
      * 创建一个普通对话框（包含确定、取消按键）
@@ -702,7 +543,7 @@ public class DialogCreator {
      * 从assets文件夹之中读取文件并显示提示框
      * @param mContext
      * @param title
-     * @param assetName
+     * @param assetName 需要后缀名
      */
     public static void createAssetTipDialog(Context mContext, String title, String assetName){
         BufferedReader br = null;

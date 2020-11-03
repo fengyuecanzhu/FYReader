@@ -208,42 +208,6 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-                android:id="@+id/vw_qq"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="6dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/background_card">
-
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp">
-
-                <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/ic_qq_group"
-                        app:tint="@color/textSecondary" />
-
-                <TextView
-                        android:id="@+id/tv_qq"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_margin="5dp"
-                        android:gravity="center_vertical"
-                        android:textColor="@color/textSecondary"
-                        android:text="@string/join_qq_group" />
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
                 android:id="@+id/vw_git"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

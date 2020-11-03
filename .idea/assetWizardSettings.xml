@@ -19,8 +19,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_group" />
-                            <entry key="sourceFile" value="F:\SVG图标\分组.svg" />
+                            <entry key="outputName" value="ic_bookmark" />
+                            <entry key="sourceFile" value="F:\SVG图标\书签.svg" />
                           </map>
                         </option>
                       </PersistentState>

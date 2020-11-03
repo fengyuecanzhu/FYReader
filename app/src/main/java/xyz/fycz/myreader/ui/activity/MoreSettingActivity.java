@@ -3,8 +3,6 @@ package xyz.fycz.myreader.ui.activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
@@ -13,19 +11,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
-import com.google.android.material.textfield.TextInputLayout;
-import io.reactivex.Single;
-import io.reactivex.SingleOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
-import xyz.fycz.myreader.base.BaseActivity2;
-import xyz.fycz.myreader.base.observer.MySingleObserver;
+import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.model.storage.BackupRestoreUi;
-import xyz.fycz.myreader.model.storage.WebDavHelp;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -33,7 +23,6 @@ import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
-import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -51,7 +40,7 @@ import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
  * 阅读界面的更多设置
  */
 
-public class MoreSettingActivity extends BaseActivity2 {
+public class MoreSettingActivity extends BaseActivity {
     @BindView(R.id.more_setting_ll_webdav)
     LinearLayout mLlWebdav;
     @BindView(R.id.more_setting_rl_volume)

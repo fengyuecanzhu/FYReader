@@ -21,7 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
-import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
@@ -40,7 +40,7 @@ import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CU
  * @author fengyue
  * @date 2020/9/13 13:03
  */
-public class MainActivity extends BaseActivity2 {
+public class MainActivity extends BaseActivity {
     @BindView(R.id.bottom_navigation_view)
     BottomNavigationView bottomNavigation;
     @BindView(R.id.view_pager_main)
