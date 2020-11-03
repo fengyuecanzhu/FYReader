@@ -38,4 +38,23 @@
             android:targetClass="xyz.fycz.myreader.ui.activity.MainActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
+    <shortcut
+            android:shortcutId="searchbook"
+            android:enabled="true"
+            android:icon="@drawable/ic_search2"
+            android:shortcutShortLabel="@string/menu_bookcase_search"
+            android:shortcutLongLabel="@string/menu_bookcase_search"
+            android:shortcutDisabledMessage="@string/menu_bookcase_search"
+            tools:ignore="UnusedAttribute">
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="xyz.fycz.myreader"
+                android:targetClass="xyz.fycz.myreader.ui.activity.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="xyz.fycz.myreader"
+                android:targetClass="xyz.fycz.myreader.ui.activity.SearchBookActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
 </shortcuts>

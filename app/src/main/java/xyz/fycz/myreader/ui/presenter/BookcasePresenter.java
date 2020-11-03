@@ -23,9 +23,7 @@ import android.widget.PopupMenu;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,8 +39,6 @@ import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
-import xyz.fycz.myreader.model.backup.BackupAndRestore;
-import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.ui.activity.*;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -83,7 +79,6 @@ public class BookcasePresenter implements BasePresenter {
     private Setting mSetting;
     private final List<Book> errorLoadingBooks = new ArrayList<>();
     private int finishLoadBookCount = 0;
-    private final BackupAndRestore mBackupAndRestore;
     //    private int notifyId = 11;
     private ExecutorService es = Executors.newFixedThreadPool(1);//更新/下载线程池
 
@@ -179,7 +174,6 @@ public class BookcasePresenter implements BasePresenter {
         mMainActivity = (MainActivity) (mBookcaseFragment.getActivity());
 //        mChapterService = new ChapterService();
         mSetting = SysManager.getSetting();
-        mBackupAndRestore = new BackupAndRestore();
     }
 
     //启动
@@ -194,10 +188,6 @@ public class BookcasePresenter implements BasePresenter {
         notificationUtil = NotificationUtil.getInstance();
 
         getData();
-
-        if (mSetting.isAutoSyn() && UserService.isLogin()) {
-            synBookcaseToWeb(true);
-        }
 
         //是否启用下拉刷新（默认启用）
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -955,35 +945,6 @@ public class BookcasePresenter implements BasePresenter {
                 ToastUtils.showWarring("当前书架无任何书籍，无法同步！");
             }
             return;
-        }
-        Date nowTime = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
-        String nowTimeStr = sdf.format(nowTime);
-        SharedPreUtils spb = SharedPreUtils.getInstance();
-        String synTime = spb.getString(mMainActivity.getString(R.string.synTime));
-        if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
-                UserService.webBackup(new ResultCallback() {
-                    @Override
-                    public void onFinish(Object o, int code) {
-                        if ((boolean) o){
-                            spb.putString(mMainActivity.getString(R.string.synTime), nowTimeStr);
-                            if (!isAutoSyn) {
-                                DialogCreator.createTipDialog(mMainActivity, "成功将书架同步至网络！");
-                            }
-                        }else {
-                            if (!isAutoSyn) {
-                                DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！");
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        if (!isAutoSyn) {
-                            DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！\n" + e.getLocalizedMessage());
-                        }
-                    }
-                });
         }
     }
 

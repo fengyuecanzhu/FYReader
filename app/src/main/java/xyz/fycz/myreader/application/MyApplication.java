@@ -41,7 +41,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.ui.dialog.APPDownloadTip;
@@ -72,12 +71,8 @@ public class MyApplication extends Application {
             createNotificationChannel();
         }
         mFixedThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());//初始化线程池
-        BaseActivity.setCloseAntiHijacking(true);
         initNightTheme();
-
     }
-
-
 
     public void initNightTheme() {
         if (isNightFS()){
@@ -247,49 +242,6 @@ public class MyApplication extends Application {
     /**
      * 检查更新
      */
-    /*public static void checkVersionByServer(final Activity activity, final boolean isManualCheck) {
-        MyApplication.getApplication().newThread(new Runnable() {
-            @Override
-            public void run() {
-                Document doc = null;
-                try {
-                    doc = Jsoup.connect("https://novel.fycz.xyz/app/update.html").get();
-                    int newestVersion = 0;
-                    String updateContent = "";
-                    String downloadLink = null;
-                    boolean isForceUpdate = false;
-                    StringBuilder s = new StringBuilder();
-                    assert doc != null;
-                    Elements nodes = doc.getElementsByClass("secd-rank-list");
-                    newestVersion = Integer.valueOf(nodes.get(0).getElementsByTag("a").get(1).text());
-                    downloadLink = nodes.get(0).getElementsByTag("a").get(1).attr("href");
-                    updateContent = nodes.get(0).getElementsByTag("a").get(2).text();
-                    isForceUpdate = Boolean.parseBoolean(nodes.get(0).getElementsByTag("a").get(3).text());
-                    String[] updateContents = updateContent.split("/");
-                    for (String string : updateContents) {
-                        s.append(string);
-                        s.append("\n");
-                    }
-                    int versionCode = getVersionCode();
-                    if (newestVersion > versionCode) {
-                        MyApplication m = new MyApplication();
-                        Setting setting = SysManager.getSetting();
-                        if (isManualCheck || setting.getNewestVersionCode() < newestVersion || isForceUpdate) {
-                            setting.setNewestVersionCode(newestVersion);
-                            SysManager.saveSetting(setting);
-                            int i = setting.getNewestVersionCode();
-                            m.updateApp(activity, downloadLink, newestVersion, s.toString(), isForceUpdate);
-                        }
-                    } else if (isManualCheck) {
-                        TextHelper.showText("已经是最新版本！");
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    TextHelper.showText("无网络连接！");
-                }
-            }
-        });
-    }*/
     public static void checkVersionByServer(final AppCompatActivity activity, final boolean isManualCheck,
                                             final BookcaseFragment mBookcaseFragment) {
         MyApplication.getApplication().newThread(() -> {
@@ -436,26 +388,5 @@ public class MyApplication extends Application {
     public static boolean isDestroy(Activity mActivity) {
         return mActivity == null || mActivity.isFinishing() || mActivity.isDestroyed();
     }
-
-
-    /****************
-     *
-     * 发起添加群流程。群号：风月读书交流群(1085028304) 的 key 为： 8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn
-     * 调用 joinQQGroup(8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn) 即可发起手Q客户端申请加群 风月读书交流群(1085028304)
-     *
-     * @param key 由官网生成的key
-     * @return 返回true表示呼起手Q成功，返回false表示呼起失败
-     ******************/
-    public static boolean joinQQGroup(Context context, String key) {
-        Intent intent = new Intent();
-        intent.setData(Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26jump_from%3Dwebapi%26k%3D" + key));
-        // 此Flag可根据具体产品需要自定义，如设置，则在加群界面按返回，返回手Q主界面，不设置，按返回会返回到呼起产品界面    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        try {
-            context.startActivity(intent);
-            return true;
-        } catch (Exception e) {
-            // 未安装手Q或安装的版本不支持
-            return false;
-        }
-    }
+    
 }

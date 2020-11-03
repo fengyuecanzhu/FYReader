@@ -10,7 +10,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:background="@color/colorPrimary"
-                android:theme="@style/Theme.ToolBar.Dark.Menu"
+                android:theme="?attr/actionBarStyle"
                 app:titleTextAppearance="@style/toolbar_title_textStyle"
                 app:subtitleTextAppearance="@style/toolbar_subtitle_textStyle"
                 app:layout_scrollFlags="scroll|enterAlways">

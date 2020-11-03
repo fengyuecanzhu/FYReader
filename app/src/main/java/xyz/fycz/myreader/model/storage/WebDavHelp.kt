@@ -53,8 +53,9 @@ object WebDavHelp {
             if (initWebDav()) {
                 var files = WebDav(url + "FYReader/").listFiles()
                 files = files.reversed()
-                for (index: Int in 0 until min(10, files.size)) {
-                    files[index].displayName?.let {
+                //for (index: Int in 0 until min(10, files.size)) {
+                for (element in files) {
+                    element.displayName?.let {
                         names.add(it)
                     }
                 }

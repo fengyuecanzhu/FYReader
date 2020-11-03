@@ -21,6 +21,7 @@ import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.ScreenUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
+import xyz.fycz.myreader.widget.animation.PageAnimation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -1036,7 +1037,6 @@ public abstract class PageLoader {
             //对内容进行绘制
             for (int i = mCurPage.titleLines; i < mCurPage.lines.size(); ++i) {
                 str = mCurPage.lines.get(i);
-
                 canvas.drawText(str, mMarginWidth, top, mTextPaint);
                 if (str.endsWith("\n")) {
                     top += para;
@@ -1592,7 +1592,22 @@ public abstract class PageLoader {
         }
         return strLength;
     }
-
+    /**
+     * @return 本页内容
+     */
+    public String getContent() {
+        if (mCurPageList == null) return null;
+        if (mCurPageList.size() == 0) return null;
+        TxtPage txtPage = mCurPage;
+        StringBuilder s = new StringBuilder();
+        int size = txtPage.lines.size();
+        //int start = mPageMode == PageMode.SCROLL ? Math.min(Math.max(0, linePos), size - 1) : 0;
+        int start = 0;
+        for (int i = start; i < size; i++) {
+            s.append(txtPage.lines.get(i));
+        }
+        return s.toString();
+    }
     /*****************************************interface*****************************************/
 
     public interface OnPageChangeListener {
@@ -1630,8 +1645,6 @@ public abstract class PageLoader {
          * @param pos:当前的页面的序号
          */
         void onPageChange(int pos);
-
-        void preLoading();
 
     }
 }

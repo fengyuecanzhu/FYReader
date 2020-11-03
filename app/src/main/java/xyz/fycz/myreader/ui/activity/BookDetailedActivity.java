@@ -18,12 +18,11 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
-import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
@@ -50,7 +49,7 @@ import java.util.ArrayList;
  * @author fengyue
  * @date 2020/8/17 11:39
  */
-public class BookDetailedActivity extends BaseActivity2 {
+public class BookDetailedActivity extends BaseActivity {
     @BindView(R.id.book_detail_iv_cover)
     CoverImageView mIvCover;
    /* @BindView(R.id.book_detail_iv_blur_cover)
@@ -337,7 +336,7 @@ public class BookDetailedActivity extends BaseActivity2 {
 
     private RequestBuilder<Drawable> defaultCover() {
         return Glide.with(this)
-                .load(R.mipmap.no_image)
+                .load(R.mipmap.default_cover)
                 .apply(RequestOptions.bitmapTransform(new BlurTransformation(this, 25)));
     }
 

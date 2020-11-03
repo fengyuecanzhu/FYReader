@@ -2,8 +2,11 @@ package xyz.fycz.myreader.ui.activity;
 
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import io.reactivex.Single;
@@ -11,11 +14,12 @@ import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.base.BaseActivity2;
+import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.model.storage.BackupRestoreUi;
 import xyz.fycz.myreader.model.storage.WebDavHelp;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
@@ -27,7 +31,7 @@ import java.util.ArrayList;
  * @author fengyue
  * @date 2020/10/4 20:44
  */
-public class WebDavSettingActivity extends BaseActivity2 {
+public class WebDavSettingActivity extends BaseActivity {
     @BindView(R.id.webdav_setting_webdav_url)
     LinearLayout llWebdavUrl;
     @BindView(R.id.tv_webdav_url)
@@ -127,5 +131,21 @@ public class WebDavSettingActivity extends BaseActivity2 {
                         }
                     });
         });
+    }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.webdav_help, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_tip){
+            DialogCreator.createAssetTipDialog(this, "如何使用WebDav进行云备份？", "webdavhelp.fy");
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

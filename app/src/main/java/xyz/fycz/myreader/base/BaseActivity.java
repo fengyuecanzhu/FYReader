@@ -1,115 +1,192 @@
 package xyz.fycz.myreader.base;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.os.Build;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Window;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 
+import android.view.Menu;
+import android.view.MenuItem;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.ActivityManage;
-import xyz.fycz.myreader.util.Anti_hijackingUtils;
+import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.SysManager;
+import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.util.StatusBarUtil;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+
+/**
+ * @author fengyue
+ * @date 2020/8/12 20:02
+ */
+public abstract class BaseActivity extends AppCompatActivity {
+    private static final int INVALID_VAL = -1;
+
+    protected CompositeDisposable mDisposable;
+    //ButterKnife
+    private Toolbar mToolbar;
+
+    private Unbinder unbinder;
+
+    private int curNightMode;
+    /****************************abstract area*************************************/
+
+    @LayoutRes
+    protected abstract int getContentId();
+
+    /************************init area************************************/
+    protected void addDisposable(Disposable d){
+        if (mDisposable == null){
+            mDisposable = new CompositeDisposable();
+        }
+        mDisposable.add(d);
+    }
+
+    /**
+     * 配置Toolbar
+     * @param toolbar
+     */
+    protected void setUpToolbar(Toolbar toolbar){
+    }
+
+    protected void initData(Bundle savedInstanceState){
+    }
+    /**
+     * 初始化零件
+     */
+    protected void initWidget() {
+
+    }
+    /**
+     * 初始化点击事件
+     */
+    protected void initClick(){
+    }
+    /**
+     * 逻辑使用区
+     */
+    protected void processLogic(){
+    }
+    /**
+     * @return 是否夜间模式
+     */
+    protected boolean isNightTheme() {
+        return !SysManager.getSetting().isDayStyle();
+    }
+
+    /**
+     * 设置夜间模式
+     * @param isNightMode
+     */
+    protected void setNightTheme(boolean isNightMode) {
+        Setting setting = SysManager.getSetting();
+        setting.setDayStyle(!isNightMode);
+        MyApplication.getApplication().initNightTheme();
+    }
 
 
-public class BaseActivity extends AppCompatActivity {
-
-    public static int width = 0;
-    public static int height = 0;
-    public static boolean home;
-    public static boolean back;
-    private boolean catchHomeKey = false;
-    private boolean disallowAntiHijacking;//暂停防界面劫持
-
-    private  static boolean closeAntiHijacking;//关闭防界面劫持
 
 
-    private InputMethodManager mInputMethodManager; //输入管理器
+    /*************************lifecycle area*****************************************************/
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //将每一个Activity都加入activity管理器
+        initTheme();
         ActivityManage.addActivity(this);
-        Log.d("ActivityName: ",getLocalClassName());
-        DisplayMetrics dm = new DisplayMetrics();
-        //获取屏幕宽高
-        if(height == 0 || width == 0){
-            getWindowManager().getDefaultDisplay().getMetrics(dm);
-            width = dm.widthPixels;
-            height = dm.heightPixels;
+        setContentView(getContentId());
+        unbinder = ButterKnife.bind(this);
+        initData(savedInstanceState);
+        initToolbar();
+        initWidget();
+        initClick();
+        processLogic();
+    }
+
+    private void initToolbar(){
+        //更严谨是通过反射判断是否存在Toolbar
+        mToolbar = findViewById(R.id.toolbar);
+        if (mToolbar != null){
+            supportActionBar(mToolbar);
+            setUpToolbar(mToolbar);
         }
-
-        mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-    }
-
-    public static void setCloseAntiHijacking(boolean closeAntiHijacking) {
-        BaseActivity.closeAntiHijacking = closeAntiHijacking;
-    }
-
-    @Override
-    protected void onDestroy() {
-        ActivityManage.removeActivity(this);
-        super.onDestroy();
-    }
-
-
-    @Override
-    protected void onPause() {
-        if (!disallowAntiHijacking && !closeAntiHijacking) {
-            Anti_hijackingUtils.getinstance().onPause(this);//防界面劫持提示任务
-        }
-        super.onPause();
     }
 
     @Override
     protected void onResume() {
-        if (!closeAntiHijacking) {
-            Anti_hijackingUtils.getinstance().onResume(this);//注销防界面劫持提示任务
-        }
-        BaseActivity.home = false;
-        BaseActivity.back = false;
-        disallowAntiHijacking = false;
         super.onResume();
+        if (isThemeChange()){
+            recreate();
+        }
     }
-
-
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK){
-            back = true;//以便于判断是否按返回键触发界面劫持提示
+    protected void onDestroy() {
+        super.onDestroy();
+        ActivityManage.removeActivity(this);
+        unbinder.unbind();
+        if (mDisposable != null){
+            mDisposable.dispose();
         }
-        return super.onKeyDown(keyCode, event);
     }
-
-
-    public void setDisallowAntiHijacking(boolean disallowAntiHijacking) {
-        this.disallowAntiHijacking = disallowAntiHijacking;
-    }
-
-
-
     /**
-     * 设置状态栏颜色
-     * @param colorId
+     * 初始化主题
      */
-    public void setStatusBar(int colorId, boolean dark){
+    public void initTheme() {
+        //if (isNightTheme()) {
+            //setTheme(R.style.AppNightTheme);
+        curNightMode = AppCompatDelegate.getDefaultNightMode();
+        /*} else {
+            //curNightMode = false;
+            //setTheme(R.style.AppDayTheme);
+        }*/
+    }
+
+    protected boolean isThemeChange(){
+        return curNightMode != AppCompatDelegate.getDefaultNightMode();
+    }
+    /**************************used method area*******************************************/
+
+    protected void startActivity(Class<? extends AppCompatActivity> activity){
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
+    }
+
+    protected ActionBar supportActionBar(Toolbar toolbar){
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+        mToolbar.setNavigationOnClickListener(
+                (v) -> finish()
+        );
+        return actionBar;
+    }
+
+    protected void setStatusBarColor(int statusColor, boolean dark){
         //沉浸式代码配置
         //当FitsSystemWindows设置 true 时，会在屏幕最上方预留出状态栏高度的 padding
         StatusBarUtil.setRootViewFitsSystemWindows(this, true);
         //设置状态栏透明
         StatusBarUtil.setTranslucentStatus(this);
-        if (colorId != 0) {
-            StatusBarUtil.setStatusBarColor(this, getResources().getColor(colorId));
-        }
+        StatusBarUtil.setStatusBarColor(this, getResources().getColor(statusColor));
+
         //一般的手机的状态栏文字和图标都是白色的, 可如果你的应用也是纯白色的, 或导致状态栏文字看不清
         //所以如果你是这种情况,请使用以下代码, 设置状态使用深色文字图标风格, 否则你可以选择性注释掉这个if内容
         if (!dark) {
@@ -119,11 +196,49 @@ public class BaseActivity extends AppCompatActivity {
                 StatusBarUtil.setStatusBarColor(this, 0x55000000);
             }
         }
-
+    } /**
+     * 设置MENU图标颜色
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        for (int i = 0; i < menu.size(); i++) {
+            Drawable drawable = menu.getItem(i).getIcon();
+            if (drawable != null) {
+                drawable.mutate();
+                drawable.setColorFilter(getColor(R.color.textPrimary), PorterDuff.Mode.SRC_ATOP);
+            }
+        }
+        return super.onCreateOptionsMenu(menu);
     }
 
-    public InputMethodManager getmInputMethodManager() {
-        return mInputMethodManager;
+    @SuppressLint("PrivateApi")
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu != null) {
+            //展开菜单显示图标
+            if (menu.getClass().getSimpleName().equalsIgnoreCase("MenuBuilder")) {
+                try {
+                    Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    method.setAccessible(true);
+                    method.invoke(menu, true);
+                    method = menu.getClass().getDeclaredMethod("getNonActionItems");
+                    ArrayList<MenuItem> menuItems = (ArrayList<MenuItem>) method.invoke(menu);
+                    if (!menuItems.isEmpty()) {
+                        for (MenuItem menuItem : menuItems) {
+                            Drawable drawable = menuItem.getIcon();
+                            if (drawable != null) {
+                                drawable.mutate();
+                                drawable.setColorFilter(getResources().getColor(R.color.textPrimary), PorterDuff.Mode.SRC_ATOP);
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
+        }
+        return super.onMenuOpened(featureId, menu);
     }
 
 }

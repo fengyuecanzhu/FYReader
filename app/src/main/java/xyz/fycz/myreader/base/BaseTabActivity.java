@@ -16,7 +16,7 @@ import java.util.List;
  * @date 2020/8/12 20:02
  */
 
-public abstract class BaseTabActivity extends BaseActivity2 {
+public abstract class BaseTabActivity extends BaseActivity {
     /**************View***************/
     @BindView(R.id.tab_tl_indicator)
     protected TabLayout mTlIndicator;

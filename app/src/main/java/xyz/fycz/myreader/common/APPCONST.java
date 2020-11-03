@@ -13,7 +13,7 @@ public class APPCONST {
     public static String publicKey = "";//服务端公钥
     public static String privateKey;//app私钥
     public final static String s = "11940364935628058505";
-    public static final String KEY = "";
+    public static final String KEY = "readerByFengyue";
 
     public static final String ALARM_SCHEDULE_MSG = "alarm_schedule_msg";
 
@@ -79,7 +79,7 @@ public class APPCONST {
     public static final int PERMISSIONS_REQUEST_STORAGE = 10001;
 
     //设置版本号
-    public static final int SETTING_VERSION = 5;
+    public static final int SETTING_VERSION = 6;
 
     public static final String FORMAT_FILE_DATE = "yyyy-MM-dd";
 
