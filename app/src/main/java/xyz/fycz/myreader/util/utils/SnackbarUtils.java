@@ -43,9 +43,9 @@ public class SnackbarUtils {
                 iSnackBarClickEvent.clickEvent();
             });
         //设置snackBar和titleBar颜色一致
-        snackbar.getView().setBackgroundColor(MyApplication.getmContext().getColor(R.color.textPrimary));
+        snackbar.getView().setBackgroundColor(MyApplication.getmContext().getResources().getColor(R.color.textPrimary));
         //设置action文字的颜色
-        snackbar.setActionTextColor(MyApplication.getmContext().getColor(R.color.md_white_1000));
+        snackbar.setActionTextColor(MyApplication.getmContext().getResources().getColor(R.color.md_white_1000));
         //设置snackBar图标 这里是获取到snackBar的textView 然后给textView增加左边图标的方式来实现的
         View snackBarView = snackbar.getView();
         TextView textView = snackBarView.findViewById(R.id.snackbar_text);
