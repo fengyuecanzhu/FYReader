@@ -276,7 +276,7 @@ public class ReadActivity extends BaseActivity {
             return;
         }
         if (SharedPreUtils.getInstance().getBoolean(getString(R.string.isNightFS), false)) {
-            mSetting.setDayStyle(!ColorUtil.isColorLight(getColor(R.color.textPrimary)));
+            mSetting.setDayStyle(!ColorUtil.isColorLight(getResources().getColor(R.color.textPrimary)));
         }
         //息屏时间
         screenTimeOut = mSetting.getResetScreen() * 60;
@@ -473,15 +473,17 @@ public class ReadActivity extends BaseActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         boolean isVolumeTurnPage = SysManager.getSetting().isVolumeTurnPage();
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_VOLUME_UP:
-                if (isVolumeTurnPage) {
-                    return mPageLoader.skipToPrePage();
-                }
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-                if (isVolumeTurnPage) {
-                    return mPageLoader.skipToNextPage();
-                }
+        if (readAblTopMenu.getVisibility() != View.VISIBLE) {
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_VOLUME_UP:
+                    if (isVolumeTurnPage) {
+                        return mPageLoader.skipToPrePage();
+                    }
+                case KeyEvent.KEYCODE_VOLUME_DOWN:
+                    if (isVolumeTurnPage) {
+                        return mPageLoader.skipToNextPage();
+                    }
+            }
         }
         return super.onKeyDown(keyCode, event);
     }

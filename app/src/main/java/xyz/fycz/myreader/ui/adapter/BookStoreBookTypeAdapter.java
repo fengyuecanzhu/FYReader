@@ -58,12 +58,12 @@ public class BookStoreBookTypeAdapter extends RecyclerView.Adapter<BookStoreBook
         initView(position, holder);
         if (position == selectPos) {
             holder.itemView.setBackgroundResource(R.color.colorForeground);
-            holder.tvTypeName.setTextColor(mContext.getColor(R.color.textPrimary));
+            holder.tvTypeName.setTextColor(mContext.getResources().getColor(R.color.textPrimary));
             holder.tvTypeName.setTextSize(15);
             holder.tvTypeName.getPaint().setFakeBoldText(true);
         } else {
             holder.itemView.setBackgroundResource(R.color.colorBackground);
-            holder.tvTypeName.setTextColor(mContext.getColor(R.color.textSecondary));
+            holder.tvTypeName.setTextColor(mContext.getResources().getColor(R.color.textSecondary));
             holder.tvTypeName.getPaint().setFakeBoldText(false);
             holder.tvTypeName.setTextSize(14);
         }
