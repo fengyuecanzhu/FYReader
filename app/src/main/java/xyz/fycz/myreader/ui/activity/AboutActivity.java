@@ -60,15 +60,6 @@ public class AboutActivity extends BaseActivity {
     @Override
     protected void initClick() {
         super.initClick();
-        ClipboardManager mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        /*vmAuthor.setOnClickListener(v -> {
-            //数据
-            ClipData mClipData = ClipData.newPlainText("Label", "fy@fycz.xyz");
-            //把数据设置到剪切板上
-            assert mClipboardManager != null;
-            mClipboardManager.setPrimaryClip(mClipData);
-            ToastUtils.showSuccess("邮箱复制成功！");
-        });*/
         vmShare.setOnClickListener(v -> ShareUtils.share(this, getString(R.string.share_text) +
                 SharedPreUtils.getInstance().getString(getString(R.string.downloadLink, URLCONST.LAN_ZOUS_URL))));
         vmUpdate.setOnClickListener(v -> MyApplication.checkVersionByServer(this, true, null));
