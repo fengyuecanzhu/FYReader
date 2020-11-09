@@ -117,16 +117,16 @@ public class FontsAdapter extends ArrayAdapter<Font> {
         //viewHolder.tvExample.setTypeface(typeFace);
 //        viewHolder.tvExample.setTypeface(mTypefaceMap.get(font));
         viewHolder.tvFontName.setText(font.toString());
-        viewHolder.tvFontName.setTextColor(mFontsActivity.getColor(R.color.textPrimary));
+        viewHolder.tvFontName.setTextColor(mFontsActivity.getResources().getColor(R.color.textPrimary));
         File fontFile = new File(APPCONST.FONT_BOOK_DIR + font.fileName);
         if (font == Font.本地字体) {
             if (setting.getFont() == Font.本地字体) {
                 viewHolder.tvFontName.setText(setting.getLocalFontName());
                 viewHolder.btnFontUse.setText(getContext().getString(R.string.font_change));
-                viewHolder.btnFontUse.setButtonColor(mFontsActivity.getColor(R.color.toast_blue));
+                viewHolder.btnFontUse.setButtonColor(mFontsActivity.getResources().getColor(R.color.toast_blue));
             } else {
                 viewHolder.btnFontUse.setText(getContext().getString(R.string.font_select));
-                viewHolder.btnFontUse.setButtonColor(mFontsActivity.getColor(R.color.sys_blue_littler));
+                viewHolder.btnFontUse.setButtonColor(mFontsActivity.getResources().getColor(R.color.sys_blue_littler));
             }
             viewHolder.btnFontUse.setEnabled(true);
             viewHolder.btnFontUse.setOnClickListener(new View.OnClickListener() {
@@ -175,7 +175,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
 
         if (font != Font.默认字体 && !fontFile.exists()) {
             viewHolder.btnFontUse.setEnabled(true);
-            viewHolder.btnFontUse.setButtonColor(mFontsActivity.getColor(R.color.sys_blue_littler));
+            viewHolder.btnFontUse.setButtonColor(mFontsActivity.getResources().getColor(R.color.sys_blue_littler));
             viewHolder.btnFontUse.setText(getContext().getString(R.string.font_download));
             viewHolder.btnFontUse.setOnClickListener(v -> {
                 viewHolder.btnFontUse.setEnabled(false);
@@ -184,11 +184,11 @@ public class FontsAdapter extends ArrayAdapter<Font> {
         } else if (setting.getFont() == font) {
             viewHolder.btnFontUse.setText(getContext().getString(R.string.font_using));
             viewHolder.btnFontUse.setEnabled(false);
-            viewHolder.btnFontUse.setButtonColor(mFontsActivity.getColor(R.color.sys_word_very_little));
+            viewHolder.btnFontUse.setButtonColor(mFontsActivity.getResources().getColor(R.color.sys_word_very_little));
         } else {
             viewHolder.btnFontUse.setText(getContext().getString(R.string.font_use));
             viewHolder.btnFontUse.setEnabled(true);
-            viewHolder.btnFontUse.setButtonColor(mFontsActivity.getColor(R.color.toast_blue));
+            viewHolder.btnFontUse.setButtonColor(mFontsActivity.getResources().getColor(R.color.toast_blue));
             viewHolder.btnFontUse.setOnClickListener(v -> {
                 setting.setFont(font);
                 SysManager.saveSetting(setting);
