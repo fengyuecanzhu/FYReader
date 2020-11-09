@@ -1,7 +1,7 @@
 # FYReader-master
 风月读书，一款开源、无广告的小说阅读软件。
 
-demo下载：https://fycz.lanzoui.com/iu3dBi0gnuh
+demo下载：https://fycz.lanzoui.com/iaVu6i6ywlg
 
 #### 一、关于书源
 
