@@ -130,12 +130,13 @@ public class FontsActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         String path;
         if (resultCode == Activity.RESULT_OK && requestCode == APPCONST.SELECT_FILE_CODE) {
             Uri uri = data.getData();
-            if ("file".equalsIgnoreCase(uri.getScheme())){//使用第三方应用打开
+            if ("file".equalsIgnoreCase(uri.getScheme())) {//使用第三方应用打开
                 path = uri.getPath();
-            }else {
+            } else {
                 path = getPath(this, uri);
             }
             saveLocalFont(path);

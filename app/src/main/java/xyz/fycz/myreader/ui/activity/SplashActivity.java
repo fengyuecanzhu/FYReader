@@ -7,16 +7,40 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.app.ActivityCompat;
+
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
-import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.util.PermissionsChecker;
-import xyz.fycz.myreader.util.ToastUtils;
 
-public class SplashActivity extends AppCompatActivity {
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.signature.ObjectKey;
+import com.gyf.immersionbar.ImmersionBar;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import butterknife.BindView;
+import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.util.DateHelper;
+import xyz.fycz.myreader.util.IOUtils;
+import xyz.fycz.myreader.util.PermissionsChecker;
+import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.ImageLoader;
+import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.util.utils.SystemBarUtils;
+
+public class SplashActivity extends BaseActivity {
     /*************Constant**********/
-    private static final int WAIT_INTERVAL = 1000;
+    private static int WAIT_INTERVAL = 1000;
     private static final int PERMISSIONS_REQUEST_STORAGE = 1;
 
     static final String[] PERMISSIONS = {
@@ -24,6 +48,8 @@ public class SplashActivity extends AppCompatActivity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
+    @BindView(R.id.iv_splash)
+    AppCompatImageView ivSplash;
 
     private PermissionsChecker mPermissionsChecker;
     private Thread myThread = new Thread() {//创建子线程
@@ -41,29 +67,88 @@ public class SplashActivity extends AppCompatActivity {
     };
 
     @Override
+    protected int getContentId() {
+        return R.layout.activity_splash;
+    }
+
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setFullScreen();
-        setContentView(R.layout.activity_splash);
+        ImmersionBar.with(this)
+                .fullScreen(true)
+                .init();
+        SystemBarUtils.hideStableStatusBar(this);
+        loadImage();
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M){
             mPermissionsChecker = new PermissionsChecker(this);
             requestPermission();
         }else {
             myThread.start();
         }
-
-
     }
-    // 全屏显示
-    private void setFullScreen() {
-        // 如果该类是 extends Activity ，下面这句代码起作用
-        // 去除ActionBar(因使用的是NoActionBar的主题，故此句有无皆可)
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        // 如果该类是 extends AppCompatActivity， 下面这句代码起作用
-        if (getSupportActionBar() != null){ getSupportActionBar().hide(); }
-        // 去除状态栏，如 电量、Wifi信号等
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+    private void loadImage() {
+        File imgFile = getFileStreamPath(APPCONST.FILE_NAME_SPLASH_IMAGE);
+        if (!imgFile.exists() || SharedPreUtils.getInstance().getBoolean("needUdSI")){
+            downLoadImage();
+            return;
+        }
+        String splashLoadDate = SharedPreUtils.getInstance().getString("splashTime", "");
+        if (splashLoadDate.equals("")) {
+            return;
+        }
+        long startTime = 0;
+        long endTime = 0;
+        long curTime = DateHelper.getLongDate();
+        if (splashLoadDate.contains("~")) {
+            String[] splashLoadDates = splashLoadDate.split("~");
+            startTime = DateHelper.strDateToLong(splashLoadDates[0] + " 00:00:00");
+            endTime = DateHelper.strDateToLong(splashLoadDates[1] + " 00:00:00");
+        }
+        if (startTime == 0){
+            startTime = DateHelper.strDateToLong(splashLoadDate + " 00:00:00");
+        }
+        if (endTime == 0){
+            endTime = startTime + 24 * 60 * 60 * 1000;
+        }
+        if (curTime >= startTime && curTime <= endTime){
+            WAIT_INTERVAL = 1500;
+            ImageLoader.INSTANCE
+                    .load(this, imgFile)
+                    .error(R.drawable.start)
+                    .signature(new ObjectKey(splashLoadDate))
+                    .into(ivSplash);
+        }
+    }
+
+    private void downLoadImage() {
+        MyApplication.getApplication().newThread(() -> {
+            String url = SharedPreUtils.getInstance().getString("splashImageUrl", "");
+            if (!url.equals("")) {
+                InputStream is = null;
+                FileOutputStream fos = null;
+                try {
+                    is = OkHttpUtils.getInputStream(url);
+                    fos = openFileOutput(APPCONST.FILE_NAME_SPLASH_IMAGE, MODE_PRIVATE);
+                    byte[] bytes = new byte[1024];
+                    int len;
+                    while ((len = is.read(bytes)) != -1){
+                        fos.write(bytes, 0, len);
+                    }
+                    fos.flush();
+                    Log.d("SplashActivity", "downLoadImage success!");
+                } catch (IOException e) {
+                    File data = getFileStreamPath(APPCONST.FILE_NAME_SPLASH_IMAGE);
+                    if (data != null && data.exists()){
+                        data.delete();
+                    }
+                    e.printStackTrace();
+                }finally {
+                    IOUtils.close(is, fos);
+                }
+            }
+        });
     }
 
     private void requestPermission(){

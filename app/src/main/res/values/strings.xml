@@ -152,7 +152,7 @@
     <string name="menu_group_man">分组管理</string>
     <string name="menu_group_setting">设置分组</string>
     <string name="thread_num">搜索线程数</string>
-    <string name="cur_thread_num">当前线程数：%1$s</string>
+    <string name="cur_thread_num">当前线程数：%1$d</string>
     <string name="newest_chapter">最新章节:%1$s</string>
     <string name="source_title_num">书源:%1$s  共%2$d个源</string>
 
@@ -178,6 +178,26 @@
     <string name="menu_add_bookmark">添加书签</string>
     <string name="menu_copy_content">拷贝内容</string>
 
+
+    <!--  朗读  -->
+    <string name="read_aloud">朗读</string>
+    <string name="read_aloud_t">正在朗读</string>
+    <string name="read_aloud_s">点击返回阅读界面</string>
+    <string name="text_return">返回</string>
+    <string name="refresh">重新加载</string>
+    <string name="start">开始</string>
+    <string name="stop">停止</string>
+    <string name="pause">暂停</string>
+    <string name="resume">继续</string>
+    <string name="last">上一段</string>
+    <string name="next">下一段</string>
+    <string name="set_timer">定时</string>
+    <string name="read_aloud_pause">朗读暂停</string>
+    <string name="read_aloud_timer">正在朗读(还剩%d分钟)</string>
+    <string name="read_aloud_timerlong">"正在朗读(还剩%d小时%d分)"</string>
+    <string name="read_aloud_timerremaining">%d分钟</string>
+    <string name="read_aloud_timerremaininglong">"%d小时%d分"</string>
+    <string name="read_aloud_timerstop">"计时已取消"</string>
 
     <string-array name="reset_screen_time">
         <item>常亮</item>

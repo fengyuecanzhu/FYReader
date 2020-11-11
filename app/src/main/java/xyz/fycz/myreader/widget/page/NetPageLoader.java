@@ -32,10 +32,10 @@ public class NetPageLoader extends PageLoader {
         this.mReadCrawler = mReadCrawler;
     }
 
-    /*private List<TxtChapter> convertTxtChapter(List<Chapter> bookChapters) {
-        List<TxtChapter> txtChapters = new ArrayList<>(bookChapters.size());
+    /*private List<BookChapterBean> convertTxtChapter(List<Chapter> bookChapters) {
+        List<BookChapterBean> txtChapters = new ArrayList<>(bookChapters.size());
         for (Chapter bean : bookChapters) {
-            TxtChapter chapter = new TxtChapter();
+            BookChapterBean chapter = new BookChapterBean();
             chapter.setBookId(bean.getBookId());
             chapter.setTitle(bean.getTitle());
             chapter.setLink(bean.getUrl());

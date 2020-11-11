@@ -2,15 +2,10 @@ package xyz.fycz.myreader.widget.page;
 
 import android.util.Log;
 import io.reactivex.*;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.entity.Void;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.ChapterService;
@@ -68,10 +63,10 @@ public class LocalPageLoader extends PageLoader {
     }
 
 
-    /*private List<TxtChapter> convertTxtChapter(List<BookChapterBean> bookChapters) {
-        List<TxtChapter> txtChapters = new ArrayList<>(bookChapters.size());
+    /*private List<BookChapterBean> convertTxtChapter(List<BookChapterBean> bookChapters) {
+        List<BookChapterBean> txtChapters = new ArrayList<>(bookChapters.size());
         for (BookChapterBean bean : bookChapters) {
-            TxtChapter chapter = new TxtChapter();
+            BookChapterBean chapter = new BookChapterBean();
             chapter.title = bean.getTitle();
             chapter.start = bean.getStart();
             chapter.end = bean.getEnd();
@@ -85,11 +80,11 @@ public class LocalPageLoader extends PageLoader {
      * 1. 序章的添加
      * 2. 章节存在的书本的虚拟分章效果
      */
-    public List<TxtChapter> loadChapters() throws IOException {
+    public List<BookChapterBean> loadChapters() throws IOException {
         mBookFile = new File(mCollBook.getChapterUrl());
         //获取文件编码
         mCharset = FileUtils.getFileEncode(mBookFile.getAbsolutePath());
-        List<TxtChapter> chapters = new ArrayList<>();
+        List<BookChapterBean> chapters = new ArrayList<>();
         RandomAccessFile bookStream = null;
         boolean hasChapter = false;
         //获取文件流
@@ -132,7 +127,7 @@ public class LocalPageLoader extends PageLoader {
                         //如果当前对整个文件的偏移位置为0的话，那么就是序章
                         if (curOffset == 0) {
                             //创建序章
-                            TxtChapter preChapter = new TxtChapter();
+                            BookChapterBean preChapter = new BookChapterBean();
                             preChapter.title = "序章";
                             preChapter.start = 0;
                             preChapter.end = chapterContent.getBytes(mCharset).length; //获取String的byte值,作为最终值
@@ -143,7 +138,7 @@ public class LocalPageLoader extends PageLoader {
                             }
 
                             //创建当前章节
-                            TxtChapter curChapter = new TxtChapter();
+                            BookChapterBean curChapter = new BookChapterBean();
                             curChapter.title = matcher.group();
                             curChapter.start = preChapter.end;
                             chapters.add(curChapter);
@@ -151,7 +146,7 @@ public class LocalPageLoader extends PageLoader {
                         //否则就block分割之后，上一个章节的剩余内容
                         else {
                             //获取上一章节
-                            TxtChapter lastChapter = chapters.get(chapters.size() - 1);
+                            BookChapterBean lastChapter = chapters.get(chapters.size() - 1);
                             //将当前段落添加上一章去
                             lastChapter.end += chapterContent.getBytes(mCharset).length;
 
@@ -161,7 +156,7 @@ public class LocalPageLoader extends PageLoader {
                             }
 
                             //创建当前章节
-                            TxtChapter curChapter = new TxtChapter();
+                            BookChapterBean curChapter = new BookChapterBean();
                             curChapter.title = matcher.group();
                             curChapter.start = lastChapter.end;
                             chapters.add(curChapter);
@@ -174,7 +169,7 @@ public class LocalPageLoader extends PageLoader {
                             seekPos += chapterContent.length();
 
                             //获取上一章节
-                            TxtChapter lastChapter = chapters.get(chapters.size() - 1);
+                            BookChapterBean lastChapter = chapters.get(chapters.size() - 1);
                             lastChapter.end = lastChapter.start + chapterContent.getBytes(mCharset).length;
 
                             //如果章节内容太小，则移除
@@ -183,14 +178,14 @@ public class LocalPageLoader extends PageLoader {
                             }
 
                             //创建当前章节
-                            TxtChapter curChapter = new TxtChapter();
+                            BookChapterBean curChapter = new BookChapterBean();
                             curChapter.title = matcher.group();
                             curChapter.start = lastChapter.end;
                             chapters.add(curChapter);
                         }
                         //如果章节不存在则创建章节
                         else {
-                            TxtChapter curChapter = new TxtChapter();
+                            BookChapterBean curChapter = new BookChapterBean();
                             curChapter.title = matcher.group();
                             curChapter.start = 0;
                             chapters.add(curChapter);
@@ -220,7 +215,7 @@ public class LocalPageLoader extends PageLoader {
                                 break;
                             }
                         }
-                        TxtChapter chapter = new TxtChapter();
+                        BookChapterBean chapter = new BookChapterBean();
                         chapter.title = "第" + blockPos + "章" + "(" + chapterPos + ")";
                         chapter.start = curOffset + chapterOffset + 1;
                         chapter.end = curOffset + end;
@@ -230,7 +225,7 @@ public class LocalPageLoader extends PageLoader {
                         //设置偏移的位置
                         chapterOffset = end;
                     } else {
-                        TxtChapter chapter = new TxtChapter();
+                        BookChapterBean chapter = new BookChapterBean();
                         chapter.title = "第" + blockPos + "章" + "(" + chapterPos + ")";
                         chapter.start = curOffset + chapterOffset + 1;
                         chapter.end = curOffset + length;
@@ -245,7 +240,7 @@ public class LocalPageLoader extends PageLoader {
 
             if (hasChapter) {
                 //设置上一章的结尾
-                TxtChapter lastChapter = chapters.get(chapters.size() - 1);
+                BookChapterBean lastChapter = chapters.get(chapters.size() - 1);
                 lastChapter.end = curOffset;
             }
 
@@ -264,26 +259,26 @@ public class LocalPageLoader extends PageLoader {
 
     public void loadChapters(final ResultCallback resultCallback) {
         // 通过RxJava异步处理分章事件
-        Single.create((SingleOnSubscribe<List<TxtChapter>>) e -> {
+        Single.create((SingleOnSubscribe<List<BookChapterBean>>) e -> {
             e.onSuccess(loadChapters());
-        }).compose(RxUtils::toSimpleSingle).subscribe(new SingleObserver<List<TxtChapter>>() {
+        }).compose(RxUtils::toSimpleSingle).subscribe(new SingleObserver<List<BookChapterBean>>() {
             @Override
             public void onSubscribe(Disposable d) {
                 mChapterDisp = d;
             }
 
             @Override
-            public void onSuccess(List<TxtChapter> chapters) {
+            public void onSuccess(List<BookChapterBean> chapters) {
                 mChapterDisp = null;
                 isChapterListPrepare = true;
                 List<Chapter> mChapters = new ArrayList<>();
                 int i = 0;
-                for (TxtChapter txtChapter : chapters) {
+                for (BookChapterBean bookChapterBean : chapters) {
                     Chapter chapter = new Chapter();
                     chapter.setBookId(mCollBook.getId());
-                    chapter.setTitle(txtChapter.getTitle().replace("\n", "").replaceAll("^\\s+|\\s+$", ""));
+                    chapter.setTitle(bookChapterBean.getTitle().replace("\n", "").replaceAll("^\\s+|\\s+$", ""));
                     chapter.setId(StringHelper.getStringRandom(25));
-                    String content = getChapterContent(txtChapter);
+                    String content = getChapterContent(bookChapterBean);
                     if (StringHelper.isEmpty(content)) {
                         continue;
                     }
@@ -312,7 +307,7 @@ public class LocalPageLoader extends PageLoader {
      * @param chapter
      * @return
      */
-    private String getChapterContent(TxtChapter chapter) {
+    private String getChapterContent(BookChapterBean chapter) {
         RandomAccessFile bookStream = null;
         try {
             bookStream = new RandomAccessFile(mBookFile, "r");

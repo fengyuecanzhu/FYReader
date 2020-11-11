@@ -26,9 +26,6 @@ import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by zhao on 2017/7/25.
- */
 
 public class BookStorePresenter implements BasePresenter {
 

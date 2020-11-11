@@ -39,6 +39,7 @@ import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
+import xyz.fycz.myreader.model.backup.BackupAndRestore;
 import xyz.fycz.myreader.ui.activity.*;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -79,6 +80,7 @@ public class BookcasePresenter implements BasePresenter {
     private Setting mSetting;
     private final List<Book> errorLoadingBooks = new ArrayList<>();
     private int finishLoadBookCount = 0;
+    private final BackupAndRestore mBackupAndRestore;
     //    private int notifyId = 11;
     private ExecutorService es = Executors.newFixedThreadPool(1);//更新/下载线程池
 
@@ -174,6 +176,7 @@ public class BookcasePresenter implements BasePresenter {
         mMainActivity = (MainActivity) (mBookcaseFragment.getActivity());
 //        mChapterService = new ChapterService();
         mSetting = SysManager.getSetting();
+        mBackupAndRestore = new BackupAndRestore();
     }
 
     //启动

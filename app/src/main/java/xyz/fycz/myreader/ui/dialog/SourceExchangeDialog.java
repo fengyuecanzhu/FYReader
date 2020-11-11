@@ -30,9 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Zhouas666 on 2019-04-11
- * Github: https://github.com/zas023
- * <p>
  * 换源dialog
  */
 

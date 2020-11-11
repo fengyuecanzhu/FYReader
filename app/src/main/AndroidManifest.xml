@@ -3,28 +3,9 @@
           xmlns:tools="http://schemas.android.com/tools" package="xyz.fycz.myreader">
 
     <!-- ********************************permission************************************ -->
-    <!-- 控制振动 -->
-    <uses-permission android:name="android.permission.VIBRATE"/>
     <!-- 读取手机状态和身份 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="com.example.broadcast.permission"/>
-    <!-- 拍摄照片和视频 -->
-    <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
-    <!-- 访问闪光灯 -->
-    <!-- <uses-permission android:name="android.permission.FLASHLIGHT" /> -->
-    <!-- 读取短信 -->
-    <!-- <uses-permission android:name="android.permission.READ_SMS" /> -->
-    <!-- 修改短信 -->
-    <!-- <uses-permission android:name="android.permission.WRITE_SMS" /> -->
-    <!-- 读取联系人 -->
-    <!-- <uses-permission android:name="android.permission.READ_CONTACTS" /> -->
-    <!-- 修改您的通讯录 -->
-    <!-- <uses-permission android:name="android.permission.WRITE_CONTACTS" /> -->
-    <!-- <permission android:name="android.permission.WRITE_MEDIA_STORAGE" /> -->
-    <!-- 读取日历活动和详情 -->
-    <!-- <uses-permission android:name="android.permission.READ_CALENDAR" /> -->
-    <!-- 添加或修改日历活动，并在所有者不知情的情况下向邀请对象发送电子邮件 -->
-    <!-- <uses-permission android:name="android.permission.WRITE_CALENDAR" /> -->
     <!-- 拥有完全的网络访问权限 -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- 查看网络连接 -->
@@ -32,14 +13,11 @@
     <!-- 查看WLAN连接 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <!-- 修改或删除您的USB存储设备中的内容 -->
-
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEM"/>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <!-- 读取您的USB存储设备中的内容 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <!-- 拨打电话 -->
-    <!-- <uses-permission android:name="android.permission.CALL_PHONE" /> -->
     <!-- 开机启动 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.Manifest.permission.INTERNAL_SYSTEM_WINDOW"/>
@@ -54,7 +32,8 @@
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION"/>
     <!-- 安装应用的权限  -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <application
             android:name=".application.MyApplication"
             android:allowBackup="true"
@@ -122,8 +101,8 @@
 
         <receiver android:name=".util.notification.NotificationClickReceiver"/>
         <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver"/>
-        <receiver android:name=".ui.presenter.ReadPresenter$cancelDownloadReceiver"/>
-
+        <service android:name=".model.audio.ReadService"/>
+        <service android:name=".model.audio.ReadAloudService"/>
     </application>
 
 </manifest>

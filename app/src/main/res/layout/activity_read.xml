@@ -1,199 +1,239 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/read_abl_top_menu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/read_menu_bg"
-            android:visibility="gone"
-            tools:visibility="visible">
+        android:id="@+id/read_abl_top_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/read_menu_bg"
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    style="@style/NoPaddingToolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:minHeight="?attr/actionBarSize"
-                    android:gravity="center_vertical"
-                    android:theme="?attr/actionBarStyle"
-                    android:transitionName="sharedView"
-                    app:title="大主宰"
-                    app:layout_scrollFlags="scroll|enterAlways"
-                    app:popupTheme="@style/AppTheme.PopupOverlay">
-            </androidx.appcompat.widget.Toolbar>
+                android:id="@+id/toolbar"
+                style="@style/NoPaddingToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:gravity="center_vertical"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarStyle"
+                android:transitionName="sharedView"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:title="大主宰" />
+
             <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="0.5dp"
-                    android:background="@color/sys_dialog_setting_line" />
+                android:layout_width="fill_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/sys_dialog_setting_line" />
+
             <LinearLayout
-                    android:id="@+id/ll_chapter_view"
+                android:id="@+id/ll_chapter_view"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_chapter_title_top"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:orientation="vertical">
-                <TextView android:id="@+id/tv_chapter_title_top"
-                          android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:layout_marginStart="14dp"
-                          android:layout_marginEnd="14dp"
-                          android:textSize="15sp"
-                          android:text="章节名称"
-                          android:ellipsize="end"
-                          android:maxLines="1"
-                          android:textColor="@color/read_menu_text">
-                </TextView>
-                <TextView android:id="@+id/tv_chapter_url"
-                          android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:layout_marginStart="14dp"
-                          android:layout_marginEnd="14dp"
-                          android:ellipsize="end"
-                          android:textSize="13sp"
-                          android:text="章节链接"
-                          android:maxLines="1"
-                          android:textColor="@color/read_menu_text">
-                </TextView>
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="章节名称"
+                    android:textColor="@color/read_menu_text"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/tv_chapter_url"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="章节链接"
+                    android:textColor="@color/read_menu_text"
+                    android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <!--阅读页面-->
     <xyz.fycz.myreader.widget.page.PageView
-            android:id="@+id/read_pv_content"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            tools:visibility="gone"/>
-    <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp">
-        <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
-                android:id="@+id/pb_nextPage"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:splitTrack="false"
-                app:seekBarRotation="CW270"
-                android:visibility="invisible"
-                tools:visibility="visible"/>
-    </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
-    <ProgressBar
-            android:id="@+id/pb_loading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="gone"
-            tools:visibility="visible"/>
+        android:id="@+id/read_pv_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        tools:visibility="gone" />
 
-    <!--切换页面提示-->
-    <TextView
-            android:id="@+id/read_tv_page_tip"
+    <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp">
+
+        <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
+            android:id="@+id/pb_nextPage"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/read_ll_bottom_menu"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="10dp"
-            android:background="@color/read_menu_bg"
-            android:gravity="center"
-            android:paddingLeft="12dp"
-            android:paddingTop="8dp"
-            android:paddingRight="12dp"
-            android:paddingBottom="8dp"
-            android:text="1/12"
-            android:textColor="@color/md_white_1000"
-            android:visibility="gone"/>
+            android:layout_height="match_parent"
+            android:splitTrack="false"
+            android:visibility="invisible"
+            app:seekBarRotation="CW270"
+            tools:visibility="visible" />
+    </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+
 
     <!--底部页面-->
     <LinearLayout
-            android:id="@+id/read_ll_bottom_menu"
+        android:id="@+id/read_ll_bottom_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="@color/read_menu_bg"
-            android:clickable="true"
-            android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:layout_height="wrap_content">
+            <!--切换页面提示-->
+            <TextView
+                android:id="@+id/read_tv_page_tip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp"
+                android:background="@color/read_menu_bg"
+                android:gravity="center"
+                android:layout_marginTop="4dp"
+                android:paddingLeft="12dp"
+                android:paddingTop="8dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="8dp"
+                android:text="1/12"
+                android:textColor="@color/md_white_1000" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/iv_listen_book"
+                app:backgroundTint="@color/read_menu_bg"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="12dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:tint="@color/read_menu_text"
+                android:src="@drawable/ic_listen_book"
+                app:elevation="2dp"
+                app:fabCustomSize="40dp"
+                app:pressedTranslationZ="2dp"
+                />
+        </RelativeLayout>
 
         <!--页面进度栏-->
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@color/read_menu_bg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
-                    android:id="@+id/read_tv_pre_chapter"
-                    style="@style/MAppTheme.TextAppearance.Read.BottomMenu"
-                    android:layout_width="80dp"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="上一章"/>
+                android:id="@+id/read_tv_pre_chapter"
+                style="@style/MAppTheme.TextAppearance.Read.BottomMenu"
+                android:layout_width="80dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="上一章" />
 
             <SeekBar
-                    android:id="@+id/read_sb_chapter_progress"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:max="100"
-                    android:maxHeight="3dp"
-                    android:minHeight="3dp"
-                    android:progressDrawable="@drawable/seekbar_bg"
-                    android:thumb="@mipmap/thumb"
-                    android:thumbOffset="10dp"/>
+                android:id="@+id/read_sb_chapter_progress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="100"
+                android:maxHeight="3dp"
+                android:minHeight="3dp"
+                android:progressDrawable="@drawable/seekbar_bg"
+                android:thumb="@mipmap/thumb"
+                android:thumbOffset="10dp" />
 
             <TextView
-                    android:id="@+id/read_tv_next_chapter"
-                    style="@style/MAppTheme.TextAppearance.Read.BottomMenu"
-                    android:layout_width="80dp"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="下一章"/>
+                android:id="@+id/read_tv_next_chapter"
+                style="@style/MAppTheme.TextAppearance.Read.BottomMenu"
+                android:layout_width="80dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="下一章" />
         </LinearLayout>
+
         <View
-                android:layout_width="fill_parent"
-                android:layout_height="0.5dp"
-                android:background="@color/sys_dialog_setting_line" />
+            android:layout_width="fill_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/sys_dialog_setting_line" />
         <!--菜单栏-->
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:orientation="horizontal"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp">
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:background="@color/read_menu_bg"
+            android:orientation="horizontal"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
 
             <TextView
-                    android:id="@+id/read_tv_category"
-                    style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
-                    android:drawableTop="@mipmap/t3"
-                    android:text="目录"/>
+                android:id="@+id/read_tv_category"
+                style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
+                android:text="目录"
+                android:clickable="true"
+                android:focusable="true"
+                app:drawableTopCompat="@mipmap/t3" />
 
             <TextView
-                    android:id="@+id/read_tv_download"
-                    style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
-                    android:drawableTop="@mipmap/download"
-                    android:text="下载"/>
+                android:id="@+id/read_tv_download"
+                style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
+                android:text="下载"
+                android:clickable="true"
+                android:focusable="true"
+                app:drawableTopCompat="@mipmap/download" />
 
             <TextView
-                    android:id="@+id/read_tv_night_mode"
-                    style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
-                    android:drawableTop="@mipmap/ao"
-                    android:text="夜间"/>
+                android:id="@+id/read_tv_night_mode"
+                style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
+                android:text="夜间"
+                android:clickable="true"
+                android:focusable="true"
+                app:drawableTopCompat="@mipmap/ao" />
 
             <TextView
-                    android:id="@+id/read_tv_setting"
-                    style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
-                    android:drawableTop="@mipmap/t6"
-                    android:text="设置"/>
+                android:id="@+id/read_tv_setting"
+                style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
+                android:text="设置"
+                android:clickable="true"
+                android:focusable="true"
+                app:drawableTopCompat="@mipmap/t6" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
