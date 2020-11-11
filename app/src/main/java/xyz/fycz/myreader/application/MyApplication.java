@@ -22,6 +22,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.appcompat.app.AppCompatDelegate;
+
 import io.reactivex.internal.functions.Functions;
 import io.reactivex.plugins.RxJavaPlugins;
 import org.jsoup.Jsoup;
@@ -160,11 +161,17 @@ public class MyApplication extends Application {
     @TargetApi(26)
     private void createNotificationChannel() {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationChannel channel = new NotificationChannel(APPCONST.channelIdDownload, "下载通知", NotificationManager.IMPORTANCE_LOW);
-        channel.enableLights(true);//是否在桌面icon右上角展示小红点
-        channel.setLightColor(Color.RED);//小红点颜色
-        channel.setShowBadge(false); //是否在久按桌面图标时显示此渠道的通知
-        notificationManager.createNotificationChannel(channel);
+        NotificationChannel downloadChannel = new NotificationChannel(APPCONST.channelIdDownload, "下载通知", NotificationManager.IMPORTANCE_LOW);
+        downloadChannel.enableLights(true);//是否在桌面icon右上角展示小红点
+        downloadChannel.setLightColor(Color.RED);//小红点颜色
+        downloadChannel.setShowBadge(false); //是否在久按桌面图标时显示此渠道的通知
+        notificationManager.createNotificationChannel(downloadChannel);
+
+        NotificationChannel readChannel = new NotificationChannel(APPCONST.channelIdRead, "朗读通知", NotificationManager.IMPORTANCE_LOW);
+        readChannel.enableLights(true);//是否在桌面icon右上角展示小红点
+        readChannel.setLightColor(Color.RED);//小红点颜色
+        readChannel.setShowBadge(false); //是否在久按桌面图标时显示此渠道的通知
+        notificationManager.createNotificationChannel(readChannel);
     }
 
 
@@ -271,6 +278,13 @@ public class MyApplication extends Application {
                 updateContent = contents[3].substring(contents[3].indexOf(":") + 1);
                 SharedPreUtils spu = SharedPreUtils.getInstance();
                 spu.putString(getmContext().getString(R.string.lanzousKeyStart), contents[4].substring(contents[4].indexOf(":") + 1));
+
+                String newSplashTime = contents[5].substring(contents[5].indexOf(":") + 1);
+                String oldSplashTime = spu.getString("splashTime");
+                spu.putBoolean("needUdSI", !oldSplashTime.equals(newSplashTime));
+                spu.putString("splashTime", contents[5].substring(contents[5].indexOf(":") + 1));
+                spu.putString("splashImageUrl", contents[6].substring(contents[6].indexOf(":") + 1));
+
                 if (!StringHelper.isEmpty(downloadLink)) {
                     spu.putString(getmContext().getString(R.string.downloadLink), downloadLink);
                 } else {
@@ -388,5 +402,26 @@ public class MyApplication extends Application {
     public static boolean isDestroy(Activity mActivity) {
         return mActivity == null || mActivity.isFinishing() || mActivity.isDestroyed();
     }
-    
+
+
+    /****************
+     *
+     * 发起添加群流程。群号：风月读书交流群(1085028304) 的 key 为： 8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn
+     * 调用 joinQQGroup(8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn) 即可发起手Q客户端申请加群 风月读书交流群(1085028304)
+     *
+     * @param key 由官网生成的key
+     * @return 返回true表示呼起手Q成功，返回false表示呼起失败
+     ******************/
+    public static boolean joinQQGroup(Context context, String key) {
+        Intent intent = new Intent();
+        intent.setData(Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26jump_from%3Dwebapi%26k%3D" + key));
+        // 此Flag可根据具体产品需要自定义，如设置，则在加群界面按返回，返回手Q主界面，不设置，按返回会返回到呼起产品界面    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            context.startActivity(intent);
+            return true;
+        } catch (Exception e) {
+            // 未安装手Q或安装的版本不支持
+            return false;
+        }
+    }
 }

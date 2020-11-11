@@ -13,9 +13,7 @@ import xyz.fycz.myreader.R;
 
 import java.util.ArrayList;
 
-/**
- * Created by zhao on 2017/7/26.
- */
+
 
 public class SuggestBookAdapter extends ArrayAdapter<String> {
 

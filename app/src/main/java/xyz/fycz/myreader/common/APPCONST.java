@@ -10,7 +10,7 @@ import java.io.File;
 
 public class APPCONST {
 
-    public static String publicKey = "";//服务端公钥
+    public static String publicKey = "fyds1.0";//服务端公钥
     public static String privateKey;//app私钥
     public final static String s = "11940364935628058505";
     public static final String KEY = "readerByFengyue";
@@ -58,6 +58,7 @@ public class APPCONST {
 
     public static final String FILE_NAME_SETTING = "setting";
     public static final String FILE_NAME_UPDATE_INFO = "updateInfo";
+    public static final String FILE_NAME_SPLASH_IMAGE = "splashImage";
 
     public static final int REQUEST_FONT = 1001;
     public static final int REQUEST_CHAPTER_PAGE = 1002;
@@ -84,6 +85,9 @@ public class APPCONST {
     public static final String FORMAT_FILE_DATE = "yyyy-MM-dd";
 
     public final static String channelIdDownload = "channel_download";
+
+    public final static String channelIdRead = "channel_read_aloud";
+
 
     public static final String DEFAULT_WEB_DAV_URL = "https://dav.jianguoyun.com/dav/";
 

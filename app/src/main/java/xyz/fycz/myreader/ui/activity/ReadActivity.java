@@ -18,12 +18,14 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 import butterknife.OnClick;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gyf.immersionbar.ImmersionBar;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 import xyz.fycz.myreader.ActivityManage;
@@ -42,7 +44,9 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.BookMarkService;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
+import xyz.fycz.myreader.model.audio.ReadAloudService;
 import xyz.fycz.myreader.model.storage.Backup;
+import xyz.fycz.myreader.ui.dialog.AudioPlayerDialog;
 import xyz.fycz.myreader.ui.dialog.CopyContentDialog;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -111,6 +115,8 @@ public class ReadActivity extends BaseActivity {
     TextView readTvSetting;
     @BindView(R.id.read_ll_bottom_menu)
     LinearLayout readLlBottomMenu;
+    @BindView(R.id.iv_listen_book)
+    FloatingActionButton readBtnListenBook;
 
     /***************************variable*****************************/
     private ImmersionBar immersionBar;
@@ -164,6 +170,7 @@ public class ReadActivity extends BaseActivity {
 
     private SourceExchangeDialog mSourceDialog;
     private Dialog mSettingDialog;
+    private AudioPlayerDialog mAudioPlayerDialog;
 
     private boolean hasChangeSource;
 
@@ -360,7 +367,6 @@ public class ReadActivity extends BaseActivity {
                             preLoad(pos - 1 + i);
                         }
                         mBook.setHistoryChapterId(mChapters.get(pos).getTitle());
-                        mHandler.sendMessage(mHandler.obtainMessage(4));
                         MyApplication.getApplication().newThread(() -> {
                             if (mPageLoader.getPageStatus() == PageLoader.STATUS_LOADING) {
                                 if (!NetworkUtils.isNetWorkAvailable()) {
@@ -370,7 +376,6 @@ public class ReadActivity extends BaseActivity {
                                 }
                             }
                         });
-
                     }
 
                     @Override
@@ -390,8 +395,18 @@ public class ReadActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onPageChange(int pos) {
+                    public void onPageChange(int pos, boolean resetRead) {
                         mHandler.sendMessage(mHandler.obtainMessage(4));
+                        if ((ReadAloudService.running)) {
+                            if (resetRead) {
+                                mHandler.postDelayed(() ->mAudioPlayerDialog.readAloud(), 500);
+                                return;
+                            }
+                            if (pos == 0) {
+                                mHandler.postDelayed(() ->mAudioPlayerDialog.readAloud(), 500);
+                                return;
+                            }
+                        }
                     }
                 }
         );
@@ -445,6 +460,23 @@ public class ReadActivity extends BaseActivity {
             finish();
             startActivity(intent);
         });
+
+        readBtnListenBook.setOnClickListener(v -> {
+            if (mSetting.getPageMode() == PageMode.SCROLL) {
+                ToastUtils.showWarring("朗读暂不支持滚动翻页模式!");
+                return;
+            }
+            toggleMenu(true);
+            if (mAudioPlayerDialog == null) {
+                mAudioPlayerDialog = new AudioPlayerDialog(this, mPageLoader);
+                mAudioPlayerDialog.setOnDismissListener(dialog -> hideSystemBar());
+            }
+            if (!ReadAloudService.running) {
+                mAudioPlayerDialog.aloudStatus = ReadAloudService.Status.STOP;
+                SystemUtil.ignoreBatteryOptimization(this);
+            }
+            mAudioPlayerDialog.show();
+        });
     }
 
     @Override
@@ -455,7 +487,6 @@ public class ReadActivity extends BaseActivity {
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
         registerReceiver(mReceiver, intentFilter);
-
         //当书籍Collected且书籍id不为空的时候保存上次阅读信息
         if (isCollected && !StringHelper.isEmpty(mBook.getId())) {
             //保存上次阅读信息
@@ -499,6 +530,10 @@ public class ReadActivity extends BaseActivity {
             }
         } else if (mSettingDialog.isShowing()) {
             mSettingDialog.dismiss();
+            return;
+        } else if (ReadAloudService.running && mAudioPlayerDialog.aloudStatus == ReadAloudService.Status.PLAY) {
+            ReadAloudService.pause(this);
+            ToastUtils.showInfo("朗读暂停！");
             return;
         }
         finish();
@@ -555,6 +590,7 @@ public class ReadActivity extends BaseActivity {
         if (autoPage) {
             autoPageStop();
         }
+        ReadAloudService.stop(this);
         for (int i = 0; i < 9; i++) {
             mHandler.removeMessages(i + 1);
         }
@@ -655,6 +691,7 @@ public class ReadActivity extends BaseActivity {
                     break;
             }
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
     /**************************method*********************************/
     /**
@@ -1047,6 +1084,9 @@ public class ReadActivity extends BaseActivity {
      * 默认是隐藏的
      */
     private void toggleMenu(boolean hideStatusBar) {
+        toggleMenu(hideStatusBar, false);
+    }
+    public void toggleMenu(boolean hideStatusBar, boolean home) {
         initMenuAnim();
         if (readAblTopMenu.getVisibility() == View.VISIBLE) {
             //关闭
@@ -1054,18 +1094,22 @@ public class ReadActivity extends BaseActivity {
             readLlBottomMenu.startAnimation(mBottomOutAnim);
             readAblTopMenu.setVisibility(GONE);
             readLlBottomMenu.setVisibility(GONE);
-            readTvPageTip.setVisibility(GONE);
             if (hideStatusBar) {
                 hideSystemBar();
             }
-        } else {
-            readTvPageTip.setVisibility(VISIBLE);
-            readAblTopMenu.setVisibility(View.VISIBLE);
-            readLlBottomMenu.setVisibility(View.VISIBLE);
-            readAblTopMenu.startAnimation(mTopInAnim);
-            readLlBottomMenu.startAnimation(mBottomInAnim);
-            showSystemBar();
+            return;
         }
+        if (ReadAloudService.running && !home){
+            if (mAudioPlayerDialog != null) {
+                mAudioPlayerDialog.show();
+                return;
+            }
+        }
+        readAblTopMenu.setVisibility(View.VISIBLE);
+        readLlBottomMenu.setVisibility(View.VISIBLE);
+        readAblTopMenu.startAnimation(mTopInAnim);
+        readLlBottomMenu.startAnimation(mBottomInAnim);
+        showSystemBar();
     }
 
     //初始化菜单动画
@@ -1085,8 +1129,10 @@ public class ReadActivity extends BaseActivity {
 
     private void hideSystemBar() {
         //隐藏
-        SystemBarUtils.hideStableStatusBar(this);
-        SystemBarUtils.hideStableNavBar(this);
+        if (readAblTopMenu.getVisibility() != VISIBLE || (mAudioPlayerDialog != null && !mAudioPlayerDialog.isShowing())) {
+            SystemBarUtils.hideStableStatusBar(this);
+            SystemBarUtils.hideStableNavBar(this);
+        }
     }
 
     /******************设置相关*****************/
@@ -1112,7 +1158,11 @@ public class ReadActivity extends BaseActivity {
                     mSettingDialog.dismiss();
                 }, this::showPageModeDialog, v -> {
                     if (mSetting.getPageMode() == PageMode.SCROLL) {
-                        ToastUtils.showWarring("滚动暂时不支持自动翻页");
+                        ToastUtils.showWarring("滚动暂时不支持自动翻页！");
+                        return;
+                    }
+                    if (ReadAloudService.running){
+                        ToastUtils.showWarring("请先关闭语音朗读！");
                         return;
                     }
                     mSettingDialog.dismiss();
@@ -1309,7 +1359,7 @@ public class ReadActivity extends BaseActivity {
             keepScreenOn(true);
             return;
         }
-        int screenOffTime = screenTimeOut * 1000 - ScreenHelper.getScreenOffTime(this);
+        int screenOffTime = screenTimeOut * 1000 - SystemUtil.getScreenOffTime(this);
         if (screenOffTime > 0) {
             mHandler.removeCallbacks(keepScreenRunnable);
             keepScreenOn(true);
@@ -1508,7 +1558,7 @@ public class ReadActivity extends BaseActivity {
     /**
      * 停止自动翻页
      */
-    private void autoPageStop() {
+    public void autoPageStop() {
         autoPage = false;
         autoPage();
     }
@@ -1525,4 +1575,5 @@ public class ReadActivity extends BaseActivity {
             autoPage();
         });
     }
+
 }

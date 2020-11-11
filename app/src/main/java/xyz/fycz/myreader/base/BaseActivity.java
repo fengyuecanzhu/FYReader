@@ -205,7 +205,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             Drawable drawable = menu.getItem(i).getIcon();
             if (drawable != null) {
                 drawable.mutate();
-                drawable.setColorFilter(getColor(R.color.textPrimary), PorterDuff.Mode.SRC_ATOP);
+                drawable.setColorFilter(getResources().getColor(R.color.textPrimary), PorterDuff.Mode.SRC_ATOP);
             }
         }
         return super.onCreateOptionsMenu(menu);

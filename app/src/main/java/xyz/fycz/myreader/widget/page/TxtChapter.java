@@ -1,59 +1,99 @@
 package xyz.fycz.myreader.widget.page;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Created by newbiechen on 17-7-1.
+ * Created by zhouas666 on 18-1-23.
+ * 书籍chapter
  */
 
-public class TxtChapter {
+public class TxtChapter{
 
-    //章节所属的小说(网络)
-    String bookId;
-    //章节名
-    String title;
+    private int position;
+    private List<TxtPage> txtPageList = new ArrayList<>();
+    private List<Integer> txtPageLengthList = new ArrayList<>();
+    private List<Integer> paragraphLengthList = new ArrayList<>();
+    private Status status = Status.LOADING;
+    private String msg;
 
-    //章节内容在文章中的起始位置(本地)
-    long start;
-    //章节内容在文章中的终止位置(本地)
-    long end;
-
-    public String getBookId() {
-        return bookId;
+    TxtChapter(int position) {
+        this.position = position;
     }
 
-    public void setBookId(String id) {
-        this.bookId = id;
+    public int getPosition() {
+        return position;
     }
 
-    public String getTitle() {
-        return title;
+    List<TxtPage> getTxtPageList() {
+        return txtPageList;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    void addPage(TxtPage txtPage) {
+        txtPageList.add(txtPage);
     }
 
-    public long getStart() {
-        return start;
+    int getPageSize() {
+        return txtPageList.size();
     }
 
-    public void setStart(long start) {
-        this.start = start;
+    TxtPage getPage(int page) {
+        if (!txtPageList.isEmpty()) {
+            return txtPageList.get(Math.max(0, Math.min(page, txtPageList.size() - 1)));
+        }
+        return null;
     }
 
-    public long getEnd() {
-        return end;
+    Status getStatus() {
+        return status;
     }
 
-    public void setEnd(long end) {
-        this.end = end;
+    void setStatus(Status mStatus) {
+        this.status = mStatus;
     }
 
-    @Override
-    public String toString() {
-        return "TxtChapter{" +
-                "title='" + title + '\'' +
-                ", start=" + start +
-                ", end=" + end +
-                '}';
+    public String getMsg() {
+        return msg;
     }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    int getPageLength(int position) {
+        if (txtPageLengthList != null && position >= 0 && position < txtPageLengthList.size()) {
+            return txtPageLengthList.get(position);
+        }
+        return -1;
+    }
+
+    void addTxtPageLength(int length) {
+        txtPageLengthList.add(length);
+    }
+
+    List<Integer> getTxtPageLengthList() {
+        return txtPageLengthList;
+    }
+
+    List<Integer> getParagraphLengthList() {
+        return paragraphLengthList;
+    }
+
+    void addParagraphLength(int length) {
+        paragraphLengthList.add(length);
+    }
+
+    int getParagraphIndex(int length) {
+        for (int i = 0; i < paragraphLengthList.size(); i++) {
+            if ((i == 0 || paragraphLengthList.get(i - 1) < length) && length <= paragraphLengthList.get(i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public enum Status {
+        LOADING, FINISH, ERROR, EMPTY, CATEGORY_EMPTY, CHANGE_SOURCE,
+    }
+
 }

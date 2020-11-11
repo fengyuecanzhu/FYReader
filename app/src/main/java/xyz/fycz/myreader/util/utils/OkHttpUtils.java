@@ -9,6 +9,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.SecureRandom;
 
 public class OkHttpUtils {
@@ -32,7 +33,7 @@ public class OkHttpUtils {
                 .addHeader("connection", "Keep-Alive")
                 //.addHeader("Charsert", "utf-8")
                 .addHeader("Cache-Control", "no-cache")
-                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36");
+                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36");
         if (requestBody != null) {
             builder.post(requestBody);
             Log.d("HttpPost URl", url);
@@ -65,5 +66,20 @@ public class OkHttpUtils {
         }
 
         return ssfFactory;
+    }
+
+    public static InputStream getInputStream(String url) throws IOException {
+        Request.Builder builder = new Request.Builder()
+                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36");
+        Request request = builder
+                .url(url)
+                .build();
+        Response response = okHttpClient
+                .newCall(request)
+                .execute();
+        if (response.body() == null){
+            return null;
+        }
+        return response.body().byteStream();
     }
 }
