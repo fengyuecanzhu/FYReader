@@ -2,7 +2,11 @@ package xyz.fycz.myreader.widget.page;
 
 import android.content.Context;
 import android.graphics.*;
+import android.text.Layout;
+import android.text.StaticLayout;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import android.text.TextPaint;
 import android.util.Log;
@@ -147,7 +151,7 @@ public abstract class PageLoader {
     private int mLastChapterPos = 0;
     private int readTextLength; //已读字符数
     private boolean resetReadAloud; //是否重新朗读
-    private int readAloudParagraph; //正在朗读章节
+    private int readAloudParagraph = -1; //正在朗读章节
 
     /*****************************init params*******************************/
     public PageLoader(PageView pageView, Book collBook, Setting setting) {
@@ -1027,8 +1031,10 @@ public abstract class PageLoader {
 
             //对标题进行绘制
             boolean isLight;
+            int titleLen = 0;
             for (int i = 0; i < mCurPage.titleLines; ++i) {
                 str = mCurPage.lines.get(i);
+                titleLen += str.length();
                 isLight = ReadAloudService.running && readAloudParagraph == 0;
                 mTitlePaint.setColor(isLight ? mContext.getResources().getColor(R.color.sys_color) : mTextColor);
 
@@ -1056,7 +1062,7 @@ public abstract class PageLoader {
             for (int i = mCurPage.titleLines; i < mCurPage.lines.size(); ++i) {
                 str = mCurPage.lines.get(i);
                 strLength = strLength + str.length();
-                int paragraphLength = mCurPage.position == 0 ? strLength : mCurChapter.getPageLength(mCurPage.position - 1) + strLength;
+                int paragraphLength = mCurPage.position == 0 ? strLength + titleLen : mCurChapter.getPageLength(mCurPage.position - 1) + strLength;
                 isLight = ReadAloudService.running && readAloudParagraph == mCurChapter.getParagraphIndex(paragraphLength);
                 mTextPaint.setColor(isLight ? mContext.getResources().getColor(R.color.sys_color) : mTextColor);
                 canvas.drawText(str, mMarginWidth, top, mTextPaint);
@@ -1284,6 +1290,7 @@ public abstract class PageLoader {
 
     private void chapterChangeCallback() {
         if (mPageChangeListener != null) {
+            readAloudParagraph = -1;
             mPageChangeListener.onChapterChange(mCurChapterPos);
             mPageChangeListener.onPageChange(0, resetReadAloud);
             resetReadAloud = true;
