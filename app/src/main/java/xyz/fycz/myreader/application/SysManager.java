@@ -55,7 +55,7 @@ public class SysManager {
         setting.setLanguage(Language.simplified);
         setting.setFont(Font.默认字体);
         setting.setAutoScrollSpeed(300);
-        setting.setPageMode(PageMode.SIMULATION);
+        setting.setPageMode(PageMode.COVER);
         setting.setVolumeTurnPage(true);
         setting.setResetScreen(3);
         setting.setBookcaseStyle(BookcaseStyle.listMode);
