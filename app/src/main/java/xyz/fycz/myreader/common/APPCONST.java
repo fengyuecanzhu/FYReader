@@ -10,10 +10,10 @@ import java.io.File;
 
 public class APPCONST {
 
-    public static String publicKey = "fyds1.0";//服务端公钥
+    public static String publicKey = "";//服务端公钥
     public static String privateKey;//app私钥
     public final static String s = "11940364935628058505";
-    public static final String KEY = "readerByFengyue";
+    public static final String KEY = "";
 
     public static final String ALARM_SCHEDULE_MSG = "alarm_schedule_msg";
 
@@ -29,7 +29,6 @@ public class APPCONST {
             + "book_cache"+ File.separator ;
     public static String HTML_CACHE_PATH = FileUtils.getCachePath() + File.separator
             + "html_cache"+ File.separator ;
-    public static final String LOADING_ERROR = "\t\t \t\t\t\t\n\n　　章节内容转码失败！\n\n\t\t \t\t\t\n\n";
 
     public static long exitTime;
     public static final int exitConfirmTime = 2000;
