@@ -12,6 +12,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.NumberPicker;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -33,8 +34,8 @@ import xyz.fycz.myreader.widget.page.PageLoader;
 
 import static xyz.fycz.myreader.util.utils.StringUtils.getString;
 
-public class AudioPlayerDialog extends Dialog{
-    private static final String TAG="AudioPlayerDialog";
+public class AudioPlayerDialog extends Dialog {
+    private static final String TAG = "AudioPlayerDialog";
     private PageLoader mPageLoader;
     private ReadActivity mReadActivity;
     private boolean aloudNextPage;
@@ -45,6 +46,8 @@ public class AudioPlayerDialog extends Dialog{
     private int speechRate;
     private int timer;
 
+    @BindView(R.id.iv_reset_setting)
+    TextView tvResetSetting;
     @BindView(R.id.sb_volume_progress)
     SeekBar sbVolume;
     @BindView(R.id.sb_pitch_progress)
@@ -122,6 +125,18 @@ public class AudioPlayerDialog extends Dialog{
         sbVolume.setOnSeekBarChangeListener(seekBarChangeListener);
         sbPitch.setOnSeekBarChangeListener(seekBarChangeListener);
         sbSpeechRate.setOnSeekBarChangeListener(seekBarChangeListener);
+        tvResetSetting.setOnClickListener(v ->{
+            pitch = 10;
+            speechRate = 10;
+            sbPitch.setProgress(pitch);
+            sbSpeechRate.setProgress(speechRate);
+            SharedPreUtils.getInstance().putInt("pitch", pitch);
+            SharedPreUtils.getInstance().putInt("speechRate", speechRate);
+            if (ReadAloudService.running) {
+                ReadAloudService.pause(mReadActivity);
+                ReadAloudService.resume(mReadActivity);
+            }
+        });
     }
 
     private class SeekBarChangeListener implements SeekBar.OnSeekBarChangeListener{
@@ -206,7 +221,7 @@ public class AudioPlayerDialog extends Dialog{
                 NumberPicker hourPicker = timer.findViewById(R.id.hour_picker);
                 int hour = this.timer / 60;
                 int minute = this.timer % 60;
-                hourPicker.setMaxValue(24);
+                hourPicker.setMaxValue(5);
                 hourPicker.setMinValue(0);
                 hourPicker.setValue(hour);
                 NumberPicker minutePicker = timer.findViewById(R.id.minute_picker);
