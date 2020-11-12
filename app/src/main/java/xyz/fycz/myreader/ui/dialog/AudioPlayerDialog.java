@@ -130,7 +130,7 @@ public class AudioPlayerDialog extends Dialog {
             speechRate = 10;
             sbPitch.setProgress(pitch);
             sbSpeechRate.setProgress(speechRate);
-            SharedPreUtils.getInstance().putInt("pitch", pitch);
+            SharedPreUtils.getInstance().putInt("readPitch", pitch);
             SharedPreUtils.getInstance().putInt("speechRate", speechRate);
             if (ReadAloudService.running) {
                 ReadAloudService.pause(mReadActivity);
