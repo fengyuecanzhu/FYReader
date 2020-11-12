@@ -857,7 +857,7 @@ public abstract class PageLoader {
      *
      * @return
      */
-    protected abstract boolean hasChapterData(Chapter chapter);
+    public abstract boolean hasChapterData(Chapter chapter);
 
 
     /**

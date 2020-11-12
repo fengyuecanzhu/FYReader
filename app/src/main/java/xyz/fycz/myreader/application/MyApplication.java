@@ -254,7 +254,7 @@ public class MyApplication extends Application {
         MyApplication.getApplication().newThread(() -> {
             Document doc = null;
             try {
-                String url = "https://shimo.im/docs/cqkgjPRRydYYhQKt/read";
+                String url = "https://shimo.im/docs/JzVpMgbZUJARSaFs/read";
                 if (isApkInDebug(getmContext())) {
                     url = "https://shimo.im/docs/zfzpda7MUGskOC9v/read";
                 }
