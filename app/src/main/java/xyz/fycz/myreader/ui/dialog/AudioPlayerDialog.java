@@ -3,6 +3,7 @@ package xyz.fycz.myreader.ui.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -34,12 +35,13 @@ import xyz.fycz.myreader.widget.page.PageLoader;
 
 import static xyz.fycz.myreader.util.utils.StringUtils.getString;
 
-public class AudioPlayerDialog extends Dialog {
-    private static final String TAG = "AudioPlayerDialog";
+public class AudioPlayerDialog extends Dialog{
+    private static final String TAG="AudioPlayerDialog";
     private PageLoader mPageLoader;
     private ReadActivity mReadActivity;
     private boolean aloudNextPage;
     public ReadAloudService.Status aloudStatus = ReadAloudService.Status.STOP;
+    private Handler mHandler = new Handler();
 
     private int volume;
     private int pitch;
@@ -274,12 +276,12 @@ public class AudioPlayerDialog extends Dialog {
                 case ReadAloudService.READ_ALOUD_START:
                     aloudNextPage = true;
                     if (mPageLoader != null) {
-                        mPageLoader.readAloudStart((Integer) event);
+                        mHandler.post(() -> mPageLoader.readAloudStart((Integer) event));
                     }
                     break;
                 case ReadAloudService.READ_ALOUD_NUMBER:
                     if (mPageLoader != null && aloudNextPage) {
-                        mPageLoader.readAloudLength((Integer) event);
+                        mHandler.post(() ->  mPageLoader.readAloudLength((Integer) event));
                     }
                     break;
                 case ReadAloudService.ALOUD_STATE:
