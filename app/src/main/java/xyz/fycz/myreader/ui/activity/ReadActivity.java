@@ -397,18 +397,21 @@ public class ReadActivity extends BaseActivity {
                     @Override
                     public void onPageChange(int pos, boolean resetRead) {
                         mHandler.sendMessage(mHandler.obtainMessage(4));
-                        if ((ReadAloudService.running)) {
-                            if (resetRead) {
-                                if (mAudioPlayerDialog != null) {
-                                    mHandler.postDelayed(() ->mAudioPlayerDialog.readAloud(), 500);
+                        if (ReadAloudService.running) {
+                            if (mPageLoader.hasChapterData(mChapters.get(mPageLoader.getChapterPos()))) {
+                                if (resetRead) {
+                                    if (mAudioPlayerDialog != null) {
+                                        mHandler.postDelayed(() -> mAudioPlayerDialog.readAloud(), 500);
+                                    }
+                                    return;
                                 }
-                                return;
-                            }
-                            if (pos == 0) {
-                                if (mAudioPlayerDialog != null) {
-                                    mHandler.postDelayed(() ->mAudioPlayerDialog.readAloud(), 500);
+                                if (pos == 0) {
+                                    if (mAudioPlayerDialog != null) {
+                                        mHandler.postDelayed(() -> mAudioPlayerDialog.readAloud(), 500);
+                                    }
                                 }
-                                return;
+                            }else {
+                                ReadAloudService.stop(ReadActivity.this);
                             }
                         }
                     }
