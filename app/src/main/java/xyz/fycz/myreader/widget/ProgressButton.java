@@ -47,9 +47,9 @@ public class ProgressButton extends AppCompatButton {
         //Get default normal color
         int defaultButtonColor = getResources().getColor(R.color.toast_default);
         //Get default progress color
-        int defaultProgressColor = getResources().getColor(R.color.colorAccent, null);
+        int defaultProgressColor = getResources().getColor(R.color.colorAccent);
         //Get default progress background color
-        int defaultBackColor = getResources().getColor(R.color.toast_default, null);
+        int defaultBackColor = getResources().getColor(R.color.toast_default);
 
         TypedArray attr = context.obtainStyledAttributes(attrs, R.styleable.ProgressButton);
 
