@@ -399,11 +399,15 @@ public class ReadActivity extends BaseActivity {
                         mHandler.sendMessage(mHandler.obtainMessage(4));
                         if ((ReadAloudService.running)) {
                             if (resetRead) {
-                                mHandler.postDelayed(() ->mAudioPlayerDialog.readAloud(), 500);
+                                if (mAudioPlayerDialog != null) {
+                                    mHandler.postDelayed(() ->mAudioPlayerDialog.readAloud(), 500);
+                                }
                                 return;
                             }
                             if (pos == 0) {
-                                mHandler.postDelayed(() ->mAudioPlayerDialog.readAloud(), 500);
+                                if (mAudioPlayerDialog != null) {
+                                    mHandler.postDelayed(() ->mAudioPlayerDialog.readAloud(), 500);
+                                }
                                 return;
                             }
                         }

@@ -2,7 +2,7 @@
 
 风月读书，一款开源、无广告的小说阅读软件。
 
-demo下载：[https://fycz.lanzoui.com/iNvVQiam1cd](https://fycz.lanzoui.com/iNvVQiam1cd)
+成品下载【11.11 新增语音朗读】：[https://fycz.lanzoui.com/iETUwib10af](https://fycz.lanzoui.com/iETUwib10af)
 
 #### 一、关于书源
 
@@ -195,13 +195,8 @@ demo下载：[https://fycz.lanzoui.com/iNvVQiam1cd](https://fycz.lanzoui.com/iNv
   * 某点的排行榜、分类，全本小说网
   * 制作发现源方法与书源类似，在此不再赘述
 
-![Image](./img/1.png)
-![Image](./img/2.png)
-![Image](./img/3.png)
-![Image](./img/4.png)
-![Image](./img/10.png)
-![Image](./img/5.png)
-![Image](./img/6.png)
-![Image](./img/7.png)
-![Image](./img/8.png)
-![Image](./img/9.png)
+![Image](./img/1.png)![Image](./img/2.png)
+![Image](./img/3.png)![Image](./img/4.png)
+![Image](./img/10.png)![Image](./img/5.png)
+![Image](./img/6.png)![Image](./img/7.png)
+![Image](./img/8.png)![Image](./img/9.png)
