@@ -1461,6 +1461,9 @@ public abstract class PageLoader {
                     }
 
                     subStr = paragraph.substring(0, wordCount);
+                    if (paragraph.substring(wordCount).equals("\n")) {
+                        subStr += "\n";
+                    }
                     if (!subStr.equals("\n")) {
                         //将一行字节，存储到lines中
                         lines.add(subStr);

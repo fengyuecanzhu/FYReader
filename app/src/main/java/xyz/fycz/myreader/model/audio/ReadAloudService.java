@@ -16,7 +16,10 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -83,6 +86,22 @@ public class ReadAloudService extends Service {
     private int readAloudNumber;
     private int progress;
     private static ReadEvent mReadEvent;
+
+    PhoneStateListener phoneStateListener = new PhoneStateListener() {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+            if (state == TelephonyManager.CALL_STATE_RINGING) {
+                //Incoming call: Pause
+                pauseReadAloud(true);
+            } else if(state == TelephonyManager.CALL_STATE_IDLE) {
+                //Not in call: Play
+                resumeReadAloud();
+            } else if(state == TelephonyManager.CALL_STATE_OFFHOOK) {
+                //A call is dialing, active or on hold
+            }
+            super.onCallStateChanged(state, incomingNumber);
+        }
+    };
 
     /**
      * 朗读
@@ -195,6 +214,11 @@ public class ReadAloudService extends Service {
         dsRunnable = this::doDs;
         initBroadcastReceiver();
         updateNotification();
+        //监听电话状态
+        TelephonyManager mgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        if(mgr != null) {
+            mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        }
     }
 
     @Override
@@ -512,6 +536,11 @@ public class ReadAloudService extends Service {
         postEvent(ALOUD_STATE, Status.STOP);
         unregisterReceiver(broadcastReceiver);
         clearTTS();
+        //取消监听
+        TelephonyManager mgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        if(mgr != null) {
+            mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+        }
     }
 
     private void clearTTS() {
@@ -599,6 +628,7 @@ public class ReadAloudService extends Service {
             postEvent(READ_ALOUD_NUMBER, readAloudNumber + start);
         }
     }
+
 
 
     private void postEvent(String tag, Object event){
