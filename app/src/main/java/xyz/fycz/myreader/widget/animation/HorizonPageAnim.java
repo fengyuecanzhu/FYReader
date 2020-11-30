@@ -6,6 +6,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import xyz.fycz.myreader.application.SysManager;
+
 /**
  * Created by newbiechen on 17-7-24.
  * 横向动画的模板
@@ -31,12 +33,12 @@ public abstract class HorizonPageAnim extends PageAnimation{
     private boolean noNext = false;
 
     public HorizonPageAnim(int w, int h, View view, OnPageChangeListener listener) {
-        this(w, h, 0, 0, view, listener);
+        this(w, h, 0, 0,0, view, listener);
     }
 
-    public HorizonPageAnim(int w, int h, int marginWidth, int marginHeight,
+    public HorizonPageAnim(int w, int h, int marginWidth, int marginTop, int marginBottom,
                            View view, OnPageChangeListener listener) {
-        super(w, h, marginWidth, marginHeight, view,listener);
+        super(w, h, marginWidth, marginTop, marginBottom, view,listener);
         //创建图片
         mCurBitmap = Bitmap.createBitmap(mViewWidth, mViewHeight, Bitmap.Config.RGB_565);
         mNextBitmap = Bitmap.createBitmap(mViewWidth, mViewHeight, Bitmap.Config.RGB_565);
@@ -143,11 +145,7 @@ public abstract class HorizonPageAnim extends PageAnimation{
                 break;
             case MotionEvent.ACTION_UP:
                 if (!isMove){
-                    if (x < mScreenWidth / 2){
-                        isNext = false;
-                    }else{
-                        isNext = true;
-                    }
+                    isNext = x > mScreenWidth / 2 || SysManager.getSetting().isAlwaysNext();
 
                     if (isNext) {
                         //判断是否下一页存在

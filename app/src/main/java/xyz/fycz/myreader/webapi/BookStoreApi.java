@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.webapi;
 
 
+import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 
@@ -21,7 +22,7 @@ public class BookStoreApi extends BaseApi{
         getCommonReturnHtmlStringApi(findCrawler.getFindUrl(), null, findCrawler.getCharset(), true, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
-                callback.onFinish(findCrawler.getBookTypeList((String) o),0);
+                callback.onFinish(findCrawler.getBookTypes((String) o),0);
             }
 
             @Override
@@ -38,12 +39,12 @@ public class BookStoreApi extends BaseApi{
      * @param findCrawler
      * @param callback
      */
-    public static void getBookRankList(String url, FindCrawler findCrawler, final ResultCallback callback){
+    public static void getBookRankList(BookType bookType, FindCrawler findCrawler, final ResultCallback callback){
 
-        getCommonReturnHtmlStringApi(url, null, findCrawler.getCharset(),true, new ResultCallback() {
+        getCommonReturnHtmlStringApi(bookType.getUrl(), null, findCrawler.getCharset(),true, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
-                callback.onFinish(findCrawler.getRankBookList((String) o),0);
+                callback.onFinish(findCrawler.getFindBooks((String) o, bookType),0);
             }
 
             @Override

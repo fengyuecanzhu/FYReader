@@ -33,6 +33,8 @@ public class AboutActivity extends BaseActivity {
     CardView vmUpdate;
     @BindView(R.id.vw_update_log)
     CardView vmUpdateLog;
+    @BindView(R.id.vw_qq)
+    CardView vmQQ;
     @BindView(R.id.vw_git)
     CardView vmGit;
     @BindView(R.id.vw_disclaimer)
@@ -60,10 +62,29 @@ public class AboutActivity extends BaseActivity {
     @Override
     protected void initClick() {
         super.initClick();
+        ClipboardManager mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        vmAuthor.setOnClickListener(v -> {
+            //数据
+            ClipData mClipData = ClipData.newPlainText("Label", "fy@fycz.xyz");
+            //把数据设置到剪切板上
+            assert mClipboardManager != null;
+            mClipboardManager.setPrimaryClip(mClipData);
+            ToastUtils.showSuccess("邮箱复制成功！");
+        });
         vmShare.setOnClickListener(v -> ShareUtils.share(this, getString(R.string.share_text) +
-                SharedPreUtils.getInstance().getString(getString(R.string.downloadLink, URLCONST.LAN_ZOUS_URL))));
+                SharedPreUtils.getInstance().getString(getString(R.string.downloadLink), URLCONST.LAN_ZOUS_URL)));
         vmUpdate.setOnClickListener(v -> MyApplication.checkVersionByServer(this, true, null));
         vmUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));
+        vmQQ.setOnClickListener(v -> {
+            if (!MyApplication.joinQQGroup(this,"8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")){
+                //数据
+                ClipData mClipData = ClipData.newPlainText("Label", "1085028304");
+                //把数据设置到剪切板上
+                assert mClipboardManager != null;
+                mClipboardManager.setPrimaryClip(mClipData);
+                ToastUtils.showError("未安装手Q或安装的版本不支持！\n已复制QQ群号，您可自行前往QQ添加！");
+            }
+        });
         vmGit.setOnClickListener(v -> openIntent(Intent.ACTION_VIEW, getString(R.string.this_github_url)));
         vmDisclaimer.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "免责声明", "disclaimer.fy"));
 

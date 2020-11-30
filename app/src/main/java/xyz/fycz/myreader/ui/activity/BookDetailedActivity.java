@@ -2,27 +2,61 @@ package xyz.fycz.myreader.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import butterknife.BindView;
 import butterknife.OnClick;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder;
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.annotations.NonNull;
+import xyz.fycz.myreader.BuildConfig;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
+import xyz.fycz.myreader.common.URLCONST;
+import xyz.fycz.myreader.entity.SharedBook;
+import xyz.fycz.myreader.util.IOUtils;
+import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.utils.BitmapUtil;
+import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
+import xyz.fycz.myreader.util.utils.RxUtils;
+import xyz.fycz.myreader.util.utils.ScreenUtils;
+import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
@@ -43,7 +77,11 @@ import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.widget.CoverImageView;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author fengyue
@@ -52,8 +90,8 @@ import java.util.ArrayList;
 public class BookDetailedActivity extends BaseActivity {
     @BindView(R.id.book_detail_iv_cover)
     CoverImageView mIvCover;
-   /* @BindView(R.id.book_detail_iv_blur_cover)
-    ImageView mIvBlurCover;*/
+    /* @BindView(R.id.book_detail_iv_blur_cover)
+     ImageView mIvBlurCover;*/
     @BindView(R.id.book_detail_tv_author)
     TextView mTvAuthor;
     @BindView(R.id.book_detail_tv_type)
@@ -188,7 +226,7 @@ public class BookDetailedActivity extends BaseActivity {
                         break;
                     }
                 }
-            }else {
+            } else {
                 aBooks.get(sourceIndex).setNewestChapterId("true");
             }
         }
@@ -227,7 +265,7 @@ public class BookDetailedActivity extends BaseActivity {
 
         //换源对话框
         mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
-            Book bookTem = new Book(mBook);
+            Book bookTem = (Book) mBook.clone();
             bookTem.setChapterUrl(bean.getChapterUrl());
             if (!StringHelper.isEmpty(bean.getImgUrl())) {
                 bookTem.setImgUrl(bean.getImgUrl());
@@ -235,7 +273,7 @@ public class BookDetailedActivity extends BaseActivity {
             if (!StringHelper.isEmpty(bean.getType())) {
                 bookTem.setType(bean.getType());
             }
-            if (!StringHelper.isEmpty(bean.getDesc())){
+            if (!StringHelper.isEmpty(bean.getDesc())) {
                 bookTem.setDesc(bean.getDesc());
             }
             bookTem.setSource(bean.getSource());
@@ -522,6 +560,9 @@ public class BookDetailedActivity extends BaseActivity {
                 }*/
                 mSourceDialog.show();
                 break;
+            case R.id.action_share:
+                shareBook();
+                break;
             case R.id.action_reload:  //重新加载
                 mHandler.sendEmptyMessage(1);
                 break;
@@ -606,5 +647,173 @@ public class BookDetailedActivity extends BaseActivity {
                     break;
             }
         }
+    }
+
+    /**
+     * 分享书籍
+     */
+    private void shareBook() {
+        ToastUtils.showInfo("正在生成分享图片");
+        Single.create((SingleOnSubscribe<File>) emitter -> {
+            // 使用url
+            String url = SharedPreUtils.getInstance().getString(getString(R.string.downloadLink), URLCONST.LAN_ZOUS_URL);
+            if (url == null)
+                url = "";
+
+            int maxLength = 1273 - 1 - url.length();
+
+            SharedBook sharedBook = SharedBook.bookToSharedBook(mBook);
+
+            url = url + "#" + GsonExtensionsKt.getGSON().toJson(sharedBook);
+
+            Log.d("QRcode", "Length=" + url.length() + "\n" + url);
+
+            Bitmap bitmap;
+            QRCodeEncoder.HINTS.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
+            bitmap = QRCodeEncoder.syncEncodeQRCode(url, 360);
+            QRCodeEncoder.HINTS.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+
+            File share = makeShareFile(bitmap);
+            if (share == null) {
+                ToastUtils.showError("分享图片生成失败");
+                return;
+            }
+            emitter.onSuccess(share);
+        }).compose(RxUtils::toSimpleSingle)
+          .subscribe(new MySingleObserver<File>() {
+              @Override
+              public void onSuccess(@NonNull File File) {
+                  share(File);
+              }
+          });
+    }
+
+    /**
+     * 生成分享图片
+     * @param QRCode
+     * @return
+     */
+
+    private File makeShareFile(Bitmap QRCode) {
+        FileOutputStream fos = null;
+        try {
+            Bitmap back = BitmapFactory.decodeStream(getResources().getAssets().open("share.png")).copy(Bitmap.Config.ARGB_8888, true);
+            int backWidth = back.getWidth();
+            int backHeight = back.getHeight();
+
+            int margin = 60;
+
+            int marginTop = 24;
+
+            mIvCover.setDrawingCacheEnabled(true);
+            Bitmap img = Bitmap.createBitmap(mIvCover.getDrawingCache()).copy(Bitmap.Config.ARGB_8888, true);
+            mIvCover.setDrawingCacheEnabled(false);
+            img = BitmapUtil.getBitmap(img, 152, 209);
+
+            Canvas cv = new Canvas(back);
+            cv.drawBitmap(img, margin, margin + marginTop * 2, null);
+
+            TextPaint textPaint = new TextPaint();
+            textPaint.setAntiAlias(true);
+            textPaint.setFilterBitmap(true);
+            textPaint.setColor(Color.BLACK);
+            textPaint.setTextSize(40);
+
+            String name = TextUtils.ellipsize(mBook.getName(), textPaint, backWidth - margin + marginTop * 3 - img.getWidth(), TextUtils.TruncateAt.END).toString();
+            cv.drawText(name, margin + marginTop + img.getWidth(), margin + marginTop * 4, textPaint);
+
+
+            textPaint.setColor(getResources().getColor(R.color.origin));
+            textPaint.setTextSize(32);
+            cv.drawText(mBook.getAuthor(), margin + marginTop + img.getWidth(), margin + marginTop * 6, textPaint);
+
+            textPaint.setColor(Color.BLACK);
+            cv.drawText(mBook.getType() == null ? "" : mBook.getType(), margin + marginTop + img.getWidth(), margin + marginTop * 8, textPaint);
+            assert mBook.getSource() != null;
+            cv.drawText("书源：" + BookSource.fromString(mBook.getSource()).text, margin + marginTop + img.getWidth(), margin + marginTop * 10, textPaint);
+
+            int textSize = 35;
+            int textInterval = textSize / 2;
+            textPaint.setTextSize(textSize);
+
+            drawDesc(getDescLines(backWidth - margin * 2, textPaint), textPaint, cv, margin + marginTop * 4 + img.getHeight(), margin, textInterval);
+
+            cv.drawBitmap(QRCode, backWidth - QRCode.getWidth(), backHeight - QRCode.getHeight(), null);
+
+            cv.save();// 保存
+            cv.restore();// 存储
+
+            File share = FileUtils.getFile(APPCONST.SHARE_FILE_DIR + mBook.getName() + "_share.png");
+            fos = new FileOutputStream(share);
+            back.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            Log.i("tag", "saveBitmap success: " + share.getAbsolutePath());
+            return share;
+        } catch (Exception e) {
+            e.printStackTrace();
+            ToastUtils.showError(e.getLocalizedMessage());
+            return null;
+        } finally {
+            IOUtils.close(fos);
+        }
+    }
+
+    /**
+     * 分享生成的图片
+     * @param share
+     */
+    private void share(File share) {
+        //noinspection ResultOfMethodCallIgnored
+        share.setReadable(true, false);
+        Uri contentUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", share);
+        final Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+        intent.setType("image/png");
+        startActivity(Intent.createChooser(intent, "分享书籍"));
+    }
+
+    /**
+     * 绘制简介
+     * @param lines
+     * @param textPaint
+     * @param canvas
+     * @param top
+     * @param left
+     * @param textInterval
+     */
+    private void drawDesc(List<String> lines, TextPaint textPaint, Canvas canvas, int top, int left, int textInterval) {
+        float interval = textInterval + textPaint.getTextSize();
+        for (String line : lines) {
+            canvas.drawText(line, left, top, textPaint);
+            top += interval;
+        }
+    }
+
+    /**
+     * 生成简介lines
+     * @param width
+     * @param textPaint
+     * @return
+     */
+
+    private List<String> getDescLines(int width, TextPaint textPaint) {
+        List<String> lines = new ArrayList<>();
+        String desc = StringUtils.halfToFull("  ") + mBook.getDesc();
+        int i = 0;
+        int wordCount = 0;
+        String subStr = null;
+        while (desc.length() > 0) {
+            if (i == 9) {
+                lines.add(TextUtils.ellipsize(desc, textPaint, width / 1.8f, TextUtils.TruncateAt.END).toString());
+                break;
+            }
+            wordCount = textPaint.breakText(desc, true, width, null);
+            subStr = desc.substring(0, wordCount);
+            lines.add(subStr);
+            desc = desc.substring(wordCount);
+            i++;
+        }
+        return lines;
     }
 }

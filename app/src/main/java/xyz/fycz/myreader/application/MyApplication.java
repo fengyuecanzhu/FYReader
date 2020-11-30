@@ -44,6 +44,8 @@ import javax.net.ssl.X509TrustManager;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
+import xyz.fycz.myreader.model.backup.UserService;
+import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.ui.dialog.APPDownloadTip;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.entity.Setting;
@@ -51,7 +53,9 @@ import xyz.fycz.myreader.entity.UpdateInfo;
 import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
 import xyz.fycz.myreader.util.*;
+import xyz.fycz.myreader.util.llog.LLog;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 
 
 public class MyApplication extends Application {
@@ -73,6 +77,7 @@ public class MyApplication extends Application {
         }
         mFixedThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());//初始化线程池
         initNightTheme();
+//        LLog.init(APPCONST.LOG_DIR);
     }
 
     public void initNightTheme() {
@@ -87,7 +92,7 @@ public class MyApplication extends Application {
         }
     }
 
-    protected boolean isNightTheme() {
+    public boolean isNightTheme() {
         return !SysManager.getSetting().isDayStyle();
     }
 
@@ -254,7 +259,7 @@ public class MyApplication extends Application {
         MyApplication.getApplication().newThread(() -> {
             Document doc = null;
             try {
-                String url = "https://shimo.im/docs/JzVpMgbZUJARSaFs/read";
+                String url = "https://shimo.im/docs/cqkgjPRRydYYhQKt/read";
                 if (isApkInDebug(getmContext())) {
                     url = "https://shimo.im/docs/zfzpda7MUGskOC9v/read";
                 }

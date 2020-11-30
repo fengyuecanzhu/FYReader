@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/read_menu_bg"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_auto_scroll_speed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="15dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:text="翻页速度：50%"
+        android:textColor="@color/read_menu_text"
+        android:textSize="@dimen/text_small_size"
+        tools:ignore="RtlSymmetry" />
+
+    <SeekBar
+        android:id="@+id/sb_auto_scroll_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:max="100"
+        android:maxHeight="1.5dp"
+        android:minHeight="1.5dp"
+        android:paddingStart="40dp"
+        android:paddingEnd="40dp"
+        android:paddingBottom="20dp"
+        android:progress="50"
+        android:progressDrawable="@drawable/seekbar_bg"
+        android:thumb="@mipmap/thumb" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/sys_dialog_setting_line" />
+
+    <TextView
+        android:id="@+id/tv_exit_auto_page"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="退出自动翻页"
+        android:textColor="@drawable/setting_btn_bg_color"
+        android:textSize="@dimen/text_small_size" />
+
+    <View
+        android:id="@+id/vwNavigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/read_menu_bg" />
+</LinearLayout>

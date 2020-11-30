@@ -4,14 +4,14 @@ package xyz.fycz.myreader.widget.page;
 public class BookChapterBean {
 
     //章节所属的小说(网络)
-    String bookId;
+    public String bookId;
     //章节名
-    String title;
+    public  String title;
 
     //章节内容在文章中的起始位置(本地)
-    long start;
+    public  long start;
     //章节内容在文章中的终止位置(本地)
-    long end;
+    public  long end;
 
     public String getBookId() {
         return bookId;

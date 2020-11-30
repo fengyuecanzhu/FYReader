@@ -29,11 +29,11 @@ public class OkHttpUtils {
     public static String getHtml(String url, RequestBody requestBody, String encodeType) throws IOException {
 
         Request.Builder builder = new Request.Builder()
-                .addHeader("accept", "*/*")
-                .addHeader("connection", "Keep-Alive")
+                .addHeader("Accept", "*/*")
+                .addHeader("Connection", "Keep-Alive")
                 //.addHeader("Charsert", "utf-8")
                 .addHeader("Cache-Control", "no-cache")
-                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36");
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36");
         if (requestBody != null) {
             builder.post(requestBody);
             Log.d("HttpPost URl", url);

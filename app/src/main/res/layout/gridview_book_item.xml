@@ -5,8 +5,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,17 +15,20 @@
                 android:id="@+id/iv_book_img"
                 android:layout_width="80dp"
                 android:layout_height="110dp"
+                android:layout_gravity="center"
                 android:scaleType="fitXY"
                 app:srcCompat="@mipmap/default_cover" />
 
         <TextView
             android:layout_marginTop="5dp"
+            android:layout_gravity="center"
             android:id="@+id/tv_book_name"
-            android:layout_width="wrap_content"
+            android:layout_width="86dp"
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:ellipsize="end"
             android:text="bookname"
+            android:gravity="center"
             android:textColor="@color/textPrimary"/>
 
     </LinearLayout>
@@ -37,11 +38,10 @@
             android:id="@+id/tv_no_read_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="25dp"
-            android:includeFontPadding="false"
-            android:layout_marginRight="10dp"/>
+            android:includeFontPadding="false" />
 
     <ProgressBar
             android:id="@+id/pb_loading"

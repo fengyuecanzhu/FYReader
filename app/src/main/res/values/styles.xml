@@ -61,7 +61,24 @@
         <item name="colorControlNormal">@color/gray</item>
         <item name="colorControlActivated">@color/colorAccent</item>
     </style>
+    <declare-styleable name="CircleCheckbox">
+        <attr name="showOuterCircle" format="boolean" />
 
+        <attr name="tickColor" format="string"/>
+        <attr name="outerCircleColor" format="string"/>
+        <attr name="innerCircleColor" format="string"/>
+        <attr name="textColor" format="string"/>
+        <attr name="circleBorderColor" format="string"/>
+
+        <attr name="outerCircleRadius" format="dimension"/>
+        <attr name="innerCircleRadius" format="dimension"/>
+        <attr name="textSize" format="dimension"/>
+        <attr name="borderThickness" format="dimension"/>
+        <attr name="tickThickness" format="dimension"/>
+
+        <attr name="textLeftPadding" format="dimension"/>
+        <attr name="text" format="string"/>
+    </declare-styleable>
 
     <style name="SingleLine">
         <item name="android:singleLine">true</item>
@@ -151,7 +168,7 @@
 
 
     <!--ReadActivity-->
-    <style name="MAppTheme.TextAppearance.Read"></style>
+    <style name="MAppTheme.TextAppearance.Read" />
 
     <style name="MAppTheme.TextAppearance.Read.TopMenu">
         <item name="android:layout_width">50dp</item>
@@ -162,7 +179,7 @@
     </style>
 
     <style name="MAppTheme.TextAppearance.Read.BottomMenu">
-        <item name="android:textColor">@color/read_menu_text</item>
+        <item name="android:textColor">@drawable/setting_btn_bg_color</item>
         <item name="android:textSize">@dimen/text_small_size</item>
     </style>
 
@@ -171,6 +188,8 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
+        <item name="android:textColor">@drawable/setting_btn_bg_color</item>
+        <item name="android:textSize">@dimen/text_small_size</item>
     </style>
 
     <style name="dialogWindowAnim" parent="android:Animation" mce_bogus="1">

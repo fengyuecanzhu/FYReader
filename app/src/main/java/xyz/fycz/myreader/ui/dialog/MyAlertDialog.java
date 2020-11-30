@@ -11,6 +11,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.textfield.TextInputLayout;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
@@ -82,6 +83,7 @@ public class MyAlertDialog {
                                              DialogInterface.OnClickListener posListener) {
         return createInputDia(context, title, hint, initText, InputType.TYPE_CLASS_TEXT, cancelable, maxLen, oic, posListener);
     }
+
 
     public interface onInputChangeListener{
         void onChange(String text);

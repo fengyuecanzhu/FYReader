@@ -1,6 +1,8 @@
 package xyz.fycz.myreader.webapi.crawler.find;
 
 import android.content.Context;
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,6 +42,7 @@ public class QiDianMobileRank extends FindCrawler {
     private LinkedHashMap<String, Integer> sortName = new LinkedHashMap<>();
     private boolean isFemale;
     private boolean isSort;
+    private int onePageNum = 20;
 
     public QiDianMobileRank(boolean isFemale) {
         this.isFemale = isFemale;
@@ -118,7 +121,7 @@ public class QiDianMobileRank extends FindCrawler {
     }
 
 
-    public List<BookType> getRankTypes() {
+    public List<BookType> getBookTypes() {
         if (!isSort) {
             initMaleRankName();
         } else {
@@ -159,7 +162,7 @@ public class QiDianMobileRank extends FindCrawler {
                 new ResultCallback() {
                     @Override
                     public void onFinish(Object o, int code) {
-                        rc.onFinish(getBooksFromJson((String) o), 1);
+                        rc.onFinish(getBooksFromJson((String) o, bookType), 1);
                     }
 
                     @Override
@@ -169,11 +172,13 @@ public class QiDianMobileRank extends FindCrawler {
                 });
     }
 
-    private List<QDBook> getBooksFromJson(String json) {
+    private List<QDBook> getBooksFromJson(String json, BookType bookType) {
         List<QDBook> books = new ArrayList<>();
         try {
             JSONObject all = new JSONObject(json);
             JSONObject data = all.getJSONObject("data");
+            int total = data.getInt("total");
+            bookType.setPageSize(total % onePageNum == 0 ? total / onePageNum : total / onePageNum + 1);
             JSONArray jsonBooks = data.getJSONArray("records");
             for (int i = 0; i < jsonBooks.length(); i++) {
                 JSONObject jsonBook = jsonBooks.getJSONObject(i);
@@ -218,7 +223,10 @@ public class QiDianMobileRank extends FindCrawler {
     @Override
     public boolean getTypePage(BookType curType, int page) {
         if (!isSort) {
-            if (page > 30) {
+            if (curType.getPageSize() <= 0){
+                curType.setPageSize(30);
+            }
+            if (page > curType.getPageSize()) {
                 return true;
             }
         }else {
@@ -237,12 +245,12 @@ public class QiDianMobileRank extends FindCrawler {
     }
 
     @Override
-    public List<BookType> getBookTypeList(String html) {
-        return null;
+    public boolean needSearch() {
+        return true;
     }
 
     @Override
-    public List<Book> getRankBookList(String html) {
+    public List<Book> getFindBooks(String html, BookType bookType) {
         return null;
     }
 

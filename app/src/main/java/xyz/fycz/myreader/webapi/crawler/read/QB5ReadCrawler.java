@@ -65,13 +65,19 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
     public boolean hasImg() {
         return false;
     }
+
+    @Override
+    public boolean needSearch() {
+        return false;
+    }
+
     /**
      * 获取书城小说分类列表
      *
      * @param html
      * @return
      */
-    public List<BookType> getBookTypeList(String html) {
+    public List<BookType> getBookTypes(String html) {
         List<BookType> bookTypes = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         Elements divs = doc.getElementsByClass("nav_cont");
@@ -126,9 +132,13 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
         return books;
     }
 
-    public List<Book> getRankBookList(String html) {
+    public List<Book> getFindBooks(String html, BookType bookType) {
         List<Book> books = new ArrayList<>();
         Document doc = Jsoup.parse(html);
+        try {
+            int pageSize = Integer.parseInt(doc.getElementsByClass("last").first().text());
+            bookType.setPageSize(pageSize);
+        }catch (Exception ignored){}
         String type = doc.select("meta[name=keywords]").attr("content").replace(",全本小说网", "");
         Element div = doc.getElementById("tlist");
         Elements uls = div.getElementsByTag("ul");
@@ -267,19 +277,18 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
 
 
     public boolean getTypePage(BookType curType, int page){
-        if (page > 10){
+        if (curType.getPageSize() <= 0){
+            curType.setPageSize(10);
+        }
+        if (page > curType.getPageSize()){
             return true;
         }
         if (!curType.getTypeName().equals("完本小说")) {
             curType.setUrl(curType.getUrl().substring(0, curType.getUrl().lastIndexOf("_") + 1) + page + "/");
         }else {
-            if (page > 1){
-                return true;
-            }
+            curType.setUrl(curType.getUrl().substring(0, curType.getUrl().lastIndexOf("/") + 1) + page);
         }
         return false;
     }
-
-
 
 }

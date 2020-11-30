@@ -1,18 +1,14 @@
 package xyz.fycz.myreader.model.storage
 
 import android.app.Activity
-import android.app.Activity.RESULT_OK
-import android.content.Intent
 import android.net.Uri
 import android.text.TextUtils
-import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.toast
+import xyz.fycz.myreader.application.SysManager
 import xyz.fycz.myreader.base.observer.MySingleObserver
 import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.model.storage.WebDavHelp.getWebDavFileNames
@@ -47,6 +43,7 @@ object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
     }
 
     override fun restoreSuccess() {
+        SysManager.regetmSetting()
         ToastUtils.showSuccess("恢复成功")
     }
 

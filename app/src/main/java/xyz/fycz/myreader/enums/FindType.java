@@ -2,11 +2,6 @@ package xyz.fycz.myreader.enums;
 
 import java.io.Serializable;
 
-/**
- * 小说源
- * Created by zhao on 2020/04/13.
- */
-
 public enum FindType implements Serializable {
 
     qidian("排行榜[起点中文网]", "https://www.qidian.com/rank"),

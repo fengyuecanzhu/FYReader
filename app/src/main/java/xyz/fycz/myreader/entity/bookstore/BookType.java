@@ -9,6 +9,7 @@ public class BookType {
 
     private String typeName;//分类名称
     private String url;//分类链接
+    private int pageSize;//页数
 
     public String getTypeName() {
         return typeName;
@@ -24,5 +25,13 @@ public class BookType {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
 }

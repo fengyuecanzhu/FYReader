@@ -16,6 +16,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
+import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.widget.CoverImageView;
 
 /**
@@ -59,7 +60,8 @@ public class BookStoreBookHolder extends ViewHolderImpl<Book> {
     public void onBind(Book data, int pos) {
         tvBookName.setText(data.getName());
         tvBookAuthor.setText(data.getAuthor());
-        tvBookNewestChapter.setText(data.getNewestChapterTitle());
+        tvBookNewestChapter.setText(StringHelper.isEmpty(data.getNewestChapterTitle()) ?
+                data.getDesc() : data.getNewestChapterTitle());
         tvBookTime.setText(data.getUpdateDate());
         if (hasImg){
             tvBookImg.setVisibility(View.VISIBLE);
@@ -68,7 +70,7 @@ public class BookStoreBookHolder extends ViewHolderImpl<Book> {
             }
         }
         if (data.getSource() != null) {
-            tvBookSource.setText("书源：" + BookSource.fromString(data.getSource()).text);
+            tvBookSource.setText(String.format("书源：%s", BookSource.fromString(data.getSource()).text));
         }else {
             tvBookSource.setText(data.getNewestChapterId());
         }

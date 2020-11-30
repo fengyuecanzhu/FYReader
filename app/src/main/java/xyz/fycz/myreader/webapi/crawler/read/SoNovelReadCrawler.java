@@ -19,8 +19,8 @@ import java.util.List;
 
 
 public class SoNovelReadCrawler implements ReadCrawler, BookInfoCrawler {
-    public static final String NAME_SPACE = "https://www.soxs.cc";
-    public static final String NOVEL_SEARCH = "https://www.soxs.cc/search.html,searchtype=all&searchkey={key}";
+    public static final String NAME_SPACE = "https://www.soxscc.com";
+    public static final String NOVEL_SEARCH = "https://www.soxscc.com/search.html,searchtype=all&searchkey={key}&action=search&submit= 搜  索 ";
     public static final String CHARSET = "UTF-8";
     public static final String SEARCH_CHARSET = "UTF-8";
 
@@ -119,7 +119,7 @@ public class SoNovelReadCrawler implements ReadCrawler, BookInfoCrawler {
                 book.setName(info.text());
                 book.setChapterUrl(NAME_SPACE + info.getElementsByTag("a").attr("href"));
                 book.setAuthor(element.getElementsByClass("s4").first().text());
-                book.setType(element.getElementsByTag("span").first().text());
+                book.setType(element.getElementsByTag("span").first().text().replace("[", "").replace("]", ""));
                 book.setNewestChapterTitle(element.getElementsByClass("s3").first().text());
                 book.setSource(BookSource.sonovel.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());

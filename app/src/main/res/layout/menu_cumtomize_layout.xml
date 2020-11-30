@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/read_menu_bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="背景颜色："
+                android:textColor="@color/read_menu_text"
+                android:textSize="@dimen/text_small_size" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_bg_color"
+                android:layout_width="36dp"
+                android:layout_height="28dp"
+                android:background="@drawable/image_btn_bg"
+                android:padding="1dp"
+                app:srcCompat="@color/sys_breen_bg" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="字体颜色："
+                android:textColor="@color/read_menu_text"
+                android:textSize="@dimen/text_small_size" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_font_color"
+                android:layout_width="36dp"
+                android:layout_height="28dp"
+                android:background="@drawable/image_btn_bg"
+                android:padding="1dp"
+                app:srcCompat="@color/sys_breen_bg" />
+        </LinearLayout>
+
+        <xyz.fycz.myreader.widget.CircleCheckBox
+            android:id="@+id/cb_share_layout"
+            android:layout_width="90dp"
+            android:layout_height="28dp"
+            app:circleBorderColor="#CBCBCB"
+            app:innerCircleColor="#90cbf6"
+            app:borderThickness="0.5dp"
+            app:textColor="#CBCBCB"
+            app:tickColor="#FFFFFF"
+            app:innerCircleRadius="10dp"
+            app:showOuterCircle="false"
+            app:textSize="@dimen/text_small_size"
+            app:text="共用布局" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:padding="6dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="背景图片"
+            android:textColor="@color/read_menu_text" />
+
+        <xyz.fycz.myreader.widget.HorizontalListView
+            android:id="@+id/bgImgList"
+            android:layout_width="match_parent"
+            android:layout_height="100dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_save_layout"
+                android:layout_width="60dp"
+                android:layout_height="30dp"
+                android:background="@drawable/setting_btn_bg"
+                android:gravity="center"
+                android:text="保存"
+                android:textColor="@drawable/setting_btn_bg_color" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_import_layout"
+                android:layout_width="70dp"
+                android:layout_height="30dp"
+                android:background="@drawable/setting_btn_bg"
+                android:gravity="center"
+                android:text="导入"
+                android:textColor="@drawable/setting_btn_bg_color" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_export_layout"
+                android:layout_width="70dp"
+                android:layout_height="30dp"
+                android:background="@drawable/setting_btn_bg"
+                android:gravity="center"
+                android:text="导出"
+                android:textColor="@drawable/setting_btn_bg_color" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_reset_layout"
+                android:layout_width="70dp"
+                android:layout_height="30dp"
+                android:background="@drawable/setting_btn_bg"
+                android:gravity="center"
+                android:text="重置布局"
+                android:textColor="@drawable/setting_btn_bg_color" />
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/vwNavigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/read_menu_bg" />
+</LinearLayout>

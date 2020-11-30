@@ -1,13 +1,10 @@
 package xyz.fycz.myreader.enums;
 
-/**
- * Created by zhao on 2016/11/3.
- */
-
 public enum Language {
 
-    simplified,//简体中文
-    traditional;//繁体中文
+    normal,
+    simplified,//繁转简
+    traditional;//简转繁
 
 
     Language() {

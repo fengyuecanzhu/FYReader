@@ -17,7 +17,7 @@
                 android:orientation="vertical">
 
             <LinearLayout
-                    android:id="@+id/more_setting_ll_webdav"
+                    android:id="@+id/ll_webdav"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:paddingTop="8dp"
@@ -55,9 +55,9 @@
 
             </RelativeLayout>
             <RelativeLayout
-                    android:id="@+id/more_setting_rl_volume"
+                    android:id="@+id/rl_volume"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:gravity="center"
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
@@ -72,7 +72,7 @@
                         android:text="@string/volume_turn_page"/>
 
                 <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/more_setting_sc_volume"
+                        android:id="@+id/sc_volume"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -80,35 +80,139 @@
                         android:clickable="false"
                         android:longClickable="false"/>
             </RelativeLayout>
-
             <RelativeLayout
-                    android:id="@+id/more_setting_rl_reset_screen"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:gravity="center"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:background="@drawable/selector_common_bg">
+                android:id="@+id/rl_reset_screen"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/selector_common_bg">
 
                 <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/textSecondary"
-                        android:layout_centerVertical="true"
-                        android:textSize="@dimen/text_normal_size"
-                        android:text="@string/reset_screen_time"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textSecondary"
+                    android:layout_centerVertical="true"
+                    android:textSize="@dimen/text_normal_size"
+                    android:text="@string/reset_screen_time"/>
 
                 <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/more_setting_sc_reset_screen"
-                        android:layout_width="115dp"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentEnd="true"
-                        android:gravity="center"
-                        android:dropDownWidth="75dp"
-                        android:clickable="false"
-                        android:longClickable="false"/>
+                    android:id="@+id/sc_reset_screen"
+                    android:layout_width="115dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:gravity="center"
+                    android:dropDownWidth="75dp"
+                    android:clickable="false"
+                    android:longClickable="false"/>
             </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rl_always_next"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/selector_common_bg">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_normal_size"
+                    android:text="@string/always_next"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/sc_always_next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:clickable="false"
+                    android:longClickable="false"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rl_show_status"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/selector_common_bg">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_normal_size"
+                    android:text="@string/show_status"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/sc_show_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:clickable="false"
+                    android:longClickable="false"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rl_read_aloud_volume_turn_page"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/selector_common_bg">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_normal_size"
+                    android:text="@string/read_aloud_volume_turn_page"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/sc_read_aloud_volume_turn_page"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:clickable="false"
+                    android:longClickable="false"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rl_no_menu_title"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/selector_common_bg">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_normal_size"
+                    android:text="@string/no_menu_ch_title"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/sc_no_menu_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:clickable="false"
+                    android:longClickable="false"/>
+            </RelativeLayout>
+
             <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="25dp"
@@ -123,8 +227,32 @@
                         android:textColor="@color/textPrimary"
                         android:text="@string/bookcase_setting"/>
             </RelativeLayout>
+            <LinearLayout
+                android:id="@+id/ll_book_sort"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:paddingTop="8dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:orientation="vertical"
+                android:background="@drawable/selector_common_bg">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_normal_size"
+                    android:textColor="@color/textSecondary"
+                    android:text="@string/book_sort"/>
+                <TextView
+                    android:id="@+id/tv_book_sort"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:textColor="@color/textAssist"
+                    android:text="@string/manual_sort"/>
+            </LinearLayout>
+
             <RelativeLayout
-                    android:id="@+id/more_setting_rl_auto_refresh"
+                    android:id="@+id/rl_auto_refresh"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:gravity="center"
@@ -153,7 +281,7 @@
                 </LinearLayout>
 
                 <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/more_setting_sc_auto_refresh"
+                        android:id="@+id/sc_auto_refresh"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -163,7 +291,7 @@
             </RelativeLayout>
 
             <LinearLayout
-                    android:id="@+id/more_setting_ll_close_refresh"
+                    android:id="@+id/ll_close_refresh"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:paddingTop="8dp"
@@ -199,7 +327,7 @@
                         android:text="@string/search_setting"/>
             </RelativeLayout>
             <LinearLayout
-                    android:id="@+id/more_setting_ll_disable_source"
+                    android:id="@+id/ll_disable_source"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:paddingTop="8dp"
@@ -221,7 +349,7 @@
                         android:text="@string/disable_source_tip"/>
             </LinearLayout>
             <LinearLayout
-                    android:id="@+id/more_setting_ll_thread_num"
+                    android:id="@+id/ll_thread_num"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:paddingTop="8dp"
@@ -236,7 +364,7 @@
                         android:textColor="@color/textSecondary"
                         android:text="@string/thread_num"/>
                 <TextView
-                        android:id="@+id/more_setting_tv_thread_num"
+                        android:id="@+id/tv_thread_num"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="5dp"
@@ -257,7 +385,7 @@
                         android:textColor="@color/textPrimary"
                         android:text="@string/change_source_setting"/>
                 <ImageView
-                        android:id="@+id/more_setting_iv_match_chapter_tip"
+                        android:id="@+id/iv_match_chapter_tip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -267,9 +395,9 @@
             </RelativeLayout>
 
             <RelativeLayout
-                    android:id="@+id/more_setting_rl_match_chapter"
+                    android:id="@+id/rl_match_chapter"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:gravity="center"
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
@@ -284,7 +412,7 @@
                         android:text="@string/match_chapters"/>
 
                 <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/more_setting_sc_match_chapter"
+                        android:id="@+id/sc_match_chapter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -294,9 +422,9 @@
             </RelativeLayout>
 
             <RelativeLayout
-                    android:id="@+id/more_setting_rl_match_chapter_suitability"
+                    android:id="@+id/rl_match_chapter_suitability"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:gravity="center"
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
@@ -311,7 +439,7 @@
                         android:text="@string/match_chapters_sui"/>
 
                 <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/more_setting_sc_match_chapter_suitability"
+                        android:id="@+id/sc_match_chapter_suitability"
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -340,9 +468,9 @@
             </RelativeLayout>
 
             <RelativeLayout
-                    android:id="@+id/more_setting_rl_cathe_gap"
+                    android:id="@+id/rl_cathe_gap"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:gravity="center"
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
@@ -357,7 +485,7 @@
                         android:text="@string/cathe_gap"/>
 
                 <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/more_setting_sc_cathe_gap"
+                        android:id="@+id/sc_cathe_gap"
                         android:layout_width="115dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -370,7 +498,7 @@
             </RelativeLayout>
 
             <LinearLayout
-                    android:id="@+id/more_setting_ll_download_all"
+                    android:id="@+id/ll_download_all"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:paddingTop="8dp"
@@ -392,7 +520,7 @@
                         android:text="@string/download_all_tip"/>
             </LinearLayout>
             <RelativeLayout
-                    android:id="@+id/more_setting_rl_delete_cathe"
+                    android:id="@+id/rl_delete_cathe"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:paddingLeft="20dp"
@@ -425,7 +553,7 @@
 
             </RelativeLayout>
             <RelativeLayout
-                    android:id="@+id/more_setting_rl_bookstore"
+                    android:id="@+id/rl_bookstore"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:gravity="center"
@@ -454,7 +582,7 @@
                 </LinearLayout>
 
                 <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/more_setting_sc_bookstore"
+                        android:id="@+id/sc_bookstore"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"

@@ -21,7 +21,6 @@
     </declare-styleable>
 
 
-
     <attr name="progressColor" format="color"/>
     <attr name="progressBackColor" format="color"/>
     <attr name="progress" format="integer"/>

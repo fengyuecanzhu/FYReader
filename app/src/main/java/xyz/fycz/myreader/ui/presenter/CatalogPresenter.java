@@ -6,6 +6,7 @@ import android.view.View;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BasePresenter;
+import xyz.fycz.myreader.util.llog.LLog;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.CatalogActivity;
@@ -26,12 +27,12 @@ import java.util.Collections;
  * @date 2020/7/22 9:14
  */
 public class CatalogPresenter implements BasePresenter {
+    private static final String TAG = CatalogPresenter.class.getSimpleName();
     private CatalogFragment mCatalogFragment;
     private ChapterService mChapterService;
     private ArrayList<Chapter> mChapters = new ArrayList<>();
     private ArrayList<Chapter> mConvertChapters = new ArrayList<>();
     private int curSortflag = 0; //0正序  1倒序
-    private boolean isDayStyle;
     private ChapterTitleAdapter mChapterTitleAdapter;
     private Book mBook;
 
@@ -96,6 +97,8 @@ public class CatalogPresenter implements BasePresenter {
             } else {
                 position = chapter.getNumber();
             }
+            /*LLog.i(TAG, "position = " + position);
+            LLog.i(TAG, "mChapters.size() = " + mChapters.size());*/
             Intent intent = new Intent();
             intent.putExtra(APPCONST.CHAPTER_PAGE, new int[]{position, 0});
             mCatalogFragment.getActivity().setResult(Activity.RESULT_OK, intent);

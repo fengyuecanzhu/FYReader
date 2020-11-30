@@ -254,6 +254,7 @@ public class AudioPlayerDialog extends Dialog{
 
 
     public void readAloud() {
+        mPageLoader.resetReadAloudParagraph();
         aloudNextPage = false;
         String unReadContent = mPageLoader.getUnReadContent();
         ReadAloudService.setReadEvent(new ReadEvent());

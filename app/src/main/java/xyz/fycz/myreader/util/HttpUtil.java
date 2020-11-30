@@ -305,9 +305,11 @@ public class HttpUtil {
                         })
                         .build();*/
                 Request.Builder requestBuilder = new Request.Builder()
-                        .addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-                        .addHeader("accept-language", "zh-CN,zh;q=0.9")
-                        .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36");
+                        .addHeader("Accept", "*/*")
+                        .addHeader("Connection", "Keep-Alive")
+                        //.addHeader("Charsert", "utf-8")
+                        .addHeader("Cache-Control", "no-cache")
+                        .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36");
                 if (address.contains("qidian.com")) {
                     SharedPreUtils spu = SharedPreUtils.getInstance();
                     String cookie = spu.getString(MyApplication.getmContext().getString(R.string.qdCookie), "");

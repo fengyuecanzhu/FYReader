@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/read_menu_bg"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tv_reduce_text_size"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="A-"
+            android:background="@drawable/setting_btn_bg"
+            android:textColor="@drawable/setting_btn_bg_color"/>
+
+        <TextView
+            android:id="@+id/tv_text_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="20"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:textColor="@color/read_menu_text"/>
+
+        <TextView
+            android:id="@+id/tv_increase_text_size"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:text="A+"
+            android:background="@drawable/setting_btn_bg"
+            android:textColor="@drawable/setting_btn_bg_color"/>
+
+        <TextView
+            android:id="@+id/tv_switch_st"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:layout_marginStart="10dp"
+            android:textSize="15sp"
+            android:background="@drawable/setting_circle_btn_bg"
+            android:textColor="@drawable/setting_btn_bg_color"
+            android:text="繁"/>
+
+        <TextView
+            android:id="@+id/tv_text_font"
+            android:layout_marginStart="10dp"
+            android:layout_width="45dp"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:text="字体"
+            android:textSize="15sp"
+            android:background="@drawable/setting_btn_bg"
+            android:textColor="@drawable/setting_btn_bg_color"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        >
+        <LinearLayout
+            android:id="@+id/ll_line_spacing4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_line_spacing4"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:padding="7dp"
+                app:srcCompat="@drawable/ic_line_spacing4"
+                app:tint="@drawable/setting_btn_bg_color"
+                android:background="@drawable/setting_btn_bg"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_line_spacing3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_line_spacing3"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:padding="7dp"
+                app:srcCompat="@drawable/ic_line_spacing3"
+                app:tint="@drawable/setting_btn_bg_color"
+                android:background="@drawable/setting_btn_bg"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_line_spacing2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_line_spacing2"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:padding="7dp"
+                app:srcCompat="@drawable/ic_line_spacing2"
+                app:tint="@drawable/setting_btn_bg_color"
+                android:background="@drawable/setting_btn_bg"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_line_spacing1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tv_line_spacing1"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:padding="2dp"
+                android:gravity="center"
+                android:text="默认"
+                android:textSize="14sp"
+                android:background="@drawable/setting_btn_bg"
+                android:textColor="@drawable/setting_btn_bg_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_line_spacing0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1.5">
+
+            <TextView
+                android:id="@+id/tv_line_spacing0"
+                android:layout_width="80dp"
+                android:layout_height="30dp"
+                android:padding="2dp"
+                android:gravity="center"
+                android:text="自定义排版"
+                android:textSize="14sp"
+                android:background="@drawable/setting_btn_bg"
+                android:textColor="@drawable/setting_btn_bg_color"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_intent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tv_intent"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:padding="2dp"
+                android:gravity="center"
+                android:text="缩进"
+                android:textSize="14sp"
+                android:background="@drawable/setting_btn_bg"
+                android:textColor="@drawable/setting_btn_bg_color"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:gravity="center">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <xyz.fycz.myreader.widget.custom.CircleImageView
+                android:id="@+id/iv_common_style"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@color/background_menu"
+                app:civ_border_color="@color/read_menu_text"
+                app:civ_border_width="1dp"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <xyz.fycz.myreader.widget.custom.CircleImageView
+                android:id="@+id/iv_leather_style"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@color/background_menu"
+                app:civ_border_color="@color/read_menu_text"
+                app:civ_border_width="1dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <xyz.fycz.myreader.widget.custom.CircleImageView
+                android:id="@+id/iv_protect_eye_style"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@color/background_menu"
+                app:civ_border_color="@color/read_menu_text"
+                app:civ_border_width="1dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <xyz.fycz.myreader.widget.custom.CircleImageView
+                android:id="@+id/iv_breen_style"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@color/background_menu"
+                app:civ_border_color="@color/read_menu_text"
+                app:civ_border_width="1dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <xyz.fycz.myreader.widget.custom.CircleImageView
+                android:id="@+id/iv_blue_deep_style"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@color/background_menu"
+                app:civ_border_color="@color/read_menu_text"
+                app:civ_border_width="1dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/iv_custom_style"
+                android:padding="4dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_add"
+                android:background="@drawable/setting_circle_btn_bg"
+                app:tint="@drawable/setting_btn_bg_color" />
+        </LinearLayout>
+    </LinearLayout>
+    <!--菜单栏-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/read_menu_bg"
+        android:orientation="horizontal"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
+
+        <TextView
+            android:id="@+id/read_tv_auto_page"
+            style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
+            android:text="自动翻页"
+            android:clickable="true"
+            android:focusable="true"
+            app:drawableTint="@drawable/setting_btn_bg_color"
+            app:drawableTopCompat="@drawable/ic_auto_page" />
+
+        <TextView
+            android:id="@+id/read_tv_page_mode"
+            style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
+            android:text="翻页模式"
+            android:clickable="true"
+            android:focusable="true"
+            app:drawableTint="@drawable/setting_btn_bg_color"
+            app:drawableTopCompat="@drawable/ic_page_mode" />
+
+        <TextView
+            android:id="@+id/read_tv_hv_screen"
+            style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
+            android:text="横屏阅读"
+            android:clickable="true"
+            android:focusable="true"
+            app:drawableTint="@drawable/setting_btn_bg_color"
+            app:drawableTopCompat="@drawable/ic_hv_screen" />
+
+        <TextView
+            android:id="@+id/read_tv_more_setting"
+            style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
+            android:text="更多设置"
+            android:clickable="true"
+            android:focusable="true"
+            app:drawableTint="@drawable/setting_btn_bg_color"
+            app:drawableTopCompat="@drawable/ic_more_setting" />
+    </LinearLayout>
+    <View
+        android:id="@+id/vwNavigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/read_menu_bg" />
+</LinearLayout>

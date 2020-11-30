@@ -13,6 +13,8 @@ import android.widget.Scroller;
  */
 
 public abstract class PageAnimation {
+    //动画速度
+    static final int animationSpeed = 300;
     //正在使用的View
     protected View mView;
     //滑动装置
@@ -44,18 +46,18 @@ public abstract class PageAnimation {
     protected float mLastY;
 
     public PageAnimation(int w, int h, View view, OnPageChangeListener listener){
-        this(w, h, 0, 0, view,listener);
+        this(w, h, 0, 0, 0, view,listener);
     }
 
-    public PageAnimation(int w, int h, int marginWidth, int marginHeight, View view, OnPageChangeListener listener){
+    public PageAnimation(int w, int h, int marginWidth, int marginTop, int marginBottom, View view, OnPageChangeListener listener){
         mScreenWidth = w;
         mScreenHeight = h;
 
         mMarginWidth = marginWidth;
-        mMarginHeight = marginHeight;
+        mMarginHeight = marginTop;
 
-        mViewWidth = mScreenWidth - mMarginWidth * 2;
-        mViewHeight = mScreenHeight - mMarginHeight * 2;
+        mViewWidth = mScreenWidth - marginWidth * 2;
+        mViewHeight = mScreenHeight - marginTop - marginBottom;
 
         mView = view;
         mListener = listener;
@@ -137,6 +139,14 @@ public abstract class PageAnimation {
      * 获取内容显示版面
      */
     public abstract Bitmap getNextBitmap();
+
+    public float getmTouchX() {
+        return mTouchX;
+    }
+
+    public float getmTouchY() {
+        return mTouchY;
+    }
 
     public enum Direction {
         NONE(true),NEXT(true), PRE(true), UP(false), DOWN(false);

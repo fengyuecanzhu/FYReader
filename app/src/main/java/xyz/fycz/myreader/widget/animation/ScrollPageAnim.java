@@ -3,13 +3,17 @@ package xyz.fycz.myreader.widget.animation;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewConfiguration;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import xyz.fycz.myreader.application.SysManager;
 
 /**
  * Created by newbiechen on 17-7-23.
@@ -28,7 +32,8 @@ public class ScrollPageAnim extends PageAnimation {
     // 滑动追踪的时间
     private static final int VELOCITY_DURATION = 1000;
     private VelocityTracker mVelocity;
-
+    //是否移动了
+    private boolean isMove = false;
     // 整个Bitmap的背景显示
     private Bitmap mBgBitmap;
 
@@ -43,9 +48,9 @@ public class ScrollPageAnim extends PageAnimation {
     // 是否处于刷新阶段
     private boolean isRefresh = true;
 
-    public ScrollPageAnim(int w, int h, int marginWidth, int marginHeight,
+    public ScrollPageAnim(int w, int h, int marginWidth, int marginTop, int marginBottom,
                           View view, OnPageChangeListener listener) {
-        super(w, h, marginWidth, marginHeight, view, listener);
+        super(w, h, marginWidth, marginTop, marginBottom, view, listener);
         // 创建两个BitmapView
         initWidget();
     }
@@ -304,12 +309,17 @@ public class ScrollPageAnim extends PageAnimation {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 isRunning = false;
+                isMove = false;
                 // 设置起始点
                 setStartPoint(x, y);
                 // 停止动画
                 abortAnim();
                 break;
             case MotionEvent.ACTION_MOVE:
+                final int slop = ViewConfiguration.get(mView.getContext()).getScaledTouchSlop();
+                if (!isMove) {
+                    isMove = Math.abs(mStartX - x) > slop || Math.abs(mStartY - y) > slop;
+                }
                 mVelocity.computeCurrentVelocity(VELOCITY_DURATION);
                 isRunning = true;
                 // 进行刷新
@@ -317,11 +327,23 @@ public class ScrollPageAnim extends PageAnimation {
                 break;
             case MotionEvent.ACTION_UP:
                 isRunning = false;
-                // 开启动画
-                startAnim();
+                if (!isMove) {
+                    //是否翻阅下一页。true表示翻到下一页，false表示上一页。
+                    boolean isNext = x > mScreenWidth / 2 || SysManager.getSetting().isAlwaysNext();
+                    if (isNext) {
+                        startAnim(Direction.NEXT);
+                    } else {
+                        startAnim(Direction.PRE);
+                    }
+                } else {
+                    // 开启动画
+                    startAnim();
+                }
                 // 删除检测器
-                mVelocity.recycle();
-                mVelocity = null;
+                if (mVelocity != null) {
+                    mVelocity.recycle();
+                    mVelocity = null;
+                }
                 break;
 
             case MotionEvent.ACTION_CANCEL:
@@ -369,6 +391,23 @@ public class ScrollPageAnim extends PageAnimation {
                 , 0, 0, Integer.MAX_VALUE * -1, Integer.MAX_VALUE);
     }
 
+    /**
+     * 翻页动画
+     */
+    public void startAnim(Direction direction) {
+        setStartPoint(0, 0);
+        setTouchPoint(0, 0);
+        switch (direction) {
+            case NEXT:
+                isRunning = true;
+                mScroller.startScroll(0, 0, 0, -mViewHeight + mMarginHeight * 2, animationSpeed);
+                break;
+            case PRE:
+                isRunning = true;
+                mScroller.startScroll(0, 0, 0, mViewHeight - mMarginHeight * 2, animationSpeed);
+                break;
+        }
+    }
 
     @Override
     public void scrollAnim() {

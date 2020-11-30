@@ -1,5 +1,9 @@
 package xyz.fycz.myreader.enums;
 
+import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.util.ToastUtils;
+
 /**
  * 小说源
  */
@@ -7,21 +11,27 @@ package xyz.fycz.myreader.enums;
 public enum BookSource {
 
     fynovel("风月小说"),
-    tianlai("天籁小说"),
-    biquge44("笔趣阁44"),
-    pinshu("品书网"),
-    biquge("笔趣阁"),
-    qb5("全本小说"),
-    miqu("米趣小说"),
-    jiutao("九桃小说"),
-    yunzhong("云中书库"),
-    sonovel("搜小说网"),
-    quannovel("全小说网"),
-    qiqi("奇奇小说"),
-    chaoxing("超星图书·实体"),
-    zuopin("作品集·实体"),
-    cangshu99("99藏书·实体"),
-    ben100("100本·实体"),
+    tianlai(MyApplication.getApplication().getString(R.string.read_tianlai)),
+    biquge44(MyApplication.getApplication().getString(R.string.read_biquge44)),
+    pinshu(MyApplication.getApplication().getString(R.string.read_pinshu)),
+    biquge(MyApplication.getApplication().getString(R.string.read_biquge)),
+    qb5(MyApplication.getApplication().getString(R.string.read_qb5)),
+    miqu(MyApplication.getApplication().getString(R.string.read_miqu)),
+    jiutao(MyApplication.getApplication().getString(R.string.read_jiutao)),
+    miaobi(MyApplication.getApplication().getString(R.string.read_miaobi)),
+    dstq(MyApplication.getApplication().getString(R.string.read_dstq)),
+    yunzhong(MyApplication.getApplication().getString(R.string.read_yunzhong)),
+    sonovel(MyApplication.getApplication().getString(R.string.read_sonovel)),
+    quannovel(MyApplication.getApplication().getString(R.string.read_quannovel)),
+    qiqi(MyApplication.getApplication().getString(R.string.read_qiqi)),
+    xs7(MyApplication.getApplication().getString(R.string.read_xs7)),
+    du1du(MyApplication.getApplication().getString(R.string.read_du1du)),
+    paiotian(MyApplication.getApplication().getString(R.string.read_paiotian)),
+    chaoxing(MyApplication.getApplication().getString(R.string.read_chaoxing)),
+    zuopin(MyApplication.getApplication().getString(R.string.read_zuopin)),
+    cangshu99(MyApplication.getApplication().getString(R.string.read_cangshu99)),
+    ben100(MyApplication.getApplication().getString(R.string.read_ben100)),
+    //liulangcat("流浪猫·实体"),
     local("本地书籍");
     public String text;
 
@@ -35,7 +45,7 @@ public enum BookSource {
                 return bookSource.toString();
             }
         }
-        return null;
+        return "";
     }
 
     public static BookSource get(int var0) {
@@ -43,7 +53,12 @@ public enum BookSource {
     }
 
     public static BookSource fromString(String string) {
-        return valueOf(string);
+        try {
+            return valueOf(string);
+        } catch (Exception e) {
+            ToastUtils.showError(e.getLocalizedMessage());
+            return fynovel;
+        }
     }
 
 }

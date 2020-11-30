@@ -1,16 +1,23 @@
 package xyz.fycz.myreader.widget.page;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+
+import com.gyf.immersionbar.ImmersionBar;
+
+import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.ChapterService;
+import xyz.fycz.myreader.ui.popmenu.AutoPageMenu;
 import xyz.fycz.myreader.util.utils.SnackbarUtils;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.widget.animation.*;
@@ -26,13 +33,14 @@ public class PageView extends View {
 
     private int mViewWidth = 0; // 当前View的宽
     private int mViewHeight = 0; // 当前View的高
+    private int statusBarHeight = 0; //状态栏高度
 
     private int mStartX = 0;
     private int mStartY = 0;
     private boolean isMove = false;
     // 初始化参数
     private int mBgColor = 0xFFCEC29C;
-    private PageMode mPageMode = PageMode.SIMULATION;
+    private PageMode mPageMode = PageMode.COVER;
     // 是否允许点击
     private boolean canTouch = true;
     // 唤醒菜单的区域
@@ -73,6 +81,7 @@ public class PageView extends View {
 
     public PageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        statusBarHeight = ImmersionBar.getStatusBarHeight((Activity) getContext());
     }
 
     @Override
@@ -104,12 +113,18 @@ public class PageView extends View {
             case SLIDE:
                 mPageAnim = new SlidePageAnim(mViewWidth, mViewHeight, this, mPageAnimListener);
                 break;
+            case VERTICAL_COVER:
+                mPageAnim = new CoverVerticalPageAnim(mViewWidth, mViewHeight, this, mPageAnimListener);
+                break;
             case NONE:
                 mPageAnim = new NonePageAnim(mViewWidth, mViewHeight, this, mPageAnimListener);
                 break;
             case SCROLL:
                 mPageAnim = new ScrollPageAnim(mViewWidth, mViewHeight, 0,
-                        mPageLoader.getMarginHeight(), this, mPageAnimListener);
+                        mPageLoader.getMarginTop(), mPageLoader.getMarginBottom(),this, mPageAnimListener);
+                break;
+            case AUTO:
+                mPageAnim = new AutoPageAnim(mViewWidth, mViewHeight, this, mPageAnimListener);
                 break;
             default:
                 mPageAnim = new SimulationPageAnim(mViewWidth, mViewHeight, this, mPageAnimListener);
@@ -119,6 +134,10 @@ public class PageView extends View {
     public Bitmap getNextBitmap() {
         if (mPageAnim == null) return null;
         return mPageAnim.getNextBitmap();
+    }
+
+    public int getStatusBarHeight() {
+        return statusBarHeight;
     }
 
     public Bitmap getBgBitmap() {
@@ -145,6 +164,12 @@ public class PageView extends View {
         }
     }
 
+    public void autoPageOnSpeedChange() {
+        //是否正在执行动画
+        abortAnimation();
+        mPageLoader.noAnimationToPrePage();
+    }
+
     private void startPageAnim(PageAnimation.Direction direction) {
         if (mTouchListener == null) return;
         //是否正在执行动画
@@ -166,6 +191,10 @@ public class PageView extends View {
         } else {
             int x = 0;
             int y = mViewHeight;
+            if (mPageAnim instanceof VerticalPageAnim) {
+                x = mViewWidth;
+                y = 0;
+            }
             //初始化动画
             mPageAnim.setStartPoint(x, y);
             //设置点击点
@@ -187,10 +216,6 @@ public class PageView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-
-        //绘制背景
-        canvas.drawColor(mBgColor);
-
         //绘制动画
         mPageAnim.draw(canvas);
     }
@@ -253,7 +278,7 @@ public class PageView extends View {
     private boolean hasPrevPage() {
         mTouchListener.prePage();
         boolean hasPrevPage = mPageLoader.prev();
-        if (!hasPrevPage){
+        if (!hasPrevPage) {
             showSnackBar("已经是第一页了");
         }
         return hasPrevPage;
@@ -267,7 +292,7 @@ public class PageView extends View {
     private boolean hasNextPage() {
         boolean hasNextPage = mPageLoader.next();
         mTouchListener.nextPage(hasNextPage);
-        if (!hasNextPage){
+        if (!hasNextPage) {
             showSnackBar("已经是最后一页了");
         }
         return hasNextPage;
@@ -320,6 +345,10 @@ public class PageView extends View {
 
         if (mPageAnim instanceof HorizonPageAnim) {
             ((HorizonPageAnim) mPageAnim).changePage();
+        }else if (mPageAnim instanceof VerticalPageAnim){
+            ((VerticalPageAnim) mPageAnim).changePage();
+        } else if (mPageAnim instanceof AutoPageAnim) {
+            ((AutoPageAnim) mPageAnim).changePage();
         }
         mPageLoader.drawPage(getNextBitmap(), false);
     }
@@ -332,7 +361,7 @@ public class PageView extends View {
     public void drawCurPage(boolean isUpdate) {
         if (!isPrepare) return;
 
-        if (!isUpdate){
+        if (!isUpdate) {
             if (mPageAnim instanceof ScrollPageAnim) {
                 ((ScrollPageAnim) mPageAnim).resetBitmap();
             }
@@ -363,9 +392,9 @@ public class PageView extends View {
             return mPageLoader;
         }
         // 获取具体的加载器
-        if ("本地书籍".equals(collBook.getType())){
+        if ("本地书籍".equals(collBook.getType())) {
             mPageLoader = new LocalPageLoader(this, collBook, ChapterService.getInstance(), setting);
-        }else {
+        } else {
             mPageLoader = new NetPageLoader(this, collBook, ChapterService.getInstance(), mReadCrawler, setting);
         }
         // 判断是否 PageView 已经初始化完成
