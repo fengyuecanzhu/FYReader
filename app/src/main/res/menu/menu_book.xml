@@ -47,6 +47,11 @@
                 android:title="@string/menu_bookcase_download_all"
                 app:showAsAction="never"
                 android:visible="true"/>
-
+        <item
+            android:id="@+id/action_qr_scan"
+            android:icon="@drawable/ic_scan"
+            android:title="@string/menu_scan"
+            app:showAsAction="never"
+            android:visible="true"/>
     </group>
 </menu>

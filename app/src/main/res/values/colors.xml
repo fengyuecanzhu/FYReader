@@ -27,7 +27,7 @@
 
     <color name="textError">#ffe7492e</color>
     <color name="textTranslucent">#96ffffff</color>
-
+    <color name="transparent30">#30000000</color>
     <!--menu-->
     <color name="menu_color_default">#383838</color>
     <color name="background_menu">#fcfcfc</color>
@@ -40,6 +40,8 @@
     <color name="divider_narrow">@color/colorDivider</color>
     <!--通用分割线粗-->
     <color name="divider_wide">@color/colorDivider</color>
+
+    <color name="btn_bg_press_2">#80858585</color>
 
     <!--scroll-->
     <color name="scroll_refresh_tip">#88303F9F</color>
@@ -161,26 +163,26 @@
 
     <color name="sys_translucent_white">#aaffffff</color>
 
-
-
     <color name="sys_home_tab_select">#90cbf6</color>
 
-
-    <color name="sys_protect_eye_bg">#ceebce</color>
+    <color name="sys_protect_eye_bg">#E1F1DA</color>
     <color name="sys_protect_eye_word">#313031</color>
 
     <color name="sys_common_bg">#f5f4f0</color>
     <color name="sys_common_word">#313031</color>
 
     <!--<color name="sys_leather_eye_bg">#ceebce</color>-->
-    <color name="sys_leather_word">#313031</color>
     <color name="sys_leather_bg">#CEC29C</color>
+    <color name="sys_leather_word">#313031</color>
 
-    <color name="sys_blue_deep_bg">#001c29</color>
     <color name="sys_blue_deep_word">#637079</color>
+    <color name="sys_blue_deep_bg">#001c29</color>
 
     <color name="sys_breen_bg">#b5bd9a</color>
     <color name="sys_breen_word">#313031</color>
+
+    <color name="sys_black_bg">#2B241E</color>
+    <color name="sys_black_word">#94928c</color>
 
     <color name="sys_night_bg">#393431</color>
     <color name="sys_night_word">#94928c</color>

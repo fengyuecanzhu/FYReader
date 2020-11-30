@@ -52,7 +52,7 @@
                     android:layout_centerVertical="true"
                     android:textColor="@color/textSecondary"
                     android:textSize="@dimen/text_normal_size"
-                    android:text="@string/novel_boy"/>
+                    android:text="@string/find_qidian"/>
 
         </RelativeLayout>
 
@@ -70,7 +70,25 @@
                     android:layout_centerVertical="true"
                     android:textColor="@color/textSecondary"
                     android:textSize="@dimen/text_normal_size"
-                    android:text="@string/novel_girl"/>
+                    android:text="@string/find_qidian_ns"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/find_rl_xs7_top"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:background="@drawable/selector_common_bg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size"
+                android:text="@string/read_xs7"/>
 
         </RelativeLayout>
 
@@ -114,7 +132,7 @@
                     android:layout_centerVertical="true"
                     android:textColor="@color/textSecondary"
                     android:textSize="@dimen/text_normal_size"
-                    android:text="@string/novel_boy"/>
+                    android:text="@string/find_qidian"/>
 
         </RelativeLayout>
 
@@ -132,7 +150,7 @@
                     android:layout_centerVertical="true"
                     android:textColor="@color/textSecondary"
                     android:textSize="@dimen/text_normal_size"
-                    android:text="@string/novel_girl"/>
+                    android:text="@string/find_qidian_ns"/>
 
         </RelativeLayout>
 
@@ -161,7 +179,24 @@
                     android:textSize="@dimen/text_small_size"
                     android:text="书城"/>
         </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/find_rl_ben100_store"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:background="@drawable/selector_common_bg"
+            android:visibility="visible">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size"
+                android:text="@string/read_ben100"/>
+
+        </RelativeLayout>
         <RelativeLayout
                 android:id="@+id/find_rl_qb5_store"
                 android:layout_width="match_parent"
@@ -176,25 +211,42 @@
                     android:layout_centerVertical="true"
                     android:textColor="@color/textSecondary"
                     android:textSize="@dimen/text_normal_size"
-                    android:text="全本小说"/>
+                    android:text="@string/read_qb5"/>
 
         </RelativeLayout>
         <RelativeLayout
-                android:id="@+id/find_rl_biquge_store"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:background="@drawable/selector_common_bg"
-                android:visibility="gone">
+            android:id="@+id/find_rl_miaoqu_store"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:background="@drawable/selector_common_bg">
 
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:textColor="@color/title_black"
-                    android:textSize="@dimen/text_normal_size"
-                    android:text="笔趣阁"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size"
+                android:text="@string/read_miaobi"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/find_rl_xs7_store"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:background="@drawable/selector_common_bg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size"
+                android:text="@string/read_xs7"/>
 
         </RelativeLayout>
     </LinearLayout>

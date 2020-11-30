@@ -16,8 +16,16 @@ public abstract class FindCrawler implements Serializable {
     public abstract String getCharset();
     public abstract String getFindName();
     public abstract String getFindUrl();
-    public abstract boolean getTypePage(BookType curType, int page);
     public abstract boolean hasImg();
-    public abstract List<BookType> getBookTypeList(String html);
-    public abstract List<Book> getRankBookList(String html);
+    public abstract boolean needSearch();
+    //动态获取
+    public List<BookType> getBookTypes(String html) {
+        return null;
+    }
+    //静态获取
+    public List<BookType> getBookTypes(){
+        return null;
+    }
+    public abstract List<Book> getFindBooks(String html, BookType bookType);
+    public abstract boolean getTypePage(BookType curType, int page);
 }

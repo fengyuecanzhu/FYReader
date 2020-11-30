@@ -77,22 +77,6 @@
         android:clickable="true"
         tools:visibility="gone" />
 
-    <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp">
-
-        <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
-            android:id="@+id/pb_nextPage"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:splitTrack="false"
-            android:visibility="invisible"
-            app:seekBarRotation="CW270"
-            tools:visibility="visible" />
-    </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
-
     <ProgressBar
         android:id="@+id/pb_loading"
         android:layout_width="wrap_content"
@@ -100,7 +84,6 @@
         android:layout_centerInParent="true"
         android:visibility="gone"
         tools:visibility="visible" />
-
 
 
     <!--底部页面-->
@@ -113,6 +96,7 @@
         android:orientation="vertical"
         android:visibility="gone"
         tools:visibility="visible">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -122,10 +106,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="4dp"
                 android:layout_marginBottom="10dp"
                 android:background="@color/read_menu_bg"
                 android:gravity="center"
-                android:layout_marginTop="4dp"
                 android:paddingLeft="12dp"
                 android:paddingTop="8dp"
                 android:paddingRight="12dp"
@@ -134,19 +118,18 @@
                 android:textColor="@color/md_white_1000" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/iv_listen_book"
-                app:backgroundTint="@color/read_menu_bg"
-                android:layout_marginEnd="15dp"
-                android:layout_marginBottom="12dp"
+                android:id="@+id/btn_night_mode"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
-                android:tint="@color/read_menu_text"
-                android:src="@drawable/ic_listen_book"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="12dp"
+                android:src="@drawable/ic_night_mode"
+                android:tint="@drawable/setting_btn_bg_color"
+                app:backgroundTint="@color/read_menu_bg"
                 app:elevation="2dp"
                 app:fabCustomSize="40dp"
-                app:pressedTranslationZ="2dp"
-                />
+                app:pressedTranslationZ="2dp" />
         </RelativeLayout>
 
         <!--页面进度栏-->
@@ -162,9 +145,9 @@
                 style="@style/MAppTheme.TextAppearance.Read.BottomMenu"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
-                android:gravity="center"
                 android:clickable="true"
                 android:focusable="true"
+                android:gravity="center"
                 android:text="上一章" />
 
             <SeekBar
@@ -184,9 +167,9 @@
                 style="@style/MAppTheme.TextAppearance.Read.BottomMenu"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
-                android:gravity="center"
                 android:clickable="true"
                 android:focusable="true"
+                android:gravity="center"
                 android:text="下一章" />
         </LinearLayout>
 
@@ -206,34 +189,78 @@
             <TextView
                 android:id="@+id/read_tv_category"
                 style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
+                android:clickable="true"
+                android:focusable="true"
                 android:text="目录"
-                android:clickable="true"
-                android:focusable="true"
-                app:drawableTopCompat="@mipmap/t3" />
+                app:drawableTint="@drawable/setting_btn_bg_color"
+                app:drawableTopCompat="@drawable/ic_catalog" />
 
             <TextView
-                android:id="@+id/read_tv_download"
+                android:id="@+id/read_tv_listen_book"
                 style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
-                android:text="下载"
                 android:clickable="true"
                 android:focusable="true"
-                app:drawableTopCompat="@mipmap/download" />
+                android:text="语音朗读"
+                app:drawableTint="@drawable/setting_btn_bg_color"
+                app:drawableTopCompat="@drawable/ic_listen_book" />
 
             <TextView
-                android:id="@+id/read_tv_night_mode"
+                android:id="@+id/read_tv_brightness_eye"
                 style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
-                android:text="夜间"
                 android:clickable="true"
                 android:focusable="true"
-                app:drawableTopCompat="@mipmap/ao" />
+                android:text="亮度/护眼"
+                app:drawableTint="@drawable/setting_btn_bg_color"
+                app:drawableTopCompat="@drawable/ic_sun" />
 
             <TextView
                 android:id="@+id/read_tv_setting"
                 style="@style/AppTheme.TextAppearance.Read.BottomMenu.Button"
-                android:text="设置"
                 android:clickable="true"
                 android:focusable="true"
-                app:drawableTopCompat="@mipmap/t6" />
+                android:text="设置"
+                app:drawableTint="@drawable/setting_btn_bg_color"
+                app:drawableTopCompat="@drawable/ic_aa" />
         </LinearLayout>
+        <View
+            android:id="@+id/vwNavigationBar"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/read_menu_bg" />
     </LinearLayout>
+
+    <xyz.fycz.myreader.ui.popmenu.ReadSettingMenu
+        android:id="@+id/read_setting_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible" />
+
+    <xyz.fycz.myreader.ui.popmenu.CustomizeComMenu
+        android:id="@+id/read_customize_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible" />
+
+    <xyz.fycz.myreader.ui.popmenu.AutoPageMenu
+        android:id="@+id/read_auto_page_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible" />
+
+    <xyz.fycz.myreader.ui.popmenu.CustomizeLayoutMenu
+        android:id="@+id/read_customize_layout_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible" />
+
+    <xyz.fycz.myreader.ui.popmenu.BrightnessEyeMenu
+        android:id="@+id/read_brightness_eye_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible" />
 </RelativeLayout>

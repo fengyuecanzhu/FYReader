@@ -18,7 +18,7 @@ public interface ReadCrawler {
     String getSearchCharset(); // 书源搜索关键字的字符编码，和书源的字符编码就行
     String getNameSpace(); // 书源主页地址
     Boolean isPost(); // 是否以post请求搜索
-    String getContentFormHtml(String html); // 获取书籍内容规则
-    ArrayList<Chapter> getChaptersFromHtml(String html); // 获取书籍章节列表规则
     ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html); // 搜索书籍规则
+    ArrayList<Chapter> getChaptersFromHtml(String html); // 获取书籍章节列表规则
+    String getContentFormHtml(String html); // 获取书籍内容规则
 }

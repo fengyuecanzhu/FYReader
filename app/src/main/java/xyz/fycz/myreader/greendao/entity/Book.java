@@ -2,11 +2,15 @@ package xyz.fycz.myreader.greendao.entity;
 
 
 import androidx.annotation.Nullable;
+
+import com.google.gson.Gson;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.util.SharedPreUtils;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -32,7 +36,6 @@ public class Book implements Serializable {
     private String author;//作者
     @Nullable
     private String type;//类型(本地书籍为：本地书籍)
-
     private String updateDate;//更新时间
     @Nullable
     private String newestChapterId;//最新章节id
@@ -65,15 +68,19 @@ public class Book implements Serializable {
 
     private int groupSort;//分组排序
 
-    @Generated(hash = 170911086)
-    public Book(String id, String name, String chapterUrl, String infoUrl,
-            String imgUrl, String desc, String author, String type,
-            String updateDate, String newestChapterId, String newestChapterTitle,
-            String newestChapterUrl, String historyChapterId,
-            int histtoryChapterNum, int sortCode, int noReadNum,
-            int chapterTotalNum, int lastReadPosition, String source,
-            boolean isCloseUpdate, boolean isDownLoadAll, String groupId,
-            int groupSort) {
+    private String tag;
+
+    private Boolean replaceEnable = SharedPreUtils.getInstance().getBoolean("replaceEnableDefault", true);
+
+    private long lastReadTime;
+
+    @Generated(hash = 1269102537)
+    public Book(String id, String name, String chapterUrl, String infoUrl, String imgUrl, String desc,
+            String author, String type, String updateDate, String newestChapterId, String newestChapterTitle,
+            String newestChapterUrl, String historyChapterId, int histtoryChapterNum, int sortCode, int noReadNum,
+            int chapterTotalNum, int lastReadPosition, String source, boolean isCloseUpdate,
+            boolean isDownLoadAll, String groupId, int groupSort, String tag, Boolean replaceEnable,
+            long lastReadTime) {
         this.id = id;
         this.name = name;
         this.chapterUrl = chapterUrl;
@@ -97,37 +104,27 @@ public class Book implements Serializable {
         this.isDownLoadAll = isDownLoadAll;
         this.groupId = groupId;
         this.groupSort = groupSort;
+        this.tag = tag;
+        this.replaceEnable = replaceEnable;
+        this.lastReadTime = lastReadTime;
     }
 
-    public Book(Book book) {
-        this.id = book.id;
-        this.name = book.name;
-        this.chapterUrl = book.chapterUrl;
-        this.infoUrl = book.infoUrl;
-        this.imgUrl = book.imgUrl;
-        this.desc = book.desc;
-        this.author = book.author;
-        this.type = book.type;
-        this.updateDate = book.updateDate;
-        this.newestChapterId = book.newestChapterId;
-        this.newestChapterTitle = book.newestChapterTitle;
-        this.newestChapterUrl = book.newestChapterUrl;
-        this.historyChapterId = book.historyChapterId;
-        this.histtoryChapterNum = book.histtoryChapterNum;
-        this.sortCode = book.sortCode;
-        this.noReadNum = book.noReadNum;
-        this.chapterTotalNum = book.chapterTotalNum;
-        this.lastReadPosition = book.lastReadPosition;
-        this.source = book.source;
-        this.isCloseUpdate = book.isCloseUpdate;
-        this.isDownLoadAll = book.isDownLoadAll;
-        this.groupId = book.groupId;
-        this.groupSort = book.groupSort;
-    }
 
     @Generated(hash = 1839243756)
     public Book() {
     }
+
+    @Override
+    public Object clone() {
+        try {
+            Gson gson = new Gson();
+            String json = gson.toJson(this);
+            return gson.fromJson(json, Book.class);
+        } catch (Exception ignored) {
+        }
+        return this;
+    }
+
     public String getId() {
         return this.id;
     }
@@ -265,33 +262,6 @@ public class Book implements Serializable {
 
 
     @Override
-    public String toString() {
-        return "{\n" +
-                "id='" + id + '\'' +
-                ",\nname='" + name + '\'' +
-                ",\nchapterUrl='" + chapterUrl + '\'' +
-                ",\nimgUrl='" + imgUrl + '\'' +
-                ",\ndesc='" + desc + '\'' +
-                ",\nauthor='" + author + '\'' +
-                ",\ntype='" + type + '\'' +
-                ",\nupdateDate='" + updateDate + '\'' +
-                ",\nnewestChapterId='" + newestChapterId + '\'' +
-                ",\nnewestChapterTitle='" + newestChapterTitle + '\'' +
-                ",\nnewestChapterUrl='" + newestChapterUrl + '\'' +
-                ",\nhistoryChapterId='" + historyChapterId + '\'' +
-                ",\nhisttoryChapterNum='" + histtoryChapterNum + '\'' +
-                ",\nsortCode='" + sortCode + '\'' +
-                ",\nnoReadNum='" + noReadNum + '\'' +
-                ",\nchapterTotalNum='" + chapterTotalNum + '\'' +
-                ",\nlastReadPosition='" + lastReadPosition + '\'' +
-                ",\nsource='" + source + '\'' +
-                ",\nisCloseUpdate='" + isCloseUpdate + '\'' +
-                ",\nisDownLoadAll='" + isDownLoadAll + '\'' +
-                ",\ngroupId='" + groupId + '\'' +
-                "\n}";
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -324,11 +294,34 @@ public class Book implements Serializable {
     }
 
 
+    public String getTag() {
+        return this.tag;
+    }
 
 
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
 
+    public Boolean getReplaceEnable() {
+        return this.replaceEnable;
+    }
 
+
+    public void setReplaceEnable(Boolean replaceEnable) {
+        this.replaceEnable = replaceEnable;
+    }
+
+
+    public long getLastReadTime() {
+        return this.lastReadTime;
+    }
+
+
+    public void setLastReadTime(long lastReadTime) {
+        this.lastReadTime = lastReadTime;
+    }
 
 
 }

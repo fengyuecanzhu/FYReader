@@ -10,6 +10,7 @@ import io.reactivex.schedulers.Schedulers
 import xyz.fycz.myreader.application.MyApplication
 import xyz.fycz.myreader.application.SysManager
 import xyz.fycz.myreader.base.observer.MySingleObserver
+import xyz.fycz.myreader.entity.ReadStyle
 import xyz.fycz.myreader.entity.Setting
 import xyz.fycz.myreader.greendao.GreenDaoManager
 import xyz.fycz.myreader.greendao.entity.Book
@@ -94,9 +95,16 @@ object Restore {
                 e.printStackTrace()
             }
             try {
-                val file = FileUtils.getFile(path + File.separator + "setting.json")
-                val json = file.readText()
-                SysManager.saveSetting(GSON.fromJsonObject<Setting>(json))
+                val settingFile = FileUtils.getFile(path + File.separator + "setting.json")
+                val settingJson = settingFile.readText()
+                val readStyleFile = FileUtils.getFile(path + File.separator + "readStyles.json")
+                val readStylesJson = readStyleFile.readText()
+                val readStyles = GSON.fromJsonObject<List<ReadStyle>>(readStylesJson)
+                val setting = GSON.fromJsonObject<Setting>(settingJson)
+                if (setting != null) {
+                    setting.readStyles = readStyles
+                }
+                SysManager.saveSetting(setting)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

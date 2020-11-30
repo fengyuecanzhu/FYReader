@@ -1,8 +1,9 @@
 package xyz.fycz.myreader.util.utils;
 
-import android.content.Context;
 
 import android.text.Editable;
+import android.text.TextUtils;
+
 import androidx.annotation.StringRes;
 import xyz.fycz.myreader.application.MyApplication;
 
@@ -141,50 +142,6 @@ public class StringUtils {
         return new String(c);
     }
 
-    //繁簡轉換
-    /*public static String convertCC(String input, Context context)
-    {
-        ConversionType currentConversionType = ConversionType.S2TWP;
-        int convertType = SharedPreUtils.getInstance().getInt(SHARED_READ_CONVERT_TYPE, 0);
-
-        if (input.length() == 0)
-            return "";
-
-        switch (convertType) {
-            case 1:
-                currentConversionType = ConversionType.TW2SP;
-                break;
-            case 2:
-                currentConversionType = ConversionType.S2HK;
-                break;
-            case 3:
-                currentConversionType = ConversionType.S2T;
-                break;
-            case 4:
-                currentConversionType = ConversionType.S2TW;
-                break;
-            case 5:
-                currentConversionType = ConversionType.S2TWP;
-                break;
-            case 6:
-                currentConversionType = ConversionType.T2HK;
-                break;
-            case 7:
-                currentConversionType = ConversionType.T2S;
-                break;
-            case 8:
-                currentConversionType = ConversionType.T2TW;
-                break;
-            case 9:
-                currentConversionType = ConversionType.TW2S;
-                break;
-            case 10:
-                currentConversionType = ConversionType.HK2S;
-                break;
-        }
-
-        return (convertType != 0)?ChineseConverter.convert(input, currentConversionType, context):input;
-    }*/
 
     public static void isNotChinese(Editable s){
         //禁止输入中文
@@ -345,6 +302,41 @@ public class StringUtils {
             }
         }
         return -1;
+    }
+
+    public static String repeat(String str, int n) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            stringBuilder.append(str);
+        }
+        return stringBuilder.toString();
+    }
+
+    public static boolean isJsonType(String str) {
+        boolean result = false;
+        if (!TextUtils.isEmpty(str)) {
+            str = str.trim();
+            if (str.startsWith("{") && str.endsWith("}")) {
+                result = true;
+            } else if (str.startsWith("[") && str.endsWith("]")) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    public static boolean isContainEachOther(String s1, String s2){
+        if (s1 == null || s2 == null) return true;
+        s1 = s1.trim();
+        s2 = s2.trim();
+        return s1.contains(s2) || s2.contains(s1);
+    }
+
+    public static boolean isEqual(String s1, String s2){
+        if (s1 == null || s2 == null) return true;
+        s1 = s1.trim();
+        s2 = s2.trim();
+        return s1.equals(s2);
     }
 
 }

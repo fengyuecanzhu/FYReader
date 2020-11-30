@@ -36,65 +36,91 @@ import java.util.Iterator;
 import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
 
 /**
- * Created by newbiechen on 17-6-6.
+ * Created by fengyue on 17-6-6.
  * 阅读界面的更多设置
  */
 
 public class MoreSettingActivity extends BaseActivity {
-    @BindView(R.id.more_setting_ll_webdav)
+    @BindView(R.id.ll_webdav)
     LinearLayout mLlWebdav;
-    @BindView(R.id.more_setting_rl_volume)
+    @BindView(R.id.rl_volume)
     RelativeLayout mRlVolume;
-    @BindView(R.id.more_setting_sc_volume)
+    @BindView(R.id.sc_volume)
     SwitchCompat mScVolume;
-    @BindView(R.id.more_setting_rl_reset_screen)
+    @BindView(R.id.rl_always_next)
+    RelativeLayout mRlAlwaysNext;
+    @BindView(R.id.sc_always_next)
+    SwitchCompat mScAlwaysNext;
+    @BindView(R.id.rl_show_status)
+    RelativeLayout mRlShowStatus;
+    @BindView(R.id.sc_show_status)
+    SwitchCompat mScShowStatus;
+    @BindView(R.id.rl_read_aloud_volume_turn_page)
+    RelativeLayout mRlReadAloudVolumeTurnPage;
+    @BindView(R.id.sc_read_aloud_volume_turn_page)
+    SwitchCompat mScReadAloudVolumeTurnPage;
+    @BindView(R.id.rl_no_menu_title)
+    RelativeLayout mRlNoMenuTitle;
+    @BindView(R.id.sc_no_menu_title)
+    SwitchCompat mScNoMenuTitle;
+    @BindView(R.id.rl_reset_screen)
     RelativeLayout mRlResetScreen;
-    @BindView(R.id.more_setting_sc_reset_screen)
+    @BindView(R.id.sc_reset_screen)
     Spinner mScResetScreen;
-    @BindView(R.id.more_setting_rl_auto_refresh)
+    @BindView(R.id.rl_auto_refresh)
     RelativeLayout mRlAutoRefresh;
-    @BindView(R.id.more_setting_sc_auto_refresh)
+    @BindView(R.id.sc_auto_refresh)
     SwitchCompat mScAutoRefresh;
-    @BindView(R.id.more_setting_ll_close_refresh)
+    @BindView(R.id.ll_book_sort)
+    LinearLayout mLlBookSort;
+    @BindView(R.id.tv_book_sort)
+    TextView mTvBookSort;
+    @BindView(R.id.ll_close_refresh)
     LinearLayout mLlCloseRefresh;
-    @BindView(R.id.more_setting_ll_disable_source)
+    @BindView(R.id.ll_disable_source)
     LinearLayout mLlDisableSource;
-    @BindView(R.id.more_setting_ll_thread_num)
+    @BindView(R.id.ll_thread_num)
     LinearLayout mLlThreadNum;
-    @BindView(R.id.more_setting_tv_thread_num)
+    @BindView(R.id.tv_thread_num)
     TextView mTvThreadNum;
-    @BindView(R.id.more_setting_iv_match_chapter_tip)
+    @BindView(R.id.iv_match_chapter_tip)
     ImageView mIvMatchChapterTip;
-    @BindView(R.id.more_setting_rl_match_chapter)
+    @BindView(R.id.rl_match_chapter)
     RelativeLayout mRlMatchChapter;
-    @BindView(R.id.more_setting_sc_match_chapter)
+    @BindView(R.id.sc_match_chapter)
     SwitchCompat mScMatchChapter;
-    @BindView(R.id.more_setting_rl_match_chapter_suitability)
+    @BindView(R.id.rl_match_chapter_suitability)
     RelativeLayout mRlMatchChapterSuitability;
-    @BindView(R.id.more_setting_sc_match_chapter_suitability)
+    @BindView(R.id.sc_match_chapter_suitability)
     Spinner mScMatchChapterSuitability;
-    @BindView(R.id.more_setting_rl_cathe_gap)
+    @BindView(R.id.rl_cathe_gap)
     RelativeLayout mRlCatheGap;
-    @BindView(R.id.more_setting_sc_cathe_gap)
+    @BindView(R.id.sc_cathe_gap)
     Spinner mScCatheGap;
-    @BindView(R.id.more_setting_rl_delete_cathe)
+    @BindView(R.id.rl_delete_cathe)
     RelativeLayout mRlDeleteCathe;
-    @BindView(R.id.more_setting_ll_download_all)
+    @BindView(R.id.ll_download_all)
     LinearLayout mLlDownloadAll;
-    /*@BindView(R.id.more_setting_rl_bookstore)
+    /*@BindView(R.id.rl_bookstore)
     RelativeLayout mRlBookstore;
-    @BindView(R.id.more_setting_sc_bookstore)
+    @BindView(R.id.sc_bookstore)
     SwitchCompat mScBookstore;*/
 
+    private boolean needRefresh;
+    private boolean upMenu;
 
     private Setting mSetting;
     private boolean isVolumeTurnPage;
     private int resetScreenTime;
+    private int sortStyle;
     private boolean autoRefresh;
     private boolean isMatchChapter;
-    private boolean openBookStore;
     private float matchChapterSuitability;
     private int catheCap;
+    private boolean isShowStatusBar;
+    private boolean alwaysNext;
+    private boolean noMenuTitle;
+    private boolean readAloudVolumeTurnPage;
 
     private ArrayList<Book> mBooks;
     int booksCount;
@@ -105,12 +131,8 @@ public class MoreSettingActivity extends BaseActivity {
     private AlertDialog mCloseRefreshDia;
     //选择禁用更新书源对话框
     private AlertDialog mDisableSourceDia;
-    //线程选择
-    private AlertDialog mThreadSelectDia;
     //选择一键缓存书籍对话框
     private AlertDialog mDownloadAllDia;
-    //选择清除缓存对话框
-    private AlertDialog mDeleteCatheDia;
 
 
     @Override
@@ -121,14 +143,19 @@ public class MoreSettingActivity extends BaseActivity {
     @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
+        needRefresh = false;
         mSetting = SysManager.getSetting();
         isVolumeTurnPage = mSetting.isVolumeTurnPage();
+        alwaysNext = mSetting.isAlwaysNext();
         resetScreenTime = mSetting.getResetScreen();
         isMatchChapter = mSetting.isMatchChapter();
         matchChapterSuitability = mSetting.getMatchChapterSuitability();
         catheCap = mSetting.getCatheGap();
+        sortStyle = mSetting.getSortStyle();
         autoRefresh = mSetting.isRefreshWhenStart();
-        openBookStore = mSetting.isOpenBookStore();
+        isShowStatusBar = mSetting.isShowStatusBar();
+        noMenuTitle = mSetting.isNoMenuChTitle();
+        readAloudVolumeTurnPage = mSetting.isReadAloudVolumeTurnPage();
         threadNum = SharedPreUtils.getInstance().getInt(getString(R.string.threadNum), 8);
     }
 
@@ -143,6 +170,11 @@ public class MoreSettingActivity extends BaseActivity {
     protected void initWidget() {
         super.initWidget();
         initSwitchStatus();
+        if (sortStyle == 1){
+            mTvBookSort.setText(getString(R.string.time_sort));
+        }else if (sortStyle == 2){
+            mTvBookSort.setText(getString(R.string.book_name_sort));
+        }
         if (isMatchChapter) {
             mRlMatchChapterSuitability.setVisibility(View.VISIBLE);
         } else {
@@ -154,9 +186,12 @@ public class MoreSettingActivity extends BaseActivity {
 
     private void initSwitchStatus() {
         mScVolume.setChecked(isVolumeTurnPage);
+        mScAlwaysNext.setChecked(alwaysNext);
         mScMatchChapter.setChecked(isMatchChapter);
         mScAutoRefresh.setChecked(autoRefresh);
-        //mScBookstore.setChecked(openBookStore);
+        mScShowStatus.setChecked(isShowStatusBar);
+        mScNoMenuTitle.setChecked(noMenuTitle);
+        mScReadAloudVolumeTurnPage.setChecked(readAloudVolumeTurnPage);
     }
 
     @Override
@@ -176,6 +211,79 @@ public class MoreSettingActivity extends BaseActivity {
                     SysManager.saveSetting(mSetting);
                 }
         );
+        mRlAlwaysNext.setOnClickListener(
+                (v) -> {
+                    if (alwaysNext) {
+                        alwaysNext = false;
+                    } else {
+                        alwaysNext = true;
+                    }
+                    mScAlwaysNext.setChecked(alwaysNext);
+                    mSetting.setAlwaysNext(alwaysNext);
+                    SysManager.saveSetting(mSetting);
+                }
+        );
+        mRlShowStatus.setOnClickListener(
+                (v) -> {
+                    needRefresh = true;
+                    if (isShowStatusBar) {
+                        isShowStatusBar = false;
+                    } else {
+                        isShowStatusBar = true;
+                    }
+                    mScShowStatus.setChecked(isShowStatusBar);
+                    mSetting.setShowStatusBar(isShowStatusBar);
+                    SysManager.saveSetting(mSetting);
+                }
+        );
+        mRlReadAloudVolumeTurnPage.setOnClickListener(
+                (v) -> {
+                    if (readAloudVolumeTurnPage) {
+                        readAloudVolumeTurnPage = false;
+                    } else {
+                        readAloudVolumeTurnPage = true;
+                    }
+                    mScReadAloudVolumeTurnPage.setChecked(readAloudVolumeTurnPage);
+                    mSetting.setReadAloudVolumeTurnPage(readAloudVolumeTurnPage);
+                    SysManager.saveSetting(mSetting);
+                }
+        );
+        mRlNoMenuTitle.setOnClickListener(
+                (v) -> {
+                    upMenu = true;
+                    if (noMenuTitle) {
+                        noMenuTitle = false;
+                    } else {
+                        noMenuTitle = true;
+                    }
+                    mScNoMenuTitle.setChecked(noMenuTitle);
+                    mSetting.setNoMenuChTitle(noMenuTitle);
+                    SysManager.saveSetting(mSetting);
+                }
+        );
+
+        mLlBookSort.setOnClickListener(v -> {
+            MyAlertDialog.build(this)
+                    .setTitle(getString(R.string.book_sort))
+                    .setSingleChoiceItems(R.array.book_sort, sortStyle, (dialog, which) -> {
+                        sortStyle = which;
+                        mSetting.setSortStyle(sortStyle);
+                        SysManager.saveSetting(mSetting);
+                        if (sortStyle == 0){
+                            mTvBookSort.setText(getString(R.string.manual_sort));
+                            if (!SharedPreUtils.getInstance().getBoolean("manualSortTip")){
+                                DialogCreator.createTipDialog(this, "可在书架编辑状态下长按移动书籍进行排序！");
+                                SharedPreUtils.getInstance().putBoolean("manualSortTip", true);
+                            }
+                        }else if (sortStyle == 1){
+                            mTvBookSort.setText(getString(R.string.time_sort));
+                        }else if (sortStyle == 2){
+                            mTvBookSort.setText(getString(R.string.book_name_sort));
+                        }
+                        dialog.dismiss();
+                    }).setNegativeButton("取消", null).show();
+        });
+
         mRlAutoRefresh.setOnClickListener(
                 (v) -> {
                     if (autoRefresh) {
@@ -289,7 +397,7 @@ public class MoreSettingActivity extends BaseActivity {
             threadPick.setOnScrollListener((view1, scrollState) -> {
 
             });
-            mThreadSelectDia = MyAlertDialog.build(this)
+            MyAlertDialog.build(this)
                     .setTitle("搜索线程数")
                     .setView(view)
                     .setPositiveButton("确定", (dialog, which) -> {
@@ -383,7 +491,7 @@ public class MoreSettingActivity extends BaseActivity {
                 }
                 CharSequence[] cathes = {"章节缓存：" + eCatheFileSize, "图片缓存：" + catheFileSize};
                 boolean[] catheCheck = {true, true};
-                mDeleteCatheDia = new MultiChoiceDialog().create(this, "清除缓存", cathes, catheCheck, 2,
+                new MultiChoiceDialog().create(this, "清除缓存", cathes, catheCheck, 2,
                         (dialog, which) -> {
                             String tip = "";
                             if (catheCheck[0]) {
@@ -409,6 +517,15 @@ public class MoreSettingActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initSpinner();
+    }
+
+    @Override
+    public void finish() {
+        Intent result = new Intent();
+        result.putExtra(APPCONST.RESULT_NEED_REFRESH, needRefresh);
+        result.putExtra(APPCONST.RESULT_UP_MENU, upMenu);
+        setResult(AppCompatActivity.RESULT_OK, result);
+        super.finish();
     }
 
     private void initSpinner() {
@@ -453,9 +570,6 @@ public class MoreSettingActivity extends BaseActivity {
                 }
                 mSetting.setResetScreen(resetScreenTime);
                 SysManager.saveSetting(mSetting);
-                Intent result = new Intent();
-                result.putExtra(APPCONST.RESULT_RESET_SCREEN, resetScreenTime);
-                setResult(AppCompatActivity.RESULT_OK, result);
             }
 
             @Override

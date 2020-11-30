@@ -19,8 +19,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_home" />
-                            <entry key="sourceFile" value="F:\SVG图标\主页.svg" />
+                            <entry key="outputName" value="ic_share" />
+                            <entry key="sourceFile" value="F:\SVG图标\分享.svg" />
                           </map>
                         </option>
                       </PersistentState>

@@ -11,6 +11,8 @@ import xyz.fycz.myreader.greendao.util.MySQLiteOpenHelper;
 public class GreenDaoManager {
     private static GreenDaoManager instance;
     private static DaoMaster daoMaster;
+    private DaoSession mDaoSession;
+
     private static MySQLiteOpenHelper mySQLiteOpenHelper;
 
     public static GreenDaoManager getInstance() {
@@ -23,12 +25,15 @@ public class GreenDaoManager {
     public GreenDaoManager(){
         mySQLiteOpenHelper = new MySQLiteOpenHelper(MyApplication.getmContext(), "read" , null);
         daoMaster = new DaoMaster(mySQLiteOpenHelper.getWritableDatabase());
+        mDaoSession = daoMaster.newSession();
     }
 
-
+    public static DaoSession getDaoSession() {
+        return getInstance().mDaoSession;
+    }
 
     public DaoSession getSession(){
-       return daoMaster.newSession();
+       return mDaoSession;
     }
 
 }

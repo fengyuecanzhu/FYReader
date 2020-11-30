@@ -23,7 +23,11 @@ import android.widget.PopupMenu;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,6 +43,7 @@ import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
+import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.ui.activity.*;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -79,6 +84,7 @@ public class BookcasePresenter implements BasePresenter {
     private Setting mSetting;
     private final List<Book> errorLoadingBooks = new ArrayList<>();
     private int finishLoadBookCount = 0;
+    //    private int notifyId = 11;
     private ExecutorService es = Executors.newFixedThreadPool(1);//更新/下载线程池
 
     public ExecutorService getEs() {
@@ -188,6 +194,10 @@ public class BookcasePresenter implements BasePresenter {
 
         getData();
 
+        if (mSetting.isAutoSyn() && UserService.isLogin()) {
+            synBookcaseToWeb(true);
+        }
+
         //是否启用下拉刷新（默认启用）
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mBookcaseFragment.getSrlContent().setEnableRefresh(false);
@@ -289,7 +299,6 @@ public class BookcasePresenter implements BasePresenter {
     //初始化
     public void init() {
         initBook();
-        mSetting = SysManager.getSetting();
         if (mBooks.size() == 0) {
             mBookcaseFragment.getGvBook().setVisibility(View.GONE);
             mBookcaseFragment.getLlNoDataTips().setVisibility(View.VISIBLE);
@@ -297,11 +306,11 @@ public class BookcasePresenter implements BasePresenter {
             if (mBookcaseAdapter == null || isBookcaseStyleChange) {
                 switch (mSetting.getBookcaseStyle()) {
                     case listMode:
-                        mBookcaseAdapter = new BookcaseDetailedAdapter(mBookcaseFragment.getContext(), R.layout.gridview_book_detailed_item, mBooks, false, this, isGroup);
+                        mBookcaseAdapter = new BookcaseDetailedAdapter(mMainActivity, R.layout.gridview_book_detailed_item, mBooks, false, this, isGroup);
                         mBookcaseFragment.getGvBook().setNumColumns(1);
                         break;
                     case threePalaceMode:
-                        mBookcaseAdapter = new BookcaseDragAdapter(mBookcaseFragment.getContext(), R.layout.gridview_book_item, mBooks, false, this, isGroup);
+                        mBookcaseAdapter = new BookcaseDragAdapter(mMainActivity, R.layout.gridview_book_item, mBooks, false, this, isGroup);
                         mBookcaseFragment.getGvBook().setNumColumns(3);
                         break;
                 }
@@ -331,6 +340,20 @@ public class BookcasePresenter implements BasePresenter {
             mBookcaseAdapter.setGroup(isGroup);
         }
         mBooks.addAll(mBookService.getGroupBooks(curBookGroupId));
+
+        if (mSetting.getSortStyle() == 1) {
+            Collections.sort(mBooks, (o1, o2) -> {
+                if (o1.getLastReadTime() < o2.getLastReadTime()){
+                    return 1;
+                }else if (o1.getLastReadTime() > o2.getLastReadTime()){
+                    return -1;
+                }
+                return 0;
+            });
+        }else if (mSetting.getSortStyle() == 2){
+            Collections.sort(mBooks, (o1, o2) -> o2.getName().compareTo(o1.getName()));
+        }
+
         for (int i = 0; i < mBooks.size(); i++) {
             int sort = !isGroup ? mBooks.get(i).getSortCode() : mBooks.get(i).getGroupSort();
             if (sort != i + 1) {
@@ -523,8 +546,9 @@ public class BookcasePresenter implements BasePresenter {
             if (mBooks.size() > 0) {
                 mBookcaseFragment.getSrlContent().setEnableRefresh(false);
                 mBookcaseAdapter.setmEditState(true);
-                mBookcaseFragment.getGvBook().setDragModel(DragSortGridView.DRAG_BY_LONG_CLICK);
-
+                if (mSetting.getSortStyle() == 0) {
+                    mBookcaseFragment.getGvBook().setDragModel(DragSortGridView.DRAG_BY_LONG_CLICK);
+                }
                 mBookcaseFragment.getRlBookEdit().setVisibility(View.VISIBLE);
                 setBtnClickable(false);
                 changeCheckedAllStatus();
@@ -944,6 +968,35 @@ public class BookcasePresenter implements BasePresenter {
                 ToastUtils.showWarring("当前书架无任何书籍，无法同步！");
             }
             return;
+        }
+        Date nowTime = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
+        String nowTimeStr = sdf.format(nowTime);
+        SharedPreUtils spb = SharedPreUtils.getInstance();
+        String synTime = spb.getString(mMainActivity.getString(R.string.synTime));
+        if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
+                UserService.webBackup(new ResultCallback() {
+                    @Override
+                    public void onFinish(Object o, int code) {
+                        if ((boolean) o){
+                            spb.putString(mMainActivity.getString(R.string.synTime), nowTimeStr);
+                            if (!isAutoSyn) {
+                                DialogCreator.createTipDialog(mMainActivity, "成功将书架同步至网络！");
+                            }
+                        }else {
+                            if (!isAutoSyn) {
+                                DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        if (!isAutoSyn) {
+                            DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！\n" + e.getLocalizedMessage());
+                        }
+                    }
+                });
         }
     }
 

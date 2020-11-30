@@ -4,22 +4,17 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.TextView;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
 import xyz.fycz.myreader.model.SearchEngine;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
@@ -40,7 +35,7 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
             case 1:
                 Book book = (Book) message.obj;
                 int pos = message.arg1;
-                initOtherInfo(book, pos);
+                initOtherInfo(book);
                 break;
         }
         return false;
@@ -84,7 +79,6 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
         if (StringHelper.isEmpty(book.getImgUrl())){
             book.setImgUrl("");
         }
-
         if (!StringHelper.isEmpty(book.getDesc())) {
             tvDesc.setText("简介:" + book.getDesc());
         }
@@ -104,7 +98,7 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
             if (tvBookName.getTag() == null || !(Boolean) tvBookName.getTag()) {
                 tvBookName.setTag(true);
             } else {
-                initOtherInfo(book, pos);
+                initOtherInfo(book);
                 return;
             }
             Log.i(book.getName(), "initOtherInfo");
@@ -116,11 +110,11 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
                     tvBookName.setTag(false);
             });
         }else {
-            initOtherInfo(book, pos);
+            initOtherInfo(book);
         }
     }
 
-    private void initOtherInfo(Book book, int pos){
+    private void initOtherInfo(Book book){
         //简介
         if (StringHelper.isEmpty(tvDesc.getText().toString())) {
             tvDesc.setText("简介:" + book.getDesc());

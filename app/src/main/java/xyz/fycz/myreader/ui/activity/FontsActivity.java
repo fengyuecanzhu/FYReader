@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static xyz.fycz.myreader.util.UriFileUtil.getPath;
 
@@ -81,14 +82,7 @@ public class FontsActivity extends BaseActivity {
 
     private void initFonts() {
         mFonts = new ArrayList<>();
-        mFonts.add(Font.默认字体);
-        mFonts.add(Font.方正楷体);
-        mFonts.add(Font.经典宋体);
-        mFonts.add(Font.方正行楷);
-        mFonts.add(Font.迷你隶书);
-        mFonts.add(Font.方正黄草);
-        mFonts.add(Font.方正硬笔行书);
-        mFonts.add(Font.本地字体);
+        Collections.addAll(mFonts, Font.values());
     }
 
     public void saveLocalFont(String path){

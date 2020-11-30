@@ -16,9 +16,7 @@ public class DateHelper {
      *               2147483647
      */
     public static long getLongDate(){
-        long res = System.currentTimeMillis();
-      return res;
-
+        return System.currentTimeMillis();
     }
 
     /**

@@ -1,16 +1,13 @@
 package xyz.fycz.myreader.enums;
 
-/**
- * Created by zhao on 2016/11/3.
- */
-
 public enum ReadStyle {
 
     protectedEye,//护眼
     common,//普通
     blueDeep,//深蓝
     leather,//羊皮纸
-    breen;//
+    breen,//
+    custom;
 
     ReadStyle() {
     }

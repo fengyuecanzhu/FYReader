@@ -15,14 +15,12 @@
         android:paddingRight="20dp"
         android:paddingTop="10dp">
 
-        <!--<TextView
-            android:id="@+id/tv_font_example"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_font_example"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="@drawable/font_example_bg"
-            android:gravity="center"
-            android:text="@string/font_example"
-            android:textSize="40sp" />-->
+            android:gravity="center" />
 
 
         <TextView

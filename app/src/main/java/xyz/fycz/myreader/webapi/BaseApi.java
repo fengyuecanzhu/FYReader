@@ -224,7 +224,6 @@ public class BaseApi {
         if (!jsonModel.isSuccess()) {
             if (jsonModel.getError() == ErrorCode.no_security) {
                 ToastUtils.showWarring("登录过期，请重新登录");
-                SysManager.logout();
             } else {
                 if (jsonModel.getError() == 0) {
                     callback.onFinish(jsonModel.getResult(), -1);

@@ -95,7 +95,7 @@ public class SearchEngine {
     }
 
     /**
-     * 搜索关键字
+     * 搜索关键字(模糊搜索)
      *
      * @param keyword
      */
@@ -108,10 +108,11 @@ public class SearchEngine {
         searchSuccessNum = 0;
         searchSiteIndex = -1;
         searchFinishNum = 0;
-        for (int i = 0; i < threadsNum; i++) {
+        for (int i = 0; i < Math.min(mSourceList.size(), threadsNum); i++) {
             searchOnEngine(keyword);
         }
     }
+
 
     /**
      * 根据书名和作者搜索书籍
@@ -128,7 +129,7 @@ public class SearchEngine {
         searchSuccessNum = 0;
         searchSiteIndex = -1;
         searchFinishNum = 0;
-        for (int i = 0; i < threadsNum; i++) {
+        for (int i = 0; i < Math.min(mSourceList.size(), threadsNum); i++) {
             searchOnEngine(title, author);
         }
     }

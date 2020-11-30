@@ -46,10 +46,41 @@
                 android:text="搜索"
                 android:textColor="@color/textPrimaryInverted"
                 android:textSize="18sp"/>
-
-
     </LinearLayout>
+    <RadioGroup
+        android:id="@+id/rg_search_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
 
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/rb_all_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_small_size"
+            android:checked="true"
+            android:text="@string/all" />
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/rb_fuzzy_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_small_size"
+            android:layout_marginStart="10dp"
+            android:checked="true"
+            android:text="@string/fuzzy_search" />
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/rb_precise_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_small_size"
+            android:layout_marginStart="10dp"
+            android:text="@string/precise_search" />
+    </RadioGroup>
     <xyz.fycz.myreader.widget.RefreshProgressBar
             android:id="@+id/rpb"
             android:layout_width="match_parent"

@@ -75,6 +75,11 @@ public class SplashActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 避免从桌面启动程序后，会重新实例化入口类的activity
+        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
+            finish();
+            return;
+        }
         ImmersionBar.with(this)
                 .fullScreen(true)
                 .init();

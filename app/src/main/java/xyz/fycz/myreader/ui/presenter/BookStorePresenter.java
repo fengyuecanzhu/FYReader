@@ -102,7 +102,7 @@ public class BookStorePresenter implements BasePresenter {
         mBookStoreFragment.getRvBookList().setAdapter(mBookStoreBookAdapter);
         mBookStoreBookAdapter.setOnItemClickListener((view, pos) -> {
             Book book = bookList.get(pos);
-            if (!findCrawler.hasImg()) {
+            if (!findCrawler.needSearch()) {
                 Intent intent = new Intent(mMainActivity, BookDetailedActivity.class);
                 intent.putExtra(APPCONST.BOOK, book);
                 mMainActivity.startActivity(intent);
@@ -156,7 +156,7 @@ public class BookStorePresenter implements BasePresenter {
                 mHandler.sendEmptyMessage(5);
             }
         });*/
-        mBookTypes = findCrawler.getRankTypes();
+        mBookTypes = findCrawler.getBookTypes();
         curType = mBookTypes.get(0);
         mHandler.sendMessage(mHandler.obtainMessage(1));
         page = 1;

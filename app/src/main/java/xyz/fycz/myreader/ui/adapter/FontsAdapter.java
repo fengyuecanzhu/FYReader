@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -94,7 +96,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
             convertView = LayoutInflater.from(getContext()).inflate(mResourceId, null);
             viewHolder.tvFontName = (TextView) convertView.findViewById(R.id.tv_font_name);
             viewHolder.btnFontUse = (ProgressButton) convertView.findViewById(R.id.btn_font_use);
-            //viewHolder.tvExample = (TextView)convertView.findViewById(R.id.tv_font_example);
+            viewHolder.ivExample = (ImageView) convertView.findViewById(R.id.iv_font_example);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -105,20 +107,22 @@ public class FontsAdapter extends ArrayAdapter<Font> {
 
     private void initView(int position, final ViewHolder viewHolder) {
         final Font font = getItem(position);
-        /*Typeface typeFace = null;
-        if (font != Font.默认字体) {
-            if (!mTypefaceMap.containsKey(font)){
-                typeFace = Typeface.createFromAsset(getContext().getAssets(), font.path);
-                mTypefaceMap.put(font,typeFace);
-            }else {
-                typeFace = mTypefaceMap.get(font);
+
+        if (font != Font.本地字体 && font != Font.默认字体) {
+            try {
+                viewHolder.ivExample.setVisibility(View.VISIBLE);
+                viewHolder.ivExample.setImageBitmap(BitmapFactory.decodeStream(mFontsActivity.getAssets().open("font_img/" + font.toString() + ".png")));
+            } catch (IOException e) {
+                e.printStackTrace();
+                viewHolder.ivExample.setVisibility(View.GONE);
             }
-        }*/
-        //viewHolder.tvExample.setTypeface(typeFace);
-//        viewHolder.tvExample.setTypeface(mTypefaceMap.get(font));
+        } else {
+            viewHolder.ivExample.setVisibility(View.GONE);
+        }
+
         viewHolder.tvFontName.setText(font.toString());
         viewHolder.tvFontName.setTextColor(mFontsActivity.getResources().getColor(R.color.textPrimary));
-        File fontFile = new File(APPCONST.FONT_BOOK_DIR + font.fileName);
+        File fontFile = new File(APPCONST.FONT_BOOK_DIR + font.toString() + ".ttf");
         if (font == Font.本地字体) {
             if (setting.getFont() == Font.本地字体) {
                 viewHolder.tvFontName.setText(setting.getLocalFontName());
@@ -129,50 +133,46 @@ public class FontsAdapter extends ArrayAdapter<Font> {
                 viewHolder.btnFontUse.setButtonColor(mFontsActivity.getResources().getColor(R.color.sys_blue_littler));
             }
             viewHolder.btnFontUse.setEnabled(true);
-            viewHolder.btnFontUse.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    /*ArrayList<File> localFontFiles = getLocalFontList();
-                    if (localFontFiles == null || localFontFiles.size() == 0) {
-                        DialogCreator.createTipDialog(getContext(), getContext().getString(R.string.font_select_tip));
-                        return;
-                    }
-                    final CharSequence[] fontNames = new CharSequence[localFontFiles.size()];
-                    int checkedItem = 0;
-                    for (int i = 0; i < fontNames.length; i++) {
-                        fontNames[i] = localFontFiles.get(i).getName();
-                        if (font.fileName.equals(fontNames[i])) {
-                            checkedItem = i;
-                        }
-                    }
-                    MyAlertDialog dialog = new MyAlertDialog.Builder(getContext())
-                            .setTitle(getContext().getString(R.string.font_select))
-                            .setCancelable(true)
-                            .setSingleChoiceItems(fontNames, checkedItem, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    font.fileName = (String) fontNames[which];
-                                    setting.setFont(font);
-                                    setting.setLocalFontName(font.fileName);
-                                    SysManager.saveSetting(setting);
-                                    notifyDataSetChanged();
-                                    Intent intent = new Intent();
-                                    intent.putExtra(APPCONST.FONT, font);
-                                    ((Activity) getContext()).setResult(Activity.RESULT_OK, intent);
-                                    dialog.dismiss();
-                                }
-                            }).create();
-                    dialog.show();*/
-                    ToastUtils.showInfo("请选择一个ttf格式的字体文件");
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("*/*");
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    mFontsActivity.startActivityForResult(intent, APPCONST.SELECT_FILE_CODE);
+            viewHolder.btnFontUse.setOnClickListener(v -> {
+                /*ArrayList<File> localFontFiles = getLocalFontList();
+                if (localFontFiles == null || localFontFiles.size() == 0) {
+                    DialogCreator.createTipDialog(getContext(), getContext().getString(R.string.font_select_tip));
+                    return;
                 }
+                final CharSequence[] fontNames = new CharSequence[localFontFiles.size()];
+                int checkedItem = 0;
+                for (int i = 0; i < fontNames.length; i++) {
+                    fontNames[i] = localFontFiles.get(i).getName();
+                    if (font.fileName.equals(fontNames[i])) {
+                        checkedItem = i;
+                    }
+                }
+                MyAlertDialog dialog = new MyAlertDialog.Builder(getContext())
+                        .setTitle(getContext().getString(R.string.font_select))
+                        .setCancelable(true)
+                        .setSingleChoiceItems(fontNames, checkedItem, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                font.fileName = (String) fontNames[which];
+                                setting.setFont(font);
+                                setting.setLocalFontName(font.fileName);
+                                SysManager.saveSetting(setting);
+                                notifyDataSetChanged();
+                                Intent intent = new Intent();
+                                intent.putExtra(APPCONST.FONT, font);
+                                ((Activity) getContext()).setResult(Activity.RESULT_OK, intent);
+                                dialog.dismiss();
+                            }
+                        }).create();
+                dialog.show();*/
+                ToastUtils.showInfo("请选择一个ttf格式的字体文件");
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                mFontsActivity.startActivityForResult(intent, APPCONST.SELECT_FILE_CODE);
             });
             return;
         }
-
         if (font != Font.默认字体 && !fontFile.exists()) {
             viewHolder.btnFontUse.setEnabled(true);
             viewHolder.btnFontUse.setButtonColor(mFontsActivity.getResources().getColor(R.color.sys_blue_littler));
@@ -206,7 +206,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
             mHandler.sendMessage(mHandler.obtainMessage(3));
             return;
         }
-        final String[] url = {URLCONST.FONT_DOWNLOAD_URL + font.fileName};
+        final String[] url = {URLCONST.FONT_DOWNLOAD_URL + font.toString() + ".ttf"};
         viewHolder.btnFontUse.setText("获取连接...");
         CommonApi.getUrl(font.downloadPath, new ResultCallback() {
             @Override
@@ -237,7 +237,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
                 con = (HttpURLConnection) webUrl.openConnection();
                 is = con.getInputStream();
                 int fileLength = con.getContentLength();
-                String filePath = APPCONST.FONT_BOOK_DIR + font.fileName + ".temp";
+                String filePath = APPCONST.FONT_BOOK_DIR + font.toString() + ".ttf.temp";
                 fontFile = FileUtils.getFile(filePath);
                 fos = new FileOutputStream(fontFile);
                 byte[] tem = new byte[1024];
@@ -300,7 +300,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
                 if (font == Font.本地字体) {
                     continue;
                 }
-                if (font.fileName.equals(fontFile.getName())) {
+                if ((font.toString() + ".ttf").equals(fontFile.getName())) {
                     continue fontFilesFor;
                 }
             }
@@ -311,7 +311,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
         return localFontFiles;
     }
 
-    public void saveLocalFontName(String fontName){
+    public void saveLocalFontName(String fontName) {
         setting.setFont(Font.本地字体);
         setting.setLocalFontName(fontName);
         SysManager.saveSetting(setting);
@@ -322,7 +322,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
     }
 
     class ViewHolder {
-        //TextView tvExample;
+        ImageView ivExample;
         TextView tvFontName;
         ProgressButton btnFontUse;
     }

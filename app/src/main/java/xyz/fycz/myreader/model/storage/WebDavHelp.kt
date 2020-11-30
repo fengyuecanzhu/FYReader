@@ -69,7 +69,7 @@ object WebDavHelp {
     fun showRestoreDialog(context: Context, names: ArrayList<String>, callBack: Restore.CallBack?): Boolean {
         return if (names.isNotEmpty()) {
             context.selector(title = "选择恢复文件", items = names) { _, index ->
-                if (index in 0 until names.size) {
+                if (index in 0 until 30.coerceAtLeast(names.size)) {
                     restoreWebDav(names[index], callBack)
                 }
             }

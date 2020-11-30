@@ -2,7 +2,9 @@ package xyz.fycz.myreader.ui.adapter;
 
 import android.app.Activity;
 import android.text.TextUtils;
+
 import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.adapter.BaseListAdapter;
 import xyz.fycz.myreader.base.adapter.IViewHolder;
 import xyz.fycz.myreader.entity.SearchBookBean;
@@ -10,6 +12,7 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.ui.adapter.holder.SearchBookHolder;
+import xyz.fycz.myreader.util.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +41,38 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
 
     public synchronized void addAll(List<SearchBookBean> newDataS, String keyWord) {
         List<SearchBookBean> copyDataS = mList;
-        if (newDataS != null && newDataS.size() > 0) {
+        List<SearchBookBean> filterDataS = new ArrayList<>();
+
+        switch (SysManager.getSetting().getSearchFilter()) {
+            case 0:
+                filterDataS.addAll(newDataS);
+                break;
+            case 1:
+            default:
+                for (SearchBookBean ssb : newDataS) {
+                    if (StringUtils.isContainEachOther(ssb.getName(), keyWord) ||
+                            StringUtils.isContainEachOther(ssb.getAuthor(), keyWord)) {
+                        filterDataS.add(ssb);
+                    }
+                }
+                break;
+            case 2:
+                for (SearchBookBean ssb : newDataS) {
+                    if (StringUtils.isEqual(ssb.getName(), keyWord) ||
+                            StringUtils.isEqual(ssb.getAuthor(), keyWord)) {
+                        filterDataS.add(ssb);
+                    }
+                }
+                break;
+        }
+
+        if (filterDataS != null && filterDataS.size() > 0) {
             List<SearchBookBean> searchBookBeansAdd = new ArrayList<>();
             if (copyDataS.size() == 0) {
-                copyDataS.addAll(newDataS);
+                copyDataS.addAll(filterDataS);
             } else {
                 //存在
-                for (SearchBookBean temp : newDataS) {
+                for (SearchBookBean temp : filterDataS) {
                     boolean hasSame = false;
                     for (int i = 0, size = copyDataS.size(); i < size; i++) {
                         SearchBookBean searchBook = copyDataS.get(i);

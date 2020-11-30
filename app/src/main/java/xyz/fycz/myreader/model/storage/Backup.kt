@@ -39,6 +39,7 @@ object Backup {
                 "myBookMark.json",
                 "myBookGroup.json",
                 "setting.json",
+                "readStyles.json",
                 "config.xml"
         )
     }
@@ -86,9 +87,22 @@ object Backup {
                             .writeText(json)
                 }
             }
-            val json = GSON.toJson(SysManager.getSetting())
-            FileUtils.getFile(backupPath + File.separator + "setting.json")
-                    .writeText(json)
+
+
+            try {
+                val setting = SysManager.getNewSetting()
+                val readStyles = setting.readStyles
+                val readStylesJson = GSON.toJson(readStyles)
+                setting.readStyles = null
+                val settingJson = GSON.toJson(setting)
+                FileUtils.getFile(backupPath + File.separator + "setting.json")
+                        .writeText(settingJson)
+                FileUtils.getFile(backupPath + File.separator + "readStyles.json")
+                        .writeText(readStylesJson)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
             Preferences.getSharedPreferences(context, backupPath, "config")?.let { sp ->
                 val edit = sp.edit()
                 SharedPreUtils.getInstance().all.map {

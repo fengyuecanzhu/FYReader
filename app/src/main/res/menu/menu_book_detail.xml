@@ -8,6 +8,13 @@
             android:icon="@drawable/ic_change_source"
             android:title="@string/menu_change_source"
             app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_share"
+        android:title="@string/menu_share"
+        app:showAsAction="ifRoom"/>
+
     <item
             android:id="@+id/action_reload"
             android:icon="@drawable/ic_refresh"

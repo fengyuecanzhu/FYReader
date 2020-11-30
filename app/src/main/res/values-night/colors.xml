@@ -26,7 +26,8 @@
     <color name="textSecondaryInverted">#8affffff</color>
     <color name="textAssistInverted">#43ffffff</color>
     <color name="textError">#ffe7492e</color>
-
+    <color name="transparent30">#30ffffff</color>
+    <color name="btn_bg_press_2">#80686868</color>
     <!--menu-->
     <color name="menu_color_default">#b7b7b7</color>
     <color name="background_menu">#282828</color>

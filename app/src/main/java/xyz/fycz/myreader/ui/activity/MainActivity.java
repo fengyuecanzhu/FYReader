@@ -6,8 +6,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
@@ -16,19 +18,26 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
 import butterknife.BindView;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.entity.SharedBook;
+import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
 import xyz.fycz.myreader.ui.fragment.FindFragment;
 import xyz.fycz.myreader.ui.fragment.MineFragment;
 import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,6 +50,7 @@ import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CU
  * @date 2020/9/13 13:03
  */
 public class MainActivity extends BaseActivity {
+    public static final String TAG = MainActivity.class.getSimpleName();
     @BindView(R.id.bottom_navigation_view)
     BottomNavigationView bottomNavigation;
     @BindView(R.id.view_pager_main)
@@ -138,9 +148,9 @@ public class MainActivity extends BaseActivity {
                 //将滑动到的页面对应的 menu 设置为选中状态
                 bottomNavigation.getMenu().getItem(i).setChecked(true);
                 getSupportActionBar().setTitle(titles[i]);
-                if (i == 0)  {
+                if (i == 0) {
                     getSupportActionBar().setSubtitle(groupName);
-                }else {
+                } else {
                     getSupportActionBar().setSubtitle("");
                 }
                 invalidateOptionsMenu();
@@ -162,11 +172,23 @@ public class MainActivity extends BaseActivity {
         super.processLogic();
         try {
             int settingVersion = SysManager.getSetting().getSettingVersion();
-            if (settingVersion < APPCONST.SETTING_VERSION){
+            if (settingVersion < APPCONST.SETTING_VERSION) {
                 SysManager.resetSetting();
+                Log.d(TAG, "resetSetting");
             }
-        }catch (Exception e){
-            SysManager.resetSetting();
+        } catch (Exception e) {
+            ToastUtils.showError(e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+        try {
+            int sourceVersion = SysManager.getSetting().getSourceVersion();
+            if (sourceVersion < APPCONST.SOURCE_VERSION) {
+                SysManager.resetSource();
+                Log.d(TAG, "resetSource");
+            }
+        } catch (Exception e) {
+            ToastUtils.showError(e.getLocalizedMessage());
+            e.printStackTrace();
         }
     }
 
@@ -232,7 +254,8 @@ public class MainActivity extends BaseActivity {
                 mBookcaseFragment.getmBookcasePresenter().cancelEdit();
                 invalidateOptionsMenu();
                 return true;
-            case R.id.action_change_group: case R.id.action_group_man:
+            case R.id.action_change_group:
+            case R.id.action_group_man:
                 if (!mBookcaseFragment.getmBookcasePresenter().hasOnGroupChangeListener()) {
                     mBookcaseFragment.getmBookcasePresenter().addOnGroupChangeListener(() -> {
                         groupName = SharedPreUtils.getInstance().getString(getString(R.string.curBookGroupName), "所有书籍");
@@ -242,6 +265,10 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.action_edit:
                 invalidateOptionsMenu();
+                break;
+            case R.id.action_qr_scan:
+                Intent intent = new Intent(this, QRCodeScanActivity.class);
+                startActivityForResult(intent, APPCONST.REQUEST_QR_SCAN);
                 break;
         }
         return mBookcaseFragment.getmBookcasePresenter().onOptionsItemSelected(item);
@@ -271,16 +298,45 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if ((resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && requestCode == APPCONST.APP_INSTALL_CODE) {
             installProcess(appFile, isForceUpdate);//再次执行安装流程，包含权限判等
         }
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case APPCONST.REQUEST_LOGIN:
-                    if (mMineFragment.isRecreate()){
+                    if (mMineFragment.isRecreate()) {
                         reLoadFragment();
                     }
                     mMineFragment.onActivityResult(requestCode, resultCode, data);
+                    break;
+                case APPCONST.REQUEST_QR_SCAN:
+                    if (data != null) {
+                        String result = data.getStringExtra("result");
+                        if (!StringHelper.isEmpty(result)) {
+                            String[] string = result.split("#", 2);
+                            if (string.length == 2) {
+                                SharedBook sharedBook = GsonExtensionsKt.getGSON().fromJson(string[1], SharedBook.class);
+                                if (sharedBook != null && !StringHelper.isEmpty(sharedBook.getChapterUrl())){
+                                    Book book = SharedBook.sharedBookToBook(sharedBook);
+                                    Intent intent = new Intent(this, BookDetailedActivity.class);
+                                    intent.putExtra(APPCONST.BOOK, book);
+                                    startActivity(intent);
+                                }else {
+                                    ToastUtils.showError("书籍加载失败");
+                                }
+                            }else {
+                                try {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    Uri uri = Uri.parse(result);
+                                    intent.setData(uri);
+                                    startActivity(intent);
+                                }catch (Exception e){
+                                    ToastUtils.showError(e.getLocalizedMessage());
+                                }
+                            }
+                        }
+                    }
                     break;
             }
         }
@@ -368,7 +424,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    public interface OnGroupChangeListener{
+    public interface OnGroupChangeListener {
         void onChange();
     }
 }

@@ -1,6 +1,10 @@
 package xyz.fycz.myreader.ui.adapter;
 
 import android.app.Activity;
+import android.os.Handler;
+
+import java.util.List;
+
 import xyz.fycz.myreader.base.adapter.BaseListAdapter;
 import xyz.fycz.myreader.base.adapter.IViewHolder;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -20,5 +24,18 @@ public class BookStoreBookAdapter extends BaseListAdapter<Book> {
     @Override
     protected IViewHolder<Book> createViewHolder(int viewType) {
         return new BookStoreBookHolder(hasImg, mActivity);
+    }
+
+    @Override
+    public void addItems(List<Book> values) {
+        mList.addAll(values);
+
+        Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
     }
 }

@@ -1,19 +1,21 @@
 package xyz.fycz.myreader.ui.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.app.Notification;
 import android.content.*;
+import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.*;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -22,12 +24,15 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+
 import butterknife.BindView;
 import butterknife.OnClick;
+
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gyf.immersionbar.ImmersionBar;
-import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
+import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
+
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
@@ -37,7 +42,6 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.enums.Font;
-import xyz.fycz.myreader.enums.ReadStyle;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookMark;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -50,8 +54,15 @@ import xyz.fycz.myreader.ui.dialog.AudioPlayerDialog;
 import xyz.fycz.myreader.ui.dialog.CopyContentDialog;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
+import xyz.fycz.myreader.ui.popmenu.AutoPageMenu;
+import xyz.fycz.myreader.ui.popmenu.BrightnessEyeMenu;
+import xyz.fycz.myreader.ui.popmenu.CustomizeComMenu;
+import xyz.fycz.myreader.ui.popmenu.CustomizeLayoutMenu;
+import xyz.fycz.myreader.ui.popmenu.ReadSettingMenu;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
+import xyz.fycz.myreader.ui.presenter.CatalogPresenter;
 import xyz.fycz.myreader.util.*;
+import xyz.fycz.myreader.util.llog.LLog;
 import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
 import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.ColorUtil;
@@ -69,6 +80,7 @@ import xyz.fycz.myreader.widget.page.PageView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -78,7 +90,8 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
  * @author fengyue
  * @date 2020/10/21 16:46
  */
-public class ReadActivity extends BaseActivity {
+public class ReadActivity extends BaseActivity implements ColorPickerDialogListener {
+    private static final String TAG = ReadActivity.class.getSimpleName();
 
     /*****************************View***********************************/
     @BindView(R.id.toolbar)
@@ -95,8 +108,6 @@ public class ReadActivity extends BaseActivity {
     PageView pageView;
     @BindView(R.id.pb_loading)
     ProgressBar pbLoading;
-    @BindView(R.id.pb_nextPage)
-    VerticalSeekBar pbNextPage;
     @BindView(R.id.read_tv_page_tip)
     TextView readTvPageTip;
     @BindView(R.id.read_tv_pre_chapter)
@@ -107,19 +118,30 @@ public class ReadActivity extends BaseActivity {
     TextView readTvNextChapter;
     @BindView(R.id.read_tv_category)
     TextView readTvCategory;
-    @BindView(R.id.read_tv_night_mode)
-    TextView readTvNightMode;
-    @BindView(R.id.read_tv_download)
-    TextView readTvDownload;
+    @BindView(R.id.btn_night_mode)
+    FloatingActionButton readBtnNightMode;
+    @BindView(R.id.read_tv_brightness_eye)
+    TextView readTvBrightnessEye;
     @BindView(R.id.read_tv_setting)
     TextView readTvSetting;
     @BindView(R.id.read_ll_bottom_menu)
     LinearLayout readLlBottomMenu;
-    @BindView(R.id.iv_listen_book)
-    FloatingActionButton readBtnListenBook;
+    @BindView(R.id.read_tv_listen_book)
+    TextView readTvListenBook;
+    @BindView(R.id.read_setting_menu)
+    ReadSettingMenu readSettingMenu;
+    @BindView(R.id.read_customize_menu)
+    CustomizeComMenu customizeComMenu;
+    @BindView(R.id.read_auto_page_menu)
+    AutoPageMenu autoPageMenu;
+    @BindView(R.id.read_customize_layout_menu)
+    CustomizeLayoutMenu customizeLayoutMenu;
+    @BindView(R.id.read_brightness_eye_menu)
+    BrightnessEyeMenu brightnessEyeMenu;
+    @BindView(R.id.vwNavigationBar)
+    View vwNavigationBar;
 
     /***************************variable*****************************/
-    private ImmersionBar immersionBar;
     private Book mBook;
     private ArrayList<Chapter> mChapters = new ArrayList<>();
     private ChapterService mChapterService;
@@ -136,8 +158,6 @@ public class ReadActivity extends BaseActivity {
 
     private boolean loadFinish = false;
 
-    private Dialog mPageModeDialog;//翻页模式视图
-
     private int curCacheChapterNum = 0;//缓存章节数
 
     private int needCacheChapterNum;//需要缓存的章节
@@ -148,7 +168,6 @@ public class ReadActivity extends BaseActivity {
 
     private Runnable keepScreenRunnable;//息屏线程
     private Runnable autoPageRunnable;//自动翻页
-    private Runnable upHpbNextPage;//更新自动翻页进度条
     private Runnable sendDownloadNotification;
     private static boolean isStopDownload = true;
 
@@ -158,18 +177,11 @@ public class ReadActivity extends BaseActivity {
 
     private ReadCrawler mReadCrawler;
 
-    private int nextPageTime;//下次翻页时间
-
     private int upHpbInterval = 30;//更新翻页进度速度
 
     private int downloadInterval = 150;
 
-    private final CharSequence[] pageMode = {
-            "覆盖", "仿真", "滑动", "滚动", "无动画"
-    };
-
     private SourceExchangeDialog mSourceDialog;
-    private Dialog mSettingDialog;
     private AudioPlayerDialog mAudioPlayerDialog;
 
     private boolean hasChangeSource;
@@ -211,14 +223,19 @@ public class ReadActivity extends BaseActivity {
                     init();
                     break;
                 case 2:
-                    int chapterPos = msg.arg1;
-                    int pagePos = msg.arg2;
-                    mPageLoader.skipToChapter(chapterPos);
-                    mPageLoader.skipToPage(pagePos);
+                    try {
+                        int chapterPos = msg.arg1;
+                        int pagePos = msg.arg2;
+                        mPageLoader.skipToChapter(chapterPos);
+                        mPageLoader.skipToPage(pagePos);
+                    } catch (Exception e) {
+                        ToastUtils.showError("章节跳转失败，请截图联系作者。\n" +
+                                Objects.requireNonNull(e.getMessage()));
+                        e.printStackTrace();
+                    }
                     pbLoading.setVisibility(View.GONE);
                     break;
                 case 3:
-                    updateDownloadProgress((TextView) msg.obj);
                     break;
                 case 4:
                     saveLastChapterReadPosition();
@@ -226,7 +243,9 @@ public class ReadActivity extends BaseActivity {
                     initMenu();
                     break;
                 case 5:
-
+                    if (mPageLoader != null) {
+                        mPageLoader.refreshUi();
+                    }
                     break;
                 case 6:
                     mPageLoader.openChapter();
@@ -264,6 +283,7 @@ public class ReadActivity extends BaseActivity {
         return R.layout.activity_read;
     }
 
+
     @Override
     protected void setUpToolbar(Toolbar toolbar) {
         super.setUpToolbar(toolbar);
@@ -277,7 +297,6 @@ public class ReadActivity extends BaseActivity {
         mChapterService = ChapterService.getInstance();
         mBookMarkService = BookMarkService.getInstance();
         mSetting = SysManager.getSetting();
-
         if (!loadBook()) {
             finish();
             return;
@@ -290,7 +309,6 @@ public class ReadActivity extends BaseActivity {
         //保持屏幕常亮
         keepScreenRunnable = this::unKeepScreenOn;
         autoPageRunnable = this::nextPage;
-        upHpbNextPage = this::upHpbNextPage;
         sendDownloadNotification = this::sendNotification;
 
         notificationUtil = NotificationUtil.getInstance();
@@ -313,13 +331,16 @@ public class ReadActivity extends BaseActivity {
                 this::hideSystemBar
         );
         if (!mSetting.isBrightFollowSystem()) {
-            BrightUtil.setBrightness(this, BrightUtil.progressToBright(mSetting.getBrightProgress()));
+            BrightUtil.setBrightness(this, mSetting.getBrightProgress());
         }
         pbLoading.setVisibility(View.VISIBLE);
-        createSettingDetailView();
+        initEyeView();
+        initSettingListener();
         initTopMenu();
         initBottomMenu();
+        setOrientation(mSetting.isHorizontalScreen());
     }
+
 
     @Override
     protected void initClick() {
@@ -333,9 +354,6 @@ public class ReadActivity extends BaseActivity {
             @Override
             public void center() {
                 toggleMenu(true);
-                if (autoPage) {
-                    autoPageStop();
-                }
             }
 
             @Override
@@ -368,6 +386,9 @@ public class ReadActivity extends BaseActivity {
                         }
                         mBook.setHistoryChapterId(mChapters.get(pos).getTitle());
                         MyApplication.getApplication().newThread(() -> {
+                            if (mPageLoader == null) {
+                                return;
+                            }
                             if (mPageLoader.getPageStatus() == PageLoader.STATUS_LOADING) {
                                 if (!NetworkUtils.isNetWorkAvailable()) {
                                     mHandler.sendMessage(mHandler.obtainMessage(7));
@@ -401,16 +422,16 @@ public class ReadActivity extends BaseActivity {
                             if (mPageLoader.hasChapterData(mChapters.get(mPageLoader.getChapterPos()))) {
                                 if (resetRead) {
                                     if (mAudioPlayerDialog != null) {
-                                        mHandler.postDelayed(() -> mAudioPlayerDialog.readAloud(), 500);
+                                        mHandler.postDelayed(() -> mAudioPlayerDialog.readAloud(), 400);
                                     }
                                     return;
                                 }
                                 if (pos == 0) {
                                     if (mAudioPlayerDialog != null) {
-                                        mHandler.postDelayed(() -> mAudioPlayerDialog.readAloud(), 500);
+                                        mHandler.postDelayed(() -> mAudioPlayerDialog.readAloud(), 400);
                                     }
                                 }
-                            }else {
+                            } else {
                                 ReadAloudService.stop(ReadActivity.this);
                             }
                         }
@@ -441,7 +462,7 @@ public class ReadActivity extends BaseActivity {
         });
 
         mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
-            Book bookTem = new Book(mBook);
+            Book bookTem = (Book) mBook.clone();
             bookTem.setChapterUrl(bean.getChapterUrl());
             bookTem.setSource(bean.getSource());
             if (!StringHelper.isEmpty(bean.getImgUrl())) {
@@ -468,7 +489,7 @@ public class ReadActivity extends BaseActivity {
             startActivity(intent);
         });
 
-        readBtnListenBook.setOnClickListener(v -> {
+        readTvListenBook.setOnClickListener(v -> {
             if (mSetting.getPageMode() == PageMode.SCROLL) {
                 ToastUtils.showWarring("朗读暂不支持滚动翻页模式!");
                 return;
@@ -499,6 +520,8 @@ public class ReadActivity extends BaseActivity {
             //保存上次阅读信息
             SharedPreUtils.getInstance().putString(getString(R.string.lastRead), mBook.getId());
         }
+        //保存最近阅读时间
+        mBook.setLastReadTime(DateHelper.getLongDate());
         getData();
     }
 
@@ -511,32 +534,42 @@ public class ReadActivity extends BaseActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         boolean isVolumeTurnPage = SysManager.getSetting().isVolumeTurnPage();
-        if (readAblTopMenu.getVisibility() != View.VISIBLE) {
+        if (readAblTopMenu.getVisibility() != View.VISIBLE &&
+                customizeLayoutMenu.getVisibility() != View.VISIBLE &&
+                autoPageMenu.getVisibility() != View.VISIBLE &&
+                customizeComMenu.getVisibility() != View.VISIBLE &&
+                readSettingMenu.getVisibility() != View.VISIBLE &&
+                brightnessEyeMenu.getVisibility() != View.VISIBLE) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_VOLUME_UP:
-                    if (isVolumeTurnPage) {
-                        return mPageLoader.skipToPrePage();
+                    if (ReadAloudService.running) {
+                        if (mSetting.isReadAloudVolumeTurnPage()) {
+                            return mPageLoader.skipToPrePage();
+                        }
+                    } else {
+                        if (isVolumeTurnPage) {
+                            return mPageLoader.skipToPrePage();
+                        }
                     }
                 case KeyEvent.KEYCODE_VOLUME_DOWN:
-                    if (isVolumeTurnPage) {
-                        return mPageLoader.skipToNextPage();
+                    if (ReadAloudService.running) {
+                        if (mSetting.isReadAloudVolumeTurnPage()) {
+                            return mPageLoader.skipToNextPage();
+                        }
+                    } else {
+                        if (isVolumeTurnPage) {
+                            return mPageLoader.skipToNextPage();
+                        }
                     }
             }
         }
+
         return super.onKeyDown(keyCode, event);
     }
 
     @Override
     public void onBackPressed() {
-        if (readAblTopMenu.getVisibility() == View.VISIBLE) {
-            // 非全屏下才收缩，全屏下直接退出
-            //if (!ReadSettingManager.getInstance().isFullScreen()) {
-            if (true) {
-                toggleMenu(true);
-                return;
-            }
-        } else if (mSettingDialog.isShowing()) {
-            mSettingDialog.dismiss();
+        if (hideReadMenu()) {
             return;
         } else if (ReadAloudService.running && mAudioPlayerDialog.aloudStatus == ReadAloudService.Status.PLAY) {
             ReadAloudService.pause(this);
@@ -589,7 +622,6 @@ public class ReadActivity extends BaseActivity {
         super.onDestroy();
         unregisterReceiver(mReceiver);
         mHandler.removeCallbacks(keepScreenRunnable);
-        mHandler.removeCallbacks(upHpbNextPage);
         mHandler.removeCallbacks(autoPageRunnable);
         /*mHandler.removeCallbacks(sendDownloadNotification);
         notificationUtil.cancelAll();
@@ -615,12 +647,12 @@ public class ReadActivity extends BaseActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.setGroupVisible(R.id.action_load_finish, loadFinish);
         if ("本地书籍".equals(mBook.getType())) {
             menu.findItem(R.id.action_change_source).setVisible(false);
             menu.findItem(R.id.action_open_link).setVisible(false);
+            menu.findItem(R.id.action_download).setVisible(false);
         }
-        menu.setGroupVisible(R.id.action_load_finish, loadFinish);
-
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -665,6 +697,9 @@ public class ReadActivity extends BaseActivity {
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
                 break;
+            case R.id.action_download:
+                download();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -688,17 +723,76 @@ public class ReadActivity extends BaseActivity {
                     break;
                 case APPCONST.REQUEST_CHAPTER_PAGE:
                     int[] chapterAndPage = data.getIntArrayExtra(APPCONST.CHAPTER_PAGE);
-                    assert chapterAndPage != null;
-                    skipToChapterAndPage(chapterAndPage[0], chapterAndPage[1]);
+                    /*LLog.i(TAG, "chapterAndPage == null" + (chapterAndPage == null));
+                    LLog.i(TAG, "chapterAndPage.length" + (chapterAndPage.length));*/
+                    if (chapterAndPage == null) {
+                        ToastUtils.showError("章节跳转失败!");
+                        return;
+                    }
+                    try {
+                        skipToChapterAndPage(chapterAndPage[0], chapterAndPage[1]);
+                    } catch (Exception e) {
+                        ToastUtils.showError("章节跳转失败，请截图联系作者。\n" +
+                                Objects.requireNonNull(e.getMessage()));
+                        e.printStackTrace();
+                    }
                     break;
-                case APPCONST.REQUEST_RESET_SCREEN_TIME:
-                    int resetScreen = data.getIntExtra(APPCONST.RESULT_RESET_SCREEN, 0);
-                    screenTimeOut = resetScreen * 60;
+                case APPCONST.REQUEST_REFRESH_READ_UI:
+                    screenTimeOut = mSetting.getResetScreen() * 60;
                     screenOffTimerStart();
+                    boolean needRefresh = data.getBooleanExtra(APPCONST.RESULT_NEED_REFRESH, false);
+                    boolean upMenu = data.getBooleanExtra(APPCONST.RESULT_UP_MENU, false);
+                    if (needRefresh) {
+                        mHandler.sendEmptyMessage(5);
+                    }
+                    if (upMenu) {
+                        initTopMenu();
+                    }
+                    break;
+                case APPCONST.REQUEST_SELECT_BG:
+                    String bgPath = getPath(this, data.getData());
+                    customizeLayoutMenu.setCustomBg(bgPath);
+                    break;
+                case APPCONST.REQUEST_IMPORT_LAYOUT:
+                    String zipPath = getPath(this, data.getData());
+                    customizeLayoutMenu.zip2Layout(zipPath);
                     break;
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * Callback that is invoked when a color is selected from the color picker dialog.
+     *
+     * @param dialogId The dialog id used to create the dialog instance.
+     * @param color    The selected color
+     */
+    @Override
+    public void onColorSelected(int dialogId, int color) {
+        switch (dialogId) {
+            case APPCONST.SELECT_TEXT_COLOR:
+                mSetting.setTextColor(color);
+                mPageLoader.setTextSize();
+                break;
+            case APPCONST.SELECT_BG_COLOR:
+                mSetting.setBgIsColor(true);
+                mSetting.setBgColor(color);
+                mPageLoader.refreshUi();
+                break;
+        }
+        SysManager.saveSetting(mSetting);
+        customizeLayoutMenu.upColor();
+    }
+
+    /**
+     * Callback that is invoked when the color picker dialog was dismissed.
+     *
+     * @param dialogId The dialog id used to create the dialog instance.
+     */
+    @Override
+    public void onDialogDismissed(int dialogId) {
+
     }
     /**************************method*********************************/
     /**
@@ -801,14 +895,12 @@ public class ReadActivity extends BaseActivity {
 
     /**
      * 添加到书架并缓存书籍
-     *
-     * @param tvDownloadProgress
      */
-    private void addBookToCaseAndDownload(final TextView tvDownloadProgress) {
+    private void addBookToCaseAndDownload() {
         DialogCreator.createCommonDialog(this, this.getString(R.string.tip), this.getString(R.string.download_no_add_tips), true, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                downloadBook(tvDownloadProgress);
+                downloadBook();
                 isCollected = true;
             }
         }, (dialog, which) -> dialog.dismiss());
@@ -1040,8 +1132,14 @@ public class ReadActivity extends BaseActivity {
      * 初始化顶部菜单
      */
     private void initTopMenu() {
-        if (Build.VERSION.SDK_INT >= 19) {
-            readAblTopMenu.setPadding(0, ImmersionBar.getStatusBarHeight(this), 0, 0);
+        int statusBarHeight = ImmersionBar.getStatusBarHeight(this);
+        readAblTopMenu.setPadding(0, statusBarHeight, 0, 0);
+        if (mSetting.isNoMenuChTitle()) {
+            chapterView.setVisibility(GONE);
+            toolbar.getLayoutParams().height = 60 + ImmersionBar.getStatusBarHeight(this);
+        } else {
+            chapterView.setVisibility(VISIBLE);
+            toolbar.getLayoutParams().height = 45 + ImmersionBar.getStatusBarHeight(this);
         }
     }
 
@@ -1052,20 +1150,23 @@ public class ReadActivity extends BaseActivity {
         //判断是否全屏
         //if (mSetting.getHideStatusBar()) {
         if (!mSetting.isDayStyle()) {
-            readTvNightMode.setText("白天");
-            Drawable drawable = ContextCompat.getDrawable(this, R.mipmap.z4);
-            readTvNightMode.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null);
+            readBtnNightMode.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_sun));
         }
+        readBtnNightMode.setOnClickListener(v -> changeNightAndDaySetting(mSetting.isDayStyle()));
         if (true) {
             //还需要设置mBottomMenu的底部高度
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) readLlBottomMenu.getLayoutParams();
-            params.bottomMargin = ImmersionBar.getNavigationBarHeight(this);
-            readLlBottomMenu.setLayoutParams(params);
+            if (ImmersionBar.hasNavigationBar(this)) {
+                int height = ImmersionBar.getNavigationBarHeight(this);
+                vwNavigationBar.getLayoutParams().height = height;
+                readSettingMenu.setNavigationBarHeight(height);
+                customizeComMenu.setNavigationBarHeight(height);
+                customizeLayoutMenu.setNavigationBarHeight(height);
+                autoPageMenu.setNavigationBarHeight(height);
+                brightnessEyeMenu.setNavigationBarHeight(height);
+            }
         } else {
             //设置mBottomMenu的底部距离
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) readLlBottomMenu.getLayoutParams();
-            params.bottomMargin = 0;
-            readLlBottomMenu.setLayoutParams(params);
+            vwNavigationBar.getLayoutParams().height = 0;
         }
     }
 
@@ -1076,14 +1177,37 @@ public class ReadActivity extends BaseActivity {
      */
     private boolean hideReadMenu() {
         hideSystemBar();
+        boolean flag = false;
         if (readAblTopMenu.getVisibility() == VISIBLE) {
             toggleMenu(true);
-            return true;
-        } else if (mSettingDialog.isShowing()) {
-            mSettingDialog.dismiss();
-            return true;
+            flag = true;
         }
-        return false;
+        if (readSettingMenu.getVisibility() == View.VISIBLE) {
+            readSettingMenu.setVisibility(GONE);
+            readSettingMenu.startAnimation(mBottomOutAnim);
+            flag = true;
+        }
+        if (customizeComMenu.getVisibility() == VISIBLE) {
+            customizeComMenu.setVisibility(GONE);
+            customizeComMenu.startAnimation(mBottomOutAnim);
+            flag = true;
+        }
+        if (customizeLayoutMenu.getVisibility() == VISIBLE) {
+            customizeLayoutMenu.setVisibility(GONE);
+            customizeLayoutMenu.startAnimation(mBottomOutAnim);
+            flag = true;
+        }
+        if (autoPageMenu.getVisibility() == VISIBLE) {
+            autoPageMenu.setVisibility(GONE);
+            autoPageMenu.startAnimation(mBottomOutAnim);
+            flag = true;
+        }
+        if (brightnessEyeMenu.getVisibility() == VISIBLE) {
+            brightnessEyeMenu.setVisibility(GONE);
+            brightnessEyeMenu.startAnimation(mBottomOutAnim);
+            flag = true;
+        }
+        return flag;
     }
 
     /**
@@ -1093,6 +1217,7 @@ public class ReadActivity extends BaseActivity {
     private void toggleMenu(boolean hideStatusBar) {
         toggleMenu(hideStatusBar, false);
     }
+
     public void toggleMenu(boolean hideStatusBar, boolean home) {
         initMenuAnim();
         if (readAblTopMenu.getVisibility() == View.VISIBLE) {
@@ -1106,11 +1231,16 @@ public class ReadActivity extends BaseActivity {
             }
             return;
         }
-        if (ReadAloudService.running && !home){
+        if (ReadAloudService.running && !home) {
             if (mAudioPlayerDialog != null) {
                 mAudioPlayerDialog.show();
                 return;
             }
+        }
+        if (autoPage) {
+            autoPageMenu.setVisibility(VISIBLE);
+            autoPageMenu.startAnimation(mBottomInAnim);
+            return;
         }
         readAblTopMenu.setVisibility(View.VISIBLE);
         readLlBottomMenu.setVisibility(View.VISIBLE);
@@ -1137,101 +1267,161 @@ public class ReadActivity extends BaseActivity {
     private void hideSystemBar() {
         //隐藏
         if (readAblTopMenu.getVisibility() != VISIBLE || (mAudioPlayerDialog != null && !mAudioPlayerDialog.isShowing())) {
-            SystemBarUtils.hideStableStatusBar(this);
+            if (!mSetting.isShowStatusBar()) {
+                SystemBarUtils.hideStableStatusBar(this);
+            }
             SystemBarUtils.hideStableNavBar(this);
         }
     }
 
     /******************设置相关*****************/
 
-
     /**
-     * 创建详细设置视图
+     * 初始化详细设置
      */
-    private void createSettingDetailView() {
-        mSettingDialog = DialogCreator.createReadDetailSetting(this, mSetting,
-                this::changeStyle, v -> reduceTextSize(), v -> increaseTextSize(), v -> {
-                    if (mSetting.isVolumeTurnPage()) {
-                        mSetting.setVolumeTurnPage(false);
-                        ToastUtils.showSuccess("音量键翻页已关闭！");
-                    } else {
-                        mSetting.setVolumeTurnPage(true);
-                        ToastUtils.showSuccess("音量键翻页已开启！");
-                    }
-                    SysManager.saveSetting(mSetting);
-                }, v -> {
-                    Intent intent = new Intent(this, FontsActivity.class);
+    private void initSettingListener() {
+        readSettingMenu.setOnClickListener(null);
+        readSettingMenu.setListener(this, new ReadSettingMenu.Callback() {
+            @Override
+            public void onRefreshUI() {
+                mHandler.sendEmptyMessage(5);
+            }
+
+            @Override
+            public void onStyleChange() {
+                changeStyle();
+            }
+
+            @Override
+            public void onTextSizeChange() {
+                mPageLoader.setTextSize();
+            }
+
+            @Override
+            public void onFontClick() {
+                hideReadMenu();
+                mHandler.postDelayed(() -> {
+                    Intent intent = new Intent(ReadActivity.this, FontsActivity.class);
                     startActivityForResult(intent, APPCONST.REQUEST_FONT);
-                    mSettingDialog.dismiss();
-                }, this::showPageModeDialog, v -> {
-                    if (mSetting.getPageMode() == PageMode.SCROLL) {
-                        ToastUtils.showWarring("滚动暂时不支持自动翻页！");
-                        return;
-                    }
-                    if (ReadAloudService.running){
-                        ToastUtils.showWarring("请先关闭语音朗读！");
-                        return;
-                    }
-                    mSettingDialog.dismiss();
-                    autoPage = !autoPage;
+                }, mBottomOutAnim.getDuration());
+            }
+
+            @Override
+            public void onAutoPageClick() {
+                if (ReadAloudService.running) {
+                    ToastUtils.showWarring("请先关闭语音朗读！");
+                    return;
+                }
+                hideReadMenu();
+                ToastUtils.showInfo("自动翻页开启");
+                autoPage = !autoPage;
+                autoPage();
+            }
+
+            @Override
+            public void onHVChange() {
+                setOrientation(mSetting.isHorizontalScreen());
+            }
+
+            @Override
+            public void onMoreSettingClick() {
+                hideReadMenu();
+                mHandler.postDelayed(() -> {
+                    Intent intent = new Intent(ReadActivity.this, MoreSettingActivity.class);
+                    startActivityForResult(intent, APPCONST.REQUEST_REFRESH_READ_UI);
+                }, mBottomOutAnim.getDuration());
+            }
+        });
+        customizeComMenu.setOnClickListener(null);
+        customizeComMenu.setListener(new CustomizeComMenu.Callback() {
+            @Override
+            public void onTextPChange() {
+                mPageLoader.setTextSize();
+                mSetting.setComposition(0);
+                SysManager.saveSetting(mSetting);
+                readSettingMenu.initComposition();
+            }
+
+            @Override
+            public void onMarginChange() {
+                mPageLoader.upMargin();
+                mSetting.setComposition(0);
+                SysManager.saveSetting(mSetting);
+                readSettingMenu.initComposition();
+            }
+
+            @Override
+            public void onRefreshUI() {
+                mPageLoader.refreshUi();
+            }
+
+            @Override
+            public void onReset() {
+                mPageLoader.setTextSize();
+                mPageLoader.upMargin();
+                mSetting.setComposition(1);
+                SysManager.saveSetting(mSetting);
+                readSettingMenu.initComposition();
+                ToastUtils.showInfo("已重置各间距为默认值");
+            }
+        });
+        autoPageMenu.setOnClickListener(null);
+        autoPageMenu.setListener(new AutoPageMenu.Callback() {
+            @Override
+            public void onSpeedChange() {
+                if (pageView != null) {
+                    pageView.autoPageOnSpeedChange();
                     autoPage();
-                }, v -> {
-                    Intent intent = new Intent(this, MoreSettingActivity.class);
-                    startActivityForResult(intent, APPCONST.REQUEST_RESET_SCREEN_TIME);
-                    mSettingDialog.dismiss();
-                });
+                }
+            }
+
+            @Override
+            public void onExitClick() {
+                ToastUtils.showInfo("自动翻页关闭");
+                autoPageStop();
+                hideReadMenu();
+            }
+        });
+        customizeLayoutMenu.setOnClickListener(null);
+        customizeLayoutMenu.setListener(this, new CustomizeLayoutMenu.Callback() {
+            @Override
+            public void upBg() {
+                mPageLoader.refreshUi();
+            }
+
+            @Override
+            public void upStyle() {
+                readSettingMenu.initStyleImage();
+            }
+
+        });
+        brightnessEyeMenu.setOnClickListener(null);
+        brightnessEyeMenu.setListener(this, new BrightnessEyeMenu.Callback() {
+            @Override
+            public void onProtectEyeChange() {
+                if (mSetting.isProtectEye()) {
+                    openEye();
+                } else {
+                    closeEye();
+                }
+            }
+
+            @Override
+            public void upProtectEye() {
+                openEye();
+            }
+        });
     }
 
-    private void showPageModeDialog(final TextView tvPageMode) {
-        if (mPageModeDialog != null) {
-            mPageModeDialog.show();
+    /**
+     * 设置屏幕方向
+     */
+    @SuppressLint("SourceLockedOrientationActivity")
+    public void setOrientation(boolean isHorizontalScreen) {
+        if (isHorizontalScreen) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else {
-            //显示翻页模式视图
-            int checkedItem;
-            switch (mSetting.getPageMode()) {
-                case COVER:
-                    checkedItem = 0;
-                    break;
-                case SIMULATION:
-                    checkedItem = 1;
-                    break;
-                case SLIDE:
-                    checkedItem = 2;
-                    break;
-                case SCROLL:
-                    checkedItem = 3;
-                    break;
-                case NONE:
-                    checkedItem = 4;
-                    break;
-                default:
-                    checkedItem = 0;
-            }
-            mPageModeDialog = MyAlertDialog.build(this)
-                    .setTitle("翻页模式")
-                    .setSingleChoiceItems(pageMode, checkedItem, (dialog, which) -> {
-                        switch (which) {
-                            case 0:
-                                mSetting.setPageMode(PageMode.COVER);
-                                break;
-                            case 1:
-                                mSetting.setPageMode(PageMode.SIMULATION);
-                                break;
-                            case 2:
-                                mSetting.setPageMode(PageMode.SLIDE);
-                                break;
-                            case 3:
-                                mSetting.setPageMode(PageMode.SCROLL);
-                                break;
-                            case 4:
-                                mSetting.setPageMode(PageMode.NONE);
-                                break;
-                        }
-                        mPageModeDialog.dismiss();
-                        SysManager.saveSetting(mSetting);
-                        MyApplication.runOnUiThread(() -> mPageLoader.setPageMode(mSetting.getPageMode()));
-                        tvPageMode.setText(pageMode[which]);
-                    }).show();
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
     }
 
@@ -1245,52 +1435,42 @@ public class ReadActivity extends BaseActivity {
         //mPageLoader.setPageStyle(!isCurDayStyle);
     }
 
-    /**
-     * 缩小字体
-     */
-    private void reduceTextSize() {
-        if (mSetting.getReadWordSize() > 1) {
-            mSetting.setReadWordSize(mSetting.getReadWordSize() - 1);
-            SysManager.saveSetting(mSetting);
-            mPageLoader.setTextSize((int) mSetting.getReadWordSize());
-        }
-    }
-
-    /**
-     * 增大字体
-     */
-    private void increaseTextSize() {
-        if (mSetting.getReadWordSize() < 41) {
-            mSetting.setReadWordSize(mSetting.getReadWordSize() + 1);
-            SysManager.saveSetting(mSetting);
-            mPageLoader.setTextSize((int) mSetting.getReadWordSize());
-        }
-    }
 
     /**
      * 改变阅读风格
-     *
-     * @param readStyle
      */
-    private void changeStyle(ReadStyle readStyle) {
-        mSetting.setReadStyle(readStyle);
-        SysManager.saveSetting(mSetting);
+    private void changeStyle() {
         if (!mSetting.isDayStyle()) {
-            DialogCreator.createCommonDialog(this, "提示", "是否希望切换为日间模式？",
-                    false, "确定", "取消", (dialog, which) -> {
-                        changeNightAndDaySetting(false);
-                    }, null);
+            changeNightAndDaySetting(false);
         }
-        MyApplication.runOnUiThread(() -> mPageLoader.setPageStyle(true));
+        upBrightnessEye();
+        mPageLoader.refreshUi();
+    }
+
+    /**
+     * 更新亮度和护眼
+     */
+    private void upBrightnessEye() {
+        if (!mSetting.isBrightFollowSystem()) {
+            BrightUtil.setBrightness(this, mSetting.getBrightProgress());
+        } else {
+            BrightUtil.followSystemBright(this);
+        }
+        if (mSetting.isProtectEye()) {
+            openEye();
+        } else {
+            closeEye();
+        }
     }
 
     @OnClick({R.id.read_tv_setting, R.id.read_tv_pre_chapter
-            , R.id.read_tv_next_chapter, R.id.read_tv_night_mode})
+            , R.id.read_tv_next_chapter, R.id.read_tv_brightness_eye})
     protected void onClick(View view) {
         switch (view.getId()) {
             case R.id.read_tv_setting:  //设置
-                toggleMenu(true);
-                mSettingDialog.show();
+                toggleMenu(false);
+                readSettingMenu.startAnimation(mBottomInAnim);
+                readSettingMenu.setVisibility(VISIBLE);
                 break;
             case R.id.read_tv_pre_chapter:  //前一章
                 mPageLoader.skipPreChapter();
@@ -1298,8 +1478,11 @@ public class ReadActivity extends BaseActivity {
             case R.id.read_tv_next_chapter:  //后一章
                 mPageLoader.skipNextChapter();
                 break;
-            case R.id.read_tv_night_mode:  //夜间模式
-                changeNightAndDaySetting(mSetting.isDayStyle());
+            case R.id.read_tv_brightness_eye:
+                hideReadMenu();
+                brightnessEyeMenu.initWidget();
+                brightnessEyeMenu.setVisibility(VISIBLE);
+                brightnessEyeMenu.startAnimation(mBottomInAnim);
                 break;
         }
     }
@@ -1312,9 +1495,11 @@ public class ReadActivity extends BaseActivity {
         //切换菜单
         toggleMenu(true);
         //跳转
-        Intent intent = new Intent(this, CatalogActivity.class);
-        intent.putExtra(APPCONST.BOOK, mBook);
-        this.startActivityForResult(intent, APPCONST.REQUEST_CHAPTER_PAGE);
+        mHandler.postDelayed(() -> {
+            Intent intent = new Intent(this, CatalogActivity.class);
+            intent.putExtra(APPCONST.BOOK, mBook);
+            this.startActivityForResult(intent, APPCONST.REQUEST_CHAPTER_PAGE);
+        }, mBottomOutAnim.getDuration());
     }
 
     @OnClick(R.id.ll_chapter_view)
@@ -1331,14 +1516,28 @@ public class ReadActivity extends BaseActivity {
         }
     }
 
-    @OnClick(R.id.read_tv_download)
     protected void download() {
         if (!isCollected) {
-            addBookToCaseAndDownload(readTvDownload);
+            addBookToCaseAndDownload();
         } else {
-            downloadBook(readTvDownload);
+            downloadBook();
         }
     }
+
+    public void showCustomizeMenu() {
+        customizeComMenu.initWidget();
+        customizeComMenu.setVisibility(VISIBLE);
+        customizeComMenu.startAnimation(mBottomInAnim);
+    }
+
+    public void showCustomizeLayoutMenu() {
+        hideReadMenu();
+
+        customizeLayoutMenu.upColor();
+        customizeLayoutMenu.setVisibility(VISIBLE);
+        customizeLayoutMenu.startAnimation(mBottomInAnim);
+    }
+
     /****************息屏相关*****************/
     /**
      * 取消亮屏保持
@@ -1379,7 +1578,7 @@ public class ReadActivity extends BaseActivity {
     /***************************缓存相关***************************/
     private int selectedIndex;//对话框选择下标
 
-    protected void downloadBook(final TextView tvDownloadProgress) {
+    protected void downloadBook() {
         if ("本地书籍".equals(mBook.getType())) {
             ToastUtils.showWarring("《" + mBook.getName() + "》是本地书籍，不能缓存");
             return;
@@ -1395,23 +1594,23 @@ public class ReadActivity extends BaseActivity {
                     (dialog, which) -> {
                         switch (selectedIndex) {
                             case 0:
-                                addDownload(tvDownloadProgress, mPageLoader.getChapterPos(), mPageLoader.getChapterPos() + 50);
+                                addDownload(mPageLoader.getChapterPos(), mPageLoader.getChapterPos() + 50);
                                 break;
                             case 1:
-                                addDownload(tvDownloadProgress, mPageLoader.getChapterPos() - 50, mPageLoader.getChapterPos() + 50);
+                                addDownload(mPageLoader.getChapterPos() - 50, mPageLoader.getChapterPos() + 50);
                                 break;
                             case 2:
-                                addDownload(tvDownloadProgress, mPageLoader.getChapterPos(), mChapters.size());
+                                addDownload(mPageLoader.getChapterPos(), mChapters.size());
                                 break;
                             case 3:
-                                addDownload(tvDownloadProgress, 0, mChapters.size());
+                                addDownload(0, mChapters.size());
                                 break;
                         }
                     }).show();
         });
     }
 
-    private void addDownload(final TextView tvDownloadProgress, int begin, int end) {
+    private void addDownload(int begin, int end) {
         /*//取消之前下载
         if (!isStopDownload) {
             isStopDownload = true;
@@ -1450,13 +1649,11 @@ public class ReadActivity extends BaseActivity {
                         downloadingChapter = chapter.getTitle();
                         mChapterService.saveOrUpdateChapter(chapter, (String) o);
                         curCacheChapterNum++;
-                        mHandler.sendMessage(mHandler.obtainMessage(3, tvDownloadProgress));
                     }
 
                     @Override
                     public void onError(Exception e) {
                         curCacheChapterNum++;
-                        mHandler.sendMessage(mHandler.obtainMessage(3, tvDownloadProgress));
                     }
                 });
                 try {
@@ -1472,15 +1669,6 @@ public class ReadActivity extends BaseActivity {
                 ToastUtils.showInfo("《" + mBook.getName() + "》" + getString(R.string.download_already_all_tips));
             }
         });
-    }
-
-
-    private void updateDownloadProgress(TextView tvDownloadProgress) {
-        try {
-            tvDownloadProgress.setText(curCacheChapterNum * 100 / needCacheChapterNum + " %");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -1535,31 +1723,12 @@ public class ReadActivity extends BaseActivity {
      * 自动翻页
      */
     private void autoPage() {
-        mHandler.removeCallbacks(upHpbNextPage);
         mHandler.removeCallbacks(autoPageRunnable);
         if (autoPage) {
-            pbNextPage.setVisibility(View.VISIBLE);
-            //每页按字数计算一次时间
-            nextPageTime = mPageLoader.curPageLength() * 60 * 1000 / mSetting.getAutoScrollSpeed();
-            if (0 == nextPageTime) nextPageTime = 1000;
-            pbNextPage.setMax(nextPageTime);
-            mHandler.postDelayed(autoPageRunnable, nextPageTime);
-            nextPageTime = nextPageTime - upHpbInterval * 10;
-            mHandler.postDelayed(upHpbNextPage, upHpbInterval);
-        } else {
-            pbNextPage.setVisibility(View.INVISIBLE);
+            mPageLoader.setPageMode(PageMode.AUTO);
+            mPageLoader.skipToNextPage();
+            mHandler.postDelayed(autoPageRunnable, mSetting.getAutoScrollSpeed() * 1000);
         }
-    }
-
-    /**
-     * 更新自动翻页进度条
-     */
-    private void upHpbNextPage() {
-        nextPageTime = nextPageTime - upHpbInterval;
-        if (nextPageTime >= 0) {
-            pbNextPage.setProgress(nextPageTime);
-        }
-        mHandler.postDelayed(upHpbNextPage, upHpbInterval);
     }
 
     /**
@@ -1567,6 +1736,7 @@ public class ReadActivity extends BaseActivity {
      */
     public void autoPageStop() {
         autoPage = false;
+        mPageLoader.setPageMode(mSetting.getPageMode());
         autoPage();
     }
 
@@ -1576,11 +1746,64 @@ public class ReadActivity extends BaseActivity {
     private void nextPage() {
         MyApplication.runOnUiThread(() -> {
             screenOffTimerStart();
-            if (mPageLoader != null) {
-                mPageLoader.skipToNextPage();
-            }
             autoPage();
         });
+    }
+
+    /**************************护眼相关*********************************/
+    private View vProtectEye;
+
+    private void initEyeView() {
+        ViewGroup content = findViewById(android.R.id.content);
+        vProtectEye = new FrameLayout(this);
+        vProtectEye.setBackgroundColor(mSetting.isProtectEye() ? getFilterColor(mSetting.getBlueFilterPercent()) : Color.TRANSPARENT);          //设置透明
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL     //不触碰
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE            //不可定焦
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;           //不可触
+        params.width = WindowManager.LayoutParams.MATCH_PARENT;
+        params.height = WindowManager.LayoutParams.MATCH_PARENT;
+        content.addView(vProtectEye, params);
+    }
+
+
+    /**
+     * 开启护眼模式
+     */
+    public void openEye() {
+        if (vProtectEye == null) {
+            initEyeView();
+        }
+        vProtectEye.setBackgroundColor(getFilterColor(mSetting.getBlueFilterPercent()));
+    }
+
+    /**
+     * 关闭护眼模式
+     */
+    public void closeEye() {
+        if (vProtectEye == null) {
+            initEyeView();
+        }
+        vProtectEye.setBackgroundColor(Color.TRANSPARENT);
+    }
+
+    /**
+     * 过滤蓝光
+     *
+     * @param blueFilterPercent 蓝光过滤比例[10-30-80]
+     */
+    public int getFilterColor(int blueFilterPercent) {
+        int realFilter = blueFilterPercent;
+        if (realFilter < 10) {
+            realFilter = 10;
+        } else if (realFilter > 80) {
+            realFilter = 80;
+        }
+        int a = (int) (realFilter / 80f * 180);
+        int r = (int) (200 - (realFilter / 80f) * 190);
+        int g = (int) (180 - (realFilter / 80f) * 170);
+        int b = (int) (60 - realFilter / 80f * 60);
+        return Color.argb(a, r, g, b);
     }
 
 }
