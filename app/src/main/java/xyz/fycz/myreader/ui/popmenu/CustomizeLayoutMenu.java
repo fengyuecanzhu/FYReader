@@ -361,11 +361,11 @@ public class CustomizeLayoutMenu extends FrameLayout {
                 holder.mTitle.setText(getFileName(path));
                 holder.mTitle.setTextColor(Color.parseColor("#909090"));
                 try {
-                    BitmapDrawable bitmapDrawable = (BitmapDrawable) holder.mImage.getDrawable();
+                    /*BitmapDrawable bitmapDrawable = (BitmapDrawable) holder.mImage.getDrawable();
                     //如果图片还未回收，先强制回收该图片
                     if (bitmapDrawable != null && !bitmapDrawable.getBitmap().isRecycled()) {
                         bitmapDrawable.getBitmap().recycle();
-                    }
+                    }*/
                     //该变现实的图片
                     Bitmap bmp = MeUtils.getFitAssetsSampleBitmap(context.getAssets(), getItemAssetsFile(position - 1), 256, 256);
                     holder.mImage.setImageBitmap(bmp);

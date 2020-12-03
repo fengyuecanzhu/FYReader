@@ -5,10 +5,6 @@ import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 
-/**
- * Created by zhao on 2017/7/24.
- */
-
 public class BookStoreApi extends BaseApi{
 
 

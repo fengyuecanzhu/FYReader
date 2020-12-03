@@ -7,7 +7,7 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import xyz.fycz.myreader.util.DipPxUtil;
+import xyz.fycz.myreader.util.utils.ScreenUtils;
 
 public class DragFloatBtnT extends FloatingActionButton {
 
@@ -34,7 +34,7 @@ public class DragFloatBtnT extends FloatingActionButton {
     }
 
     private void init() {
-        padding = DipPxUtil.dp2px(getContext(), 15);
+        padding = ScreenUtils.dpToPx(15);
     }
 
     @SuppressLint("ClickableViewAccessibility")

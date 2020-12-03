@@ -82,6 +82,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author fengyue
@@ -748,10 +749,15 @@ public class BookDetailedActivity extends BaseActivity {
             back.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
             Log.i("tag", "saveBitmap success: " + share.getAbsolutePath());
+
+            back.recycle();
+            img.recycle();
+            QRCode.recycle();
+
             return share;
         } catch (Exception e) {
             e.printStackTrace();
-            ToastUtils.showError(e.getLocalizedMessage());
+            ToastUtils.showError(Objects.requireNonNull(e.getLocalizedMessage()));
             return null;
         } finally {
             IOUtils.close(fos);

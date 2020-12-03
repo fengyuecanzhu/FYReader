@@ -1,21 +1,16 @@
 package xyz.fycz.myreader.webapi;
 
-import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.common.ErrorCode;
 import xyz.fycz.myreader.entity.JsonModel;
 import xyz.fycz.myreader.util.HttpUtil;
-import xyz.fycz.myreader.util.JsonArrayToObjectArray;
 import com.google.gson.Gson;
+
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.webapi.callback.JsonCallback;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
-import xyz.fycz.myreader.source.HttpDataSource;
 import xyz.fycz.myreader.util.ToastUtils;
 
 import java.util.Map;
-
-/**
- * Created by zhao on 2017/6/20.
- */
 
 public class BaseApi {
 
@@ -185,7 +180,7 @@ public class BaseApi {
             public void onFinish(JsonModel jsonModel) {
                 if (jsonModel.isSuccess()) {
                     try {
-                        callback.onFinish(JsonArrayToObjectArray.getArray(jsonModel.getResult(),c), jsonModel.getError());
+                        callback.onFinish(GsonExtensionsKt.getGSON().fromJson(jsonModel.getResult(), c), jsonModel.getError());
                     }catch (Exception e){
                         callback.onError(e);
                         e.printStackTrace();

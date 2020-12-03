@@ -4,7 +4,8 @@ import android.text.TextUtils;
 
 import com.luhuiguo.chinese.ChineseUtils;
 
-import xyz.fycz.myreader.entity.ReadBookControl;
+import xyz.fycz.myreader.application.SysManager;
+import xyz.fycz.myreader.enums.Language;
 import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
 import xyz.fycz.myreader.model.ReplaceRuleManager;
 
@@ -22,14 +23,14 @@ public class ChapterContentHelp {
      * 转繁体
      */
     private String toTraditional(String content) {
-        int convertCTS = ReadBookControl.getInstance().getTextConvert();
+        Language convertCTS = SysManager.getSetting().getLanguage();
         switch (convertCTS) {
-            case 0:
+            case normal:
                 break;
-            case 1:
+            case simplified:
                 content = ChineseUtils.toSimplified(content);
                 break;
-            case 2:
+            case traditional:
                 content = ChineseUtils.toTraditional(content);
                 break;
         }
