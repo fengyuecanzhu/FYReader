@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.source;
+package xyz.fycz.myreader.webapi;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,9 +23,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Map;
 
-/**
- * Created by zhao on 2016/4/16.
- */
 
 public class HttpDataSource {
 

@@ -140,18 +140,7 @@
             style="?android:attr/progressBarStyleSmall"
     />
 
-    <ImageView
-            android:id="@+id/iv_delete"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="10dp"
-            android:visibility="gone"
-            app:srcCompat="@mipmap/delete"
-            android:layout_alignParentRight="true"
-    />
-    <View
+   <View
             android:layout_width="fill_parent"
             android:layout_height="0.5dp"
             android:layout_alignParentBottom="true"
