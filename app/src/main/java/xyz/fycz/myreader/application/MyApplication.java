@@ -13,18 +13,16 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
-
 import android.util.Log;
-import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
-import io.reactivex.internal.functions.Functions;
-import io.reactivex.plugins.RxJavaPlugins;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -41,25 +39,28 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import io.reactivex.internal.functions.Functions;
+import io.reactivex.plugins.RxJavaPlugins;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.model.backup.UserService;
-import xyz.fycz.myreader.model.storage.Backup;
+import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.dialog.APPDownloadTip;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.entity.UpdateInfo;
-import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
-import xyz.fycz.myreader.util.*;
-import xyz.fycz.myreader.util.llog.LLog;
+import xyz.fycz.myreader.util.HttpUtil;
+import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.util.utils.OkHttpUtils;
 
 
 public class MyApplication extends Application {
 
+    public static final String TAG = MyApplication.class.getSimpleName();
     private static Handler handler = new Handler();
     private static MyApplication application;
     private ExecutorService mFixedThreadPool;
@@ -238,16 +239,18 @@ public class MyApplication extends Application {
     }
 
     /**
-     * 检查更新
+     * 获取apk包的信息：版本号，名称，图标等
+     * @param absPath apk包的绝对路径
      */
-    public static void checkVersion(AppCompatActivity activity) {
-        UpdateInfo updateInfo = (UpdateInfo) CacheHelper.readObject(APPCONST.FILE_NAME_UPDATE_INFO);
-        int versionCode = getVersionCode();
-        if (updateInfo != null) {
-            if (updateInfo.getNewestVersionCode() > versionCode) {
-                //updateApp(activity, updateInfo.getDownLoadUrl(), versionCode);
-            }
+    public static int apkInfo(String absPath) {
+        PackageManager pm = application.getPackageManager();
+        PackageInfo pkgInfo = pm.getPackageArchiveInfo(absPath, PackageManager.GET_ACTIVITIES);
+        if (pkgInfo != null) {
+            int versionCode = pkgInfo.versionCode;
+            Log.i(TAG, String.format("PkgInfo: %s", versionCode));
+            return versionCode;
         }
+        return 0;
     }
 
 
@@ -257,13 +260,13 @@ public class MyApplication extends Application {
     public static void checkVersionByServer(final AppCompatActivity activity, final boolean isManualCheck,
                                             final BookcaseFragment mBookcaseFragment) {
         MyApplication.getApplication().newThread(() -> {
-            Document doc = null;
             try {
                 String url = "https://shimo.im/docs/cqkgjPRRydYYhQKt/read";
                 if (isApkInDebug(getmContext())) {
                     url = "https://shimo.im/docs/zfzpda7MUGskOC9v/read";
                 }
-                doc = Jsoup.connect(url).get();
+                String html = OkHttpUtils.getHtml(url);
+                Document doc = Jsoup.parse(html);
                 String content = doc.getElementsByClass("ql-editor").text();
                 if (StringHelper.isEmpty(content)) {
                     if (isManualCheck || NetworkUtils.isNetWorkAvailable()) {
@@ -289,6 +292,7 @@ public class MyApplication extends Application {
                 spu.putBoolean("needUdSI", !oldSplashTime.equals(newSplashTime));
                 spu.putString("splashTime", contents[5].substring(contents[5].indexOf(":") + 1));
                 spu.putString("splashImageUrl", contents[6].substring(contents[6].indexOf(":") + 1));
+                spu.putString("splashImageMD5", contents[7].substring(contents[7].indexOf(":") + 1));
 
                 if (!StringHelper.isEmpty(downloadLink)) {
                     spu.putString(getmContext().getString(R.string.downloadLink), downloadLink);
@@ -354,6 +358,11 @@ public class MyApplication extends Application {
                     if (activity instanceof MainActivity){
                         MainActivity mainActivity = (MainActivity) activity;
                         mainActivity.getViewPagerMain().setCurrentItem(0);
+                        String filePath = APPCONST.UPDATE_APK_FILE_DIR + "FYReader.apk";
+                        if (apkInfo(filePath) == versionCode){
+                            mainActivity.installApk(FileUtils.getFile(filePath), isForceUpdate);
+                            return;
+                        }
                     }
                     if (url == null || "".equals(url)) {
                         ToastUtils.showError("获取链接失败，请前往浏览器下载！");

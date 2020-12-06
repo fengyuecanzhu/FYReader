@@ -14,7 +14,7 @@
         android:paddingEnd="10dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:text="翻页速度：50%"
+        android:text="@string/turn_page_speed"
         android:textColor="@color/read_menu_text"
         android:textSize="@dimen/text_small_size"
         tools:ignore="RtlSymmetry" />
@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="15dp"
-        android:text="退出自动翻页"
+        android:text="@string/exit_auto_page"
         android:textColor="@drawable/setting_btn_bg_color"
         android:textSize="@dimen/text_small_size" />
 

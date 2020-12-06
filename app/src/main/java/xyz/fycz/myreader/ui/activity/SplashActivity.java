@@ -35,6 +35,7 @@ import xyz.fycz.myreader.util.PermissionsChecker;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.ImageLoader;
+import xyz.fycz.myreader.util.utils.MD5Utils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.SystemBarUtils;
 
@@ -57,7 +58,7 @@ public class SplashActivity extends BaseActivity {
         public void run() {
             try {
                 sleep(WAIT_INTERVAL);//使程序休眠
-                Intent it = new Intent(getApplicationContext(), MainActivity.class);//启动MainActivity
+                Intent it = new Intent(SplashActivity.this, MainActivity.class);//启动MainActivity
                 startActivity(it);
                 finish();//关闭当前活动
             } catch (Exception e) {
@@ -95,11 +96,15 @@ public class SplashActivity extends BaseActivity {
 
     private void loadImage() {
         File imgFile = getFileStreamPath(APPCONST.FILE_NAME_SPLASH_IMAGE);
-        if (!imgFile.exists() || SharedPreUtils.getInstance().getBoolean("needUdSI")){
+        SharedPreUtils preUtils = SharedPreUtils.getInstance();
+        String splashImageMD5 = preUtils.getString("splashImageMD5");
+        if (!imgFile.exists() || preUtils.getBoolean("needUdSI") ||
+                !splashImageMD5.equals(MD5Utils.getFileMD5s(imgFile, 16))){
+            if ("".equals(splashImageMD5)) return;
             downLoadImage();
             return;
         }
-        String splashLoadDate = SharedPreUtils.getInstance().getString("splashTime", "");
+        String splashLoadDate = preUtils.getString("splashTime");
         if (splashLoadDate.equals("")) {
             return;
         }

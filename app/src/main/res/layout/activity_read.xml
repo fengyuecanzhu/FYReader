@@ -75,7 +75,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
-        tools:visibility="gone" />
+        tools:visibility="gone"
+        android:focusable="true" />
 
     <ProgressBar
         android:id="@+id/pb_loading"
@@ -95,7 +96,8 @@
         android:clickable="true"
         android:orientation="vertical"
         android:visibility="gone"
-        tools:visibility="visible">
+        tools:visibility="visible"
+        android:focusable="true">
 
         <RelativeLayout
             android:layout_width="match_parent"

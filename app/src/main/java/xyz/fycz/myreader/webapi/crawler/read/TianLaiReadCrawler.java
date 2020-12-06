@@ -18,7 +18,6 @@ import java.util.ArrayList;
 
 /**
  * 天籁小说网html解析工具
- * Created by zhao on 2017/7/24.
  */
 
 public class TianLaiReadCrawler implements ReadCrawler {

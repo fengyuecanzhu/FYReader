@@ -757,7 +757,7 @@ public class BookDetailedActivity extends BaseActivity {
             return share;
         } catch (Exception e) {
             e.printStackTrace();
-            ToastUtils.showError(Objects.requireNonNull(e.getLocalizedMessage()));
+            ToastUtils.showError(e.getLocalizedMessage() + "");
             return null;
         } finally {
             IOUtils.close(fos);

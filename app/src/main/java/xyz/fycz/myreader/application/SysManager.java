@@ -1,5 +1,7 @@
 package xyz.fycz.myreader.application;
 
+import android.util.Log;
+
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.enums.BookcaseStyle;
@@ -27,19 +29,21 @@ public class SysManager {
 
     /**
      * 获取设置
+     *
      * @return
      */
     public static Setting getSetting() {
-        if (mSetting != null){
+        if (mSetting != null) {
             return mSetting;
         }
         mSetting = (Setting) CacheHelper.readObject(APPCONST.FILE_NAME_SETTING);
-        if (mSetting == null){
+        if (mSetting == null) {
             mSetting = getDefaultSetting();
             saveSetting(mSetting);
         }
         return mSetting;
     }
+
     public static Setting getNewSetting() {
         Setting setting = (Setting) CacheHelper.readObject(APPCONST.FILE_NAME_SETTING);
         if (setting == null) {
@@ -50,10 +54,11 @@ public class SysManager {
     }
 
 
-        /**
-         * 保存设置
-         * @param setting
-         */
+    /**
+     * 保存设置
+     *
+     * @param setting
+     */
     public static void saveSetting(Setting setting) {
         CacheHelper.saveObject(setting, APPCONST.FILE_NAME_SETTING);
     }
@@ -61,9 +66,10 @@ public class SysManager {
 
     /**
      * 默认设置
+     *
      * @return
      */
-    private static Setting getDefaultSetting(){
+    private static Setting getDefaultSetting() {
         Setting setting = new Setting();
         setting.setDayStyle(true);
         setting.setBookcaseStyle(BookcaseStyle.listMode);
@@ -82,7 +88,7 @@ public class SysManager {
         return setting;
     }
 
-    public static void regetmSetting(){
+    public static void regetmSetting() {
         mSetting = (Setting) CacheHelper.readObject(APPCONST.FILE_NAME_SETTING);
     }
 
@@ -91,19 +97,36 @@ public class SysManager {
      * 重置设置
      */
 
-    public static void resetSetting(){
+    public static void resetSetting() {
         Setting setting = getSetting();
-        setting.initReadStyle();
-        setting.setCurReadStyleIndex(1);
-        setting.setSharedLayout(true);
+        switch (setting.getSettingVersion()) {
+            case 10:
+                setting.initReadStyle();
+                setting.setCurReadStyleIndex(1);
+                setting.setSharedLayout(true);
+                Log.d("SettingVersion", "" + 10);
+            case 11:
+                Log.d("SettingVersion", "" + 11);
+            case 12:
+                Log.d("SettingVersion", "" + 12);
+        }
         setting.setSettingVersion(APPCONST.SETTING_VERSION);
         saveSetting(setting);
     }
 
-    public static void resetSource(){
+    public static void resetSource() {
         Setting setting = getSetting();
-        ReadCrawlerUtil.addReadCrawler(BookSource.miaobi, BookSource.dstq, BookSource.xs7, BookSource.du1du,BookSource.paiotian);
-        ReadCrawlerUtil.removeReadCrawler("cangshu99");
+        switch (setting.getSourceVersion()) {
+            case 0:
+                ReadCrawlerUtil.addReadCrawler(BookSource.miaobi, BookSource.dstq, BookSource.xs7, BookSource.du1du, BookSource.paiotian);
+                ReadCrawlerUtil.removeReadCrawler("cangshu99");
+                Log.d("SourceVersion", "" + 0);
+            case 1:
+                ReadCrawlerUtil.addReadCrawler(BookSource.laoyao, BookSource.xingxing, BookSource.shiguang, BookSource.xiagu, BookSource.hongchen);
+                Log.d("SourceVersion", "" + 1);
+            case 2:
+                Log.d("SourceVersion", "" + 2);
+        }
         setting.setSourceVersion(APPCONST.SOURCE_VERSION);
         saveSetting(setting);
     }

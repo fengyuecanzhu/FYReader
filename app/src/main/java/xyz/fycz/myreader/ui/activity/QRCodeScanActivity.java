@@ -254,7 +254,7 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
             startActivityForResult(intent, REQUEST_QR_IMAGE);
         } catch (Exception e) {
             e.printStackTrace();
-            ToastUtils.showError(Objects.requireNonNull(e.getLocalizedMessage()));
+            ToastUtils.showError(e.getLocalizedMessage() + "");
         }
     }
 

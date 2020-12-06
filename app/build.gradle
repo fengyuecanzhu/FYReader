@@ -21,7 +21,7 @@ def getVersionCode() {
         }
         return versionCode
     } else {
-        throw new GradleException("无法读取version_code.properties文件！")
+        throw new FileNotFoundException("无法读取version_code.properties文件！")
     }
 }
 def name = "风月读书"
@@ -162,6 +162,11 @@ dependencies {
     //二维码
     implementation 'cn.bingoogolapple:bga-qrcode-zxing:1.3.7'
     //Material Dialogs
+
+    /*//email
+    implementation 'com.sun.mail:android-mail:1.6.2'
+    implementation 'com.sun.mail:android-activation:1.6.2'*/
+
     /*def dialog_version = '3.3.0'
     implementation "com.afollestad.material-dialogs:core:$dialog_version"
     implementation "com.afollestad.material-dialogs:input:$dialog_version"

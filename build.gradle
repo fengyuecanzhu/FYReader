@@ -10,6 +10,7 @@ buildscript {
         google()
         maven { url 'http://s3.amazonaws.com/fabric-artifacts/public' }
         maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url "https://maven.java.net/content/groups/public/" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.2'

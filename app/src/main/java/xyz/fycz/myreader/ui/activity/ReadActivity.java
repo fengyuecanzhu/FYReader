@@ -230,7 +230,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         mPageLoader.skipToPage(pagePos);
                     } catch (Exception e) {
                         ToastUtils.showError("章节跳转失败，请截图联系作者。\n" +
-                                Objects.requireNonNull(e.getMessage()));
+                                e.getMessage());
                         e.printStackTrace();
                     }
                     pbLoading.setVisibility(View.GONE);
@@ -733,7 +733,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         skipToChapterAndPage(chapterAndPage[0], chapterAndPage[1]);
                     } catch (Exception e) {
                         ToastUtils.showError("章节跳转失败，请截图联系作者。\n" +
-                                Objects.requireNonNull(e.getMessage()));
+                                e.getMessage());
                         e.printStackTrace();
                     }
                     break;

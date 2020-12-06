@@ -1,10 +1,8 @@
 package xyz.fycz.myreader.ui.dialog;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -23,11 +21,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.model.audio.ReadAloudService;
-import xyz.fycz.myreader.model.audio.ReadService;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
-import xyz.fycz.myreader.util.DateHelper;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.AudioMngHelper;

@@ -22,7 +22,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:text="背景颜色："
+                android:text="@string/back_color"
                 android:textColor="@color/read_menu_text"
                 android:textSize="@dimen/text_small_size" />
 
@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:text="字体颜色："
+                android:text="@string/font_color"
                 android:textColor="@color/read_menu_text"
                 android:textSize="@dimen/text_small_size" />
 
@@ -70,7 +70,7 @@
             app:innerCircleRadius="10dp"
             app:showOuterCircle="false"
             app:textSize="@dimen/text_small_size"
-            app:text="共用布局" />
+            app:text="@string/share_layout" />
 
     </LinearLayout>
 
@@ -87,7 +87,7 @@
             android:layout_height="wrap_content"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="背景图片"
+            android:text="@string/back_picture"
             android:textColor="@color/read_menu_text" />
 
         <xyz.fycz.myreader.widget.HorizontalListView
@@ -116,7 +116,7 @@
                 android:layout_height="30dp"
                 android:background="@drawable/setting_btn_bg"
                 android:gravity="center"
-                android:text="保存"
+                android:text="@string/save"
                 android:textColor="@drawable/setting_btn_bg_color" />
         </LinearLayout>
 
@@ -132,7 +132,7 @@
                 android:layout_height="30dp"
                 android:background="@drawable/setting_btn_bg"
                 android:gravity="center"
-                android:text="导入"
+                android:text="@string/import_"
                 android:textColor="@drawable/setting_btn_bg_color" />
         </LinearLayout>
 
@@ -148,7 +148,7 @@
                 android:layout_height="30dp"
                 android:background="@drawable/setting_btn_bg"
                 android:gravity="center"
-                android:text="导出"
+                android:text="@string/export"
                 android:textColor="@drawable/setting_btn_bg_color" />
         </LinearLayout>
 
@@ -164,7 +164,7 @@
                 android:layout_height="30dp"
                 android:background="@drawable/setting_btn_bg"
                 android:gravity="center"
-                android:text="重置布局"
+                android:text="@string/reset_layout"
                 android:textColor="@drawable/setting_btn_bg_color" />
         </LinearLayout>
 
