@@ -79,6 +79,7 @@ public class Chapter {
         this.url = url;
     }
     public String getContent() {
+        if (end > 0) return end + "";
         String filePath = APPCONST.BOOK_CACHE_PATH + bookId
                 + File.separator + title + FileUtils.SUFFIX_FY;
         File file = new File(filePath);

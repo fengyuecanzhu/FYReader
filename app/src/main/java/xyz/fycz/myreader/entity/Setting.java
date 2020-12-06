@@ -89,8 +89,7 @@ public class Setting implements Serializable {
 
     public ReadStyle getCurReadStyle(){
         //Log.d("curReadStyleIndex", String.valueOf(curReadStyleIndex));
-        ReadStyle readStyle = readStyles.get(curReadStyleIndex);
-        if (readStyle == null) {
+        if (readStyles == null || readStyles.size() == 0) {
             initReadStyle();
         }
         if (!dayStyle){

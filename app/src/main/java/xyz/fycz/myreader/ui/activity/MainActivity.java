@@ -182,10 +182,10 @@ public class MainActivity extends BaseActivity {
         }
         try {
             int sourceVersion = SysManager.getSetting().getSourceVersion();
-            if (sourceVersion < APPCONST.SOURCE_VERSION) {
+            //if (sourceVersion < APPCONST.SOURCE_VERSION) {
                 SysManager.resetSource();
                 Log.d(TAG, "resetSource");
-            }
+            //}
         } catch (Exception e) {
             ToastUtils.showError(e.getLocalizedMessage());
             e.printStackTrace();

@@ -9,6 +9,8 @@ import android.widget.Filter;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.entity.Setting;
@@ -66,10 +68,10 @@ public class ChapterTitleAdapter extends ArrayAdapter<Chapter> {
         final Chapter chapter = getItem(postion);
 //        viewHolder.tvTitle.setText("【" + chapter.getTitle() + "】");
         viewHolder.tvTitle.setText(chapter.getTitle());
-        if (ChapterService.isChapterCached(chapter.getBookId(), chapter.getTitle())) {
-            viewHolder.tvTitle.setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.selector_category_load), null, null, null);
+        if (ChapterService.isChapterCached(chapter.getBookId(), chapter.getTitle()) || chapter.getEnd() > 0 ) {
+            viewHolder.tvTitle.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(),R.drawable.selector_category_load), null, null, null);
         } else {
-            viewHolder.tvTitle.setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.selector_category_unload), null, null, null);
+            viewHolder.tvTitle.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(),R.drawable.selector_category_unload), null, null, null);
         }
         viewHolder.tvTitle.setTextColor(getContext().getResources().getColor(R.color.textSecondary));
         /*if (!setting.isDayStyle()) {

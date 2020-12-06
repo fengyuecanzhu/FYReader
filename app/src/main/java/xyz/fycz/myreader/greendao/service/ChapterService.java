@@ -42,6 +42,8 @@ public class ChapterService extends BaseService {
                 chapter.setTitle(cursor.getString(3));
                 chapter.setUrl(cursor.getString(4));
                 chapter.setContent(cursor.getString(5));
+                chapter.setStart(cursor.getInt(6));
+                chapter.setEnd(cursor.getInt(7));
                 chapters.add(chapter);
             }
         } catch (Exception e) {
@@ -283,6 +285,7 @@ public class ChapterService extends BaseService {
                 + File.separator + fileName + FileUtils.SUFFIX_FY);
         return file.exists();
     }
+
 
     private void deleteAllChapterCacheFile(String bookId) {
         FileUtils.deleteFile(APPCONST.BOOK_CACHE_PATH + bookId);

@@ -30,7 +30,7 @@ public class Book implements Serializable {
 
     private String name;//书名
     private String chapterUrl;//书目Url(本地书籍为：本地书籍地址)
-    private String infoUrl;//书目详情Url
+    private String infoUrl;//书目详情Url(本地书籍为：文件编码)
     private String imgUrl;//封面图片url
     private String desc;//简介
     private String author;//作者

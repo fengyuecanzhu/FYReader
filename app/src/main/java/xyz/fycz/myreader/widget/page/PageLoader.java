@@ -1502,10 +1502,15 @@ public abstract class PageLoader {
         float rHeight = mVisibleHeight;
         int titleLinesCount = 0;
         boolean showTitle = true; // 是否展示标题
+        boolean firstLine = true;
         String paragraph = chapter.getTitle();//默认展示标题
         paragraph = paragraph.trim() + "\n";
         try {
             while (showTitle || (paragraph = br.readLine()) != null) {
+                if (firstLine && !showTitle){
+                    paragraph = paragraph.replace(chapter.getTitle(), "");
+                    firstLine = false;
+                }
                 if (mSettingManager.getLanguage() == Language.traditional) {
                     paragraph = ChineseUtils.toTraditional(paragraph);
                 } else if (mSettingManager.getLanguage() == Language.simplified) {

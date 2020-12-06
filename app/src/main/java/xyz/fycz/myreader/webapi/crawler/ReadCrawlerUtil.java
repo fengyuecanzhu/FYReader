@@ -89,7 +89,11 @@ public class ReadCrawlerUtil {
 
     public synchronized static void addReadCrawler(BookSource... bookSources){
         SharedPreUtils spu = SharedPreUtils.getInstance();
-        String searchSource = spu.getString(MyApplication.getmContext().getString(R.string.searchSource), null);
+        String searchSource = spu.getString(MyApplication.getmContext().getString(R.string.searchSource));
+        if ("".equals(searchSource)){
+            resetReadCrawlers();
+            return;
+        }
         StringBuilder sb = new StringBuilder(searchSource);
         for (BookSource bookSource : bookSources){
             sb.append(",");

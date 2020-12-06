@@ -1,6 +1,9 @@
 package xyz.fycz.myreader.ui.adapter.holder;
 
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -24,10 +27,10 @@ public class CatalogHolder extends ViewHolderImpl<Chapter> {
 
     @Override
     public void onBind(Chapter data, int pos) {
-        if (ChapterService.isChapterCached(data.getBookId(), data.getTitle())) {
-            tvTitle.setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.selector_category_load), null, null, null);
+        if (ChapterService.isChapterCached(data.getBookId(), data.getTitle()) || data.getEnd() > 0) {
+            tvTitle.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(),R.drawable.selector_category_load), null, null, null);
         } else {
-            tvTitle.setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.selector_category_unload), null, null, null);
+            tvTitle.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(),R.drawable.selector_category_unload), null, null, null);
         }
         tvTitle.setText(data.getTitle());
     }
