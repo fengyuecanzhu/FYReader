@@ -202,6 +202,11 @@
     <string name="read_xs7">小说旗</string>
     <string name="read_du1du">读一读网</string>
     <string name="read_paiotian">飘天文学</string>
+    <string name="read_laoyao">老幺小说</string>
+    <string name="read_xingxing">星星小说</string>
+    <string name="read_shiguang">时光小说</string>
+    <string name="read_xiagu">峡谷文学</string>
+    <string name="read_hongchen">红尘小说</string>
     <string name="read_chaoxing">超星图书·实体</string>
     <string name="read_zuopin">作品集·实体</string>
     <string name="read_cangshu99">99藏书·实体</string>
@@ -259,6 +264,20 @@
     <string name="menu_scan">扫一扫</string>
     <string name="light_contact">轻触点亮</string>
     <string name="close_contact">轻触关闭</string>
+    <string name="turn_page_speed">翻页速度：%s %%</string>
+    <string name="exit_auto_page">退出自动翻页</string>
+    <string name="brightness">亮度</string>
+    <string name="follow_sys">跟随系统</string>
+    <string name="blue_filter">蓝光过滤</string>
+    <string name="open_protect_eye">开启护眼</string>
+    <string name="back_color">背景颜色：</string>
+    <string name="font_color">字体颜色：</string>
+    <string name="share_layout">共用布局</string>
+    <string name="back_picture">背景图片</string>
+    <string name="save">保存</string>
+    <string name="import_">导入</string>
+    <string name="export">导出</string>
+    <string name="reset_layout">重置布局</string>
 
     <string-array name="reset_screen_time">
         <item>常亮</item>

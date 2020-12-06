@@ -92,7 +92,7 @@ public class APPCONST {
     //设置版本号
     public static final int SETTING_VERSION = 11;
 
-    public static final int SOURCE_VERSION = 1;
+    public static final int SOURCE_VERSION = 2;
 
     public static final String FORMAT_FILE_DATE = "yyyy-MM-dd";
 

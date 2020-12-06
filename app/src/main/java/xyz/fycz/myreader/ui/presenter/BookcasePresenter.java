@@ -23,6 +23,7 @@ import android.widget.PopupMenu;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
+import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -351,7 +352,10 @@ public class BookcasePresenter implements BasePresenter {
                 return 0;
             });
         }else if (mSetting.getSortStyle() == 2){
-            Collections.sort(mBooks, (o1, o2) -> o2.getName().compareTo(o1.getName()));
+            Collections.sort(mBooks, (o1, o2) -> {
+                Collator cmp = Collator.getInstance(java.util.Locale.CHINA);
+                return cmp.compare(o1.getName(), o2.getName());
+            });
         }
 
         for (int i = 0; i < mBooks.size(); i++) {
