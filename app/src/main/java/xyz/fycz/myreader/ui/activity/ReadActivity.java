@@ -911,12 +911,16 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      */
     private void getData() {
         mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
-        if (!isCollected || mChapters.size() == 0 || ("本地书籍".equals(mBook.getType()) &&
-                !ChapterService.isChapterCached(mBook.getId(), mChapters.get(0).getTitle()))) {
+        if (!isCollected || mChapters.size() == 0 || ("本地书籍".equals(mBook.getType()) && !ChapterService.isChapterCached(mBook.getId(), mChapters.get(0).getTitle())
+                        )) {
             if ("本地书籍".equals(mBook.getType())) {
                 if (!new File(mBook.getChapterUrl()).exists()) {
                     ToastUtils.showWarring("书籍缓存为空且源文件不存在，书籍加载失败！");
                     finish();
+                    return;
+                }
+                if (mChapters.size() != 0 && mChapters.get(0).getEnd() > 0){
+                    initChapters();
                     return;
                 }
                 ((LocalPageLoader) mPageLoader).loadChapters(new ResultCallback() {
@@ -935,6 +939,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
                     @Override
                     public void onError(Exception e) {
+                        e.printStackTrace();
                         mChapters.clear();
                         initChapters();
                         mHandler.sendMessage(mHandler.obtainMessage(1));

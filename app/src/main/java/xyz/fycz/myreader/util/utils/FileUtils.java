@@ -1,6 +1,5 @@
 package xyz.fycz.myreader.util.utils;
 
-import android.app.Application;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -11,7 +10,25 @@ import android.os.StatFs;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
-import info.monitorenter.cpdetector.io.*;
+
+import org.mozilla.universalchardet.UniversalDetector;
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
@@ -19,11 +36,6 @@ import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.StringHelper;
-
-import java.io.*;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class FileUtils {
@@ -215,32 +227,42 @@ public class FileUtils {
     }
 
     /**
-     * 获得文件编码
-     * @param filePath
+     * 获取文件编码
+     * @param file
      * @return
-     * @throws Exception
      */
-    public static String getFileEncode(String filePath) {
-        String charsetName = null;
+    public static String getFileCharset(File file){
+        FileInputStream fis = null;
+        FileInputStream temFis = null;
+        FileOutputStream fos = null;
+        File temFile = null;
         try {
-            File file = new File(filePath);
-            CodepageDetectorProxy detector = CodepageDetectorProxy.getInstance();
-            detector.add(new ParsingDetector(false));
-            detector.add(JChardetFacade.getInstance());
-            detector.add(ASCIIDetector.getInstance());
-            detector.add(UnicodeDetector.getInstance());
-            java.nio.charset.Charset charset = null;
-            charset = detector.detectCodepage(file.toURI().toURL());
-            if (charset != null) {
-                charsetName = charset.name();
-            } else {
-                charsetName = "UTF-8";
+            temFile = getFile(APPCONST.TEM_FILE_DIR + "tem.fy");
+            fis = new FileInputStream(file);
+            fos = new FileOutputStream(temFile);
+            byte[] bytes = new byte[1024 * 10];
+            int len;
+            if ((len = fis.read(bytes)) != -1){
+                fos.write(bytes, 0, len);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
+            fos.flush();
+            temFis = new FileInputStream(temFile);
+            String encoding = UniversalDetector.detectCharset(temFis);
+            if (encoding != null) {
+                Log.d("encoding", encoding);
+                return encoding;
+            } else {
+                return "UTF-8";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "UTF-8";
+        }finally {
+            IOUtils.close(fis, temFis, fos);
+            if (temFile != null) {
+                temFile.delete();
+            }
         }
-        return charsetName;
     }
 
     public static byte[] getBytes(File file) {

@@ -146,6 +146,7 @@ public class CatalogPresenter implements BasePresenter {
      * @param query
      */
     public void startSearch(String query) {
+        if (mChapters.size() == 0)  return;
         mChapterTitleAdapter.getFilter().filter(query);
         mCatalogFragment.getLvChapterList().setSelection(0);
     }
