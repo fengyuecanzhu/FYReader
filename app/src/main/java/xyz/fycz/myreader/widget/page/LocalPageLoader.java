@@ -316,8 +316,22 @@ public class LocalPageLoader extends PageLoader {
                         seekPos += chapterContent.length();
 
                         if (mChapterList.size() == 0) { //如果当前没有章节，那么就是序章
-                            //加入简介
-                            mCollBook.setDesc(chapterContent);
+
+                            //创建序章
+                            Chapter preChapter = new Chapter();
+                            preChapter.setTitle("序章");
+                            preChapter.setStart(0);
+                            preChapter.setEnd(chapterContent.getBytes(mCharset).length); //获取String的byte值,作为最终值
+
+                            //如果序章大小大于30才添加进去
+                            if (preChapter.getEnd() - preChapter.getStart() > 30) {
+                                mChapterList.add(preChapter);
+                            }else {
+                                //加入简介
+                                mCollBook.setDesc(chapterContent);
+                            }
+
+
                             //创建当前章节
                             Chapter curChapter = new Chapter();
                             curChapter.setTitle(matcher.group());
