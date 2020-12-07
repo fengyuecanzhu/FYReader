@@ -129,10 +129,18 @@ public class BookService extends BaseService {
      * @return
      */
     public Book findBookByAuthorAndName(String bookName, String author) {
-        return GreenDaoManager.getInstance().getSession().getBookDao()
-                .queryBuilder()
-                .where(BookDao.Properties.Name.eq(bookName), BookDao.Properties.Author.eq(author))
-                .unique();
+        try {
+            return GreenDaoManager.getInstance().getSession().getBookDao()
+                    .queryBuilder()
+                    .where(BookDao.Properties.Name.eq(bookName), BookDao.Properties.Author.eq(author))
+                    .unique();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return GreenDaoManager.getInstance().getSession().getBookDao()
+                    .queryBuilder()
+                    .where(BookDao.Properties.Name.eq(bookName), BookDao.Properties.Author.eq(author))
+                    .list().get(0);
+        }
     }
 
     /**
@@ -142,10 +150,18 @@ public class BookService extends BaseService {
      * @return
      */
     public Book findBookByPath(String path) {
-        return GreenDaoManager.getInstance().getSession().getBookDao()
-                .queryBuilder()
-                .where(BookDao.Properties.ChapterUrl.eq(path))
-                .unique();
+        try {
+            return GreenDaoManager.getInstance().getSession().getBookDao()
+                    .queryBuilder()
+                    .where(BookDao.Properties.ChapterUrl.eq(path))
+                    .unique();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return GreenDaoManager.getInstance().getSession().getBookDao()
+                    .queryBuilder()
+                    .where(BookDao.Properties.ChapterUrl.eq(path))
+                    .list().get(0);
+        }
     }
 
     /**
@@ -166,9 +182,11 @@ public class BookService extends BaseService {
      * @param book
      */
     public void deleteBook(Book book) {
-        deleteEntity(book);
-        mChapterService.deleteBookALLChapterById(book.getId());
-        mBookMarkService.deleteBookALLBookMarkById(book.getId());
+        try {
+            deleteEntity(book);
+            mChapterService.deleteBookALLChapterById(book.getId());
+            mBookMarkService.deleteBookALLBookMarkById(book.getId());
+        }catch (Exception ignored){}
     }
 
     /**
