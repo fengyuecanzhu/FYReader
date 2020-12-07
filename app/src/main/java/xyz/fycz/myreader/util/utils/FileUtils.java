@@ -45,7 +45,7 @@ public class FileUtils {
     public static final String SUFFIX_TXT = ".txt";
     public static final String SUFFIX_EPUB = ".epub";
     public static final String SUFFIX_PDF = ".pdf";
-
+    public static final byte BLANK = 0x0a;
     //获取文件夹
     public static File getFolder(String filePath){
         File file = new File(filePath);
@@ -240,6 +240,7 @@ public class FileUtils {
             temFile = getFile(APPCONST.TEM_FILE_DIR + "tem.fy");
             fis = new FileInputStream(file);
             fos = new FileOutputStream(temFile);
+            //用10kb作为试探
             byte[] bytes = new byte[1024 * 10];
             int len;
             if ((len = fis.read(bytes)) != -1){
