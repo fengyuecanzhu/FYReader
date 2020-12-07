@@ -129,8 +129,8 @@ public class LocalPageLoader extends PageLoader {
                             preChapter.setStart(0);
                             preChapter.setEnd(chapterContent.getBytes(mCharset).length); //获取String的byte值,作为最终值
 
-                            //如果序章大小大于30才添加进去
-                            if (preChapter.getEnd() - preChapter.getStart() > 30) {
+                            //如果序章大小大于500才添加进去
+                            if (preChapter.getEnd() - preChapter.getStart() > 500) {
                                 mChapterList.add(preChapter);
                             }else {
                                 //加入简介
