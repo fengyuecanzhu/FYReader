@@ -6,15 +6,17 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
-import xyz.fycz.myreader.application.MyApplication;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.enums.BookcaseStyle;
 import xyz.fycz.myreader.enums.Font;
 import xyz.fycz.myreader.enums.Language;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.ZipUtils;
 import xyz.fycz.myreader.util.utils.BitmapUtil;
 import xyz.fycz.myreader.util.utils.FileUtils;
@@ -22,19 +24,12 @@ import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.MeUtils;
 import xyz.fycz.myreader.widget.page.PageMode;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import static xyz.fycz.myreader.common.APPCONST.READ_STYLE_BLUE_DEEP;
 import static xyz.fycz.myreader.common.APPCONST.READ_STYLE_BREEN;
 import static xyz.fycz.myreader.common.APPCONST.READ_STYLE_COMMON;
 import static xyz.fycz.myreader.common.APPCONST.READ_STYLE_LEATHER;
 import static xyz.fycz.myreader.common.APPCONST.READ_STYLE_NIGHT;
 import static xyz.fycz.myreader.common.APPCONST.READ_STYLE_PROTECTED_EYE;
-import static xyz.fycz.myreader.common.APPCONST.s;
 import static xyz.fycz.myreader.widget.page.PageLoader.DEFAULT_MARGIN_WIDTH;
 
 /**

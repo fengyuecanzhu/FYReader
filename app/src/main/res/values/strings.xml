@@ -205,6 +205,8 @@
     <string name="read_laoyao">老幺小说</string>
     <string name="read_xingxing">星星小说</string>
     <string name="read_shiguang">时光小说</string>
+    <string name="read_rexue">热血小说</string>
+    <string name="read_chuanqi">传奇小说</string>
     <string name="read_xiagu">峡谷文学</string>
     <string name="read_hongchen">红尘小说</string>
     <string name="read_chaoxing">超星图书·实体</string>
@@ -334,5 +336,12 @@
         <item>@string/manual_sort</item>
         <item>@string/time_sort</item>
         <item>@string/book_name_sort</item>
+    </string-array>
+
+    <string-array name="download">
+        <item>下载后面五十章</item>
+        <item>下载前后五十章</item>
+        <item>下载后面全部章</item>
+        <item>下载本书所有章</item>
     </string-array>
 </resources>
