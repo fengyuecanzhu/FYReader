@@ -277,12 +277,8 @@ public abstract class BookcaseAdapter extends DragAdapter {
         final int[] end = new int[1];
         MyAlertDialog.build(mContext)
                 .setTitle("缓存书籍")
-                .setSingleChoiceItems(APPCONST.DIALOG_DOWNLOAD, selectedIndex, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        selectedIndex = which;
-                    }
-                }).setNegativeButton("取消", ((dialog, which) -> dialog.dismiss())).setPositiveButton("确定",
+                .setSingleChoiceItems(mContext.getResources().getStringArray(R.array.download), selectedIndex,
+                        (dialog, which) -> selectedIndex = which).setNegativeButton("取消", ((dialog, which) -> dialog.dismiss())).setPositiveButton("确定",
                 (dialog, which) -> {
                     switch (selectedIndex) {
                         case 0:

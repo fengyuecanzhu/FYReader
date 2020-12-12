@@ -1595,7 +1595,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         MyApplication.runOnUiThread(() -> {
             MyAlertDialog.build(this)
                     .setTitle("缓存书籍")
-                    .setSingleChoiceItems(APPCONST.DIALOG_DOWNLOAD, selectedIndex, (dialog, which) -> selectedIndex = which).setNegativeButton("取消", ((dialog, which) -> dialog.dismiss())).setPositiveButton("确定",
+                    .setSingleChoiceItems(getResources().getStringArray(R.array.download), selectedIndex,
+                            (dialog, which) -> selectedIndex = which).setNegativeButton("取消", ((dialog, which) -> dialog.dismiss())).setPositiveButton("确定",
                     (dialog, which) -> {
                         switch (selectedIndex) {
                             case 0:

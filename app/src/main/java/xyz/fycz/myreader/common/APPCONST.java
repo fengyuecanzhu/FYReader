@@ -12,10 +12,7 @@ public class APPCONST {
 
     public static String publicKey = "";//服务端公钥
     public static String privateKey;//app私钥
-    public final static String s = "11940364935628058505";
     public static final String KEY = "";
-
-    public static final String ALARM_SCHEDULE_MSG = "alarm_schedule_msg";
 
     public static final String FILE_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/";
     public static final String SHARE_FILE_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/share/";
@@ -32,7 +29,6 @@ public class APPCONST {
             + "book_cache"+ File.separator ;
     public static String HTML_CACHE_PATH = FileUtils.getCachePath() + File.separator
             + "html_cache"+ File.separator ;
-    public static final String LOADING_ERROR = "\t\t \t\t\t\t\n\n　　章节内容转码失败！\n\n\t\t \t\t\t\n\n";
 
     public static long exitTime;
     public static final int exitConfirmTime = 2000;
@@ -61,7 +57,6 @@ public class APPCONST {
 
 
     public static final String FILE_NAME_SETTING = "setting";
-    public static final String FILE_NAME_UPDATE_INFO = "updateInfo";
     public static final String FILE_NAME_SPLASH_IMAGE = "splashImage";
 
     public static final int SELECT_TEXT_COLOR = 201;
@@ -78,11 +73,6 @@ public class APPCONST {
 
     public static final int REQUEST_READ = 1;
 
-    public static final CharSequence[] DIALOG_DOWNLOAD = {
-            "下载后面五十章", "下载前后五十章",
-            "下载后面全部章", "下载本书所有章"
-    };
-
     public static final int APP_INSTALL_CODE = 10086;
 
     public static final int SELECT_FILE_CODE = 10000;
@@ -92,7 +82,7 @@ public class APPCONST {
     //设置版本号
     public static final int SETTING_VERSION = 11;
 
-    public static final int SOURCE_VERSION = 2;
+    public static final int SOURCE_VERSION = 3;
 
     public static final String FORMAT_FILE_DATE = "yyyy-MM-dd";
 

@@ -141,7 +141,7 @@ public class BookcasePresenter implements BasePresenter {
                             initBook();
                             isFirstRefresh = false;
                         }
-                        downloadAll(false);
+                        downloadAll(false, false);
                     }
                     break;
                 case 5:
@@ -501,11 +501,11 @@ public class BookcasePresenter implements BasePresenter {
                     DialogCreator.createCommonDialog(mMainActivity, "一键缓存",
                             mMainActivity.getString(R.string.all_cathe_tip), true,
                             (dialog, which) -> {
-                                downloadAll(true);
+                                downloadAll(true, true);
                                 SharedPreUtils.getInstance().putBoolean(mMainActivity.getString(R.string.isReadDownloadAllTip), true);
                             }, null);
                 } else {
-                    downloadAll(true);
+                    downloadAll(true, true);
                 }
                 return true;
 
@@ -729,13 +729,14 @@ public class BookcasePresenter implements BasePresenter {
     /**
      * 缓存所有书籍
      */
-    private void downloadAll(boolean isDownloadAllChapters) {
+    private void downloadAll(boolean isDownloadAllChapters, boolean isFromUser) {
         if (!NetworkUtils.isNetWorkAvailable()) {
             ToastUtils.showWarring("无网络连接！");
             return;
         }
         if (mBooks.size() == 0) {
-            ToastUtils.showWarring("当前书架没有任何书籍，无法一键缓存！");
+            if (isFromUser)
+                ToastUtils.showWarring("当前书架没有任何书籍，无法一键缓存！");
             return;
         }
         MyApplication.getApplication().newThread(() -> {
@@ -747,7 +748,8 @@ public class BookcasePresenter implements BasePresenter {
                 }
             }
             if (needDownloadBooks.size() == 0) {
-                ToastUtils.showWarring("当前书架书籍不支持/已关闭(可在设置开启)一键缓存！");
+                if (isFromUser)
+                    ToastUtils.showWarring("当前书架书籍不支持/已关闭(可在设置开启)一键缓存！");
                 return;
             }
             if (isDownloadAllChapters) {

@@ -3,24 +3,13 @@ package xyz.fycz.myreader.application;
 import android.util.Log;
 
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.enums.BookcaseStyle;
-import xyz.fycz.myreader.enums.Font;
-import xyz.fycz.myreader.enums.Language;
-import xyz.fycz.myreader.enums.ReadStyle;
-import xyz.fycz.myreader.model.backup.UserService;
-import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.util.CacheHelper;
-import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
-import xyz.fycz.myreader.widget.page.PageMode;
 
 import static xyz.fycz.myreader.application.MyApplication.getVersionCode;
-import static xyz.fycz.myreader.common.APPCONST.READ_STYLE_LEATHER;
-import static xyz.fycz.myreader.common.APPCONST.s;
-import static xyz.fycz.myreader.widget.page.PageLoader.DEFAULT_MARGIN_WIDTH;
 
 
 public class SysManager {
@@ -100,7 +89,7 @@ public class SysManager {
     public static void resetSetting() {
         Setting setting = getSetting();
         switch (setting.getSettingVersion()) {
-            case 10:
+            case 10: default:
                 setting.initReadStyle();
                 setting.setCurReadStyleIndex(1);
                 setting.setSharedLayout(true);
@@ -117,7 +106,7 @@ public class SysManager {
     public static void resetSource() {
         Setting setting = getSetting();
         switch (setting.getSourceVersion()) {
-            case 0:
+            case 0: default:
                 ReadCrawlerUtil.addReadCrawler(BookSource.miaobi, BookSource.dstq, BookSource.xs7, BookSource.du1du, BookSource.paiotian);
                 ReadCrawlerUtil.removeReadCrawler("cangshu99");
                 Log.d("SourceVersion", "" + 0);
@@ -125,6 +114,7 @@ public class SysManager {
                 ReadCrawlerUtil.addReadCrawler(BookSource.laoyao, BookSource.xingxing, BookSource.shiguang, BookSource.xiagu, BookSource.hongchen);
                 Log.d("SourceVersion", "" + 1);
             case 2:
+                ReadCrawlerUtil.addReadCrawler(BookSource.rexue, BookSource.chuanqi);
                 Log.d("SourceVersion", "" + 2);
         }
         setting.setSourceVersion(APPCONST.SOURCE_VERSION);

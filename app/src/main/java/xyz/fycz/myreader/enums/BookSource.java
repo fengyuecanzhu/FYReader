@@ -30,6 +30,8 @@ public enum BookSource {
     laoyao(MyApplication.getApplication().getString(R.string.read_laoyao)),
     xingxing(MyApplication.getApplication().getString(R.string.read_xingxing)),
     shiguang(MyApplication.getApplication().getString(R.string.read_shiguang)),
+    rexue(MyApplication.getApplication().getString(R.string.read_rexue)),
+    chuanqi(MyApplication.getApplication().getString(R.string.read_chuanqi)),
     xiagu(MyApplication.getApplication().getString(R.string.read_xiagu)),
     hongchen(MyApplication.getApplication().getString(R.string.read_hongchen)),
     chaoxing(MyApplication.getApplication().getString(R.string.read_chaoxing)),
