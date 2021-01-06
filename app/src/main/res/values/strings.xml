@@ -147,7 +147,7 @@
     <string name="common_search">搜索</string>
     <string name="theme_mode">主题模式</string>
     <string name="join_qq_group">加入QQ群</string>
-    <string name="mine_feedback">问题反馈</string>
+    <string name="mine_feedback">建议反馈</string>
     <string name="menu_change_group">分组切换</string>
     <string name="menu_group_man">分组管理</string>
     <string name="menu_group_setting">设置分组</string>
@@ -214,8 +214,8 @@
     <string name="read_cangshu99">99藏书·实体</string>
     <string name="read_ben100">100本·实体</string>
 
-    <string name="find_qidian">起点中文网</string>
-    <string name="find_qidian_ns">起点女生网</string>
+    <string name="find_qidian">男生小说</string>
+    <string name="find_qidian_ns">女生小说</string>
 
     <!--  朗读  -->
     <string name="read_aloud">朗读</string>

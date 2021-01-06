@@ -49,6 +49,7 @@
                             android:layout_height="wrap_content"
                             app:srlTextLoading="@string/loading_tip"
                             app:srlTextFailed="@string/loading_tip"
+                            app:srlTextNothing="总得有个结尾吧"
                             app:srlAccentColor="@color/textSecondary"/>
                 </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
