@@ -98,6 +98,8 @@
 
         <activity android:name=".ui.activity.FileSystemActivity"/>
 
+        <activity android:name=".ui.activity.FeedbackActivity"/>
+
         <activity android:name=".ui.activity.MoreSettingActivity"/>
         <activity android:name=".ui.activity.BookstoreActivity"/>
         <activity android:name=".ui.activity.WebDavSettingActivity"/>

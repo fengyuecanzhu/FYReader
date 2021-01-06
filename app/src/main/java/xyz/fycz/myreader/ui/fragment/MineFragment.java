@@ -19,6 +19,7 @@ import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.model.storage.Restore;
+import xyz.fycz.myreader.ui.activity.FeedbackActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.entity.Setting;
@@ -253,18 +254,8 @@ public class MineFragment extends BaseFragment {
         });
 
         mRlFeedback.setOnClickListener(v -> {
-            DialogCreator.createCommonDialog(getContext(), "问题反馈", "请加入QQ群(1085028304)反馈问题!", true,
-                    "加入QQ群", "取消", (dialog, which) -> {
-                        if (!MyApplication.joinQQGroup(getContext(), "8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")) {
-                            ClipboardManager mClipboardManager = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                            //数据
-                            ClipData mClipData = ClipData.newPlainText("Label", "1085028304");
-                            //把数据设置到剪切板上
-                            assert mClipboardManager != null;
-                            mClipboardManager.setPrimaryClip(mClipData);
-                            ToastUtils.showError("未安装手Q或安装的版本不支持！\n已复制QQ群号，您可自行前往QQ添加！");
-                        }
-                    }, null);
+            Intent intent = new Intent(getContext(), FeedbackActivity.class);
+            getActivity().startActivity(intent);
         });
     }
 
