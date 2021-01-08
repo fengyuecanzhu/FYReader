@@ -89,7 +89,8 @@ public class SysManager {
     public static void resetSetting() {
         Setting setting = getSetting();
         switch (setting.getSettingVersion()) {
-            case 10: default:
+            case 10:
+            default:
                 setting.initReadStyle();
                 setting.setCurReadStyleIndex(1);
                 setting.setSharedLayout(true);
@@ -106,7 +107,8 @@ public class SysManager {
     public static void resetSource() {
         Setting setting = getSetting();
         switch (setting.getSourceVersion()) {
-            case 0: default:
+            case 0:
+            default:
                 ReadCrawlerUtil.addReadCrawler(BookSource.miaobi, BookSource.dstq, BookSource.xs7, BookSource.du1du, BookSource.paiotian);
                 ReadCrawlerUtil.removeReadCrawler("cangshu99");
                 Log.d("SourceVersion", "" + 0);
@@ -116,6 +118,10 @@ public class SysManager {
             case 2:
                 ReadCrawlerUtil.addReadCrawler(BookSource.rexue, BookSource.chuanqi);
                 Log.d("SourceVersion", "" + 2);
+            case 3:
+                ReadCrawlerUtil.resetReadCrawlers();
+                Log.d("SourceVersion", "" + 3);
+
         }
         setting.setSourceVersion(APPCONST.SOURCE_VERSION);
         saveSetting(setting);

@@ -212,7 +212,7 @@ public class QiDianMobileRank extends FindCrawler {
 
     @Override
     public String getFindName() {
-        return !isFemale ? !isSort ? "排行榜[男生小说]" : "分类[男生小说]" : !isSort ? "排行榜[女生小说]" : "分类[女生小说]";
+        return !isFemale ? !isSort ? "排行榜[起点中文网]" : "分类[起点中文网]" : !isSort ? "排行榜[起点女生网]" : "分类[起点女生网]";
     }
 
     @Override
