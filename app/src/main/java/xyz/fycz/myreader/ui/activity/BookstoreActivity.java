@@ -9,11 +9,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import butterknife.BindView;
+
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseActivity;
@@ -76,35 +80,33 @@ public class BookstoreActivity extends BaseActivity {
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if (!MyApplication.isDestroy(BookstoreActivity.this)) {
-                switch (msg.what) {
-                    case 1:
-                        initTypeList();
-                        mRlRefresh.showFinish();
-                        break;
-                    case 2:
-                        List<Book> bookList = (List<Book>) msg.obj;
-                        initBookList(bookList);
-                        srlBookList.setEnableRefresh(true);
-                        srlBookList.setEnableLoadMore(true);
-                        pbLoading.setVisibility(View.GONE);
-                        break;
-                    case 3:
-                        pbLoading.setVisibility(View.VISIBLE);
-                        break;
-                    case 4:
-                        pbLoading.setVisibility(View.GONE);
-                        srlBookList.finishRefresh(false);
-                        srlBookList.finishLoadMore(false);
-                        break;
-                    case 5:
-                        mRlRefresh.showError();
-                        break;
-                    case 6:
-                        DialogCreator.createTipDialog(BookstoreActivity.this,
-                                getResources().getString(R.string.top_sort_tip, title));
-                        break;
-                }
+            switch (msg.what) {
+                case 1:
+                    initTypeList();
+                    mRlRefresh.showFinish();
+                    break;
+                case 2:
+                    List<Book> bookList = (List<Book>) msg.obj;
+                    initBookList(bookList);
+                    srlBookList.setEnableRefresh(true);
+                    srlBookList.setEnableLoadMore(true);
+                    pbLoading.setVisibility(View.GONE);
+                    break;
+                case 3:
+                    pbLoading.setVisibility(View.VISIBLE);
+                    break;
+                case 4:
+                    pbLoading.setVisibility(View.GONE);
+                    srlBookList.finishRefresh(false);
+                    srlBookList.finishLoadMore(false);
+                    break;
+                case 5:
+                    mRlRefresh.showError();
+                    break;
+                case 6:
+                    DialogCreator.createTipDialog(BookstoreActivity.this,
+                            getResources().getString(R.string.top_sort_tip, title));
+                    break;
             }
         }
     };
@@ -225,6 +227,7 @@ public class BookstoreActivity extends BaseActivity {
                 ((QiDianMobileRank) findCrawler).initCookie(this, new ResultCallback() {
                     @Override
                     public void onFinish(Object o, int code) {
+                        if (MyApplication.isDestroy(BookstoreActivity.this)) return;
                         spu.putString(getString(R.string.qdCookie), (String) o);
                         mBookTypes = findCrawler.getBookTypes();
                         initBooks();
@@ -232,6 +235,7 @@ public class BookstoreActivity extends BaseActivity {
 
                     @Override
                     public void onError(Exception e) {
+                        if (MyApplication.isDestroy(BookstoreActivity.this)) return;
                         mRlRefresh.showError();
                         e.printStackTrace();
                     }
@@ -240,18 +244,20 @@ public class BookstoreActivity extends BaseActivity {
                 mBookTypes = findCrawler.getBookTypes();
                 initBooks();
             }
-        } else if ((mBookTypes = findCrawler.getBookTypes()) != null){
+        } else if ((mBookTypes = findCrawler.getBookTypes()) != null) {
             initBooks();
         } else {
             BookStoreApi.getBookTypeList(findCrawler, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
+                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
                     mBookTypes = (ArrayList<BookType>) o;
                     initBooks();
                 }
 
                 @Override
                 public void onError(Exception e) {
+                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
                     e.printStackTrace();
                     mHandler.sendEmptyMessage(5);
                 }
@@ -259,7 +265,7 @@ public class BookstoreActivity extends BaseActivity {
         }
     }
 
-    private void initBooks(){
+    private void initBooks() {
         curType = mBookTypes.get(0);
         mHandler.sendMessage(mHandler.obtainMessage(1));
         page = 1;
@@ -280,6 +286,7 @@ public class BookstoreActivity extends BaseActivity {
             ((QiDianMobileRank) findCrawler).getRankBooks(curType, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
+                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
                     List<Book> books = new ArrayList<>();
                     for (QDBook rb : (List<QDBook>) o) {
                         Book book = new Book();
@@ -291,8 +298,7 @@ public class BookstoreActivity extends BaseActivity {
                         book.setNewestChapterTitle(rb.getDesc());
                         book.setDesc(rb.getDesc());
                         if (rb instanceof RankBook) {
-                            boolean hasRankCnt = !((RankBook) rb).getRankCnt().equals("null") &&
-                                    MyApplication.isApkInDebug(BookstoreActivity.this);
+                            boolean hasRankCnt = !((RankBook) rb).getRankCnt().equals("null");
                             book.setUpdateDate(hasRankCnt ? book.getType() + "-" + rb.getCnt() : rb.getCnt());
                             book.setNewestChapterId(hasRankCnt ? ((RankBook) rb).getRankCnt() : book.getType());
                         } else if (rb instanceof SortBook) {
@@ -306,6 +312,7 @@ public class BookstoreActivity extends BaseActivity {
 
                 @Override
                 public void onError(Exception e) {
+                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
                     mHandler.sendMessage(mHandler.obtainMessage(4));
                     ToastUtils.showError("数据加载失败！\n" + e.getMessage());
                     e.printStackTrace();
@@ -315,11 +322,13 @@ public class BookstoreActivity extends BaseActivity {
             BookStoreApi.getBookRankList(curType, findCrawler, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
+                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
                     mHandler.sendMessage(mHandler.obtainMessage(2, o));
                 }
 
                 @Override
                 public void onError(Exception e) {
+                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
                     mHandler.sendMessage(mHandler.obtainMessage(4));
                     ToastUtils.showError("数据加载失败！\n" + e.getMessage());
                     e.printStackTrace();

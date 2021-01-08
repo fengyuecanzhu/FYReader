@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.*;
 import android.view.animation.Animation;
@@ -21,6 +22,8 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -186,6 +189,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
     private boolean hasChangeSource;
 
+    private int pagePos;
+
+    private int chapterPos;
+
     private Animation mTopInAnim;
     private Animation mTopOutAnim;
     private Animation mBottomInAnim;
@@ -285,6 +292,27 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
 
     @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            pagePos = savedInstanceState.getInt("pagePos");
+            chapterPos = savedInstanceState.getInt("chapterPos");
+        }else {
+            pagePos = -1;
+            chapterPos = -1;
+        }
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mBook != null) {
+            outState.putInt("pagePos", mBook.getLastReadPosition());
+            outState.putInt("chapterPos", mBook.getHisttoryChapterNum());
+        }
+    }
+
+    @Override
     protected void setUpToolbar(Toolbar toolbar) {
         super.setUpToolbar(toolbar);
         getSupportActionBar().setTitle(mBook.getName());
@@ -300,6 +328,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         if (!loadBook()) {
             finish();
             return;
+        }
+        if (pagePos != -1 && chapterPos != -1){
+            mBook.setHisttoryChapterNum(chapterPos);
+            mBook.setLastReadPosition(pagePos);
         }
         if (SharedPreUtils.getInstance().getBoolean(getString(R.string.isNightFS), false)) {
             mSetting.setDayStyle(!ColorUtil.isColorLight(getResources().getColor(R.color.textPrimary)));
@@ -794,11 +826,13 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     public void onDialogDismissed(int dialogId) {
 
     }
+
     /**************************method*********************************/
     /**
      * 初始化
      */
     private void init() {
+        if (MyApplication.isDestroy(this)) return;
         screenOffTimerStart();
         mPageLoader.init();
         mPageLoader.refreshChapterList();

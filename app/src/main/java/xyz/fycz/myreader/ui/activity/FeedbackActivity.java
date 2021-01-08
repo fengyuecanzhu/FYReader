@@ -13,6 +13,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import butterknife.BindView;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.widget.RefreshLayout;
@@ -68,13 +69,14 @@ public class FeedbackActivity extends BaseActivity {
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 super.onReceivedError(view, request, error);
-                mRlRefresh.showError();
+                if (!MyApplication.isDestroy(FeedbackActivity.this))
+                    mRlRefresh.showError();
             }
         });
         wvFeedback.setWebChromeClient(new WebChromeClient(){
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                if (newProgress == 100){
+                if (newProgress == 100 && !MyApplication.isDestroy(FeedbackActivity.this)){
                     mRlRefresh.showFinish();
                 }
             }});
