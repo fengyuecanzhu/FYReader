@@ -82,7 +82,7 @@ public class FileSystemActivity extends BaseTabActivity {
     protected void setUpToolbar(Toolbar toolbar) {
         super.setUpToolbar(toolbar);
         setStatusBarColor(R.color.colorPrimary, true);
-        getSupportActionBar().setTitle("添加本地");
+        getSupportActionBar().setTitle("本地导入");
     }
 
     @Override
@@ -169,6 +169,15 @@ public class FileSystemActivity extends BaseTabActivity {
     protected void processLogic() {
         super.processLogic();
         mCurFragment = mLocalFragment;
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (mCurFragment == mCategoryFragment){
+            if (mCategoryFragment.backLast()) return;
+        }
+        super.onBackPressed();
     }
 
     /**

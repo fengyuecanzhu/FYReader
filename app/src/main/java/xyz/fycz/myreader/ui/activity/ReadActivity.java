@@ -48,6 +48,7 @@ import xyz.fycz.myreader.enums.Font;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookMark;
 import xyz.fycz.myreader.greendao.entity.Chapter;
+import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.greendao.service.BookMarkService;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
@@ -548,7 +549,9 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
         registerReceiver(mReceiver, intentFilter);
         //当书籍Collected且书籍id不为空的时候保存上次阅读信息
-        if (isCollected && !StringHelper.isEmpty(mBook.getId())) {
+        String privateGroupId = SharedPreUtils.getInstance().getString("privateGroupId");
+        if (isCollected && !StringHelper.isEmpty(mBook.getId())
+                && !privateGroupId.equals(mBook.getGroupId())) {
             //保存上次阅读信息
             SharedPreUtils.getInstance().putString(getString(R.string.lastRead), mBook.getId());
         }
@@ -923,7 +926,11 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             return;
         }
 
-        mBookService.addBook(book);
+        if (BookGroupService.getInstance().curGroupIsPrivate()){
+            mBookService.addBookNoGroup(book);
+        }else {
+            mBookService.addBook(book);
+        }
         mBook = book;
     }
 

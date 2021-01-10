@@ -53,9 +53,9 @@ object WebDavHelp {
             if (initWebDav()) {
                 var files = WebDav(url + "FYReader/").listFiles()
                 files = files.reversed()
-                //for (index: Int in 0 until min(10, files.size)) {
-                for (element in files) {
-                    element.displayName?.let {
+                val max = SharedPreUtils.getInstance().getInt("restoreNum", 30)
+                for (index: Int in 0 until min(max, files.size)) {
+                    files[index].displayName?.let {
                         names.add(it)
                     }
                 }

@@ -49,6 +49,7 @@ import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.SharedBook;
+import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.utils.BitmapUtil;
@@ -130,6 +131,7 @@ public class BookDetailedActivity extends BaseActivity {
     private boolean isCollected;
     private SourceExchangeDialog mSourceDialog;
     private int sourceIndex;
+    private BookGroupDialog mBookGroupDia;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -181,6 +183,7 @@ public class BookDetailedActivity extends BaseActivity {
         if (isCollected) {
             mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
         }
+        mBookGroupDia = new BookGroupDialog(this);
     }
 
     @Override
@@ -577,6 +580,17 @@ public class BookDetailedActivity extends BaseActivity {
                 startActivity(intent);
                 break;
             case R.id.action_group_setting:
+                mBookGroupDia.addGroup(mBook, new BookGroupDialog.OnGroup() {
+                    @Override
+                    public void change() {
+
+                    }
+
+                    @Override
+                    public void addGroup() {
+
+                    }
+                });
                 break;
             default:
                 break;

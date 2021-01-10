@@ -78,13 +78,28 @@ public class BookService extends BaseService {
     }
 
     /**
+     * 获取所有的书
+     *
+     * @return
+     */
+    public List<Book> getAllBooksNoHide() {
+        List<Book> oldBooks = getAllBooks();
+        List<Book> newBooks = new ArrayList<>();
+        String privateGroupId = SharedPreUtils.getInstance().getString("privateGroupId");
+        for (Book book : oldBooks){
+            if (StringHelper.isEmpty(book.getGroupId()) || !privateGroupId.equals(book.getGroupId())) newBooks.add(book);
+        }
+        return newBooks;
+    }
+
+    /**
      * 获取特定分组的书
      *
      * @return
      */
     public List<Book> getGroupBooks(String groupId) {
         if (StringHelper.isEmpty(groupId)){
-            return getAllBooks();
+            return getAllBooksNoHide();
         }
         return GreenDaoManager.getInstance().getSession().getBookDao()
                 .queryBuilder()
@@ -99,11 +114,18 @@ public class BookService extends BaseService {
      * @param book
      */
     public void addBook(Book book) {
-//        book.setSortCode(countBookTotalNum() + 1);
-
         book.setSortCode(0);
         book.setGroupSort(0);
         book.setGroupId(SharedPreUtils.getInstance().getString(MyApplication.getmContext().getString(R.string.curBookGroupId), ""));
+        if (StringHelper.isEmpty(book.getId())) {
+            book.setId(StringHelper.getStringRandom(25));
+        }
+        addEntity(book);
+    }
+
+    public void addBookNoGroup(Book book) {
+        book.setSortCode(0);
+        book.setGroupSort(0);
         if (StringHelper.isEmpty(book.getId())) {
             book.setId(StringHelper.getStringRandom(25));
         }
@@ -194,6 +216,15 @@ public class BookService extends BaseService {
      */
     public void deleteAllBooks() {
         for (Book book : getAllBooks()) {
+            deleteBook(book);
+        }
+    }
+
+    /**
+     * 通过分组id删除书
+     */
+    public void deleteBooksByGroupId(String groupId) {
+        for (Book book : getGroupBooks(groupId)) {
             deleteBook(book);
         }
     }

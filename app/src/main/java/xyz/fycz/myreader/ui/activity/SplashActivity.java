@@ -29,10 +29,13 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.greendao.service.BookGroupService;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.DateHelper;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.PermissionsChecker;
 import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.util.utils.MD5Utils;
@@ -59,6 +62,7 @@ public class SplashActivity extends BaseActivity {
             try {
                 sleep(WAIT_INTERVAL);//使程序休眠
                 Intent it = new Intent(SplashActivity.this, MainActivity.class);//启动MainActivity
+                it.putExtra("startFromSplash", true);
                 startActivity(it);
                 finish();//关闭当前活动
             } catch (Exception e) {
@@ -66,6 +70,7 @@ public class SplashActivity extends BaseActivity {
             }
         }
     };
+
 
     @Override
     protected int getContentId() {
@@ -89,6 +94,22 @@ public class SplashActivity extends BaseActivity {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M){
             mPermissionsChecker = new PermissionsChecker(this);
             requestPermission();
+        }else {
+            start();
+        }
+    }
+
+    private void start(){
+        if (BookGroupService.getInstance().curGroupIsPrivate()) {
+            MyApplication.runOnUiThread(() ->{
+                MyAlertDialog.showPrivateVerifyDia(SplashActivity.this, needGoTo -> {
+                    myThread.start();
+                }, () -> {
+                    SharedPreUtils.getInstance().putString(SplashActivity.this.getString(R.string.curBookGroupId), "");
+                    SharedPreUtils.getInstance().putString(SplashActivity.this.getString(R.string.curBookGroupName), "");
+                    myThread.start();
+                });
+            });
         }else {
             myThread.start();
         }
@@ -166,7 +187,7 @@ public class SplashActivity extends BaseActivity {
         if (mPermissionsChecker.lacksPermissions(PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONS_REQUEST_STORAGE);
         } else {
-            myThread.start();
+            start();
         }
     }
 
@@ -179,7 +200,7 @@ public class SplashActivity extends BaseActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //申请权限成功
-                    myThread.start();
+                    start();
                 } else {
                     //申请权限失败
                     finish();

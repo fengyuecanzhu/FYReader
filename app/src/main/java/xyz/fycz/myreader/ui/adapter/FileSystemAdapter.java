@@ -94,8 +94,12 @@ public class FileSystemAdapter extends BaseListAdapter<File> {
         mCheckedCount = 0;
         for (Map.Entry<File, Boolean> entry:entrys){
             //必须是文件，必须没有被收藏
-            if (entry.getKey().isFile() && !isFileLoaded(entry.getKey().getAbsolutePath())){
-                entry.setValue(isChecked);
+            if (entry.getKey().isFile()){
+                if (!isFileLoaded(entry.getKey().getAbsolutePath())) {
+                    entry.setValue(isChecked);
+                }else {
+                    entry.setValue(false);
+                }
                 //如果选中，则增加点击的数量
                 if (isChecked){
                     ++mCheckedCount;

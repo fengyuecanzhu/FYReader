@@ -6,7 +6,6 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:orientation="vertical">
 
-    <include layout="@layout/toolbar"/>
     <LinearLayout
             android:id="@+id/webdav_setting_webdav_url"
             android:layout_width="match_parent"
@@ -20,14 +19,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/text_normal_size"
-                android:textColor="@color/textPrimary"
+                android:textColor="@color/textSecondary"
                 android:text="@string/webdav_url"/>
         <TextView
                 android:id="@+id/tv_webdav_url"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
-                android:textColor="@color/textSecondary"
+                android:textColor="@color/textAssist"
                 tools:text="https://dav.jianguoyun.com/dav/"/>
     </LinearLayout>
 
@@ -44,14 +43,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/text_normal_size"
-                android:textColor="@color/textPrimary"
+                android:textColor="@color/textSecondary"
                 android:text="@string/webdav_account"/>
         <TextView
                 android:id="@+id/tv_webdav_account"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
-                android:textColor="@color/textSecondary"
+                android:textColor="@color/textAssist"
                 tools:text="输入你的WebDav账号"/>
     </LinearLayout>
 
@@ -68,14 +67,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/text_normal_size"
-                android:textColor="@color/textPrimary"
+                android:textColor="@color/textSecondary"
                 android:text="@string/webdav_password"/>
         <TextView
                 android:id="@+id/tv_webdav_password"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
-                android:textColor="@color/textSecondary"
+                android:textColor="@color/textAssist"
                 tools:text="输入你的WebDav授权密码"/>
     </LinearLayout>
 
@@ -92,14 +91,40 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/text_normal_size"
-                android:textColor="@color/textPrimary"
+                android:textColor="@color/textSecondary"
                 android:text="@string/menu_backup_restore"/>
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
-                android:textColor="@color/textSecondary"
+                android:textColor="@color/textAssist"
                 android:text="@string/webdav_restore_tip"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_restore_num"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/selector_common_bg"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingTop="8dp"
+        android:paddingRight="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/max_restore_list"
+            android:textColor="@color/textSecondary"
+            android:textSize="@dimen/text_normal_size" />
+
+        <TextView
+            android:id="@+id/tv_restore_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:text="@string/cur_restore_list_num"
+            android:textColor="@color/textAssist" />
     </LinearLayout>
 
 </LinearLayout>

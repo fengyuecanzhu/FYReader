@@ -65,7 +65,7 @@
 
     <string name="menu_bookcase_edit">编辑书架</string>
     <string name="menu_bookcase_style">切换布局</string>
-    <string name="menu_bookcase_add">添加本地</string>
+    <string name="menu_bookcase_add">本地导入</string>
     <string name="menu_bookcase_syn">同步书架</string>
     <string name="menu_bookcase_download_all">一键缓存</string>
     <string name="menu_settings">应用设置</string>
@@ -280,6 +280,22 @@
     <string name="import_">导入</string>
     <string name="export">导出</string>
     <string name="reset_layout">重置布局</string>
+    <string name="max_restore_list">恢复列表最大显示数</string>
+    <string name="cur_restore_list_num">当前显示数：%1$d</string>
+    <string name="private_bookcase">私密书架</string>
+    <string name="hide_books">隐藏书籍</string>
+    <string name="hide_books_tip">选择隐藏的书籍</string>
+    <string name="change_pwd">更改密码</string>
+    <string name="input_private_pwd">请输入隐私密码</string>
+    <string name="fingerprint">使用指纹解锁</string>
+    <string name="private_pwd">隐私密码</string>
+    <string name="set_private_pwd">设置隐私密码</string>
+    <string name="verify_fingerprint">请验证指纹</string>
+    <string name="verify_has_fingerprint">请验证已有指纹</string>
+    <string name="private_bookcase_tip">1、什么是私密书架？\n私密书架是设置隐私密码后自动创建的书籍分组，
+        此书架的书籍仅能在该分组内阅读、查看及其他操作，且阅读后不会保存上次阅读记录。\n\n2、如何进入私密书架？\n在书架页面长按左上角书架标题正确验证隐私密码即可进入私密书架。
+    \n\n3、如何退出私密书架？\n点击书架菜单栏切换分组按钮切换至其他分组即可退出私密书架。\n\n4、忘记隐私密码怎么办？\n隐私密码不支持找回，忘记密码后可强制关闭私密书架，并删除私密书架内所有书籍。\n\n
+    5、此功能处于测试阶段，如发现问题，请到我的-建议反馈里进行反馈。</string>
 
     <string-array name="reset_screen_time">
         <item>常亮</item>
