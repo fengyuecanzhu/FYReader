@@ -6,13 +6,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.ActionMenuView;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -30,13 +35,19 @@ import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.SharedBook;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.entity.BookGroup;
+import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.FingerprintDialog;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
 import xyz.fycz.myreader.ui.fragment.FindFragment;
 import xyz.fycz.myreader.ui.fragment.MineFragment;
+import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.FingerprintUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 
 import java.io.File;
@@ -68,6 +79,16 @@ public class MainActivity extends BaseActivity {
     @Override
     protected int getContentId() {
         return R.layout.activity_main;
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        boolean startFromSplash = getIntent().getBooleanExtra("startFromSplash", false);
+        if (!startFromSplash && BookGroupService.getInstance().curGroupIsPrivate()){
+            SharedPreUtils.getInstance().putString(getString(R.string.curBookGroupId), "");
+            SharedPreUtils.getInstance().putString(getString(R.string.curBookGroupName), "");
+        }
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -118,6 +139,15 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initClick() {
         super.initClick();
+
+        mToolbar.setOnLongClickListener(v -> {
+            if (viewPagerMain.getCurrentItem() == 0 && !BookGroupService.getInstance().curGroupIsPrivate()){
+                goPrivateBookcase();
+                return true;
+            }
+            return false;
+        });
+
         //BottomNavigationView 点击事件监听
         bottomNavigation.setOnNavigationItemSelectedListener(menuItem -> {
             int menuId = menuItem.getItemId();
@@ -292,6 +322,16 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        String curBookGroupId = SharedPreUtils.getInstance().getString(this.getString(R.string.curBookGroupId), "");
+        BookGroup bookGroup = BookGroupService.getInstance().getGroupById(curBookGroupId);
+        if (bookGroup == null) {
+            groupName = "";
+        }else {
+            groupName = bookGroup.getName();
+        }
+        if (viewPagerMain.getCurrentItem() == 0){
+            getSupportActionBar().setSubtitle(groupName);
+        }
 //        MyApplication.checkVersionByServer(this);
     }
 
@@ -422,6 +462,28 @@ public class MainActivity extends BaseActivity {
         if (isForceUpdate) {
             finish();
         }
+    }
+
+    private void goPrivateBookcase(){
+        MyAlertDialog.showPrivateVerifyDia(this, needGoTo -> {
+            if (needGoTo) showPrivateBooks();
+        });
+    }
+
+    /**
+     * 显示私密书架
+     */
+    private void showPrivateBooks(){
+        BookGroup bookGroup = BookGroupService.getInstance().
+                getGroupById(SharedPreUtils.getInstance().getString("privateGroupId"));
+        groupName = bookGroup.getName();
+        SharedPreUtils.getInstance().putString(getString(R.string.curBookGroupId), bookGroup.getId());
+        SharedPreUtils.getInstance().putString(getString(R.string.curBookGroupName), groupName);
+        getSupportActionBar().setSubtitle(groupName);
+        if (mBookcaseFragment.isRecreate()) {
+            reLoadFragment();
+        }
+        mBookcaseFragment.onResume();
     }
 
     public interface OnGroupChangeListener {

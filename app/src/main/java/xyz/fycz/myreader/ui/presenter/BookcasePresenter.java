@@ -38,6 +38,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BasePresenter;
+import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
@@ -108,6 +109,7 @@ public class BookcasePresenter implements BasePresenter {
     private boolean isFirstRefresh = true;//是否首次进入刷新
     private boolean isGroup;
     private MainActivity.OnGroupChangeListener ogcl;
+    private final BookGroupDialog mBookGroupDia;
 
     public static final String CANCEL_ACTION = "cancelAction";
 
@@ -180,6 +182,7 @@ public class BookcasePresenter implements BasePresenter {
         mMainActivity = (MainActivity) (mBookcaseFragment.getActivity());
 //        mChapterService = new ChapterService();
         mSetting = SysManager.getSetting();
+        mBookGroupDia = new BookGroupDialog(mMainActivity);
     }
 
     //启动
@@ -265,7 +268,20 @@ public class BookcasePresenter implements BasePresenter {
 
         //加入分组监听器
         mBookcaseFragment.getmBtnAddGroup().setOnClickListener(v -> {
-            initBookGroups(true);
+            mBookGroupDia.addGroup(mBookcaseAdapter.getSelectBooks(), new BookGroupDialog.OnGroup(){
+                @Override
+                public void change() {
+                    init();
+                    if (hasOnGroupChangeListener())
+                        ogcl.onChange();
+                }
+
+                @Override
+                public void addGroup() {
+                    mBookcaseFragment.getmBtnAddGroup().performClick();
+                }
+            });
+            /*initBookGroups(true);
             showSelectGroupDia((dialog, which) -> {
                 if (which < mBookGroups.size()) {
                     BookGroup bookGroup = mBookGroups.get(which);
@@ -284,7 +300,7 @@ public class BookcasePresenter implements BasePresenter {
                 } else if (which == mBookGroups.size()) {
                     showAddOrRenameGroupDia(false, true, 0);
                 }
-            });
+            });*/
         });
     }
 
@@ -336,6 +352,14 @@ public class BookcasePresenter implements BasePresenter {
     private void initBook() {
         mBooks.clear();
         String curBookGroupId = SharedPreUtils.getInstance().getString(mMainActivity.getString(R.string.curBookGroupId), "");
+        BookGroup bookGroup = mBookGroupService.getGroupById(curBookGroupId);
+        if (bookGroup == null) {
+            curBookGroupId = "";
+            SharedPreUtils.getInstance().putString(mMainActivity.getString(R.string.curBookGroupId), "");
+            SharedPreUtils.getInstance().putString(mMainActivity.getString(R.string.curBookGroupName), "");
+            if (hasOnGroupChangeListener())
+                ogcl.onChange();
+        }
         isGroup = !"".equals(curBookGroupId);
         if (mBookcaseAdapter != null) {
             mBookcaseAdapter.setGroup(isGroup);
@@ -485,7 +509,6 @@ public class BookcasePresenter implements BasePresenter {
                     if (mPermissionsChecker == null) {
                         mPermissionsChecker = new PermissionsChecker(mMainActivity);
                     }
-
                     //获取读取和写入SD卡的权限
                     if (mPermissionsChecker.lacksPermissions(PERMISSIONS)) {
                         //请求权限
@@ -518,18 +541,18 @@ public class BookcasePresenter implements BasePresenter {
      *
      */
     public void showBookGroupMenu(View view) {
-        initBookGroups(false);
+        mBookGroupDia.initBookGroups(false);
         PopupMenu popupMenu = new PopupMenu(mMainActivity, view, Gravity.END);
         popupMenu.getMenu().add(0, 0, 0, "所有书籍");
-        for (int i = 0; i < mGroupNames.length; i++) {
-            popupMenu.getMenu().add(0, 0, i + 1, mGroupNames[i]);
+        for (int i = 0; i < mBookGroupDia.getmGroupNames().length; i++) {
+            popupMenu.getMenu().add(0, 0, i + 1, mBookGroupDia.getmGroupNames()[i]);
         }
         popupMenu.setOnMenuItemClickListener(menuItem -> {
             String curBookGroupId = "";
             String curBookGroupName = "";
             if (menuItem.getOrder() > 0) {
-                curBookGroupId = mBookGroups.get(menuItem.getOrder() - 1).getId();
-                curBookGroupName = mBookGroups.get(menuItem.getOrder() - 1).getName();
+                curBookGroupId = mBookGroupDia.getmBookGroups().get(menuItem.getOrder() - 1).getId();
+                curBookGroupName = mBookGroupDia.getmBookGroups().get(menuItem.getOrder() - 1).getName();
             }
             SharedPreUtils.getInstance().putString(mMainActivity.getString(R.string.curBookGroupId), curBookGroupId);
             SharedPreUtils.getInstance().putString(mMainActivity.getString(R.string.curBookGroupName), curBookGroupName);
@@ -580,18 +603,44 @@ public class BookcasePresenter implements BasePresenter {
                 .setTitle("分组管理")
                 .setItems(mMainActivity.getResources().getStringArray(R.array.group_man)
                         , (dialog, which) -> {
-                            initBookGroups(false);
+                            mBookGroupDia.initBookGroups(false);
                     switch (which){
                         case 0:
-                            showAddOrRenameGroupDia(false, false,0);
+                            mBookGroupDia.showAddOrRenameGroupDia(false, false, 0, new BookGroupDialog.OnGroup() {
+                                @Override
+                                public void change() {
+                                    ogcl.onChange();
+                                }
+
+                                @Override
+                                public void addGroup() {
+                                    mBookcaseFragment.getmBtnAddGroup().performClick();
+                                }
+                            });
                             break;
                         case 1:
-                            showSelectGroupDia((dialog1, which1) -> {
-                                showAddOrRenameGroupDia(true,false, which1);
+                            mBookGroupDia.showSelectGroupDia((dialog1, which1) -> {
+                                mBookGroupDia.showAddOrRenameGroupDia(true,false, which1, new BookGroupDialog.OnGroup() {
+                                    @Override
+                                    public void change() {
+                                        ogcl.onChange();
+                                    }
+
+                                    @Override
+                                    public void addGroup() {
+                                        mBookcaseFragment.getmBtnAddGroup().performClick();
+                                    }
+                                });
                             });
                             break;
                         case 2:
-                            showDeleteGroupDia();
+                            mBookGroupDia.showDeleteGroupDia(new BookGroupDialog.OnGroup() {
+                                @Override
+                                public void change() {
+                                    ogcl.onChange();
+                                    init();
+                                }
+                            });
                             break;
                     }
                 }).show();

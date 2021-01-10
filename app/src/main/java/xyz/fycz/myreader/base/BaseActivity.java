@@ -38,7 +38,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected CompositeDisposable mDisposable;
     //ButterKnife
-    private Toolbar mToolbar;
+    protected Toolbar mToolbar;
 
     private Unbinder unbinder;
 

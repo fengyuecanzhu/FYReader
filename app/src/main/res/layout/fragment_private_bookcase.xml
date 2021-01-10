@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/rl_private_bookcase"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/selector_common_bg"
+        android:gravity="center"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/private_bookcase"
+            android:textColor="@color/textSecondary"
+            android:textSize="@dimen/text_normal_size" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/sc_private_bookcase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:clickable="false"
+            android:longClickable="false" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_height="15dp"
+        android:layout_width="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/ll_content"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/ll_hide_books"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/selector_common_bg"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingTop="8dp"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/hide_books"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:text="@string/hide_books_tip"
+                android:textColor="@color/textAssist" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_change_pwd"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/change_pwd"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_fingerprint"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/fingerprint"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/sc_fingerprint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="false"
+                android:longClickable="false" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

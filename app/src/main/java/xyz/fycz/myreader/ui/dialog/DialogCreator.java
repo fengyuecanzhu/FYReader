@@ -61,14 +61,11 @@ public class DialogCreator {
         normalDialog.setNegativeButton("取消", negativeListener);
         // 显示
         final AlertDialog alertDialog = normalDialog.create();
-        MyApplication.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    alertDialog.show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        MyApplication.runOnUiThread(() -> {
+            try {
+                alertDialog.show();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
 

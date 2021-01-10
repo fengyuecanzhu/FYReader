@@ -1,9 +1,13 @@
 package xyz.fycz.myreader.greendao.service;
 
+import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.greendao.GreenDaoManager;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.gen.BookGroupDao;
 import xyz.fycz.myreader.greendao.gen.BookMarkDao;
+import xyz.fycz.myreader.ui.activity.SplashActivity;
+import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 
 import java.util.List;
@@ -67,6 +71,32 @@ public class BookGroupService extends BaseService{
         deleteEntity(bookGroup);
     }
 
+    public void deleteGroupById(String id){
+        GreenDaoManager.getInstance().getSession().getBookGroupDao().deleteByKey(id);
+    }
+
+    public void createPrivateGroup(){
+        BookGroup bookGroup = new BookGroup();
+        bookGroup.setName("私密书架");
+        addBookGroup(bookGroup);
+        SharedPreUtils.getInstance().putString("privateGroupId", bookGroup.getId());
+    }
+
+    public void deletePrivateGroup(){
+        String privateGroupId = SharedPreUtils.getInstance().getString("privateGroupId");
+        deleteGroupById(privateGroupId);
+        BookService.getInstance().deleteBooksByGroupId(privateGroupId);
+    }
+
+    /**
+     * 当前是否为私密书架
+     * @return
+     */
+    public boolean curGroupIsPrivate(){
+        String curBookGroupId = SharedPreUtils.getInstance().getString(MyApplication.getmContext().getString(R.string.curBookGroupId), "");
+        String privateGroupId = SharedPreUtils.getInstance().getString("privateGroupId");
+        return !StringHelper.isEmpty(curBookGroupId) && curBookGroupId.equals(privateGroupId);
+    }
 
     private int countBookGroup(){
         return (int) GreenDaoManager.getInstance().getSession().getBookGroupDao()

@@ -3,29 +3,43 @@ package xyz.fycz.myreader.ui.activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentTransaction;
+
 import butterknife.BindView;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.FingerprintDialog;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.ui.fragment.PrivateBooksFragment;
+import xyz.fycz.myreader.ui.fragment.WebDavFragment;
+import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.FingerprintUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 
 import java.io.File;
@@ -41,6 +55,8 @@ import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
  */
 
 public class MoreSettingActivity extends BaseActivity {
+    @BindView(R.id.sv_content)
+    ScrollView svContent;
     @BindView(R.id.ll_webdav)
     LinearLayout mLlWebdav;
     @BindView(R.id.rl_volume)
@@ -75,6 +91,8 @@ public class MoreSettingActivity extends BaseActivity {
     LinearLayout mLlBookSort;
     @BindView(R.id.tv_book_sort)
     TextView mTvBookSort;
+    @BindView(R.id.rl_private_bookcase)
+    RelativeLayout mRlPrivateBookcase;
     @BindView(R.id.ll_close_refresh)
     LinearLayout mLlCloseRefresh;
     @BindView(R.id.ll_disable_source)
@@ -134,6 +152,10 @@ public class MoreSettingActivity extends BaseActivity {
     //选择一键缓存书籍对话框
     private AlertDialog mDownloadAllDia;
 
+    private WebDavFragment mWebDavFragment;
+    private PrivateBooksFragment mPrivateBooksFragment;
+
+    private BaseFragment curFragment;
 
     @Override
     protected int getContentId() {
@@ -163,16 +185,28 @@ public class MoreSettingActivity extends BaseActivity {
     protected void setUpToolbar(Toolbar toolbar) {
         super.setUpToolbar(toolbar);
         setStatusBarColor(R.color.colorPrimary, true);
-        getSupportActionBar().setTitle("设置");
+        setUpToolbar();
+    }
+
+    private void setUpToolbar() {
+        if (curFragment == null) {
+            getSupportActionBar().setTitle("设置");
+        } else if (curFragment == mWebDavFragment) {
+            getSupportActionBar().setTitle(getString(R.string.webdav_setting));
+            invalidateOptionsMenu();
+        }else if (curFragment == mPrivateBooksFragment){
+            getSupportActionBar().setTitle(getString(R.string.private_bookcase));
+            invalidateOptionsMenu();
+        }
     }
 
     @Override
     protected void initWidget() {
         super.initWidget();
         initSwitchStatus();
-        if (sortStyle == 1){
+        if (sortStyle == 1) {
             mTvBookSort.setText(getString(R.string.time_sort));
-        }else if (sortStyle == 2){
+        } else if (sortStyle == 2) {
             mTvBookSort.setText(getString(R.string.book_name_sort));
         }
         if (isMatchChapter) {
@@ -183,6 +217,33 @@ public class MoreSettingActivity extends BaseActivity {
         mTvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.webdav_help, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (curFragment == null) {
+            menu.findItem(R.id.action_tip).setVisible(false);
+        } else {
+            menu.findItem(R.id.action_tip).setVisible(true);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_tip) {
+            if (curFragment == mWebDavFragment) {
+                DialogCreator.createAssetTipDialog(this, "如何使用WebDav进行云备份？", "webdavhelp.fy");
+            }else if(curFragment == mPrivateBooksFragment){
+                DialogCreator.createTipDialog(this, "关于私密书架", getString(R.string.private_bookcase_tip));
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void initSwitchStatus() {
         mScVolume.setChecked(isVolumeTurnPage);
@@ -197,7 +258,19 @@ public class MoreSettingActivity extends BaseActivity {
     @Override
     protected void initClick() {
         super.initClick();
-        mLlWebdav.setOnClickListener(v -> startActivity(WebDavSettingActivity.class));
+        mLlWebdav.setOnClickListener(v -> {
+            svContent.setVisibility(View.GONE);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            if (mWebDavFragment == null) {
+                mWebDavFragment = new WebDavFragment();
+                ft.add(R.id.ll_content, mWebDavFragment);
+            } else {
+                ft.show(mWebDavFragment);
+            }
+            ft.commit();
+            curFragment = mWebDavFragment;
+            setUpToolbar();
+        });
 
         mRlVolume.setOnClickListener(
                 (v) -> {
@@ -269,19 +342,25 @@ public class MoreSettingActivity extends BaseActivity {
                         sortStyle = which;
                         mSetting.setSortStyle(sortStyle);
                         SysManager.saveSetting(mSetting);
-                        if (sortStyle == 0){
+                        if (sortStyle == 0) {
                             mTvBookSort.setText(getString(R.string.manual_sort));
-                            if (!SharedPreUtils.getInstance().getBoolean("manualSortTip")){
+                            if (!SharedPreUtils.getInstance().getBoolean("manualSortTip")) {
                                 DialogCreator.createTipDialog(this, "可在书架编辑状态下长按移动书籍进行排序！");
                                 SharedPreUtils.getInstance().putBoolean("manualSortTip", true);
                             }
-                        }else if (sortStyle == 1){
+                        } else if (sortStyle == 1) {
                             mTvBookSort.setText(getString(R.string.time_sort));
-                        }else if (sortStyle == 2){
+                        } else if (sortStyle == 2) {
                             mTvBookSort.setText(getString(R.string.book_name_sort));
                         }
                         dialog.dismiss();
                     }).setNegativeButton("取消", null).show();
+        });
+
+        mRlPrivateBookcase.setOnClickListener(v -> {
+            MyAlertDialog.showPrivateVerifyDia(this, needGoTo -> {
+                showPrivateBooksFragment();
+            });
         });
 
         mRlAutoRefresh.setOnClickListener(
@@ -521,11 +600,21 @@ public class MoreSettingActivity extends BaseActivity {
 
     @Override
     public void finish() {
-        Intent result = new Intent();
-        result.putExtra(APPCONST.RESULT_NEED_REFRESH, needRefresh);
-        result.putExtra(APPCONST.RESULT_UP_MENU, upMenu);
-        setResult(AppCompatActivity.RESULT_OK, result);
-        super.finish();
+        if (curFragment == null) {
+            Intent result = new Intent();
+            result.putExtra(APPCONST.RESULT_NEED_REFRESH, needRefresh);
+            result.putExtra(APPCONST.RESULT_UP_MENU, upMenu);
+            setResult(AppCompatActivity.RESULT_OK, result);
+            super.finish();
+        } else {
+            svContent.setVisibility(View.VISIBLE);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.hide(curFragment);
+            ft.commit();
+            curFragment = null;
+            setUpToolbar();
+            invalidateOptionsMenu();
+        }
     }
 
     private void initSpinner() {
@@ -638,7 +727,7 @@ public class MoreSettingActivity extends BaseActivity {
         if (mBooks != null) {
             return;
         }
-        mBooks = (ArrayList<Book>) BookService.getInstance().getAllBooks();
+        mBooks = (ArrayList<Book>) BookService.getInstance().getAllBooksNoHide();
 
         Iterator<Book> mBooksIter = mBooks.iterator();
         while (mBooksIter.hasNext()) {
@@ -656,5 +745,19 @@ public class MoreSettingActivity extends BaseActivity {
         }
     }
 
+    private void showPrivateBooksFragment(){
+        svContent.setVisibility(View.GONE);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        if (mPrivateBooksFragment == null) {
+            mPrivateBooksFragment = new PrivateBooksFragment();
+            ft.add(R.id.ll_content, mPrivateBooksFragment);
+        } else {
+            ft.show(mPrivateBooksFragment);
+            mPrivateBooksFragment.init();
+        }
+        ft.commit();
+        curFragment = mPrivateBooksFragment;
+        setUpToolbar();
+    }
 
 }

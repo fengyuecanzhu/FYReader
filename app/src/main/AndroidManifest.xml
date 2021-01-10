@@ -5,6 +5,8 @@
     <!-- ********************************permission************************************ -->
     <!-- 读取手机状态和身份 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="com.example.broadcast.permission"/>
     <!-- 拥有完全的网络访问权限 -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -102,7 +104,6 @@
 
         <activity android:name=".ui.activity.MoreSettingActivity"/>
         <activity android:name=".ui.activity.BookstoreActivity"/>
-        <activity android:name=".ui.activity.WebDavSettingActivity"/>
         <activity android:name=".ui.activity.QRCodeScanActivity"/>
 
         <receiver android:name=".util.notification.NotificationClickReceiver"/>

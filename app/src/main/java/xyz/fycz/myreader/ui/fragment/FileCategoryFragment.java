@@ -86,21 +86,21 @@ public class FileCategoryFragment extends BaseFileFragment {
                 }
         );
 
-        mTvBackLast.setOnClickListener(
-                (v) -> {
-                    FileStack.FileSnapshot snapshot = mFileStack.pop();
-                    int oldScrollOffset = mRvContent.computeHorizontalScrollOffset();
-                    if (snapshot == null) return;
-                    mTvPath.setText(snapshot.filePath);
-                    mAdapter.refreshItems(snapshot.files);
-                    mRvContent.scrollBy(0,snapshot.scrollOffset - oldScrollOffset);
-                    //反馈
-                    if (mListener != null){
-                        mListener.onCategoryChanged();
-                    }
-                }
-        );
+        mTvBackLast.setOnClickListener(v -> backLast());
+    }
 
+    public boolean backLast(){
+        FileStack.FileSnapshot snapshot = mFileStack.pop();
+        int oldScrollOffset = mRvContent.computeHorizontalScrollOffset();
+        if (snapshot == null) return false;
+        mTvPath.setText(snapshot.filePath);
+        mAdapter.refreshItems(snapshot.files);
+        mRvContent.scrollBy(0,snapshot.scrollOffset - oldScrollOffset);
+        //反馈
+        if (mListener != null){
+            mListener.onCategoryChanged();
+        }
+        return true;
     }
 
     @Override
