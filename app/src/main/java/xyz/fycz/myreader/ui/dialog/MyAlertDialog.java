@@ -89,7 +89,9 @@ public class MyAlertDialog {
                         imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
                     })
                     .setNegativeButton("取消", (dialog, which) -> {
-                        negListener.onClick(dialog, which);
+                        if (negListener != null) {
+                            negListener.onClick(dialog, which);
+                        }
                         imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
                     })
                     .show();
