@@ -84,13 +84,17 @@ public class WebDavFragment extends BaseFragment {
         llWebdavUrl.setOnClickListener(v -> {
             MyAlertDialog.createInputDia(getContext(), getString(R.string.webdav_url),
                     "", webdavUrl.equals(APPCONST.DEFAULT_WEB_DAV_URL) ?
-                            "" : webdavUrl, true, 100,
+                            "" : webdavUrl, InputType.TYPE_CLASS_TEXT,true, 100,
                     text -> webdavTexts[0] = text,
                     (dialog, which) -> {
                         webdavUrl = webdavTexts[0];
                         tvWebdavUrl.setText(webdavUrl);
                         SharedPreUtils.getInstance().putString("webdavUrl", webdavUrl);
                         dialog.dismiss();
+                    }, null, "恢复默认", (dialog, which) -> {
+                        webdavUrl = APPCONST.DEFAULT_WEB_DAV_URL;
+                        tvWebdavUrl.setText(webdavUrl);
+                        SharedPreUtils.getInstance().putString("webdavUrl", webdavUrl);
                     });
         });
         llWebdavAccount.setOnClickListener(v -> {
