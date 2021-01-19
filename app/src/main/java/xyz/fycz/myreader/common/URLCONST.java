@@ -35,6 +35,11 @@ public class URLCONST {
 
     public static final String APP_WEB_URL = "http://fyreader.fycz.xyz:8080/FYReader/";
 
+    public static final String BAI_DU_SEARCH = "https://m.baidu.com/s?word={key}";
+
+    public static final String GOOGLE_SEARCH = "https://www.google.com/search?q={key}";
+
+    public static final String YOU_DAO_SEARCH = "http://m.youdao.com/dict?le=eng&q={key}";
 
 }
 

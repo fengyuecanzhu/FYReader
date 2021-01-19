@@ -9,15 +9,10 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-
 import android.text.TextPaint;
 import android.util.DisplayMetrics;
-import android.util.Log;
 
 import com.gyf.immersionbar.ImmersionBar;
-import com.luhuiguo.chinese.ChineseUtils;
 
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
@@ -34,14 +29,13 @@ import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.audio.ReadAloudService;
 import xyz.fycz.myreader.util.IOUtils;
-import xyz.fycz.myreader.util.StatusBarUtil;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.help.ChapterContentHelp;
 import xyz.fycz.myreader.util.utils.BitmapUtil;
 import xyz.fycz.myreader.util.utils.MeUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.ScreenUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
-import xyz.fycz.myreader.widget.page2.TxtChar;
 import xyz.fycz.myreader.widget.page2.TxtLine;
 
 import java.io.BufferedReader;
@@ -50,8 +44,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import static xyz.fycz.myreader.common.APPCONST.*;
 
 /**
  * Created by fengyue on 20-11-21
@@ -103,7 +95,7 @@ public abstract class PageLoader {
     // 绘制背景颜色的画笔(用来擦除需要重绘的部分)
     private Paint mBgPaint;
     // 绘制小说内容的画笔
-    private TextPaint mTextPaint;
+    public TextPaint mTextPaint;
     // 阅读器的配置选项
     private Setting mSettingManager;
     // 被遮盖的页，或者认为被取消显示的页
@@ -169,6 +161,7 @@ public abstract class PageLoader {
     private int readAloudParagraph = -1; //正在朗读章节
 
     private Bitmap bgBitmap;
+    private ChapterContentHelp contentHelper = new ChapterContentHelp();
 
     public void resetReadAloudParagraph() {
         readAloudParagraph = -1;
@@ -900,11 +893,13 @@ public abstract class PageLoader {
                 //根据状态不一样，数据不一样
                 if (mStatus != STATUS_FINISH) {
                     if (isChapterListPrepare) {
-                        canvas.drawText(mChapterList.get(mCurChapterPos).getTitle()
-                                , mMarginLeft, tipTop, mTipPaint);
+                        String title = mChapterList.get(mCurChapterPos).getTitle();
+                        title = contentHelper.replaceContent(mCollBook.getName() + "-" + mCollBook.getAuthor(), mCollBook.getSource(), title, true);
+                        canvas.drawText(title, mMarginLeft, tipTop, mTipPaint);
                     }
                 } else {
-                    String title = TextUtils.ellipsize(mCurPage.title, mTipPaint, mDisplayWidth - mMarginLeft - mMarginRight - mTipPaint.measureText(progress), TextUtils.TruncateAt.END).toString();
+                    String title = contentHelper.replaceContent(mCollBook.getName() + "-" + mCollBook.getAuthor(), mCollBook.getSource(), mCurPage.title, true);
+                    title = TextUtils.ellipsize(title, mTipPaint, mDisplayWidth - mMarginLeft - mMarginRight - mTipPaint.measureText(progress), TextUtils.TruncateAt.END).toString();
                     canvas.drawText(title, mMarginLeft, tipTop, mTipPaint);
                     /******绘制页码********/
                     // 底部的字显示的位置Y
@@ -1041,14 +1036,15 @@ public abstract class PageLoader {
                     top += ImmersionBar.getStatusBarHeight((Activity) mContext);
                 }
             }
-
+            Paint.FontMetrics fontMetricsForTitle = mTitlePaint.getFontMetrics();
+            Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
             //设置总距离
             float interval = mTextInterval + mTextPaint.getTextSize();
             float para = mTextPara + mTextPaint.getTextSize();
             float titleInterval = mTitleInterval + mTitlePaint.getTextSize();
             float titlePara = mTitlePara + mTextPaint.getTextSize();
             String str = null;
-
+            int ppp = 0;//pzl,文字位置
             //对标题进行绘制
             boolean isLight;
             int titleLen = 0;
@@ -1062,11 +1058,45 @@ public abstract class PageLoader {
                 if (i == 0) {
                     top += mTitlePara;
                 }
-
                 //计算文字显示的起始点
                 int start = (int) (mDisplayWidth - mTitlePaint.measureText(str)) / 2;
                 //进行绘制
                 canvas.drawText(str, start, top, mTitlePaint);
+
+                //pzl
+                float leftposition = start;
+                float rightposition = 0;
+                float bottomposition = top + mTitlePaint.getFontMetrics().descent;
+                float TextHeight = Math.abs(fontMetricsForTitle.ascent) + Math.abs(fontMetricsForTitle.descent);
+
+                if (mCurPage.txtLists != null) {
+                    for (TxtChar c : mCurPage.txtLists.get(i).getCharsData()) {
+                        rightposition = leftposition + c.getCharWidth();
+                        Point tlp = new Point();
+                        c.setTopLeftPosition(tlp);
+                        tlp.x = (int) leftposition;
+                        tlp.y = (int) (bottomposition - TextHeight);
+
+                        Point blp = new Point();
+                        c.setBottomLeftPosition(blp);
+                        blp.x = (int) leftposition;
+                        blp.y = (int) bottomposition;
+
+                        Point trp = new Point();
+                        c.setTopRightPosition(trp);
+                        trp.x = (int) rightposition;
+                        trp.y = (int) (bottomposition - TextHeight);
+
+                        Point brp = new Point();
+                        c.setBottomRightPosition(brp);
+                        brp.x = (int) rightposition;
+                        brp.y = (int) bottomposition;
+                        ppp++;
+                        c.setIndex(ppp);
+
+                        leftposition = rightposition;
+                    }
+                }
 
                 //设置尾部间距
                 if (i == mCurPage.titleLines - 1) {
@@ -1096,6 +1126,47 @@ public abstract class PageLoader {
                 } else {
                     canvas.drawText(str, mMarginLeft, top, mTextPaint);
                 }
+                //记录文字位置 --开始 pzl
+                float leftposition = mMarginLeft;
+                if (isFirstLineOfParagraph(str)) {
+                    //canvas.drawText(blanks, x, top, mTextPaint);
+                    float bw = StaticLayout.getDesiredWidth(indent, mTextPaint);
+                    leftposition += bw;
+                }
+                float rightposition = 0;
+                float bottomposition = top + mTextPaint.getFontMetrics().descent;
+                float textHeight = Math.abs(fontMetrics.ascent) + Math.abs(fontMetrics.descent);
+
+                if (mCurPage.txtLists != null) {
+                    for (TxtChar c : mCurPage.txtLists.get(i).getCharsData()) {
+                        rightposition = leftposition + c.getCharWidth();
+                        Point tlp = new Point();
+                        c.setTopLeftPosition(tlp);
+                        tlp.x = (int) leftposition;
+                        tlp.y = (int) (bottomposition - textHeight);
+
+                        Point blp = new Point();
+                        c.setBottomLeftPosition(blp);
+                        blp.x = (int) leftposition;
+                        blp.y = (int) bottomposition;
+
+                        Point trp = new Point();
+                        c.setTopRightPosition(trp);
+                        trp.x = (int) rightposition;
+                        trp.y = (int) (bottomposition - textHeight);
+
+                        Point brp = new Point();
+                        c.setBottomRightPosition(brp);
+                        brp.x = (int) rightposition;
+                        brp.y = (int) bottomposition;
+
+                        leftposition = rightposition;
+
+                        ppp++;
+                        c.setIndex(ppp);
+                    }
+                }
+                //记录文字位置 --结束 pzl
                 if (str.endsWith("\n")) {
                     top += para;
                 } else {
@@ -1507,14 +1578,10 @@ public abstract class PageLoader {
         paragraph = paragraph.trim() + "\n";
         try {
             while (showTitle || (paragraph = br.readLine()) != null) {
-                if (firstLine && !showTitle){
+                paragraph = contentHelper.replaceContent(mCollBook.getName() + "-" + mCollBook.getAuthor(), mCollBook.getSource(), paragraph, true);
+                if (firstLine && !showTitle) {
                     paragraph = paragraph.replace(chapter.getTitle(), "");
                     firstLine = false;
-                }
-                if (mSettingManager.getLanguage() == Language.traditional) {
-                    paragraph = ChineseUtils.toTraditional(paragraph);
-                } else if (mSettingManager.getLanguage() == Language.simplified) {
-                    paragraph = ChineseUtils.toSimplified(paragraph);
                 }
                 // 重置段落
                 if (!showTitle) {
@@ -1585,9 +1652,9 @@ public abstract class PageLoader {
                         lines.add(subStr);
                         //begin pzl
                         //记录每个字的位置
-                        char[] cs = subStr.toCharArray();
+                        char[] cs = subStr.replace((char) 12288, ' ').trim().toCharArray();
                         TxtLine txtList = new TxtLine();//每一行
-                        txtList.setCharsData(new ArrayList<TxtChar>());
+                        txtList.setCharsData(new ArrayList<>());
                         for (char c : cs) {
                             String mesasrustr = String.valueOf(c);
                             float charwidth = mTextPaint.measureText(mesasrustr);
@@ -1642,13 +1709,7 @@ public abstract class PageLoader {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            IOUtils.close(br);
         }
         return txtChapter;
     }
@@ -1691,6 +1752,10 @@ public abstract class PageLoader {
             resetReadAloud = true;
         }
         return mCurChapter.getPage(pos);
+    }
+
+    public TxtPage curPage() {
+        return mCurPage;
     }
 
     /**
@@ -1887,6 +1952,37 @@ public abstract class PageLoader {
             noAnimationToNextPage();
             mPageView.invalidate();
         }
+    }
+
+    /**
+     * --------------------
+     * 检测获取按压坐标所在位置的字符，没有的话返回null
+     * --------------------
+     * author: huangwei
+     * 2017年7月4日上午10:23:19
+     */
+    TxtChar detectPressTxtChar(float down_X2, float down_Y2) {
+        TxtPage txtPage = mCurPage;
+        if (txtPage == null) return null;
+        List<TxtLine> txtLines = txtPage.txtLists;
+        if (txtLines == null) return null;
+        for (TxtLine l : txtLines) {
+            List<TxtChar> txtChars = l.getCharsData();
+            if (txtChars != null) {
+                for (TxtChar c : txtChars) {
+                    Point leftPoint = c.getBottomLeftPosition();
+                    Point rightPoint = c.getBottomRightPosition();
+                    if (leftPoint != null && down_Y2 > leftPoint.y) {
+                        break;// 说明是在下一行
+                    }
+                    if (leftPoint != null && rightPoint != null && down_X2 >= leftPoint.x && down_X2 <= rightPoint.x) {
+                        return c;
+                    }
+
+                }
+            }
+        }
+        return null;
     }
 
     /*****************************************interface*****************************************/

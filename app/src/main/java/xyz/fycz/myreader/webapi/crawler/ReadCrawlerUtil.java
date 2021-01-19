@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -47,6 +48,16 @@ public class ReadCrawlerUtil {
             }
         }
         return readCrawlers;
+    }
+
+    public static List<String> getAllSources(){
+        List<String> sources = new ArrayList<>();
+        for (BookSource bookSource : BookSource.values()) {
+            if (bookSource.equals(BookSource.fynovel))
+                continue;
+            sources.add(bookSource.text);
+        }
+        return sources;
     }
 
     public static HashMap<CharSequence, Boolean> getDisableSources() {
@@ -129,8 +140,8 @@ public class ReadCrawlerUtil {
     }
 
     public static ReadCrawler getReadCrawler(String bookSource) {
-        ResourceBundle rb = ResourceBundle.getBundle("crawler");
         try {
+            ResourceBundle rb = ResourceBundle.getBundle("crawler");
             String readCrawlerPath = rb.getString(bookSource);
             Class clz = Class.forName(readCrawlerPath);
             return (ReadCrawler) clz.newInstance();

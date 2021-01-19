@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorForeground"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="5dp">
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:text="@string/content_replace"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_medium_size" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/summary"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_rule_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/summary_tip"
+                android:maxLines="3"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textSize="@dimen/text_small_size" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/replace_rule_old"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_rule_old"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/replace_rule_old_tip"
+                android:maxLines="3"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textSize="@dimen/text_small_size" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/cb_use_regex"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:text="@string/replace_use_regex"
+            android:textColor="@color/textPrimary"
+            android:theme="@style/MyCheckBox" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/replace_rule_new"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_rule_new"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/replace_rule_new_tip"
+                android:maxLines="3"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textSize="@dimen/text_small_size" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/use_to_source"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/et_rule_source"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:hint="@string/use_to_source_tip"
+                    android:maxLines="3"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textSize="@dimen/text_small_size" />
+
+                <Button
+                    android:id="@+id/bt_select_source"
+                    android:layout_width="48dp"
+                    android:layout_height="35dp"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/select"
+                    android:textSize="@dimen/text_default_size" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/use_to_book"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/et_rule_book"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:hint="@string/use_to_book_tip"
+                    android:maxLines="3"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textSize="@dimen/text_small_size" />
+
+                <Button
+                    android:id="@+id/bt_select_book"
+                    android:layout_width="48dp"
+                    android:layout_height="35dp"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/select"
+                    android:textSize="@dimen/text_default_size" />
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/colorBackground" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textColor="@color/textPrimary"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorBackground" />
+
+        <TextView
+            android:id="@+id/tv_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:text="@string/confirm"
+            android:textColor="@color/textPrimary"
+            android:textSize="16sp" />
+    </LinearLayout>
+</LinearLayout>

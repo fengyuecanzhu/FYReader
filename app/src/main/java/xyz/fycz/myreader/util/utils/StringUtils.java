@@ -324,6 +324,16 @@ public class StringUtils {
         }
         return result;
     }
+    public static boolean isJsonArray(String str) {
+        boolean result = false;
+        if (!TextUtils.isEmpty(str)) {
+            str = str.trim();
+            if (str.startsWith("[") && str.endsWith("]")) {
+                result = true;
+            }
+        }
+        return result;
+    }
 
     public static boolean isContainEachOther(String s1, String s2){
         if (s1 == null || s2 == null) return true;

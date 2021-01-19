@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -422,6 +423,21 @@ public class FileUtils {
         }
 
         return writeSucc;
+    }
+
+    public static boolean writeText(String text, File file){
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(file);
+            fw.write(text);
+            fw.flush();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }finally {
+            IOUtils.close(fw);
+        }
     }
 
     public static boolean copy(String src, String dest){

@@ -166,4 +166,5 @@ public class ReplaceRuleBean implements Parcelable {
     public void setIsRegex(Boolean isRegex) {
         this.isRegex = isRegex;
     }
+
 }

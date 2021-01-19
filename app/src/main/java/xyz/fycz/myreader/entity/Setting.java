@@ -78,6 +78,10 @@ public class Setting implements Serializable {
 
     private int sortStyle;//排序方式:0-手动排序，1-按时间排序，2-按照书名排序
 
+    private boolean canSelectText;//是否长按选择
+
+    private boolean lightNovelParagraph;//是否自动重分段落
+
     private int sourceVersion;//书源版本号
 
     private int settingVersion;//设置版本号
@@ -687,5 +691,21 @@ public class Setting implements Serializable {
 
     public void setSortStyle(int sortStyle) {
         this.sortStyle = sortStyle;
+    }
+
+    public boolean isCanSelectText() {
+        return canSelectText;
+    }
+
+    public void setCanSelectText(boolean canSelectText) {
+        this.canSelectText = canSelectText;
+    }
+
+    public boolean isLightNovelParagraph() {
+        return lightNovelParagraph;
+    }
+
+    public void setLightNovelParagraph(boolean lightNovelParagraph) {
+        this.lightNovelParagraph = lightNovelParagraph;
     }
 }

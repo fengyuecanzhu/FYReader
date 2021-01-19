@@ -200,7 +200,8 @@ dependencies {
     implementation "com.afollestad.material-dialogs:input:$dialog_version"
     implementation "com.afollestad.material-dialogs:files:$dialog_version"
     implementation "com.afollestad.material-dialogs:bottomsheets:$dialog_version"*/
-
+    //左滑菜单
+    implementation 'com.github.mcxtzhang:SwipeDelMenuLayout:V1.3.0'
 }
 
 greendao {

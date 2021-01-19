@@ -17,7 +17,7 @@
                 app:showAsAction="always"/>
         <item
                 android:id="@+id/action_change_group"
-                android:icon="@drawable/ic_change_source"
+                android:icon="@drawable/ic_change"
                 android:title="@string/menu_change_group"
                 app:showAsAction="always"/>
         <item
