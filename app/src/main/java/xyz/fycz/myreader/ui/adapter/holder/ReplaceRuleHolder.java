@@ -112,7 +112,7 @@ public class ReplaceRuleHolder extends ViewHolderImpl<ReplaceRuleBean> {
                     .subscribe(new MyObserver<Boolean>() {
                         @Override
                         public void onNext(Boolean aBoolean) {
-                            onDeleteListener.success(pos, data);
+                            onDeleteListener.success(pos);
                             refreshUI();
                         }
 
