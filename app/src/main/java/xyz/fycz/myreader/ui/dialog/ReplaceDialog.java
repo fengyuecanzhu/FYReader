@@ -28,6 +28,7 @@ import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.model.ReplaceRuleManager;
 import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 
@@ -88,6 +89,10 @@ public class ReplaceDialog extends DialogFragment {
         btSelectBook.setOnClickListener(v1 -> selectBook());
 
         tvConfirm.setOnClickListener(v1 -> {
+            if (StringHelper.isEmpty(etRuleOld.getText().toString())) {
+                ToastUtils.showWarring("替换规则不能为空");
+                return;
+            }
             replaceRule.setReplaceSummary(etRuleDesc.getText().toString());
             replaceRule.setRegex(etRuleOld.getText().toString());
             replaceRule.setIsRegex(cbUseRegex.isChecked());
