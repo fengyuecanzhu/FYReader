@@ -96,10 +96,12 @@ public class RuleActivity extends BaseActivity {
     }
 
     protected void initRuleList() {
-        mAdapter = new ReplaceRuleAdapter(this, (which, data) -> {
-            mReplaceRules.remove(data);
+        mAdapter = new ReplaceRuleAdapter(this, which -> {
+            mReplaceRules.remove(which);
+            mAdapter.removeItem(which);
             mAdapter.notifyItemRemoved(which);
-            mAdapter.removeItem2(data);
+            if(which != mReplaceRules.size())
+                mAdapter.notifyItemRangeChanged(which, mReplaceRules.size() - which);
             setUpBarTitle();
         });
         rvRuleList.setLayoutManager(new LinearLayoutManager(this));

@@ -27,11 +27,11 @@ public class ReplaceRuleAdapter extends BaseListAdapter<ReplaceRuleBean> {
         return new ReplaceRuleHolder(activity, onDeleteListener);
     }
 
-    public void removeItem2(ReplaceRuleBean ruleBean){
-        mList.remove(ruleBean);
+    public void removeItem(int pos){
+        mList.remove(pos);
     }
 
     public interface OnDeleteListener{
-        void success(int which, ReplaceRuleBean ruleBean);
+        void success(int which);
     }
 }
