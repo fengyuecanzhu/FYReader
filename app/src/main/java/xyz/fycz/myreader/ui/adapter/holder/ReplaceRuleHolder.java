@@ -31,6 +31,7 @@ import xyz.fycz.myreader.model.ReplaceRuleManager;
 import xyz.fycz.myreader.ui.adapter.ReplaceRuleAdapter;
 import xyz.fycz.myreader.ui.dialog.ReplaceDialog;
 import xyz.fycz.myreader.util.ShareUtils;
+import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 
@@ -127,11 +128,19 @@ public class ReplaceRuleHolder extends ViewHolderImpl<ReplaceRuleBean> {
     private void banOrUse(ReplaceRuleBean data){
         if (data.getEnable()) {
             tvRuleSummary.setTextColor(getContext().getResources().getColor(R.color.textPrimary));
-            tvRuleSummary.setText(String.format("%s->%s", data.getRegex(), data.getReplacement()));
+            if (StringHelper.isEmpty(data.getReplaceSummary())) {
+                tvRuleSummary.setText(String.format("%s->%s", data.getRegex(), data.getReplacement()));
+            }else {
+                tvRuleSummary.setText(data.getReplaceSummary());
+            }
             btBan.setText(getContext().getString(R.string.ban));
         } else {
             tvRuleSummary.setTextColor(getContext().getResources().getColor(R.color.textSecondary));
-            tvRuleSummary.setText(String.format("(禁用中)%s->%s", data.getRegex(), data.getReplacement()));
+            if (StringHelper.isEmpty(data.getReplaceSummary())) {
+                tvRuleSummary.setText(String.format("(禁用中)%s->%s", data.getRegex(), data.getReplacement()));
+            }else {
+                tvRuleSummary.setText(String.format("(禁用中)%s", data.getReplaceSummary()));
+            }
             btBan.setText(R.string.enable_use);
         }
     }
