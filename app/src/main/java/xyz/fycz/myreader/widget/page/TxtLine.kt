@@ -1,5 +1,7 @@
 package xyz.fycz.myreader.widget.page2
 
+import xyz.fycz.myreader.widget.page.TxtChar
+
 class TxtLine {
 
     var charsData: List<TxtChar>? = null

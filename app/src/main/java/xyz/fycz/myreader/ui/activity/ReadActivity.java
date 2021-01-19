@@ -2,23 +2,36 @@ package xyz.fycz.myreader.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PersistableBundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.view.*;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -28,26 +41,32 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
-import butterknife.BindView;
-import butterknife.OnClick;
-
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gyf.immersionbar.ImmersionBar;
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import butterknife.BindView;
+import butterknife.OnClick;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.enums.Font;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookMark;
 import xyz.fycz.myreader.greendao.entity.Chapter;
+import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.greendao.service.BookMarkService;
 import xyz.fycz.myreader.greendao.service.BookService;
@@ -58,33 +77,36 @@ import xyz.fycz.myreader.ui.dialog.AudioPlayerDialog;
 import xyz.fycz.myreader.ui.dialog.CopyContentDialog;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
+import xyz.fycz.myreader.ui.dialog.ReplaceDialog;
+import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.ui.popmenu.AutoPageMenu;
 import xyz.fycz.myreader.ui.popmenu.BrightnessEyeMenu;
 import xyz.fycz.myreader.ui.popmenu.CustomizeComMenu;
 import xyz.fycz.myreader.ui.popmenu.CustomizeLayoutMenu;
 import xyz.fycz.myreader.ui.popmenu.ReadSettingMenu;
-import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
-import xyz.fycz.myreader.ui.presenter.CatalogPresenter;
-import xyz.fycz.myreader.util.*;
-import xyz.fycz.myreader.util.llog.LLog;
+import xyz.fycz.myreader.util.BrightUtil;
+import xyz.fycz.myreader.util.DateHelper;
+import xyz.fycz.myreader.util.ShareUtils;
+import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.SystemUtil;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
 import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.ColorUtil;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.util.utils.ScreenUtils;
+import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.util.utils.SystemBarUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.widget.BubblePopupView;
 import xyz.fycz.myreader.widget.page.LocalPageLoader;
 import xyz.fycz.myreader.widget.page.PageLoader;
 import xyz.fycz.myreader.widget.page.PageMode;
 import xyz.fycz.myreader.widget.page.PageView;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -94,10 +116,12 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
  * @author fengyue
  * @date 2020/10/21 16:46
  */
-public class ReadActivity extends BaseActivity implements ColorPickerDialogListener {
+public class ReadActivity extends BaseActivity implements ColorPickerDialogListener, View.OnTouchListener {
     private static final String TAG = ReadActivity.class.getSimpleName();
 
     /*****************************View***********************************/
+    @BindView(R.id.rl_content)
+    RelativeLayout rlContent;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.read_abl_top_menu)
@@ -112,6 +136,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     PageView pageView;
     @BindView(R.id.pb_loading)
     ProgressBar pbLoading;
+    @BindView(R.id.cursor_left)
+    ImageView cursorLeft;
+    @BindView(R.id.cursor_right)
+    ImageView cursorRight;
     @BindView(R.id.read_tv_page_tip)
     TextView readTvPageTip;
     @BindView(R.id.read_tv_pre_chapter)
@@ -198,6 +226,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private Animation mTopOutAnim;
     private Animation mBottomInAnim;
     private Animation mBottomOutAnim;
+    private int lastX, lastY;
 
     // 接收电池信息和时间更新的广播
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -297,7 +326,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         if (savedInstanceState != null) {
             pagePos = savedInstanceState.getInt("pagePos");
             chapterPos = savedInstanceState.getInt("chapterPos");
-        }else {
+        } else {
             pagePos = -1;
             chapterPos = -1;
         }
@@ -330,7 +359,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             finish();
             return;
         }
-        if (pagePos != -1 && chapterPos != -1){
+        if (pagePos != -1 && chapterPos != -1) {
             mBook.setHisttoryChapterNum(chapterPos);
             mBook.setLastReadPosition(pagePos);
         }
@@ -375,12 +404,14 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void initClick() {
         super.initClick();
         pageView.setTouchListener(new PageView.TouchListener() {
             @Override
             public boolean onTouch() {
+                screenOffTimerStart();
                 return !hideReadMenu();
             }
 
@@ -406,6 +437,21 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
             @Override
             public void cancel() {
+            }
+
+            @Override
+            public void onTouchClearCursor() {
+                cursorLeft.setVisibility(View.INVISIBLE);
+                cursorRight.setVisibility(View.INVISIBLE);
+                longPressMenu.hidePopupListWindow();
+            }
+
+            @Override
+            public void onLongPress() {
+                if (!pageView.isRunning()) {
+                    selectTextCursorShow();
+                    showAction();
+                }
             }
         });
 
@@ -538,7 +584,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             }
             mAudioPlayerDialog.show();
         });
+        initReadLongPressPop();
+        cursorLeft.setOnTouchListener(this);
+        cursorRight.setOnTouchListener(this);
+        rlContent.setOnTouchListener(this);
     }
+
 
     @Override
     protected void processLogic() {
@@ -575,6 +626,9 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 customizeComMenu.getVisibility() != View.VISIBLE &&
                 readSettingMenu.getVisibility() != View.VISIBLE &&
                 brightnessEyeMenu.getVisibility() != View.VISIBLE) {
+            if (pageView.getSelectMode() != PageView.SelectMode.Normal) {
+                clearSelect();
+            }
             switch (keyCode) {
                 case KeyEvent.KEYCODE_VOLUME_UP:
                     if (ReadAloudService.running) {
@@ -724,6 +778,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         "》：" + bookMark.getTitle() + "[" + (bookMark.getBookMarkReadPosition() + 1) +
                         "]\n书签添加成功，书签列表可在目录界面查看！");
                 return true;
+            case R.id.action_replace_content:
+                Intent ruleIntent = new Intent(this, RuleActivity.class);
+                startActivityForResult(ruleIntent, APPCONST.REQUEST_REFRESH_READ_UI);
+                break;
             case R.id.action_copy_content:
                 new CopyContentDialog(this, mPageLoader.getContent()).show();
                 break;
@@ -912,10 +970,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         Book book = new Book();
         book.setName(file.getName().replace(".txt", ""));
         book.setChapterUrl(path);
-        book.setType("本地书籍");
+        book.setType(getString(R.string.local_book));
         book.setHistoryChapterId("未开始阅读");
         book.setNewestChapterTitle("未拆分章节");
-        book.setAuthor("本地书籍");
+        book.setAuthor(getString(R.string.local_book));
         book.setSource(BookSource.local.toString());
         book.setDesc("无");
         book.setIsCloseUpdate(true);
@@ -926,9 +984,9 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             return;
         }
 
-        if (BookGroupService.getInstance().curGroupIsPrivate()){
+        if (BookGroupService.getInstance().curGroupIsPrivate()) {
             mBookService.addBookNoGroup(book);
-        }else {
+        } else {
             mBookService.addBook(book);
         }
         mBook = book;
@@ -953,14 +1011,14 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private void getData() {
         mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
         if (!isCollected || mChapters.size() == 0 || ("本地书籍".equals(mBook.getType()) && !ChapterService.isChapterCached(mBook.getId(), mChapters.get(0).getTitle())
-                        )) {
+        )) {
             if ("本地书籍".equals(mBook.getType())) {
                 if (!new File(mBook.getChapterUrl()).exists()) {
                     ToastUtils.showWarring("书籍缓存为空且源文件不存在，书籍加载失败！");
                     finish();
                     return;
                 }
-                if (mChapters.size() != 0 && mChapters.get(0).getEnd() > 0){
+                if (mChapters.size() != 0 && mChapters.get(0).getEnd() > 0) {
                     initChapters();
                     return;
                 }
@@ -1853,4 +1911,256 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         return Color.argb(a, r, g, b);
     }
 
+    /***********************长按弹出菜单相关*************************/
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        if (v.getId() == R.id.cursor_left || v.getId() == R.id.cursor_right) {
+            int ea = event.getAction();
+            //final int screenWidth = dm.widthPixels;
+            //final int screenHeight = dm.heightPixels;
+            switch (ea) {
+                case MotionEvent.ACTION_DOWN:
+                    lastX = (int) event.getRawX();// 获取触摸事件触摸位置的原始X坐标
+                    lastY = (int) event.getRawY();
+                    longPressMenu.hidePopupListWindow();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    int dx = (int) event.getRawX() - lastX;
+                    int dy = (int) event.getRawY() - lastY;
+                    int l = v.getLeft() + dx;
+                    int b = v.getBottom() + dy;
+                    int r = v.getRight() + dx;
+                    int t = v.getTop() + dy;
+
+                    v.layout(l, t, r, b);
+                    lastX = (int) event.getRawX();
+                    lastY = (int) event.getRawY();
+                    v.postInvalidate();
+
+                    //移动过程中要画线
+                    pageView.setSelectMode(PageView.SelectMode.SelectMoveForward);
+
+                    int hh = cursorLeft.getHeight();
+                    int ww = cursorLeft.getWidth();
+
+                    if (v.getId() == R.id.cursor_left) {
+                        pageView.setFirstSelectTxtChar(pageView.getCurrentTxtChar(lastX + ww, lastY - hh));
+                        if (pageView.getFirstSelectTxtChar() != null) {
+                            cursorLeft.setX(pageView.getFirstSelectTxtChar().getTopLeftPosition().x - ww);
+                            cursorLeft.setY(pageView.getFirstSelectTxtChar().getBottomLeftPosition().y);
+                        }
+                    } else {
+                        pageView.setLastSelectTxtChar(pageView.getCurrentTxtChar(lastX - ww, lastY - hh));
+                        if (pageView.getLastSelectTxtChar() != null) {
+                            cursorRight.setX(pageView.getLastSelectTxtChar().getBottomRightPosition().x);
+                            cursorRight.setY(pageView.getLastSelectTxtChar().getBottomRightPosition().y);
+                        }
+                    }
+
+                    pageView.invalidate();
+
+                    break;
+                case MotionEvent.ACTION_UP:
+                    showAction();
+                    //v.layout(l, t, r, b);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 显示长按菜单
+     */
+    public void showAction() {
+        float x, y;
+        if (cursorLeft.getX() - cursorRight.getX() > 0){
+            x = cursorRight.getX() + (cursorLeft.getX() - cursorRight.getX()) / 2 + ScreenUtils.dpToPx(12);
+        }else {
+            x = cursorLeft.getX() + (cursorRight.getX() - cursorLeft.getX()) / 2 + ScreenUtils.dpToPx(12);
+        }
+        if ((cursorLeft.getY() - ScreenUtils.spToPx(mSetting.getReadWordSize()) - ScreenUtils.dpToPx(60)) < 0) {
+            longPressMenu.setShowBottom(true);
+            y = cursorLeft.getY() + cursorLeft.getHeight() * 3 / 5;
+        } else {
+            longPressMenu.setShowBottom(false);
+            y = cursorLeft.getY() - ScreenUtils.spToPx(mSetting.getReadWordSize()) - ScreenUtils.dpToPx(5);
+        }
+        longPressMenu.showPopupListWindow(rlContent, 0, x, y,
+                longPressMenuItems, longPressMenuListener);
+    }
+
+    /**
+     * 显示
+     */
+    private void selectTextCursorShow() {
+        if (pageView.getFirstSelectTxtChar() == null || pageView.getLastSelectTxtChar() == null)
+            return;
+        //show Cursor on current position
+        cursorShow();
+        //set current word selected
+        pageView.invalidate();
+
+//        hideSnackBar();
+    }
+
+    /**
+     * 显示选择
+     */
+    private void cursorShow() {
+        cursorLeft.setVisibility(View.VISIBLE);
+        cursorRight.setVisibility(View.VISIBLE);
+        int hh = cursorLeft.getHeight();
+        int ww = cursorLeft.getWidth();
+        if (pageView.getFirstSelectTxtChar() != null) {
+            cursorLeft.setX(pageView.getFirstSelectTxtChar().getTopLeftPosition().x - ww);
+            cursorLeft.setY(pageView.getFirstSelectTxtChar().getBottomLeftPosition().y);
+            cursorRight.setX(pageView.getFirstSelectTxtChar().getBottomRightPosition().x);
+            cursorRight.setY(pageView.getFirstSelectTxtChar().getBottomRightPosition().y);
+        }
+    }
+
+    private final List<String> longPressMenuItems = new ArrayList<>();
+    private BubblePopupView longPressMenu;
+    private BubblePopupView.PopupListListener longPressMenuListener;
+
+    /**
+     * 长按选择按钮
+     */
+    private void initReadLongPressPop() {
+        longPressMenuItems.add("拷贝");
+        longPressMenuItems.add("替换");
+        longPressMenuItems.add("发声");
+        longPressMenuItems.add("搜索");
+        longPressMenuItems.add("分享");
+        longPressMenu = new BubblePopupView(this);
+        //是否跟随手指显示，默认false，设置true后翻转高度无效，永远在上方显示
+        longPressMenu.setShowTouchLocation(true);
+        longPressMenu.setFocusable(false);
+        longPressMenuListener = new BubblePopupView.PopupListListener() {
+            @Override
+            public boolean showPopupList(View adapterView, View contextView, int contextPosition) {
+                return true;
+            }
+
+            @Override
+            public void onPopupListClick(View contextView, int contextPosition, int position) {
+                String selectString;
+                switch (position) {
+                    case 0:
+                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clipData = ClipData.newPlainText(null, pageView.getSelectStr());
+                        if (clipboard != null) {
+                            clipboard.setPrimaryClip(clipData);
+                            ToastUtils.showInfo("所选内容已经复制到剪贴板");
+                        }
+                        clearSelect();
+                        break;
+                    case 1:
+                        ReplaceRuleBean oldRuleBean = new ReplaceRuleBean();
+                        oldRuleBean.setReplaceSummary("");
+                        oldRuleBean.setEnable(true);
+                        oldRuleBean.setRegex(pageView.getSelectStr().trim());
+                        oldRuleBean.setIsRegex(false);
+                        oldRuleBean.setReplacement("");
+                        oldRuleBean.setSerialNumber(0);
+                        oldRuleBean.setUseTo(String.format("%s;%s", mBook.getSource(), mBook.getName() + "-" + mBook.getAuthor()));
+                        ReplaceDialog replaceDialog = new ReplaceDialog(ReadActivity.this, oldRuleBean
+                                , () -> {
+                            ToastUtils.showSuccess("内容替换规则添加成功！");
+                            clearSelect();
+                            mPageLoader.refreshUi();
+                        });
+                        replaceDialog.show(getSupportFragmentManager(), "replaceRule");
+                        break;
+                    case 2:
+                        selectString = pageView.getSelectStr();
+                        speak(ReadActivity.this, selectString);
+                        clearSelect();
+                        break;
+                    case 3:
+                        selectString = StringUtils.deleteWhitespace(pageView.getSelectStr());
+                        MyAlertDialog.build(ReadActivity.this)
+                                .setTitle(R.string.search)
+                                .setItems(R.array.search_way, (dialog, which) -> {
+                                    String url = "";
+                                    switch (which) {
+                                        case 0:
+                                            url = URLCONST.BAI_DU_SEARCH;
+                                            break;
+                                        case 1:
+                                            url = URLCONST.GOOGLE_SEARCH;
+                                            break;
+                                        case 2:
+                                            url = URLCONST.YOU_DAO_SEARCH;
+                                            break;
+                                    }
+                                    url = url.replace("{key}", selectString);
+                                    Log.d("SEARCH_URL", url);
+                                    try {
+                                        Uri uri = Uri.parse(url);
+                                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                        startActivity(intent);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        ToastUtils.showError(e.getLocalizedMessage());
+                                    }
+                                }).setNegativeButton("取消", null)
+                                .show();
+                        clearSelect();
+                        break;
+                    case 4:
+                        selectString = pageView.getSelectStr();
+                        ShareUtils.share(ReadActivity.this, selectString);
+                        clearSelect();
+                        break;
+                }
+            }
+        };
+    }
+
+    /**
+     * 清除选择
+     */
+    private void clearSelect() {
+        cursorLeft.setVisibility(View.INVISIBLE);
+        cursorRight.setVisibility(View.INVISIBLE);
+        longPressMenu.hidePopupListWindow();
+        pageView.clearSelect();
+    }
+
+    private TextToSpeech textToSpeech;
+    private boolean ttsInitFinish = false;
+    private String lastText = "";
+
+    /**
+     * 发声
+     *
+     * @param context
+     * @param text
+     */
+    public void speak(Context context, String text) {
+        lastText = text;
+        if (textToSpeech == null) {
+            textToSpeech = new TextToSpeech(context, status -> {
+                if (status == TextToSpeech.SUCCESS) {
+                    textToSpeech.setLanguage(Locale.CHINA);
+                    ttsInitFinish = true;
+                    speak(context, lastText);
+                } else {
+                    ToastUtils.showError("TTS初始化失败！");
+                }
+            });
+            return;
+        }
+        if (!ttsInitFinish) return;
+        if ("".equals(text)) return;
+        if (textToSpeech.isSpeaking())
+            textToSpeech.stop();
+        textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, "select_text");
+        lastText = "";
+    }
 }

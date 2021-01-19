@@ -174,7 +174,49 @@
                         android:clickable="false"
                         android:longClickable="false" />
                 </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/rl_long_press"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/selector_common_bg"
+                    android:gravity="center"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/long_press"
+                        android:textColor="@color/textSecondary"
+                        android:textSize="@dimen/text_normal_size" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sc_long_press"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:clickable="false"
+                        android:longClickable="false" />
+                </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/rl_content_replace"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/selector_common_bg"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/content_replace"
+                        android:textColor="@color/textSecondary"
+                        android:textSize="@dimen/text_normal_size" />
+
+                </RelativeLayout>
                 <RelativeLayout
                     android:id="@+id/rl_read_aloud_volume_turn_page"
                     android:layout_width="match_parent"

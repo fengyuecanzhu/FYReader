@@ -57,11 +57,15 @@
             android:layout_weight="1"
             android:layout_height="50dp"
             android:gravity="center"
-            android:text="取消"
+            android:text="@string/cancel"
             android:textColor="@color/textSecondary"
             android:textSize="16sp"
             />
-
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorBackground"
+            />
         <TextView
             android:id="@+id/use_pwd"
             android:background="@drawable/selector_common_bg"
@@ -69,7 +73,7 @@
             android:layout_weight="1"
             android:layout_height="50dp"
             android:gravity="center"
-            android:text="使用密码"
+            android:text="@string/use_pwd"
             android:textColor="@color/textSecondary"
             android:textSize="16sp"
             />

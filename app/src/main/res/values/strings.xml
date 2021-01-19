@@ -296,6 +296,42 @@
         此书架的书籍仅能在该分组内阅读、查看及其他操作，且阅读后不会保存上次阅读记录。\n\n2、如何进入私密书架？\n在书架页面长按左上角书架标题正确验证隐私密码即可进入私密书架。
     \n\n3、如何退出私密书架？\n点击书架菜单栏切换分组按钮切换至其他分组即可退出私密书架。\n\n4、忘记隐私密码怎么办？\n隐私密码不支持找回，忘记密码后可强制关闭私密书架，并删除私密书架内所有书籍。\n\n
     5、此功能处于测试阶段，如发现问题，请到我的-建议反馈里进行反馈。</string>
+    <string name="long_press">长按选择文字</string>
+    <string name="search">搜索</string>
+    <string name="speak">发声</string>
+    <string name="replace">替换</string>
+    <string name="copy">拷贝</string>
+    <string name="content_replace">内容替换</string>
+    <string name="summary">概要</string>
+    <string name="summary_tip">说明信息</string>
+    <string name="replace_rule_old">替换前</string>
+    <string name="replace_rule_old_tip">要替换的内容</string>
+    <string name="replace_use_regex">使用正则</string>
+    <string name="replace_rule_new">替换为</string>
+    <string name="replace_rule_new_tip">替换后的内容</string>
+    <string name="use_to_source">应用于书源</string>
+    <string name="use_to_source_tip">默认将应用于所有书源</string>
+    <string name="select">选择</string>
+    <string name="use_to_book">应用于书籍</string>
+    <string name="use_to_book_tip">默认将应用于所有书籍</string>
+    <string name="cancel">取消</string>
+    <string name="confirm">确定</string>
+    <string name="use_pwd">使用密码</string>
+    <string name="local_book">本地书籍</string>
+    <string name="delete">删除</string>
+    <string name="ban">禁用</string>
+    <string name="top">置顶</string>
+    <string name="enable_use">启用</string>
+    <string name="replace_rule">内容替换规则</string>
+    <string name="bookcase">书架</string>
+    <string name="find">发现</string>
+    <string name="mine">我</string>
+    <string name="add_rule">新建规则</string>
+    <string name="export_all">导出所有</string>
+    <string name="reverse_rule">反转规则可用性</string>
+    <string name="delete_ban_rule">删除禁用规则</string>
+    <string name="import_rule">导入规则</string>
+    <string name="help">帮助</string>
 
     <string-array name="reset_screen_time">
         <item>常亮</item>
@@ -359,5 +395,16 @@
         <item>下载前后五十章</item>
         <item>下载后面全部章</item>
         <item>下载本书所有章</item>
+    </string-array>
+
+    <string-array name="search_way">
+        <item>使用[百度]</item>
+        <item>使用[谷歌]</item>
+        <item>使用[有道词典]</item>
+    </string-array>
+
+    <string-array name="import_rule">
+        <item>从剪切板导入</item>
+        <item>从文件导入</item>
     </string-array>
 </resources>

@@ -46,6 +46,7 @@ public class APPCONST {
     public static final String RESULT_LAST_READ_POSITION = "result_last_read_position";
     public static final String RESULT_HISTORY_CHAPTER = "result_history_chapter";
     public static final String RESULT_UP_MENU = "result_up_meu";
+    public static final String RESULT_REPLACE_RULE = "result_up_meu";
 
 
     public static final String[] READ_STYLE_NIGHT = {"#94928c", "#393431"};//黑夜
@@ -69,7 +70,7 @@ public class APPCONST {
     public static final int REQUEST_SELECT_BG = 1005;
     public static final int REQUEST_IMPORT_LAYOUT = 1006;
     public static final int REQUEST_QR_SCAN = 1007;
-
+    public static final int REQUEST_IMPORT_REPLACE_RULE = 1008;
 
     public static final int REQUEST_READ = 1;
 

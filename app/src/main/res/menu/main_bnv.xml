@@ -6,14 +6,14 @@
     <item
             android:id="@+id/menu_bookshelf"
             android:icon="@drawable/ic_bookshelf"
-            android:title="书架"/>
+            android:title="@string/bookcase"/>
     <item
             android:id="@+id/menu_find_book"
             android:icon="@drawable/ic_dicovery"
-            android:title="发现"/>
+            android:title="@string/find"/>
     <item
             android:id="@+id/menu_my_config"
             android:icon="@drawable/ic_mine"
-            android:title="我"/>
+            android:title="@string/mine"/>
 
 </menu>

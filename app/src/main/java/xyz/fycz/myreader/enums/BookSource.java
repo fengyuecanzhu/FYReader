@@ -9,7 +9,7 @@ import xyz.fycz.myreader.util.ToastUtils;
  */
 
 public enum BookSource {
-
+    local("本地书籍"),
     fynovel("风月小说"),
     tianlai(MyApplication.getApplication().getString(R.string.read_tianlai)),
     biquge44(MyApplication.getApplication().getString(R.string.read_biquge44)),
@@ -37,9 +37,9 @@ public enum BookSource {
     chaoxing(MyApplication.getApplication().getString(R.string.read_chaoxing)),
     zuopin(MyApplication.getApplication().getString(R.string.read_zuopin)),
     cangshu99(MyApplication.getApplication().getString(R.string.read_cangshu99)),
-    ben100(MyApplication.getApplication().getString(R.string.read_ben100)),
+    ben100(MyApplication.getApplication().getString(R.string.read_ben100));
     //liulangcat("流浪猫·实体"),
-    local("本地书籍");
+
     public String text;
 
     BookSource(String text) {

@@ -71,6 +71,12 @@ public class MoreSettingActivity extends BaseActivity {
     RelativeLayout mRlShowStatus;
     @BindView(R.id.sc_show_status)
     SwitchCompat mScShowStatus;
+    @BindView(R.id.rl_long_press)
+    RelativeLayout mRlLongPress;
+    @BindView(R.id.sc_long_press)
+    SwitchCompat mScLongPress;
+    @BindView(R.id.rl_content_replace)
+    RelativeLayout mRlContentReplace;
     @BindView(R.id.rl_read_aloud_volume_turn_page)
     RelativeLayout mRlReadAloudVolumeTurnPage;
     @BindView(R.id.sc_read_aloud_volume_turn_page)
@@ -136,6 +142,7 @@ public class MoreSettingActivity extends BaseActivity {
     private float matchChapterSuitability;
     private int catheCap;
     private boolean isShowStatusBar;
+    private boolean isLongPress;
     private boolean alwaysNext;
     private boolean noMenuTitle;
     private boolean readAloudVolumeTurnPage;
@@ -176,6 +183,7 @@ public class MoreSettingActivity extends BaseActivity {
         sortStyle = mSetting.getSortStyle();
         autoRefresh = mSetting.isRefreshWhenStart();
         isShowStatusBar = mSetting.isShowStatusBar();
+        isLongPress = mSetting.isCanSelectText();
         noMenuTitle = mSetting.isNoMenuChTitle();
         readAloudVolumeTurnPage = mSetting.isReadAloudVolumeTurnPage();
         threadNum = SharedPreUtils.getInstance().getInt(getString(R.string.threadNum), 8);
@@ -251,6 +259,7 @@ public class MoreSettingActivity extends BaseActivity {
         mScMatchChapter.setChecked(isMatchChapter);
         mScAutoRefresh.setChecked(autoRefresh);
         mScShowStatus.setChecked(isShowStatusBar);
+        mScLongPress.setChecked(isLongPress);
         mScNoMenuTitle.setChecked(noMenuTitle);
         mScReadAloudVolumeTurnPage.setChecked(readAloudVolumeTurnPage);
     }
@@ -309,6 +318,20 @@ public class MoreSettingActivity extends BaseActivity {
                     SysManager.saveSetting(mSetting);
                 }
         );
+        mRlLongPress.setOnClickListener(
+                (v) -> {
+                    needRefresh = false;
+                    if (isLongPress) {
+                        isLongPress = false;
+                    } else {
+                        isLongPress = true;
+                    }
+                    mScLongPress.setChecked(isLongPress);
+                    mSetting.setCanSelectText(isLongPress);
+                    SysManager.saveSetting(mSetting);
+                }
+        );
+        mRlContentReplace.setOnClickListener(v -> startActivity(new Intent(this, RuleActivity.class)));
         mRlReadAloudVolumeTurnPage.setOnClickListener(
                 (v) -> {
                     if (readAloudVolumeTurnPage) {

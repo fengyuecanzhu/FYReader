@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    android:id="@+id/rl_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -86,7 +88,23 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cursor_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@null"
+        app:tint="@color/colorAccent"
+        app:srcCompat="@drawable/ic_cursor_left"
+        android:visibility="invisible" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cursor_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@null"
+        app:tint="@color/colorAccent"
+        app:srcCompat="@drawable/ic_cursor_right"
+        android:visibility="invisible" />
     <!--底部页面-->
     <LinearLayout
         android:id="@+id/read_ll_bottom_menu"

@@ -146,5 +146,4 @@
             android:layout_alignParentBottom="true"
             android:background="@color/sys_window_back"/>
 
-
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.widget.page2
+package xyz.fycz.myreader.widget.page
 
 import android.graphics.Point
 
