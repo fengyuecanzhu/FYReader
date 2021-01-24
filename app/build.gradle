@@ -51,12 +51,12 @@ def getVersionName(){
 def versionN = getVersionName()
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 29
     buildToolsVersion '30.0.3'
     defaultConfig {
         applicationId "xyz.fycz.myreader"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 29
         versionCode version
         versionName versionN
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
