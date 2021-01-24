@@ -114,7 +114,8 @@ public class BookGroupDialog {
     public void showAddOrRenameGroupDia(boolean isRename, boolean isAddGroup, int groupNum, OnGroup onGroup){
         View view = LayoutInflater.from(mContext).inflate(R.layout.edit_dialog, null);
         TextInputLayout textInputLayout = view.findViewById(R.id.text_input_lay);
-        textInputLayout.setCounterMaxLength(10);
+        int maxLen = 20;
+        textInputLayout.setCounterMaxLength(maxLen);
         EditText editText = textInputLayout.getEditText();
         editText.setHint("请输入分组名");
         BookGroup bookGroup = !isRename ? new BookGroup() : mBookGroups.get(groupNum);
@@ -178,7 +179,7 @@ public class BookGroupDialog {
             @Override
             public void afterTextChanged(Editable s) {
                 String text = editText.getText().toString();
-                if (editText.getText().length() > 0 && editText.getText().length() <= 10 && !text.equals(oldName)) {
+                if (editText.getText().length() > 0 && editText.getText().length() <= maxLen && !text.equals(oldName)) {
                     posBtn.setEnabled(true);
                 } else {
                     posBtn.setEnabled(false);

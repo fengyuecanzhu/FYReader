@@ -233,9 +233,6 @@ public class CommonApi extends BaseApi {
         });
     }
 
-    public static void getNewestAppVersion(final ResultCallback callback) {
-        getCommonReturnStringApi(URLCONST.method_getCurAppVersion, null, callback);
-    }
 
     /**
      * 通过api获取蓝奏云可下载直链
