@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +33,7 @@ import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
+import xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout;
 
 /**
  * @author fengyue

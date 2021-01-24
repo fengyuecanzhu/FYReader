@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.mcxtzhang.swipemenulib.SwipeMenuLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="50dp"
     android:clickable="true"
     android:paddingBottom="1dp"
-    app:ios="false"
+    app:ios="true"
     app:leftSwipe="true"
     app:swipeEnable="true"
     android:focusable="true">
@@ -76,4 +76,4 @@
         android:text="@string/delete"
         android:textColor="@android:color/white"/>
 
-</com.mcxtzhang.swipemenulib.SwipeMenuLayout>
+</xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout>

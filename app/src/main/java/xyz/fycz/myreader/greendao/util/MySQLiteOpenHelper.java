@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.github.yuweiguocn.library.greendao.MigrationHelper;
+
+import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
 import xyz.fycz.myreader.greendao.gen.*;
 
 import org.greenrobot.greendao.database.Database;
@@ -34,7 +36,7 @@ public class MySQLiteOpenHelper extends DaoMaster.OpenHelper {
                         DaoMaster.dropAllTables(db, ifExists);
                     }
                 },
-                BookDao.class, ChapterDao.class, SearchHistoryDao.class, BookMarkDao.class, BookGroupDao.class
+                BookDao.class, ChapterDao.class, SearchHistoryDao.class, BookMarkDao.class, BookGroupDao.class, ReplaceRuleBeanDao.class
         );
     }
 
