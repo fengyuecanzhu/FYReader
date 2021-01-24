@@ -51,12 +51,12 @@ def getVersionName(){
 def versionN = getVersionName()
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.3'
+    compileSdkVersion 30
+    buildToolsVersion '30.0.3'
     defaultConfig {
         applicationId "xyz.fycz.myreader"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode version
         versionName versionN
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -200,8 +200,6 @@ dependencies {
     implementation "com.afollestad.material-dialogs:input:$dialog_version"
     implementation "com.afollestad.material-dialogs:files:$dialog_version"
     implementation "com.afollestad.material-dialogs:bottomsheets:$dialog_version"*/
-    //左滑菜单
-    implementation 'com.github.mcxtzhang:SwipeDelMenuLayout:V1.3.0'
 }
 
 greendao {
