@@ -1,42 +1,45 @@
 package xyz.fycz.myreader.ui.fragment;
 
 import android.annotation.SuppressLint;
-import android.content.*;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import butterknife.BindView;
-import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.application.SysManager;
-import xyz.fycz.myreader.model.backup.UserService;
-import xyz.fycz.myreader.base.BaseFragment;
-import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.model.storage.Backup;
-import xyz.fycz.myreader.model.storage.Restore;
-import xyz.fycz.myreader.ui.activity.FeedbackActivity;
-import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
-import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.greendao.service.BookService;
-import xyz.fycz.myreader.ui.activity.AboutActivity;
-import xyz.fycz.myreader.ui.activity.LoginActivity;
-import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
-import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.SysManager;
+import xyz.fycz.myreader.base.BaseFragment;
+import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.databinding.FragmentMineBinding;
+import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.model.backup.UserService;
+import xyz.fycz.myreader.model.storage.Backup;
+import xyz.fycz.myreader.model.storage.Restore;
+import xyz.fycz.myreader.ui.activity.AboutActivity;
+import xyz.fycz.myreader.ui.activity.FeedbackActivity;
+import xyz.fycz.myreader.ui.activity.LoginActivity;
+import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
+import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -45,24 +48,8 @@ import static android.app.Activity.RESULT_OK;
  * @date 2020/9/13 13:20
  */
 public class MineFragment extends BaseFragment {
-    @BindView(R.id.mine_rl_user)
-    RelativeLayout mRlUser;
-    @BindView(R.id.tv_user)
-    TextView mTvUser;
-    @BindView(R.id.mine_rl_backup)
-    RelativeLayout mRlBackup;
-    @BindView(R.id.mine_rl_syn)
-    RelativeLayout mRlSyn;
-    @BindView(R.id.mine_rl_setting)
-    RelativeLayout mRlSetting;
-    @BindView(R.id.mine_rl_theme_mode)
-    RelativeLayout mRlThemeMode;
-    @BindView(R.id.tv_theme_mode_select)
-    TextView tvThemeModeSelect;
-    @BindView(R.id.mine_rl_feedback)
-    RelativeLayout mRlFeedback;
-    @BindView(R.id.mine_rl_about)
-    RelativeLayout mRlAbout;
+
+    private FragmentMineBinding binding;
 
     private boolean isLogin;
     private Setting mSetting;
@@ -77,7 +64,7 @@ public class MineFragment extends BaseFragment {
         public void handleMessage(@NonNull Message msg) {
             switch (msg.what) {
                 case 1:
-                    mTvUser.setText("登录/注册");
+                    binding.tvUser.setText("登录/注册");
                     break;
                 case 2:
                     backup();
@@ -93,8 +80,9 @@ public class MineFragment extends BaseFragment {
     }
 
     @Override
-    protected int getContentId() {
-        return R.layout.fragment_mine;
+    protected View bindView(LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentMineBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -119,15 +107,15 @@ public class MineFragment extends BaseFragment {
     protected void initWidget(Bundle savedInstanceState) {
         super.initWidget(savedInstanceState);
         if (isLogin) {
-            mTvUser.setText(UserService.readUsername());
+            binding.tvUser.setText(UserService.readUsername());
         }
-        tvThemeModeSelect.setText(themeModeArr[themeMode]);
+        binding.tvThemeModeSelect.setText(themeModeArr[themeMode]);
     }
 
     @Override
     protected void initClick() {
         super.initClick();
-        mRlUser.setOnClickListener(v -> {
+        binding.mineRlUser.setOnClickListener(v -> {
             if (isLogin) {
                 DialogCreator.createCommonDialog(getActivity(), "退出登录", "确定要退出登录吗？"
                         , true, (dialog, which) -> {
@@ -147,7 +135,7 @@ public class MineFragment extends BaseFragment {
                 getActivity().startActivityForResult(intent, APPCONST.REQUEST_LOGIN);
             }
         });
-        mRlBackup.setOnClickListener(v -> {
+        binding.mineRlBackup.setOnClickListener(v -> {
             AlertDialog bookDialog = MyAlertDialog.build(getContext())
                     .setTitle(getContext().getResources().getString(R.string.menu_bookcase_backup))
                     .setItems(backupMenu, (dialog, which) -> {
@@ -165,7 +153,7 @@ public class MineFragment extends BaseFragment {
                     .create();
             bookDialog.show();
         });
-        mRlSyn.setOnClickListener(v -> {
+        binding.mineRlSyn.setOnClickListener(v -> {
             if (!UserService.isLogin()) {
                 ToastUtils.showWarring("请先登录！");
                 Intent loginIntent = new Intent(getActivity(), LoginActivity.class);
@@ -205,11 +193,11 @@ public class MineFragment extends BaseFragment {
                     .setPositiveButton(null, null)
                     .show();
         });
-        mRlSetting.setOnClickListener(v -> {
+        binding.mineRlSetting.setOnClickListener(v -> {
             Intent settingIntent = new Intent(getActivity(), MoreSettingActivity.class);
             startActivity(settingIntent);
         });
-        mRlThemeMode.setOnClickListener(v -> {
+        binding.mineRlThemeMode.setOnClickListener(v -> {
             if (themeModeDia != null) {
                 themeModeDia.show();
                 return;
@@ -239,7 +227,7 @@ public class MineFragment extends BaseFragment {
                                         break;
                                 }
                                 dialog.dismiss();
-                                tvThemeModeSelect.setText(themeModeArr[themeMode]);
+                                binding.tvThemeModeSelect.setText(themeModeArr[themeMode]);
                                 MyApplication.getApplication().initNightTheme();
                             })
                     .setNegativeButton("取消", null)
@@ -248,12 +236,12 @@ public class MineFragment extends BaseFragment {
 
         });
 
-        mRlAbout.setOnClickListener(v -> {
+        binding.mineRlAbout.setOnClickListener(v -> {
             Intent aboutIntent = new Intent(getActivity(), AboutActivity.class);
             startActivity(aboutIntent);
         });
 
-        mRlFeedback.setOnClickListener(v -> {
+        binding.mineRlFeedback.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), FeedbackActivity.class);
             getActivity().startActivity(intent);
         });
@@ -429,7 +417,7 @@ public class MineFragment extends BaseFragment {
                     assert data != null;
                     isLogin = data.getBooleanExtra("isLogin", false);
                     if (isLogin) {
-                        mTvUser.setText(UserService.readUsername());
+                        binding.tvUser.setText(UserService.readUsername());
                     }
                     break;
             }
@@ -437,6 +425,6 @@ public class MineFragment extends BaseFragment {
     }
 
     public boolean isRecreate() {
-        return unbinder == null;
+        return binding == null;
     }
 }

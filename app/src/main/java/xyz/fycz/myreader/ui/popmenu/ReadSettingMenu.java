@@ -6,74 +6,25 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.SysManager;
+import xyz.fycz.myreader.databinding.MenuReadSettingBinding;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.Language;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
-import xyz.fycz.myreader.util.BrightUtil;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.widget.custom.CircleImageView;
 import xyz.fycz.myreader.widget.page.PageMode;
 
 public class ReadSettingMenu extends FrameLayout {
-    @BindView(R.id.tv_reduce_text_size)
-    TextView tvReduceTextSize;
-    @BindView(R.id.tv_text_size)
-    TextView tvTextSize;
-    @BindView(R.id.tv_increase_text_size)
-    TextView tvIncreaseTextSize;
-    @BindView(R.id.tv_switch_st)
-    TextView tvSwitchST;
-    @BindView(R.id.tv_text_font)
-    TextView tvTextFont;
-    @BindView(R.id.iv_line_spacing4)
-    View ivLineSpacing4;
-    @BindView(R.id.iv_line_spacing3)
-    View ivLineSpacing3;
-    @BindView(R.id.iv_line_spacing2)
-    View ivLineSpacing2;
-    @BindView(R.id.tv_line_spacing1)
-    View tvLineSpacing1;
-    @BindView(R.id.tv_line_spacing0)
-    View tvLineSpacing0;
-    @BindView(R.id.tv_intent)
-    TextView tvIntent;
-    @BindView(R.id.iv_common_style)
-    CircleImageView ivCommonStyle;
-    @BindView(R.id.iv_leather_style)
-    CircleImageView ivLeatherStyle;
-    @BindView(R.id.iv_protect_eye_style)
-    CircleImageView ivProtectEyeStyle;
-    @BindView(R.id.iv_breen_style)
-    CircleImageView ivBreenStyle;
-    @BindView(R.id.iv_blue_deep_style)
-    CircleImageView ivBlueStyle;
-    @BindView(R.id.iv_custom_style)
-    ImageView ivCustomStyle;
-    @BindView(R.id.read_tv_auto_page)
-    TextView tvAutoPage;
-    @BindView(R.id.read_tv_page_mode)
-    TextView tvPageMode;
-    @BindView(R.id.read_tv_hv_screen)
-    TextView tvHVScreen;
-    @BindView(R.id.read_tv_more_setting)
-    TextView tvMoreSetting;
-    @BindView(R.id.vwNavigationBar)
-    View vwNavigationBar;
+
+    private MenuReadSettingBinding binding;
 
     private View vLastLineSpacing = null;
 
@@ -100,8 +51,7 @@ public class ReadSettingMenu extends FrameLayout {
     }
 
     private void init(Context context) {
-        View view = LayoutInflater.from(context).inflate(R.layout.menu_read_setting, this);
-        ButterKnife.bind(this, view);
+        binding = MenuReadSettingBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
     public void setListener(Activity activity, Callback callback) {
@@ -112,11 +62,11 @@ public class ReadSettingMenu extends FrameLayout {
     }
 
     public void setNavigationBarHeight(int height) {
-        vwNavigationBar.getLayoutParams().height = height;
+        binding.vwNavigationBar.getLayoutParams().height = height;
     }
 
     private void initWidget() {
-        tvTextSize.setText(String.valueOf(setting.getReadWordSize()));
+        binding.tvTextSize.setText(String.valueOf(setting.getReadWordSize()));
         initSwitchST(false);
         initComposition();
         initStyleImage();
@@ -126,9 +76,9 @@ public class ReadSettingMenu extends FrameLayout {
 
     private void initListener() {
         //减小字体
-        tvReduceTextSize.setOnClickListener(v -> {
+        binding.tvReduceTextSize.setOnClickListener(v -> {
             if (setting.getReadWordSize() > 10) {
-                tvTextSize.setText(String.valueOf(setting.getReadWordSize() - 1));
+                binding.tvTextSize.setText(String.valueOf(setting.getReadWordSize() - 1));
                 setting.setReadWordSize(setting.getReadWordSize() - 1);
                 SysManager.saveSetting(setting);
                 if (callback != null) {
@@ -137,9 +87,9 @@ public class ReadSettingMenu extends FrameLayout {
             }
         });
         //增大字体
-        tvIncreaseTextSize.setOnClickListener(v -> {
+        binding.tvIncreaseTextSize.setOnClickListener(v -> {
             if (setting.getReadWordSize() < 60) {
-                tvTextSize.setText(String.valueOf(setting.getReadWordSize() + 1));
+                binding.tvTextSize.setText(String.valueOf(setting.getReadWordSize() + 1));
                 setting.setReadWordSize(setting.getReadWordSize() + 1);
                 SysManager.saveSetting(setting);
                 if (callback != null) {
@@ -148,24 +98,24 @@ public class ReadSettingMenu extends FrameLayout {
             }
         });
         //繁简切换
-        tvSwitchST.setOnClickListener(v -> {
+        binding.tvSwitchSt.setOnClickListener(v -> {
             initSwitchST(true);
             callback.onRefreshUI();
         });
         //字体选择
-        tvTextFont.setOnClickListener(v -> callback.onFontClick());
+        binding.tvTextFont.setOnClickListener(v -> callback.onFontClick());
         //行距单倍
-        ivLineSpacing4.setOnClickListener(v -> setLineSpacing(0.6f, 0.4f, 4));
+        binding.ivLineSpacing4.setOnClickListener(v -> setLineSpacing(0.6f, 0.4f, 4));
         //行距双倍
-        ivLineSpacing3.setOnClickListener(v -> setLineSpacing(1.2f, 1.1f, 3));
+        binding.ivLineSpacing3.setOnClickListener(v -> setLineSpacing(1.2f, 1.1f, 3));
         //行距三倍
-        ivLineSpacing2.setOnClickListener(v -> setLineSpacing(1.8f, 1.8f, 2));
+        binding.ivLineSpacing2.setOnClickListener(v -> setLineSpacing(1.8f, 1.8f, 2));
         //行距默认
-        tvLineSpacing1.setOnClickListener(v -> setLineSpacing(1.0f, 0.9f, 1));
+        binding.tvLineSpacing1.setOnClickListener(v -> setLineSpacing(1.0f, 0.9f, 1));
         //自定义行距
-        tvLineSpacing0.setOnClickListener(v -> ((ReadActivity) context).showCustomizeMenu());
+        binding.tvLineSpacing0.setOnClickListener(v -> ((ReadActivity) context).showCustomizeMenu());
         //缩进
-        tvIntent.setOnClickListener(v -> {
+        binding.tvIntent.setOnClickListener(v -> {
             AlertDialog dialog = new AlertDialog.Builder(context, R.style.alertDialogTheme)
                     .setTitle("缩进")
                     .setSingleChoiceItems(context.getResources().getStringArray(R.array.indent),
@@ -180,12 +130,12 @@ public class ReadSettingMenu extends FrameLayout {
             dialog.show();
         });
         //样式选择
-        ivCommonStyle.setOnClickListener(v -> selectedStyle(0));
-        ivLeatherStyle.setOnClickListener(v -> selectedStyle(1));
-        ivProtectEyeStyle.setOnClickListener(v -> selectedStyle(2));
-        ivBreenStyle.setOnClickListener(v -> selectedStyle(3));
-        ivBlueStyle.setOnClickListener(v -> selectedStyle(4));
-        ivCustomStyle.setOnClickListener(v -> {
+        binding.ivCommonStyle.setOnClickListener(v -> selectedStyle(0));
+        binding.ivLeatherStyle.setOnClickListener(v -> selectedStyle(1));
+        binding.ivProtectEyeStyle.setOnClickListener(v -> selectedStyle(2));
+        binding.ivBreenStyle.setOnClickListener(v -> selectedStyle(3));
+        binding.ivBlueDeepStyle.setOnClickListener(v -> selectedStyle(4));
+        binding.ivCustomStyle.setOnClickListener(v -> {
             setting.saveLayout(5);
             if (setting.isDayStyle()) {
                 selectedStyle(5);
@@ -193,9 +143,9 @@ public class ReadSettingMenu extends FrameLayout {
             ((ReadActivity) context).showCustomizeLayoutMenu();
         });
         //自动翻页
-        tvAutoPage.setOnClickListener(v -> callback.onAutoPageClick());
+        binding.readTvAutoPage.setOnClickListener(v -> callback.onAutoPageClick());
         //翻页模式
-        tvPageMode.setOnClickListener(v -> {
+        binding.readTvPageMode.setOnClickListener(v -> {
             //显示翻页模式视图
             int checkedItem;
             switch (setting.getPageMode()) {
@@ -249,21 +199,21 @@ public class ReadSettingMenu extends FrameLayout {
                     }).show();
         });
         //横屏竖屏切换
-        tvHVScreen.setOnClickListener(v -> {
+        binding.readTvHvScreen.setOnClickListener(v -> {
             setting.setHorizontalScreen(!setting.isHorizontalScreen());
             initHVScreen();
             SysManager.saveSetting(setting);
             callback.onHVChange();
         });
         //更多设置
-        tvMoreSetting.setOnClickListener(v -> callback.onMoreSettingClick());
+        binding.readTvMoreSetting.setOnClickListener(v -> callback.onMoreSettingClick());
     }
 
     private void initSwitchST(boolean isChange) {
         switch (setting.getLanguage()){
             case normal:
-                tvSwitchST.setSelected(false);
-                tvSwitchST.setText("繁");
+                binding.tvSwitchSt.setSelected(false);
+                binding.tvSwitchSt.setText("繁");
                 if (isChange){
                     setting.setLanguage(Language.traditional);
                     ToastUtils.showInfo("已设置文本为简转繁");
@@ -271,8 +221,8 @@ public class ReadSettingMenu extends FrameLayout {
                 }
                 break;
             case traditional:
-                tvSwitchST.setSelected(true);
-                tvSwitchST.setText("繁");
+                binding.tvSwitchSt.setSelected(true);
+                binding.tvSwitchSt.setText("繁");
                 if (isChange){
                     setting.setLanguage(Language.simplified);
                     DialogCreator.createTipDialog(context, context.getString(R.string.traditional_to_simplified_tip));
@@ -280,8 +230,8 @@ public class ReadSettingMenu extends FrameLayout {
                 }
                 break;
             case simplified:
-                tvSwitchST.setSelected(true);
-                tvSwitchST.setText("简");
+                binding.tvSwitchSt.setSelected(true);
+                binding.tvSwitchSt.setText("简");
                 if (isChange){
                     setting.setLanguage(Language.normal);
                     ToastUtils.showInfo("已取消简转繁/繁转简，当前为原始文本");
@@ -295,41 +245,41 @@ public class ReadSettingMenu extends FrameLayout {
     }
 
     public void initStyleImage() {
-        ivCommonStyle.setImageDrawable(setting.getBgDrawable(0, context, 50, 50));
-        ivLeatherStyle.setImageDrawable(setting.getBgDrawable(1, context, 50, 50));
-        ivProtectEyeStyle.setImageDrawable(setting.getBgDrawable(2, context, 50, 50));
-        ivBreenStyle.setImageDrawable(setting.getBgDrawable(3, context, 50, 50));
-        ivBlueStyle.setImageDrawable(setting.getBgDrawable(4, context, 50, 50));
+        binding.ivCommonStyle.setImageDrawable(setting.getBgDrawable(0, context, 50, 50));
+        binding.ivLeatherStyle.setImageDrawable(setting.getBgDrawable(1, context, 50, 50));
+        binding.ivProtectEyeStyle.setImageDrawable(setting.getBgDrawable(2, context, 50, 50));
+        binding.ivBreenStyle.setImageDrawable(setting.getBgDrawable(3, context, 50, 50));
+        binding.ivBlueDeepStyle.setImageDrawable(setting.getBgDrawable(4, context, 50, 50));
     }
 
     public void initStyle() {
         if (!setting.isDayStyle()){
             return;
         }
-        ivCommonStyle.setBorderColor(context.getResources().getColor(R.color.read_menu_text));
-        ivLeatherStyle.setBorderColor(context.getResources().getColor(R.color.read_menu_text));
-        ivProtectEyeStyle.setBorderColor(context.getResources().getColor(R.color.read_menu_text));
-        ivBreenStyle.setBorderColor(context.getResources().getColor(R.color.read_menu_text));
-        ivBlueStyle.setBorderColor(context.getResources().getColor(R.color.read_menu_text));
-        ivCustomStyle.setSelected(false);
+        binding.ivCommonStyle.setBorderColor(context.getResources().getColor(R.color.read_menu_text));
+        binding.ivLeatherStyle.setBorderColor(context.getResources().getColor(R.color.read_menu_text));
+        binding.ivProtectEyeStyle.setBorderColor(context.getResources().getColor(R.color.read_menu_text));
+        binding.ivBreenStyle.setBorderColor(context.getResources().getColor(R.color.read_menu_text));
+        binding.ivBlueDeepStyle.setBorderColor(context.getResources().getColor(R.color.read_menu_text));
+        binding.ivCustomStyle.setSelected(false);
         switch (setting.getCurReadStyleIndex()) {
             case 0:
-                ivCommonStyle.setBorderColor(context.getResources().getColor(R.color.sys_dialog_setting_word_red));
+                binding.ivCommonStyle.setBorderColor(context.getResources().getColor(R.color.sys_dialog_setting_word_red));
                 break;
             case 1:
-                ivLeatherStyle.setBorderColor(context.getResources().getColor(R.color.sys_dialog_setting_word_red));
+                binding.ivLeatherStyle.setBorderColor(context.getResources().getColor(R.color.sys_dialog_setting_word_red));
                 break;
             case 2:
-                ivProtectEyeStyle.setBorderColor(context.getResources().getColor(R.color.sys_dialog_setting_word_red));
+                binding.ivProtectEyeStyle.setBorderColor(context.getResources().getColor(R.color.sys_dialog_setting_word_red));
                 break;
             case 3:
-                ivBreenStyle.setBorderColor(context.getResources().getColor(R.color.sys_dialog_setting_word_red));
+                binding.ivBreenStyle.setBorderColor(context.getResources().getColor(R.color.sys_dialog_setting_word_red));
                 break;
             case 4:
-                ivBlueStyle.setBorderColor(context.getResources().getColor(R.color.sys_dialog_setting_word_red));
+                binding.ivBlueDeepStyle.setBorderColor(context.getResources().getColor(R.color.sys_dialog_setting_word_red));
                 break;
             case 5:
-                ivCustomStyle.setSelected(true);
+                binding.ivCustomStyle.setSelected(true);
                 break;
         }
     }
@@ -340,28 +290,28 @@ public class ReadSettingMenu extends FrameLayout {
         }
         switch (setting.getComposition()){
             case 0:
-                tvLineSpacing0.setSelected(true);
-                vLastLineSpacing = tvLineSpacing0;
+                binding.tvLineSpacing0.setSelected(true);
+                vLastLineSpacing = binding.tvLineSpacing0;
                 break;
             case 1:
-                tvLineSpacing1.setSelected(true);
-                vLastLineSpacing = tvLineSpacing1;
+                binding.tvLineSpacing1.setSelected(true);
+                vLastLineSpacing = binding.tvLineSpacing1;
                 break;
             case 2:
-                ivLineSpacing2.setSelected(true);
-                vLastLineSpacing = ivLineSpacing2;
+                binding.ivLineSpacing2.setSelected(true);
+                vLastLineSpacing = binding.ivLineSpacing2;
                 break;
             case 3:
-                ivLineSpacing3.setSelected(true);
-                vLastLineSpacing = ivLineSpacing3;
+                binding.ivLineSpacing3.setSelected(true);
+                vLastLineSpacing = binding.ivLineSpacing3;
                 break;
             case 4:
-                ivLineSpacing4.setSelected(true);
-                vLastLineSpacing = ivLineSpacing4;
+                binding.ivLineSpacing4.setSelected(true);
+                vLastLineSpacing = binding.ivLineSpacing4;
                 break;
             default:
-                tvLineSpacing1.setSelected(true);
-                vLastLineSpacing = tvLineSpacing1;
+                binding.tvLineSpacing1.setSelected(true);
+                vLastLineSpacing = binding.tvLineSpacing1;
                 break;
         }
     }
@@ -369,9 +319,9 @@ public class ReadSettingMenu extends FrameLayout {
 
     private void initHVScreen(){
         if (setting.isHorizontalScreen()){
-            tvHVScreen.setText("竖屏阅读");
+            binding.readTvHvScreen.setText("竖屏阅读");
         }else {
-            tvHVScreen.setText("横屏阅读");
+            binding.readTvHvScreen.setText("横屏阅读");
         }
     }
 

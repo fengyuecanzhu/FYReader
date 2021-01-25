@@ -6,53 +6,43 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.ActionMenuView;
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import butterknife.BindView;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.databinding.ActivityMainBinding;
 import xyz.fycz.myreader.entity.SharedBook;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.ui.dialog.FingerprintDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
 import xyz.fycz.myreader.ui.fragment.FindFragment;
 import xyz.fycz.myreader.ui.fragment.MineFragment;
-import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.FingerprintUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT;
 
@@ -62,10 +52,8 @@ import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CU
  */
 public class MainActivity extends BaseActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
-    @BindView(R.id.bottom_navigation_view)
-    BottomNavigationView bottomNavigation;
-    @BindView(R.id.view_pager_main)
-    ViewPager viewPagerMain;
+
+    private ActivityMainBinding binding;
 
     private List<Fragment> mFragments = new ArrayList<>();
     private String[] titles;
@@ -77,8 +65,9 @@ public class MainActivity extends BaseActivity {
     private MineFragment mMineFragment;
 
     @Override
-    protected int getContentId() {
-        return R.layout.activity_main;
+    protected void bindView() {
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
 
     @Override
@@ -120,8 +109,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initWidget() {
         super.initWidget();
-        viewPagerMain.setOffscreenPageLimit(2);
-        viewPagerMain.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager(), BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        binding.viewPagerMain.setOffscreenPageLimit(2);
+        binding.viewPagerMain.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager(), BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @Override
             public int getCount() {
                 return mFragments.size();
@@ -141,7 +130,7 @@ public class MainActivity extends BaseActivity {
         super.initClick();
 
         mToolbar.setOnLongClickListener(v -> {
-            if (viewPagerMain.getCurrentItem() == 0 && !BookGroupService.getInstance().curGroupIsPrivate()){
+            if (binding.viewPagerMain.getCurrentItem() == 0 && !BookGroupService.getInstance().curGroupIsPrivate()){
                 goPrivateBookcase();
                 return true;
             }
@@ -149,25 +138,25 @@ public class MainActivity extends BaseActivity {
         });
 
         //BottomNavigationView 点击事件监听
-        bottomNavigation.setOnNavigationItemSelectedListener(menuItem -> {
+        binding.bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
             int menuId = menuItem.getItemId();
             // 跳转指定页面：Fragment
             switch (menuId) {
                 case R.id.menu_bookshelf:
-                    viewPagerMain.setCurrentItem(0);
+                    binding.viewPagerMain.setCurrentItem(0);
                     break;
                 case R.id.menu_find_book:
-                    viewPagerMain.setCurrentItem(1);
+                    binding.viewPagerMain.setCurrentItem(1);
                     break;
                 case R.id.menu_my_config:
-                    viewPagerMain.setCurrentItem(2);
+                    binding.viewPagerMain.setCurrentItem(2);
                     break;
             }
             return false;
         });
 
         // ViewPager 滑动事件监听
-        viewPagerMain.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        binding.viewPagerMain.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
 
@@ -176,7 +165,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onPageSelected(int i) {
                 //将滑动到的页面对应的 menu 设置为选中状态
-                bottomNavigation.getMenu().getItem(i).setChecked(true);
+                binding.bottomNavigationView.getMenu().getItem(i).setChecked(true);
                 getSupportActionBar().setTitle(titles[i]);
                 if (i == 0) {
                     getSupportActionBar().setSubtitle(groupName);
@@ -230,7 +219,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public ViewPager getViewPagerMain() {
-        return viewPagerMain;
+        return binding.viewPagerMain;
     }
 
     /********************************Event***************************************/
@@ -248,7 +237,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (viewPagerMain.getCurrentItem() == 0) {
+        if (binding.viewPagerMain.getCurrentItem() == 0) {
 
             if (mBookcaseFragment.getmBookcasePresenter() != null && mBookcaseFragment.getmBookcasePresenter().ismEditState()) {
                 menu.findItem(R.id.action_finish).setVisible(true);
@@ -275,31 +264,27 @@ public class MainActivity extends BaseActivity {
         if (mBookcaseFragment.isRecreate()) {
             reLoadFragment();
         }
-        switch (item.getItemId()) {
-            case R.id.action_search:
-                Intent searchBookIntent = new Intent(this, SearchBookActivity.class);
-                startActivity(searchBookIntent);
-                return true;
-            case R.id.action_finish:
-                mBookcaseFragment.getmBookcasePresenter().cancelEdit();
-                invalidateOptionsMenu();
-                return true;
-            case R.id.action_change_group:
-            case R.id.action_group_man:
-                if (!mBookcaseFragment.getmBookcasePresenter().hasOnGroupChangeListener()) {
-                    mBookcaseFragment.getmBookcasePresenter().addOnGroupChangeListener(() -> {
-                        groupName = SharedPreUtils.getInstance().getString(getString(R.string.curBookGroupName), "所有书籍");
-                        getSupportActionBar().setSubtitle(groupName);
-                    });
-                }
-                break;
-            case R.id.action_edit:
-                invalidateOptionsMenu();
-                break;
-            case R.id.action_qr_scan:
-                Intent intent = new Intent(this, QRCodeScanActivity.class);
-                startActivityForResult(intent, APPCONST.REQUEST_QR_SCAN);
-                break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_search) {
+            Intent searchBookIntent = new Intent(this, SearchBookActivity.class);
+            startActivity(searchBookIntent);
+            return true;
+        } else if (itemId == R.id.action_finish) {
+            mBookcaseFragment.getmBookcasePresenter().cancelEdit();
+            invalidateOptionsMenu();
+            return true;
+        } else if (itemId == R.id.action_change_group || itemId == R.id.action_group_man) {
+            if (!mBookcaseFragment.getmBookcasePresenter().hasOnGroupChangeListener()) {
+                mBookcaseFragment.getmBookcasePresenter().addOnGroupChangeListener(() -> {
+                    groupName = SharedPreUtils.getInstance().getString(getString(R.string.curBookGroupName), "所有书籍");
+                    getSupportActionBar().setSubtitle(groupName);
+                });
+            }
+        } else if (itemId == R.id.action_edit) {
+            invalidateOptionsMenu();
+        } else if (itemId == R.id.action_qr_scan) {
+            Intent intent = new Intent(this, QRCodeScanActivity.class);
+            startActivityForResult(intent, APPCONST.REQUEST_QR_SCAN);
         }
         return mBookcaseFragment.getmBookcasePresenter().onOptionsItemSelected(item);
     }
@@ -329,7 +314,7 @@ public class MainActivity extends BaseActivity {
         }else {
             groupName = bookGroup.getName();
         }
-        if (viewPagerMain.getCurrentItem() == 0){
+        if (binding.viewPagerMain.getCurrentItem() == 0){
             getSupportActionBar().setSubtitle(groupName);
         }
 //        MyApplication.checkVersionByServer(this);

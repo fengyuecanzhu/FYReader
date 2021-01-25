@@ -1,28 +1,26 @@
 package xyz.fycz.myreader.ui.activity;
 
 
-import android.widget.Button;
-import android.widget.CheckBox;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
-import butterknife.BindView;
-import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.base.BaseTabActivity;
-import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.enums.BookSource;
-import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.greendao.service.BookService;
-import xyz.fycz.myreader.ui.fragment.BaseFileFragment;
-import xyz.fycz.myreader.ui.fragment.FileCategoryFragment;
-import xyz.fycz.myreader.ui.fragment.LocalBookFragment;
-import xyz.fycz.myreader.util.ToastUtils;
-
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.base.BaseTabActivity;
+import xyz.fycz.myreader.databinding.ActivityFileSystemBinding;
+import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.fragment.BaseFileFragment;
+import xyz.fycz.myreader.ui.fragment.FileCategoryFragment;
+import xyz.fycz.myreader.ui.fragment.LocalBookFragment;
+import xyz.fycz.myreader.util.ToastUtils;
 
 
 /**
@@ -33,12 +31,7 @@ import java.util.List;
 public class FileSystemActivity extends BaseTabActivity {
     private static final String TAG = "FileSystemActivity";
 
-    @BindView(R.id.file_system_cb_selected_all)
-    CheckBox mCbSelectAll;
-    @BindView(R.id.file_system_btn_delete)
-    Button mBtnDelete;
-    @BindView(R.id.file_system_btn_add_book)
-    Button mBtnAddBook;
+    private ActivityFileSystemBinding binding;
 
     private LocalBookFragment mLocalFragment;
     private FileCategoryFragment mCategoryFragment;
@@ -62,6 +55,13 @@ public class FileSystemActivity extends BaseTabActivity {
     };
 
     @Override
+    protected void bindView() {
+        binding = ActivityFileSystemBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        super.bindView();
+    }
+
+    @Override
     protected List<Fragment> createTabFragments() {
         mLocalFragment = new LocalBookFragment();
         mCategoryFragment = new FileCategoryFragment();
@@ -74,11 +74,6 @@ public class FileSystemActivity extends BaseTabActivity {
     }
 
     @Override
-    protected int getContentId() {
-        return R.layout.activity_file_system;
-    }
-
-    @Override
     protected void setUpToolbar(Toolbar toolbar) {
         super.setUpToolbar(toolbar);
         setStatusBarColor(R.color.colorPrimary, true);
@@ -88,10 +83,10 @@ public class FileSystemActivity extends BaseTabActivity {
     @Override
     protected void initClick() {
         super.initClick();
-        mCbSelectAll.setOnClickListener(
+        binding.fileSystemCbSelectedAll.setOnClickListener(
                 (view) -> {
                     //设置全选状态
-                    boolean isChecked = mCbSelectAll.isChecked();
+                    boolean isChecked = binding.fileSystemCbSelectedAll.isChecked();
                     mCurFragment.setCheckedAll(isChecked);
                     //改变菜单状态
                     changeMenuStatus();
@@ -124,7 +119,7 @@ public class FileSystemActivity extends BaseTabActivity {
             }
         });
 
-        mBtnAddBook.setOnClickListener(
+        binding.fileSystemBtnAddBook.setOnClickListener(
                 (v) -> {
                     //获取选中的文件
                     List<File> files = mCurFragment.getCheckedFiles();
@@ -144,7 +139,7 @@ public class FileSystemActivity extends BaseTabActivity {
                 }
         );
 
-        mBtnDelete.setOnClickListener(
+        binding.fileSystemBtnDelete.setOnClickListener(
                 (v) -> {
                     //弹出，确定删除文件吗。
                     DialogCreator.createCommonDialog(this, "删除文件", "确定删除文件吗?",
@@ -213,18 +208,18 @@ public class FileSystemActivity extends BaseTabActivity {
 
         //点击、删除状态的设置
         if (mCurFragment.getCheckedCount() == 0){
-            mBtnAddBook.setText(getString(R.string.file_add_shelf));
+            binding.fileSystemBtnAddBook.setText(getString(R.string.file_add_shelf));
             //设置某些按钮的是否可点击
             setMenuClickable(false);
 
-            if (mCbSelectAll.isChecked()){
+            if (binding.fileSystemCbSelectedAll.isChecked()){
                 mCurFragment.setChecked(false);
-                mCbSelectAll.setChecked(mCurFragment.isCheckedAll());
+                binding.fileSystemCbSelectedAll.setChecked(mCurFragment.isCheckedAll());
             }
 
         }
         else {
-            mBtnAddBook.setText(getString(R.string.file_add_shelves, mCurFragment.getCheckedCount()));
+            binding.fileSystemBtnAddBook.setText(getString(R.string.file_add_shelves, mCurFragment.getCheckedCount()));
             setMenuClickable(true);
 
             //全选状态的设置
@@ -233,21 +228,21 @@ public class FileSystemActivity extends BaseTabActivity {
             if (mCurFragment.getCheckedCount() == mCurFragment.getCheckableCount()){
                 //设置为全选
                 mCurFragment.setChecked(true);
-                mCbSelectAll.setChecked(mCurFragment.isCheckedAll());
+                binding.fileSystemCbSelectedAll.setChecked(mCurFragment.isCheckedAll());
             }
             //如果曾今是全选则替换
             else if (mCurFragment.isCheckedAll()){
                 mCurFragment.setChecked(false);
-                mCbSelectAll.setChecked(mCurFragment.isCheckedAll());
+                binding.fileSystemCbSelectedAll.setChecked(mCurFragment.isCheckedAll());
             }
         }
 
         //重置全选的文字
         if (mCurFragment.isCheckedAll()){
-            mCbSelectAll.setText("取消");
+            binding.fileSystemCbSelectedAll.setText("取消");
         }
         else {
-            mCbSelectAll.setText("全选");
+            binding.fileSystemCbSelectedAll.setText("全选");
         }
 
     }
@@ -255,12 +250,12 @@ public class FileSystemActivity extends BaseTabActivity {
     private void setMenuClickable(boolean isClickable){
 
         //设置是否可删除
-        mBtnDelete.setEnabled(isClickable);
-        mBtnDelete.setClickable(isClickable);
+        binding.fileSystemBtnDelete.setEnabled(isClickable);
+        binding.fileSystemBtnDelete.setClickable(isClickable);
 
         //设置是否可添加书籍
-        mBtnAddBook.setEnabled(isClickable);
-        mBtnAddBook.setClickable(isClickable);
+        binding.fileSystemBtnAddBook.setEnabled(isClickable);
+        binding.fileSystemBtnAddBook.setClickable(isClickable);
     }
 
     /**
@@ -272,12 +267,12 @@ public class FileSystemActivity extends BaseTabActivity {
 
         //设置是否能够全选
         if (count > 0){
-            mCbSelectAll.setClickable(true);
-            mCbSelectAll.setEnabled(true);
+            binding.fileSystemCbSelectedAll.setClickable(true);
+            binding.fileSystemCbSelectedAll.setEnabled(true);
         }
         else {
-            mCbSelectAll.setClickable(false);
-            mCbSelectAll.setEnabled(false);
+            binding.fileSystemCbSelectedAll.setClickable(false);
+            binding.fileSystemCbSelectedAll.setEnabled(false);
         }
     }
 }

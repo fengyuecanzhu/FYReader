@@ -11,12 +11,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.R;
@@ -24,6 +22,7 @@ import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.databinding.ActivityRuleBinding;
 import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
 import xyz.fycz.myreader.model.ReplaceRuleManager;
 import xyz.fycz.myreader.ui.adapter.ReplaceRuleAdapter;
@@ -45,15 +44,16 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
  * @date 2021/1/19 10:02
  */
 public class RuleActivity extends BaseActivity {
-    @BindView(R.id.rv_rule_list)
-    RecyclerView rvRuleList;
+
+    private ActivityRuleBinding binding;
 
     private List<ReplaceRuleBean> mReplaceRules;
     private ReplaceRuleAdapter mAdapter;
 
     @Override
-    protected int getContentId() {
-        return R.layout.activity_rule;
+    protected void bindView() {
+        binding = ActivityRuleBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
 
     @Override
@@ -95,10 +95,10 @@ public class RuleActivity extends BaseActivity {
                 mAdapter.notifyItemRangeChanged(which, mReplaceRules.size() - which);
             setUpBarTitle();
         });
-        rvRuleList.setLayoutManager(new LinearLayoutManager(this));
-        rvRuleList.setAdapter(mAdapter);
+        binding.rvRuleList.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvRuleList.setAdapter(mAdapter);
         //设置分割线
-        rvRuleList.addItemDecoration(new DividerItemDecoration(this));
+        binding.rvRuleList.addItemDecoration(new DividerItemDecoration(this));
         mAdapter.refreshItems(mReplaceRules);
     }
 
@@ -106,7 +106,7 @@ public class RuleActivity extends BaseActivity {
     @Override
     protected void initClick() {
         super.initClick();
-        rvRuleList.setOnTouchListener((v, event) -> {
+        binding.rvRuleList.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 SwipeMenuLayout viewCache = SwipeMenuLayout.getViewCache();
                 if (null != viewCache) {

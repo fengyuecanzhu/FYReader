@@ -8,23 +8,19 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import butterknife.BindView;
-
-import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseActivity;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
+import xyz.fycz.myreader.databinding.ActiityBookstoreBinding;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.entity.bookstore.QDBook;
 import xyz.fycz.myreader.entity.bookstore.RankBook;
@@ -33,33 +29,21 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.ui.adapter.BookStoreBookAdapter;
 import xyz.fycz.myreader.ui.adapter.BookStoreBookTypeAdapter;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.BookStoreApi;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
-import xyz.fycz.myreader.widget.RefreshLayout;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author fengyue
  * @date 2020/9/13 21:11
  */
 public class BookstoreActivity extends BaseActivity {
-    @BindView(R.id.refresh_layout)
-    RefreshLayout mRlRefresh;
-    @BindView(R.id.rv_type_list)
-    RecyclerView rvTypeList;
-    @BindView(R.id.rv_book_list)
-    RecyclerView rvBookList;
-    @BindView(R.id.srl_book_list)
-    SmartRefreshLayout srlBookList;
-    @BindView(R.id.pb_loading)
-    ProgressBar pbLoading;
+    private ActiityBookstoreBinding binding;
 
     private FindCrawler findCrawler;
     private LinearLayoutManager mLinearLayoutManager;
@@ -83,25 +67,25 @@ public class BookstoreActivity extends BaseActivity {
             switch (msg.what) {
                 case 1:
                     initTypeList();
-                    mRlRefresh.showFinish();
+                    binding.refreshLayout.showFinish();
                     break;
                 case 2:
                     List<Book> bookList = (List<Book>) msg.obj;
                     initBookList(bookList);
-                    srlBookList.setEnableRefresh(true);
-                    srlBookList.setEnableLoadMore(true);
-                    pbLoading.setVisibility(View.GONE);
+                    binding.srlBookList.setEnableRefresh(true);
+                    binding.srlBookList.setEnableLoadMore(true);
+                    binding.pbLoading.setVisibility(View.GONE);
                     break;
                 case 3:
-                    pbLoading.setVisibility(View.VISIBLE);
+                    binding.pbLoading.setVisibility(View.VISIBLE);
                     break;
                 case 4:
-                    pbLoading.setVisibility(View.GONE);
-                    srlBookList.finishRefresh(false);
-                    srlBookList.finishLoadMore(false);
+                    binding.pbLoading.setVisibility(View.GONE);
+                    binding.srlBookList.finishRefresh(false);
+                    binding.srlBookList.finishLoadMore(false);
                     break;
                 case 5:
-                    mRlRefresh.showError();
+                    binding.refreshLayout.showError();
                     break;
                 case 6:
                     DialogCreator.createTipDialog(BookstoreActivity.this,
@@ -112,8 +96,9 @@ public class BookstoreActivity extends BaseActivity {
     };
 
     @Override
-    protected int getContentId() {
-        return R.layout.actiity_bookstore;
+    protected void bindView() {
+        binding = ActiityBookstoreBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
 
     @Override
@@ -139,24 +124,24 @@ public class BookstoreActivity extends BaseActivity {
     @Override
     protected void initWidget() {
         super.initWidget();
-        srlBookList.setEnableRefresh(false);
-        srlBookList.setEnableLoadMore(false);
+        binding.srlBookList.setEnableRefresh(false);
+        binding.srlBookList.setEnableLoadMore(false);
         //小说列表下拉加载更多事件
-        srlBookList.setOnLoadMoreListener(refreshLayout -> {
+        binding.srlBookList.setOnLoadMoreListener(refreshLayout -> {
             page++;
             getBooksData();
         });
 
         //小说列表上拉刷新事件
-        srlBookList.setOnRefreshListener(refreshLayout -> {
+        binding.srlBookList.setOnRefreshListener(refreshLayout -> {
             page = 1;
             getBooksData();
         });
 
         mBookStoreBookAdapter = new BookStoreBookAdapter(findCrawler.hasImg(), this);
-        rvBookList.setLayoutManager(new LinearLayoutManager(this));
-        rvBookList.setAdapter(mBookStoreBookAdapter);
-        mRlRefresh.setOnReloadingListener(this::getData);
+        binding.rvBookList.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvBookList.setAdapter(mBookStoreBookAdapter);
+        binding.refreshLayout.setOnReloadingListener(this::getData);
     }
 
     @Override
@@ -236,7 +221,7 @@ public class BookstoreActivity extends BaseActivity {
                     @Override
                     public void onError(Exception e) {
                         if (MyApplication.isDestroy(BookstoreActivity.this)) return;
-                        mRlRefresh.showError();
+                        binding.refreshLayout.showError();
                         e.printStackTrace();
                     }
                 });
@@ -277,7 +262,7 @@ public class BookstoreActivity extends BaseActivity {
      */
     private void getBooksData() {
         if (findCrawler.getTypePage(curType, page)) {
-            srlBookList.finishLoadMoreWithNoMoreData();
+            binding.srlBookList.finishLoadMoreWithNoMoreData();
             return;
         }
 
@@ -346,9 +331,9 @@ public class BookstoreActivity extends BaseActivity {
         //设置布局管理器
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        rvTypeList.setLayoutManager(mLinearLayoutManager);
+        binding.rvTypeList.setLayoutManager(mLinearLayoutManager);
         mBookStoreBookTypeAdapter = new BookStoreBookTypeAdapter(this, mBookTypes);
-        rvTypeList.setAdapter(mBookStoreBookTypeAdapter);
+        binding.rvTypeList.setAdapter(mBookStoreBookTypeAdapter);
 
         //点击事件
         mBookStoreBookTypeAdapter.setOnItemClickListener((pos, view) -> {
@@ -357,7 +342,7 @@ public class BookstoreActivity extends BaseActivity {
             }
             page = 1;
             curType = mBookTypes.get(pos);
-            srlBookList.resetNoMoreData();
+            binding.srlBookList.resetNoMoreData();
             getBooksData();
         });
 
@@ -373,7 +358,7 @@ public class BookstoreActivity extends BaseActivity {
             mBookStoreBookAdapter.refreshItems(bookList);
             this.bookList.clear();
             this.bookList.addAll(bookList);
-            rvBookList.scrollToPosition(0);
+            binding.rvBookList.scrollToPosition(0);
         } else {
             this.bookList.addAll(bookList);
             this.bookList = new ArrayList<>(new LinkedHashSet<>(this.bookList));//去重
@@ -381,9 +366,9 @@ public class BookstoreActivity extends BaseActivity {
         }
 
         //刷新动作完成
-        srlBookList.finishRefresh();
+        binding.srlBookList.finishRefresh();
         //加载更多完成
-        srlBookList.finishLoadMore();
+        binding.srlBookList.finishLoadMore();
 
     }
 
@@ -432,7 +417,7 @@ public class BookstoreActivity extends BaseActivity {
                 mHandler.sendEmptyMessage(6);
                 return true;
             case R.id.action_refresh:
-                mRlRefresh.showLoading();
+                binding.refreshLayout.showLoading();
                 getData();
                 return true;
         }

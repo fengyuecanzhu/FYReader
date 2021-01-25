@@ -10,27 +10,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import java.util.Objects;
-
-import butterknife.BindView;
 import cn.bingoogolapple.qrcode.core.QRCodeView;
-import cn.bingoogolapple.qrcode.zxing.ZXingView;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
+import xyz.fycz.myreader.databinding.ActivityQrcodeCaptureBinding;
 import xyz.fycz.myreader.util.PermissionsChecker;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -45,16 +36,8 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
 
 public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Delegate {
 
-    @BindView(R.id.zxingview)
-    ZXingView zxingview;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.ll_flashlight)
-    LinearLayout llFlashLight;
-    @BindView(R.id.fab_flashlight)
-    FloatingActionButton fabFlashlight;
-    @BindView(R.id.tv_flashlight)
-    TextView tvFlashlight;
+
+    private ActivityQrcodeCaptureBinding binding;
 
     private final int REQUEST_QR_IMAGE = 202;
     private static final String CAMERA = "android.permission.CAMERA";
@@ -64,10 +47,10 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
     private String picPath;
 
     @Override
-    protected int getContentId() {
-        return R.layout.activity_qrcode_capture;
+    protected void bindView() {
+        binding = ActivityQrcodeCaptureBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
-
 
     @Override
     protected void setUpToolbar(Toolbar toolbar) {
@@ -81,16 +64,16 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
      */
     @Override
     protected void initData(Bundle savedInstanceState) {
-        zxingview.setDelegate(this);
-        fabFlashlight.setOnClickListener(view -> {
+        binding.zxingview.setDelegate(this);
+        binding.fabFlashlight.setOnClickListener(view -> {
             if (flashlightIsOpen) {
                 flashlightIsOpen = false;
-                zxingview.closeFlashlight();
-                tvFlashlight.setText(getString(R.string.light_contact));
+                binding.zxingview.closeFlashlight();
+                binding.tvFlashlight.setText(getString(R.string.light_contact));
             } else {
                 flashlightIsOpen = true;
-                zxingview.openFlashlight();
-                tvFlashlight.setText(getString(R.string.close_contact));
+                binding.zxingview.openFlashlight();
+                binding.tvFlashlight.setText(getString(R.string.close_contact));
             }
         });
     }
@@ -107,13 +90,13 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
 
     @Override
     protected void onStop() {
-        zxingview.stopCamera(); // 关闭摄像头预览，并且隐藏扫描框
+        binding.zxingview.stopCamera(); // 关闭摄像头预览，并且隐藏扫描框
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        zxingview.onDestroy(); // 销毁二维码扫描控件
+        binding.zxingview.onDestroy(); // 销毁二维码扫描控件
         super.onDestroy();
     }
 
@@ -142,10 +125,10 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
     @Override
     public void onCameraAmbientBrightnessChanged(boolean isDark) {
         if (isDark){
-            llFlashLight.setVisibility(View.VISIBLE);
+            binding.llFlashlight.setVisibility(View.VISIBLE);
         }else {
             if (!flashlightIsOpen) {
-                llFlashLight.setVisibility(View.GONE);
+                binding.llFlashlight.setVisibility(View.GONE);
             }
         }
     }
@@ -156,8 +139,8 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
     }
 
     private void startScan() {
-        zxingview.setVisibility(View.VISIBLE);
-        zxingview.startSpotAndShowRect(); // 显示扫描框，并开始识别
+        binding.zxingview.setVisibility(View.VISIBLE);
+        binding.zxingview.startSpotAndShowRect(); // 显示扫描框，并开始识别
     }
 
     private void requestPermission() {
@@ -212,7 +195,7 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        zxingview.startSpotAndShowRect(); // 显示扫描框，并开始识别
+        binding.zxingview.startSpotAndShowRect(); // 显示扫描框，并开始识别
 
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_QR_IMAGE) {
             picPath = getPath(this, data.getData());
@@ -238,7 +221,7 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
                 .subscribe(new MySingleObserver<Bitmap>() {
                     @Override
                     public void onSuccess(Bitmap bitmap) {
-                        zxingview.decodeQRCode(bitmap);
+                        binding.zxingview.decodeQRCode(bitmap);
                     }
                 });
     }

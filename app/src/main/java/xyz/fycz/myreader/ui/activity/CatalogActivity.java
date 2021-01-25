@@ -4,14 +4,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.viewpager.widget.ViewPager;
-import butterknife.BindView;
-import com.google.android.material.tabs.TabLayout;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.databinding.ActivityCatalogBinding;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.adapter.TabFragmentPageAdapter;
 import xyz.fycz.myreader.ui.fragment.BookMarkFragment;
@@ -23,12 +23,7 @@ import xyz.fycz.myreader.ui.fragment.CatalogFragment;
 public class CatalogActivity extends BaseActivity {
 
 
-    @BindView(R.id.catalog_tab)
-    TabLayout catalogTab;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.catalog_vp)
-    ViewPager viewPager;
+    private ActivityCatalogBinding binding;
     private SearchView searchView;
 
     private Book mBook;
@@ -41,6 +36,12 @@ public class CatalogActivity extends BaseActivity {
         return mBook;
     }
 
+    @Override
+    protected void bindView() {
+        binding = ActivityCatalogBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+    }
+
     /*********************Initialization****************************/
 
 
@@ -50,10 +51,6 @@ public class CatalogActivity extends BaseActivity {
         mBook = (Book) getIntent().getSerializableExtra(APPCONST.BOOK);
     }
 
-    @Override
-    protected int getContentId() {
-        return R.layout.activity_catalog;
-    }
 
     @Override
     protected void setUpToolbar(Toolbar toolbar) {
@@ -67,9 +64,9 @@ public class CatalogActivity extends BaseActivity {
     @Override
     protected void initWidget() {
         super.initWidget();
-        viewPager.setAdapter(tabAdapter);
-        viewPager.setOffscreenPageLimit(2);
-        catalogTab.setupWithViewPager(viewPager);
+        binding.catalogVp.setAdapter(tabAdapter);
+        binding.catalogVp.setOffscreenPageLimit(2);
+        binding.catalogTab.setupWithViewPager(binding.catalogVp);
     }
 
 
@@ -90,7 +87,7 @@ public class CatalogActivity extends BaseActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                switch (viewPager.getCurrentItem()){
+                switch (binding.catalogVp.getCurrentItem()){
                     case 0:
                         ((CatalogFragment) tabAdapter.getItem(0)).getmCatalogPresent().startSearch(newText);
                         break;

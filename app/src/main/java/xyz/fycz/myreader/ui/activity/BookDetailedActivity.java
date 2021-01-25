@@ -6,36 +6,33 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Layout;
-import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.*;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import butterknife.BindView;
-import butterknife.OnClick;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 
 import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder;
 import io.reactivex.Single;
@@ -47,78 +44,43 @@ import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
-import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.entity.SharedBook;
-import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
-import xyz.fycz.myreader.util.IOUtils;
-import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.utils.BitmapUtil;
-import xyz.fycz.myreader.util.utils.FileUtils;
-import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
-import xyz.fycz.myreader.util.utils.RxUtils;
-import xyz.fycz.myreader.util.utils.ScreenUtils;
-import xyz.fycz.myreader.util.utils.StringUtils;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
-import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.BlurTransformation;
-import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
-import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
-import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.common.URLCONST;
+import xyz.fycz.myreader.databinding.ActivityBookDetailBinding;
+import xyz.fycz.myreader.entity.SharedBook;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.ui.adapter.DetailCatalogAdapter;
+import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
+import xyz.fycz.myreader.util.IOUtils;
+import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.BitmapUtil;
+import xyz.fycz.myreader.util.utils.BlurTransformation;
+import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
+import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
-import xyz.fycz.myreader.widget.CoverImageView;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
+import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 /**
  * @author fengyue
  * @date 2020/8/17 11:39
  */
 public class BookDetailedActivity extends BaseActivity {
-    @BindView(R.id.book_detail_iv_cover)
-    CoverImageView mIvCover;
-    /* @BindView(R.id.book_detail_iv_blur_cover)
-     ImageView mIvBlurCover;*/
-    @BindView(R.id.book_detail_tv_author)
-    TextView mTvAuthor;
-    @BindView(R.id.book_detail_tv_type)
-    TextView mTvType;
-    @BindView(R.id.book_detail_source)
-    TextView mTvSource;
-    @BindView(R.id.book_detail_tv_add)
-    TextView bookDetailTvAdd;
-    @BindView(R.id.book_detail_tv_open)
-    TextView bookDetailTvOpen;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.book_detail_tv_desc)
-    TextView mTvDesc;
-    @BindView(R.id.tv_disclaimer)
-    TextView mTvDisclaimer;
-    @BindView(R.id.fl_add_bookcase)
-    FrameLayout flAddBookcase;
-    @BindView(R.id.fl_open_book)
-    FrameLayout flOpenBook;
-    @BindView(R.id.book_detail_rv_catalog)
-    RecyclerView bookDetailRvCatalog;
-    @BindView(R.id.pb_loading)
-    ProgressBar pbLoading;
 
+    private ActivityBookDetailBinding binding;
 
     private Book mBook;
     private ArrayList<Book> aBooks;
@@ -151,11 +113,11 @@ public class BookDetailedActivity extends BaseActivity {
                     createChangeSourceDia();
                     break;
                 case 3:
-                    pbLoading.setVisibility(View.GONE);
+                    binding.pbLoading.setVisibility(View.GONE);
                     DialogCreator.createTipDialog(BookDetailedActivity.this, "未搜索到该书籍，书源加载失败！");
                     break;
                 case 4:
-                    pbLoading.setVisibility(View.GONE);
+                    binding.pbLoading.setVisibility(View.GONE);
                     initOtherInfo();
                     break;
             }
@@ -163,8 +125,9 @@ public class BookDetailedActivity extends BaseActivity {
     };
 
     @Override
-    protected int getContentId() {
-        return R.layout.activity_book_detail;
+    protected void bindView() {
+        binding = ActivityBookDetailBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
 
     @Override
@@ -201,8 +164,8 @@ public class BookDetailedActivity extends BaseActivity {
 
         //catalog
         mCatalogAdapter = new DetailCatalogAdapter();
-        bookDetailRvCatalog.setLayoutManager(new LinearLayoutManager(this));
-        bookDetailRvCatalog.setAdapter(mCatalogAdapter);
+        binding.ic.bookDetailRvCatalog.setLayoutManager(new LinearLayoutManager(this));
+        binding.ic.bookDetailRvCatalog.setAdapter(mCatalogAdapter);
 
         initChapters(false);
 
@@ -212,10 +175,10 @@ public class BookDetailedActivity extends BaseActivity {
             goReadActivity();
         });
 
-        mTvDisclaimer.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "免责声明", "disclaimer.fy"));
+        binding.ic.tvDisclaimer.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "免责声明", "disclaimer.fy"));
         if (isCollected) {
-            bookDetailTvAdd.setText("移除书籍");
-            bookDetailTvOpen.setText("继续阅读");
+            binding.ib.bookDetailTvAdd.setText("移除书籍");
+            binding.ib.bookDetailTvOpen.setText("继续阅读");
         }
 
         //Dialog
@@ -241,7 +204,9 @@ public class BookDetailedActivity extends BaseActivity {
     @Override
     protected void initClick() {
         super.initClick();
-        flAddBookcase.setOnClickListener(view -> {
+        binding.ic.bookDetailTvDesc.setOnClickListener(v -> showMoreDesc());
+        binding.ic.bookDetailTvCatalogMore.setOnClickListener(v -> goToMoreChapter());
+        binding.ib.flAddBookcase.setOnClickListener(view -> {
             if (!isCollected) {
                 mBook.setNoReadNum(mChapters.size());
                 mBook.setChapterTotalNum(0);
@@ -253,7 +218,7 @@ public class BookDetailedActivity extends BaseActivity {
                 mChapterService.addChapters(mChapters);
                 isCollected = true;
                 ToastUtils.showSuccess("成功加入书架");
-                bookDetailTvAdd.setText("移除书籍");
+                binding.ib.bookDetailTvAdd.setText("移除书籍");
             } else {
                 mBookService.deleteBookById(mBook.getId());
                 isCollected = false;
@@ -261,11 +226,11 @@ public class BookDetailedActivity extends BaseActivity {
                 mBook.setHistoryChapterId("未开始阅读");
                 mBook.setLastReadPosition(0);
                 ToastUtils.showSuccess("成功移除书籍");
-                bookDetailTvAdd.setText("加入书架");
-                bookDetailTvOpen.setText("开始阅读");
+                binding.ib.bookDetailTvAdd.setText("加入书架");
+                binding.ib.bookDetailTvOpen.setText("开始阅读");
             }
         });
-        flOpenBook.setOnClickListener(view -> goReadActivity());
+        binding.ib.flOpenBook.setOnClickListener(view -> goReadActivity());
 
         //换源对话框
         mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
@@ -298,6 +263,25 @@ public class BookDetailedActivity extends BaseActivity {
         });
     }
 
+    /**
+     * 展开简介
+     */
+    protected void showMoreDesc() {
+        if (binding.ic.bookDetailTvDesc.getMaxLines() == 5)
+            binding.ic.bookDetailTvDesc.setMaxLines(15);
+        else
+            binding.ic.bookDetailTvDesc.setMaxLines(5);
+    }
+
+    /**
+     * 章节列表
+     */
+    public void goToMoreChapter() {
+        Intent intent = new Intent(this, CatalogActivity.class);
+        intent.putExtra(APPCONST.BOOK, mBook);
+        startActivityForResult(intent, APPCONST.REQUEST_CHAPTER_PAGE);
+    }
+
     @Override
     protected void processLogic() {
         super.processLogic();
@@ -322,23 +306,23 @@ public class BookDetailedActivity extends BaseActivity {
      * 初始化书籍信息
      */
     private void initBookInfo() {
-        mTvAuthor.setText(mBook.getAuthor());
+        binding.ih.bookDetailTvAuthor.setText(mBook.getAuthor());
         if (StringHelper.isEmpty(mBook.getImgUrl())) {
             mBook.setImgUrl("");
         }
         assert mBook.getNewestChapterTitle() != null;
-        mTvDesc.setText("");
+        binding.ic.bookDetailTvDesc.setText("");
         if (mBook.getType() != null) {
-            mTvType.setText(mBook.getType());
+            binding.ih.bookDetailTvType.setText(mBook.getType());
         } else {
-            mTvType.setText("");
+            binding.ih.bookDetailTvType.setText("");
         }
         if (!"null".equals(mBook.getSource())) {
-            mTvSource.setText("书源：" + BookSource.fromString(mBook.getSource()).text);
+            binding.ih.bookDetailSource.setText("书源：" + BookSource.fromString(mBook.getSource()).text);
         }
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
         if (rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) {
-            pbLoading.setVisibility(View.VISIBLE);
+            binding.pbLoading.setVisibility(View.VISIBLE);
             BookInfoCrawler bic = (BookInfoCrawler) rc;
             CommonApi.getBookInfo(mBook, bic, new ResultCallback() {
                 @Override
@@ -362,10 +346,10 @@ public class BookDetailedActivity extends BaseActivity {
      * 初始化其他书籍信息
      */
     private void initOtherInfo() {
-        mTvDesc.setText("\t\t\t\t" + mBook.getDesc());
-        mTvType.setText(mBook.getType());
+        binding.ic.bookDetailTvDesc.setText("\t\t\t\t" + mBook.getDesc());
+        binding.ih.bookDetailTvType.setText(mBook.getType());
         if (!MyApplication.isDestroy(this)) {
-            mIvCover.load(mBook.getImgUrl(), mBook.getName(), mBook.getAuthor());
+            binding.ih.bookDetailIvCover.load(mBook.getImgUrl(), mBook.getName(), mBook.getAuthor());
             /*Glide.with(this)
                     .load(mBook.getImgUrl())
                     .transition(DrawableTransitionOptions.withCrossFade(1500))
@@ -598,26 +582,6 @@ public class BookDetailedActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * 展开简介
-     */
-    @OnClick(R.id.book_detail_tv_desc)
-    protected void showMoreDesc() {
-        if (mTvDesc.getMaxLines() == 5)
-            mTvDesc.setMaxLines(15);
-        else
-            mTvDesc.setMaxLines(5);
-    }
-
-    /**
-     * 章节列表
-     */
-    @OnClick(R.id.book_detail_tv_catalog_more)
-    public void goToMoreChapter() {
-        Intent intent = new Intent(this, CatalogActivity.class);
-        intent.putExtra(APPCONST.BOOK, mBook);
-        startActivityForResult(intent, APPCONST.REQUEST_CHAPTER_PAGE);
-    }
 
     /**
      * 阅读/章节界面反馈结果处理
@@ -639,8 +603,8 @@ public class BookDetailedActivity extends BaseActivity {
                     int lastReadPosition = data.getIntExtra(APPCONST.RESULT_LAST_READ_POSITION, 0);
                     int historyChapterPos = data.getIntExtra(APPCONST.RESULT_HISTORY_CHAPTER, 0);
                     if (isCollected) {
-                        bookDetailTvAdd.setText("移除书籍");
-                        bookDetailTvOpen.setText("继续阅读");
+                        binding.ib.bookDetailTvAdd.setText("移除书籍");
+                        binding.ib.bookDetailTvOpen.setText("继续阅读");
                         this.isCollected = true;
                         if (mChapters != null && mChapters.size() != 0) {
                             mBook.setHistoryChapterId(mChapters.get(historyChapterPos).getTitle());
@@ -720,9 +684,9 @@ public class BookDetailedActivity extends BaseActivity {
 
             int marginTop = 24;
 
-            mIvCover.setDrawingCacheEnabled(true);
-            Bitmap img = Bitmap.createBitmap(mIvCover.getDrawingCache()).copy(Bitmap.Config.ARGB_8888, true);
-            mIvCover.setDrawingCacheEnabled(false);
+            binding.ih.bookDetailIvCover.setDrawingCacheEnabled(true);
+            Bitmap img = Bitmap.createBitmap(binding.ih.bookDetailIvCover.getDrawingCache()).copy(Bitmap.Config.ARGB_8888, true);
+            binding.ih.bookDetailIvCover.setDrawingCacheEnabled(false);
             img = BitmapUtil.getBitmap(img, 152, 209);
 
             Canvas cv = new Canvas(back);

@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FYReader-master_-_内测.iml" filepath="$PROJECT_DIR$/.idea/modules/FYReader-master_-_内测.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FYReader-master_-_内测.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FYReader-master_-_内测.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FYReader-master.iml" filepath="$PROJECT_DIR$/.idea/modules/FYReader-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FYReader-master.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FYReader-master.app.iml" />
     </modules>
   </component>
 </project>

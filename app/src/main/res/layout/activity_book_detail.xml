@@ -36,7 +36,9 @@
                         android:layout_height="190dp"
                         android:scaleType="centerCrop"/>-->
 
-                <include layout="@layout/layout_book_detail_header"/>
+                <include
+                    android:id="@+id/ih"
+                    layout="@layout/layout_book_detail_header"/>
 
                 <androidx.appcompat.widget.Toolbar
                         android:id="@+id/toolbar"
@@ -57,7 +59,9 @@
                 android:layout_marginBottom="56dp"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <include layout="@layout/layout_book_detail_content"/>
+            <include
+                android:id="@+id/ic"
+                layout="@layout/layout_book_detail_content"/>
 
         </androidx.core.widget.NestedScrollView>
 
@@ -68,7 +72,9 @@
                 android:layout_gravity="bottom"
                 android:orientation="vertical">
 
-            <include layout="@layout/layout_book_detail_bottom"/>
+            <include
+                android:id="@+id/ib"
+                layout="@layout/layout_book_detail_bottom"/>
 
             <View
                     android:layout_width="match_parent"

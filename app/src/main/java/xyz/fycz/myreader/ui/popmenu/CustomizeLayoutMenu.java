@@ -3,25 +3,19 @@ package xyz.fycz.myreader.ui.popmenu;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,19 +23,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
-import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.databinding.MenuCumtomizeLayoutBinding;
 import xyz.fycz.myreader.entity.ReadStyle;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
@@ -51,28 +42,10 @@ import xyz.fycz.myreader.util.ZipUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.MeUtils;
-import xyz.fycz.myreader.widget.CircleCheckBox;
-import xyz.fycz.myreader.widget.HorizontalListView;
 
 public class CustomizeLayoutMenu extends FrameLayout {
-    @BindView(R.id.iv_bg_color)
-    ImageView ivBgColor;
-    @BindView(R.id.iv_font_color)
-    ImageView ivFontColor;
-    @BindView(R.id.cb_share_layout)
-    CircleCheckBox cbShareLayout;
-    @BindView(R.id.bgImgList)
-    HorizontalListView bgImgList;
-    @BindView(R.id.tv_save_layout)
-    TextView tvSaveLayout;
-    @BindView(R.id.tv_import_layout)
-    TextView tvImportLayout;
-    @BindView(R.id.tv_export_layout)
-    TextView tvExportLayout;
-    @BindView(R.id.tv_reset_layout)
-    TextView tvResetLayout;
-    @BindView(R.id.vwNavigationBar)
-    View vwNavigationBar;
+
+    private MenuCumtomizeLayoutBinding binding;
 
     private Callback callback;
 
@@ -98,8 +71,7 @@ public class CustomizeLayoutMenu extends FrameLayout {
     }
 
     private void init(Context context) {
-        View view = LayoutInflater.from(context).inflate(R.layout.menu_cumtomize_layout, this);
-        ButterKnife.bind(this, view);
+        binding = MenuCumtomizeLayoutBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
     public void setListener(Activity activity, Callback callback) {
@@ -110,14 +82,14 @@ public class CustomizeLayoutMenu extends FrameLayout {
     }
 
     private void initWidget() {
-        ivBgColor.setImageDrawable(setting.getBgDrawable(setting.getCurReadStyleIndex(), context, 200, 120));
-        ivFontColor.setImageDrawable(new ColorDrawable(setting.getTextColor()));
-        cbShareLayout.setChecked(setting.isSharedLayout());
+        binding.ivBgColor.setImageDrawable(setting.getBgDrawable(setting.getCurReadStyleIndex(), context, 200, 120));
+        binding.ivFontColor.setImageDrawable(new ColorDrawable(setting.getTextColor()));
+        binding.cbShareLayout.setChecked(setting.isSharedLayout());
 
         //背景图列表
         bgImgListAdapter = new BgImgListAdapter(context);
         bgImgListAdapter.initList();
-        bgImgList.setAdapter(bgImgListAdapter);
+        binding.bgImgList.setAdapter(bgImgListAdapter);
     }
 
     public void upColor() {
@@ -126,12 +98,12 @@ public class CustomizeLayoutMenu extends FrameLayout {
             ToastUtils.showInfo("当前正在编辑夜间模式");
             curStyleIndex = 6;
         }
-        ivFontColor.setImageDrawable(new ColorDrawable(setting.getTextColor()));
-        ivBgColor.setImageDrawable(setting.getBgDrawable(curStyleIndex, context, 200, 120));
+        binding.ivFontColor.setImageDrawable(new ColorDrawable(setting.getTextColor()));
+        binding.ivBgColor.setImageDrawable(setting.getBgDrawable(curStyleIndex, context, 200, 120));
     }
 
     private void initListener() {
-        ivBgColor.setOnClickListener(v -> {
+        binding.ivBgColor.setOnClickListener(v -> {
             ColorPickerDialog.newBuilder()
                     .setColor(setting.getBgColor())
                     .setShowAlphaSlider(false)
@@ -140,14 +112,14 @@ public class CustomizeLayoutMenu extends FrameLayout {
                     .show((FragmentActivity) context);
         });
         //选择文字颜色
-        ivFontColor.setOnClickListener(view ->
+        binding.ivFontColor.setOnClickListener(view ->
                 ColorPickerDialog.newBuilder()
                         .setColor(setting.getTextColor())
                         .setShowAlphaSlider(false)
                         .setDialogType(ColorPickerDialog.TYPE_PRESETS)
                         .setDialogId(APPCONST.SELECT_TEXT_COLOR)
                         .show((FragmentActivity) context));
-        cbShareLayout.setOnClickListener(v -> {
+        binding.cbShareLayout.setOnClickListener(v -> {
             if (!setting.isSharedLayout()) {
                 DialogCreator.createCommonDialog(context, "提示",
                         context.getString(R.string.share_layout_tip),
@@ -155,16 +127,16 @@ public class CustomizeLayoutMenu extends FrameLayout {
                             setting.setSharedLayout(true);
                             setting.sharedLayout();
                             SysManager.saveSetting(setting);
-                            cbShareLayout.setChecked(true);
+                            binding.cbShareLayout.setChecked(true);
                         }, null);
             } else {
                 setting.setSharedLayout(false);
                 setting.sharedLayout();
                 SysManager.saveSetting(setting);
-                cbShareLayout.setChecked(false);
+                binding.cbShareLayout.setChecked(false);
             }
         });
-        bgImgList.setOnItemClickListener((adapterView, view, i, l) -> {
+        binding.bgImgList.setOnItemClickListener((adapterView, view, i, l) -> {
             if (i == 0) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -175,7 +147,7 @@ public class CustomizeLayoutMenu extends FrameLayout {
                 setAssetsBg(bgPath);
             }
         });
-        tvSaveLayout.setOnClickListener(v -> {
+        binding.tvSaveLayout.setOnClickListener(v -> {
             CharSequence[] items = new CharSequence[6];
             for (int i = 0; i < items.length; i++) {
                 if (i == 5) {
@@ -194,9 +166,9 @@ public class CustomizeLayoutMenu extends FrameLayout {
                         ToastUtils.showSuccess("布局保存成功");
                     }).show();
         });
-        tvImportLayout.setOnClickListener(v -> importLayout());
-        tvExportLayout.setOnClickListener(v -> exportLayout());
-        tvResetLayout.setOnClickListener(v -> {
+        binding.tvImportLayout.setOnClickListener(v -> importLayout());
+        binding.tvExportLayout.setOnClickListener(v -> exportLayout());
+        binding.tvResetLayout.setOnClickListener(v -> {
             DialogCreator.createCommonDialog(context, "重置布局",
                     "重置布局将会恢复所有布局为默认状态，确定要重置吗？",
                     true, (dialog, which) -> {
@@ -211,7 +183,7 @@ public class CustomizeLayoutMenu extends FrameLayout {
     }
 
     public void setNavigationBarHeight(int height) {
-        vwNavigationBar.getLayoutParams().height = height;
+        binding.vwNavigationBar.getLayoutParams().height = height;
     }
 
     public void setAssetsBg(String path) {

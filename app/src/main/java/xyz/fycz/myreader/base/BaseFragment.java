@@ -1,15 +1,13 @@
 package xyz.fycz.myreader.base;
 
 import android.os.Bundle;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import androidx.annotation.LayoutRes;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
+
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
@@ -23,11 +21,11 @@ public abstract class BaseFragment extends Fragment {
     protected CompositeDisposable mDisposable;
 
     private View root = null;
-    protected Unbinder unbinder;
 
-    @LayoutRes
-    protected abstract int getContentId();
-
+    /**
+     * 绑定视图
+     */
+    protected abstract View bindView(LayoutInflater inflater, ViewGroup container);
     /*******************************init area*********************************/
     protected void addDisposable(Disposable d){
         if (mDisposable == null){
@@ -62,8 +60,7 @@ public abstract class BaseFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        int resId = getContentId();
-        root = inflater.inflate(resId,container,false);
+        root = bindView(inflater, container);
         return root;
     }
 
@@ -71,7 +68,6 @@ public abstract class BaseFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initData(savedInstanceState);
-        unbinder = ButterKnife.bind(this,root);
         initWidget(savedInstanceState);
         initClick();
         processLogic();
@@ -80,8 +76,6 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-
-        unbinder.unbind();
 
         if (mDisposable != null){
             mDisposable.clear();

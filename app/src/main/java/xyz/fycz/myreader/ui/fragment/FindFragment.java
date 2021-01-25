@@ -1,18 +1,20 @@
 package xyz.fycz.myreader.ui.fragment;
 
 import android.content.Intent;
-import android.widget.RelativeLayout;
-import butterknife.BindView;
-import xyz.fycz.myreader.R;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.databinding.FragmentFindBinding;
 import xyz.fycz.myreader.ui.activity.BookstoreActivity;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
+import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
 import xyz.fycz.myreader.webapi.crawler.find.XS7Rank;
 import xyz.fycz.myreader.webapi.crawler.read.Ben100ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.MiaoBiReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.QB5ReadCrawler;
-import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
 import xyz.fycz.myreader.webapi.crawler.read.XS7ReadCrawler;
 
 /**
@@ -20,42 +22,27 @@ import xyz.fycz.myreader.webapi.crawler.read.XS7ReadCrawler;
  * @date 2020/9/13 21:07
  */
 public class FindFragment extends BaseFragment {
-    @BindView(R.id.find_rl_qidian_top)
-    RelativeLayout mRlQiDianTop;
-    @BindView(R.id.find_rl_qidian_ns_top)
-    RelativeLayout mRlQiDianNSTop;
-    @BindView(R.id.find_rl_xs7_top)
-    RelativeLayout mRlXS7Top;
-    @BindView(R.id.find_rl_qidian_sort)
-    RelativeLayout mRlQiDianSort;
-    @BindView(R.id.find_rl_qidian_ns_sort)
-    RelativeLayout mRlQiDianNSSort;
-    @BindView(R.id.find_rl_qb5_store)
-    RelativeLayout mRlQB5Store;
-    @BindView(R.id.find_rl_ben100_store)
-    RelativeLayout mRlBen100Store;
-    @BindView(R.id.find_rl_miaoqu_store)
-    RelativeLayout mRlMiaoQuStore;
-    @BindView(R.id.find_rl_xs7_store)
-    RelativeLayout mRlXS7Store;
+
+    private FragmentFindBinding binding;
 
     @Override
-    protected int getContentId() {
-        return R.layout.fragment_find;
+    protected View bindView(LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentFindBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     protected void initClick() {
         super.initClick();
-        mRlQiDianTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false)));
-        mRlQiDianNSTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(true)));
-        mRlXS7Top.setOnClickListener(v -> comeToBookstore(new XS7Rank()));
-        mRlQiDianSort.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false, true)));
-        mRlQiDianNSSort.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(true, true)));
-        mRlQB5Store.setOnClickListener(v -> comeToBookstore(new QB5ReadCrawler()));
-        mRlBen100Store.setOnClickListener(v -> comeToBookstore(new Ben100ReadCrawler()));
-        mRlMiaoQuStore.setOnClickListener(v -> comeToBookstore(new MiaoBiReadCrawler()));
-        mRlXS7Store.setOnClickListener(v -> comeToBookstore(new XS7ReadCrawler()));
+        binding.findRlQidianTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false)));
+        binding.findRlQidianNsTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(true)));
+        binding.findRlXs7Top.setOnClickListener(v -> comeToBookstore(new XS7Rank()));
+        binding.findRlQidianSort.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false, true)));
+        binding.findRlQidianNsSort.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(true, true)));
+        binding.findRlQb5Store.setOnClickListener(v -> comeToBookstore(new QB5ReadCrawler()));
+        binding.findRlBen100Store.setOnClickListener(v -> comeToBookstore(new Ben100ReadCrawler()));
+        binding.findRlMiaoquStore.setOnClickListener(v -> comeToBookstore(new MiaoBiReadCrawler()));
+        binding.findRlXs7Store.setOnClickListener(v -> comeToBookstore(new XS7ReadCrawler()));
     }
 
 
@@ -66,6 +53,6 @@ public class FindFragment extends BaseFragment {
     }
 
     public boolean isRecreate() {
-        return unbinder == null;
+        return binding == null;
     }
 }

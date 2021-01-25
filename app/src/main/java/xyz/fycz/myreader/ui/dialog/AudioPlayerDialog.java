@@ -11,16 +11,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.NumberPicker;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatImageView;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.databinding.DialogAudioPlayerBinding;
 import xyz.fycz.myreader.model.audio.ReadAloudService;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.util.SharedPreUtils;
@@ -28,10 +25,11 @@ import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.AudioMngHelper;
 import xyz.fycz.myreader.widget.page.PageLoader;
 
-import static xyz.fycz.myreader.util.utils.StringUtils.getString;
-
 public class AudioPlayerDialog extends Dialog{
     private static final String TAG="AudioPlayerDialog";
+
+    private DialogAudioPlayerBinding binding;
+
     private PageLoader mPageLoader;
     private ReadActivity mReadActivity;
     private boolean aloudNextPage;
@@ -43,30 +41,6 @@ public class AudioPlayerDialog extends Dialog{
     private int speechRate;
     private int timer;
 
-    @BindView(R.id.iv_reset_setting)
-    TextView tvResetSetting;
-    @BindView(R.id.sb_volume_progress)
-    SeekBar sbVolume;
-    @BindView(R.id.sb_pitch_progress)
-    SeekBar sbPitch;
-    @BindView(R.id.sb_speech_rate_progress)
-    SeekBar sbSpeechRate;
-    @BindView(R.id.iv_go_tts_setting)
-    AppCompatImageView ivGoTTSSetting;
-    @BindView(R.id.iv_read_last_paragraph)
-    AppCompatImageView ivReadLastParagraph;
-    @BindView(R.id.iv_read_play_stop)
-    AppCompatImageView ivReadPlayStop;
-    @BindView(R.id.iv_read_next_paragraph)
-    AppCompatImageView ivReadNextParagraph;
-    @BindView(R.id.iv_read_stop)
-    AppCompatImageView ivReadStop;
-    @BindView(R.id.iv_read_timer)
-    AppCompatImageView ivReadTimer;
-    @BindView(R.id.iv_read_home)
-    AppCompatImageView ivReadHome;
-
-
     public AudioPlayerDialog(@NonNull ReadActivity context, PageLoader mPageLoader) {
         super(context);
         mReadActivity = context;
@@ -76,11 +50,12 @@ public class AudioPlayerDialog extends Dialog{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.diallog_audio_player);
-        ButterKnife.bind(this);
+        binding = DialogAudioPlayerBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         setUpWindow();
         initData();
         initWidget();
+        initCLick();
         readAloud();
     }
 
@@ -88,7 +63,7 @@ public class AudioPlayerDialog extends Dialog{
     protected void onStart() {
         super.onStart();
         volume = AudioMngHelper.getInstance().get100CurrentVolume();
-        sbVolume.setProgress(volume);
+        binding.sbVolumeProgress.setProgress(volume);
         if (!ReadAloudService.running){
             readAloud();
         }
@@ -115,18 +90,18 @@ public class AudioPlayerDialog extends Dialog{
     }
 
     private void initWidget() {
-        sbVolume.setProgress(volume);
-        sbPitch.setProgress(pitch);
-        sbSpeechRate.setProgress(speechRate);
+        binding.sbVolumeProgress.setProgress(volume);
+        binding.sbPitchProgress.setProgress(pitch);
+        binding.sbSpeechRateProgress.setProgress(speechRate);
         SeekBarChangeListener seekBarChangeListener = new SeekBarChangeListener();
-        sbVolume.setOnSeekBarChangeListener(seekBarChangeListener);
-        sbPitch.setOnSeekBarChangeListener(seekBarChangeListener);
-        sbSpeechRate.setOnSeekBarChangeListener(seekBarChangeListener);
-        tvResetSetting.setOnClickListener(v ->{
+        binding.sbVolumeProgress.setOnSeekBarChangeListener(seekBarChangeListener);
+        binding.sbPitchProgress.setOnSeekBarChangeListener(seekBarChangeListener);
+        binding.sbSpeechRateProgress.setOnSeekBarChangeListener(seekBarChangeListener);
+        binding.ivResetSetting.setOnClickListener(v ->{
             pitch = 10;
             speechRate = 10;
-            sbPitch.setProgress(pitch);
-            sbSpeechRate.setProgress(speechRate);
+            binding.sbPitchProgress.setProgress(pitch);
+            binding.sbSpeechRateProgress.setProgress(speechRate);
             SharedPreUtils.getInstance().putInt("readPitch", pitch);
             SharedPreUtils.getInstance().putInt("speechRate", speechRate);
             if (ReadAloudService.running) {
@@ -134,6 +109,65 @@ public class AudioPlayerDialog extends Dialog{
                 ReadAloudService.resume(mReadActivity);
             }
         });
+    }
+
+    private void initCLick() {
+        binding.ivReadPlayStop.setOnClickListener(this::onClick);
+        binding.ivReadLastParagraph.setOnClickListener(this::onClick);
+        binding.ivReadNextParagraph.setOnClickListener(this::onClick);
+        binding.ivGoTtsSetting.setOnClickListener(this::onClick);
+        binding.ivReadStop.setOnClickListener(this::onClick);
+        binding.ivReadTimer.setOnClickListener(this::onClick);
+        binding.ivReadHome.setOnClickListener(this::onClick);
+    }
+
+    public void onClick(View view){
+        int id = view.getId();
+        if (id == R.id.iv_go_tts_setting) {
+            ReadAloudService.toTTSSetting(mReadActivity);
+        } else if (id == R.id.iv_read_play_stop) {
+            if (ReadAloudService.running) {
+                if (aloudStatus == ReadAloudService.Status.PLAY) {
+                    ReadAloudService.pause(mReadActivity);
+                } else {
+                    ReadAloudService.resume(mReadActivity);
+                }
+            } else {
+                readAloud();
+            }
+        } else if (id == R.id.iv_read_last_paragraph) {
+            ReadAloudService.lastP(mReadActivity);
+        } else if (id == R.id.iv_read_next_paragraph) {
+            ReadAloudService.nextP(mReadActivity);
+        } else if (id == R.id.iv_read_timer) {
+            View timer = LayoutInflater.from(getContext()).inflate(R.layout.dialog_hour_minute_picker, null, false);
+            NumberPicker hourPicker = timer.findViewById(R.id.hour_picker);
+            int hour = this.timer / 60;
+            int minute = this.timer % 60;
+            hourPicker.setMaxValue(5);
+            hourPicker.setMinValue(0);
+            hourPicker.setValue(hour);
+            NumberPicker minutePicker = timer.findViewById(R.id.minute_picker);
+            minutePicker.setMaxValue(59);
+            minutePicker.setMinValue(0);
+            minutePicker.setValue(minute);
+            MyAlertDialog.build(mReadActivity)
+                    .setTitle("定时停止")
+                    .setView(timer)
+                    .setPositiveButton("确定", (dialog, which) -> {
+                        this.timer = hourPicker.getValue() * 60 + minutePicker.getValue();
+                        SharedPreUtils.getInstance().putInt("timer", this.timer);
+                        ReadAloudService.setTimer(mReadActivity, this.timer);
+                        ToastUtils.showInfo("朗读将在" + hourPicker.getValue() + "时" + minutePicker.getValue() + "分钟后停止！");
+                    }).setNegativeButton("取消", null)
+                    .show();
+        } else if (id == R.id.iv_read_stop) {
+            ReadAloudService.stop(mReadActivity);
+            dismiss();
+        } else if (id == R.id.iv_read_home) {
+            dismiss();
+            mReadActivity.toggleMenu(true, true);
+        }
     }
 
     private class SeekBarChangeListener implements SeekBar.OnSeekBarChangeListener{
@@ -150,24 +184,21 @@ public class AudioPlayerDialog extends Dialog{
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
             int progress = seekBar.getProgress();
-            switch (seekBar.getId()){
-                case R.id.sb_volume_progress:
-                    AudioMngHelper.getInstance().setVoice100(progress);
-                    break;
-                case R.id.sb_pitch_progress:
-                    SharedPreUtils.getInstance().putInt("readPitch", progress);
-                    if (ReadAloudService.running) {
-                        ReadAloudService.pause(mReadActivity);
-                        ReadAloudService.resume(mReadActivity);
-                    }
-                    break;
-                case R.id.sb_speech_rate_progress:
-                    SharedPreUtils.getInstance().putInt("speechRate", progress);
-                    if (ReadAloudService.running) {
-                        ReadAloudService.pause(mReadActivity);
-                        ReadAloudService.resume(mReadActivity);
-                    }
-                    break;
+            int id = seekBar.getId();
+            if (id == R.id.sb_volume_progress) {
+                AudioMngHelper.getInstance().setVoice100(progress);
+            } else if (id == R.id.sb_pitch_progress) {
+                SharedPreUtils.getInstance().putInt("readPitch", progress);
+                if (ReadAloudService.running) {
+                    ReadAloudService.pause(mReadActivity);
+                    ReadAloudService.resume(mReadActivity);
+                }
+            } else if (id == R.id.sb_speech_rate_progress) {
+                SharedPreUtils.getInstance().putInt("speechRate", progress);
+                if (ReadAloudService.running) {
+                    ReadAloudService.pause(mReadActivity);
+                    ReadAloudService.resume(mReadActivity);
+                }
             }
         }
     }
@@ -187,66 +218,6 @@ public class AudioPlayerDialog extends Dialog{
         window.getDecorView().setBackgroundColor(getContext().getResources().getColor(R.color.read_menu_bg));
     }
 
-    @OnClick({R.id.iv_read_play_stop, R.id.iv_read_last_paragraph,
-            R.id.iv_read_next_paragraph, R.id.iv_go_tts_setting,
-            R.id.iv_read_stop, R.id.iv_read_timer, R.id.iv_read_home})
-    public void onClick(View view){
-        //Log.d("onClick", String.valueOf(view.getId()));
-        switch (view.getId()){
-            case R.id.iv_go_tts_setting:
-                ReadAloudService.toTTSSetting(mReadActivity);
-                break;
-            case R.id.iv_read_play_stop:
-                if (ReadAloudService.running) {
-                    if (aloudStatus == ReadAloudService.Status.PLAY) {
-                        ReadAloudService.pause(mReadActivity);
-                    } else {
-                        ReadAloudService.resume(mReadActivity);
-                    }
-                }else {
-                    readAloud();
-                }
-                break;
-            case R.id.iv_read_last_paragraph:
-                ReadAloudService.lastP(mReadActivity);
-                break;
-            case R.id.iv_read_next_paragraph:
-                ReadAloudService.nextP(mReadActivity);
-                break;
-            case R.id.iv_read_timer:
-                View timer = LayoutInflater.from(getContext()).inflate(R.layout.dialog_hour_minute_picker, null, false);
-                NumberPicker hourPicker = timer.findViewById(R.id.hour_picker);
-                int hour = this.timer / 60;
-                int minute = this.timer % 60;
-                hourPicker.setMaxValue(5);
-                hourPicker.setMinValue(0);
-                hourPicker.setValue(hour);
-                NumberPicker minutePicker = timer.findViewById(R.id.minute_picker);
-                minutePicker.setMaxValue(59);
-                minutePicker.setMinValue(0);
-                minutePicker.setValue(minute);
-                MyAlertDialog.build(mReadActivity)
-                        .setTitle("定时停止")
-                        .setView(timer)
-                        .setPositiveButton("确定", (dialog, which) -> {
-                            this.timer = hourPicker.getValue() * 60 + minutePicker.getValue();
-                            SharedPreUtils.getInstance().putInt("timer", this.timer);
-                            ReadAloudService.setTimer(mReadActivity, this.timer);
-                            ToastUtils.showInfo("朗读将在" + hourPicker.getValue() + "时" + minutePicker.getValue() + "分钟后停止！");
-                        }).setNegativeButton("取消", null)
-                        .show();
-                break;
-            case R.id.iv_read_stop:
-                ReadAloudService.stop(mReadActivity);
-                dismiss();
-                break;
-            case R.id.iv_read_home:
-                dismiss();
-                mReadActivity.toggleMenu(true, true);
-                break;
-        }
-    }
-
 
     public void readAloud() {
         mPageLoader.resetReadAloudParagraph();
@@ -261,7 +232,7 @@ public class AudioPlayerDialog extends Dialog{
 
     public boolean addOrSubVolume(boolean isAdd){
         volume = isAdd ? AudioMngHelper.getInstance().addVoice100() : AudioMngHelper.getInstance().subVoice100();
-        sbVolume.setProgress(volume);
+        binding.sbVolumeProgress.setProgress(volume);
         return true;
     }
 
@@ -305,13 +276,13 @@ public class AudioPlayerDialog extends Dialog{
                     }
                     break;
                 case PLAY:
-                    ivReadPlayStop.setImageResource(R.drawable.ic_stop);
+                    binding.ivReadPlayStop.setImageResource(R.drawable.ic_stop);
                     break;
                 case PAUSE:
-                    ivReadPlayStop.setImageResource(R.drawable.ic_play);
+                    binding.ivReadPlayStop.setImageResource(R.drawable.ic_play);
                     break;
                 default:
-                    ivReadPlayStop.setImageResource(R.drawable.ic_play);
+                    binding.ivReadPlayStop.setImageResource(R.drawable.ic_play);
                     mPageLoader.skipToPage(mPageLoader.getPagePos());
             }
         }

@@ -6,11 +6,10 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.TextView;
+
 import androidx.annotation.NonNull;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import xyz.fycz.myreader.R;
+
+import xyz.fycz.myreader.databinding.DialogCopyContentBinding;
 
 /**
  * Created by Zhouas666 on 2019-04-14
@@ -23,8 +22,7 @@ public class CopyContentDialog extends Dialog {
 
     private static final String TAG = "CopyContentDialog";
 
-    @BindView(R.id.dialog_tv_content)
-    TextView dialogTvContent;
+    private DialogCopyContentBinding binding;
 
     private String content;
 
@@ -39,12 +37,12 @@ public class CopyContentDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_copy_content);
-        ButterKnife.bind(this);
+        binding = DialogCopyContentBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         setUpWindow();
 
-        dialogTvContent.setText(content);
+        binding.dialogTvContent.setText(content);
     }
 
     /**

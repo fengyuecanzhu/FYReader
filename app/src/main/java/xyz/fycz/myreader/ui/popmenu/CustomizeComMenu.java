@@ -1,93 +1,26 @@
 package xyz.fycz.myreader.ui.popmenu;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.SysManager;
+import xyz.fycz.myreader.databinding.MenuCustomizeComBinding;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 
-import static xyz.fycz.myreader.widget.page.PageLoader.DEFAULT_MARGIN_HEIGHT;
 import static xyz.fycz.myreader.widget.page.PageLoader.DEFAULT_MARGIN_WIDTH;
 
 public class CustomizeComMenu extends FrameLayout {
-    @BindView(R.id.tv_line_spacing)
-    TextView tvLineSpacing;
-    @BindView(R.id.iv_line_minus)
-    ImageView ivLineMinus;
-    @BindView(R.id.sb_line_progress)
-    SeekBar sbLineProgress;
-    @BindView(R.id.iv_line_add)
-    ImageView ivLineAdd;
-    @BindView(R.id.tv_para_spacing)
-    TextView tvParaSpacing;
-    @BindView(R.id.iv_para_minus)
-    ImageView ivParaMinus;
-    @BindView(R.id.sb_para_progress)
-    SeekBar sbParaProgress;
-    @BindView(R.id.iv_para_add)
-    ImageView ivParaAdd;
-    @BindView(R.id.tv_text_spacing)
-    TextView tvTextSpacing;
-    @BindView(R.id.iv_text_minus)
-    ImageView ivTextMinus;
-    @BindView(R.id.sb_text_progress)
-    SeekBar sbTextProgress;
-    @BindView(R.id.iv_text_add)
-    ImageView ivTextAdd;
-    @BindView(R.id.tv_left_spacing)
-    TextView tvLeftSpacing;
-    @BindView(R.id.iv_left_minus)
-    ImageView ivLeftMinus;
-    @BindView(R.id.sb_left_progress)
-    SeekBar sbLeftProgress;
-    @BindView(R.id.iv_left_add)
-    ImageView ivLeftAdd;
-    @BindView(R.id.tv_right_spacing)
-    TextView tvRightSpacing;
-    @BindView(R.id.iv_right_minus)
-    ImageView ivRightMinus;
-    @BindView(R.id.sb_right_progress)
-    SeekBar sbRightProgress;
-    @BindView(R.id.iv_right_add)
-    ImageView ivRightAdd;
-    @BindView(R.id.tv_top_spacing)
-    TextView tvTopSpacing;
-    @BindView(R.id.iv_top_minus)
-    ImageView ivTopMinus;
-    @BindView(R.id.sb_top_progress)
-    SeekBar sbTopProgress;
-    @BindView(R.id.iv_top_add)
-    ImageView ivTopAdd;
-    @BindView(R.id.tv_bottom_spacing)
-    TextView tvBottomSpacing;
-    @BindView(R.id.iv_bottom_minus)
-    ImageView ivBottomMinus;
-    @BindView(R.id.sb_bottom_progress)
-    SeekBar sbBottomProgress;
-    @BindView(R.id.iv_bottom_add)
-    ImageView ivBottomAdd;
-    @BindView(R.id.tv_normal_com)
-    TextView tvNormalCom;
-    @BindView(R.id.tv_tight_com)
-    TextView tvTightCom;
-    @BindView(R.id.tv_reset)
-    TextView tvReset;
-    @BindView(R.id.vwNavigationBar)
-    View vwNavigationBar;
+
+    private MenuCustomizeComBinding binding;
 
     private Callback callback;
 
@@ -109,8 +42,7 @@ public class CustomizeComMenu extends FrameLayout {
     }
 
     private void init(Context context) {
-        View view = LayoutInflater.from(context).inflate(R.layout.menu_customize_com, this);
-        ButterKnife.bind(this, view);
+        binding = MenuCustomizeComBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
     public void setListener(Callback callback) {
@@ -120,7 +52,7 @@ public class CustomizeComMenu extends FrameLayout {
     }
 
     public void setNavigationBarHeight(int height) {
-        vwNavigationBar.getLayoutParams().height = height;
+        binding.vwNavigationBar.getLayoutParams().height = height;
     }
 
     /**
@@ -143,7 +75,7 @@ public class CustomizeComMenu extends FrameLayout {
     }
 
     private void initListener() {
-        ivLineAdd.setOnClickListener(v -> {
+        binding.ivLineAdd.setOnClickListener(v -> {
             float tem = setting.getLineMultiplier() + 0.1f;
             if (tem >= -0.3f && tem <= 3.0f) {
                 setting.setLineMultiplier(tem);
@@ -151,7 +83,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onTextPChange();
             }
         });
-        ivLineMinus.setOnClickListener(v -> {
+        binding.ivLineMinus.setOnClickListener(v -> {
             float tem = setting.getLineMultiplier() - 0.1f;
             if (tem >= -0.3f && tem <= 3.0f) {
                 setting.setLineMultiplier(tem);
@@ -159,7 +91,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onTextPChange();
             }
         });
-        sbLineProgress.setOnSeekBarChangeListener(new OnSeekBarChange() {
+        binding.sbLineProgress.setOnSeekBarChangeListener(new OnSeekBarChange() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser){
@@ -169,7 +101,7 @@ public class CustomizeComMenu extends FrameLayout {
                 }
             }
         });
-        ivParaAdd.setOnClickListener(v -> {
+        binding.ivParaAdd.setOnClickListener(v -> {
             float tem = setting.getParagraphSize() + 0.1f;
             if (tem >= 0.0f && tem <= 3.0f) {
                 setting.setParagraphSize(tem);
@@ -177,7 +109,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onTextPChange();
             }
         });
-        ivParaMinus.setOnClickListener(v -> {
+        binding.ivParaMinus.setOnClickListener(v -> {
             float tem = setting.getParagraphSize() - 0.1f;
             if (tem >= 0.0f && tem <=3.0f) {
                 setting.setParagraphSize(tem);
@@ -185,7 +117,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onTextPChange();
             }
         });
-        sbParaProgress.setOnSeekBarChangeListener(new OnSeekBarChange() {
+        binding.sbParaProgress.setOnSeekBarChangeListener(new OnSeekBarChange() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser){
@@ -195,7 +127,7 @@ public class CustomizeComMenu extends FrameLayout {
                 }
             }
         });
-        ivTextAdd.setOnClickListener(v -> {
+        binding.ivTextAdd.setOnClickListener(v -> {
             float tem = setting.getTextLetterSpacing() + 0.01f;
             if (tem >= -0.20f && tem <= 0.50f) {
                 setting.setTextLetterSpacing(tem);
@@ -203,7 +135,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onTextPChange();
             }
         });
-        ivTextMinus.setOnClickListener(v -> {
+        binding.ivTextMinus.setOnClickListener(v -> {
             float tem = setting.getTextLetterSpacing() - 0.01f;
             if (tem >= -0.20f && tem <= 0.50f) {
                 setting.setTextLetterSpacing(tem);
@@ -211,7 +143,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onTextPChange();
             }
         });
-        sbTextProgress.setOnSeekBarChangeListener(new OnSeekBarChange() {
+        binding.sbTextProgress.setOnSeekBarChangeListener(new OnSeekBarChange() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser){
@@ -221,7 +153,7 @@ public class CustomizeComMenu extends FrameLayout {
                 }
             }
         });
-        ivLeftAdd.setOnClickListener(v -> {
+        binding.ivLeftAdd.setOnClickListener(v -> {
             int tem = setting.getPaddingLeft() + 1;
             if (tem >= 0 && tem <= 100) {
                 setting.setPaddingLeft(tem);
@@ -229,7 +161,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onMarginChange();
             }
         });
-        ivLeftMinus.setOnClickListener(v -> {
+        binding.ivLeftMinus.setOnClickListener(v -> {
             int tem = setting.getPaddingLeft() - 1;
             if (tem >= 0 && tem <= 100) {
                 setting.setPaddingLeft(tem);
@@ -237,7 +169,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onMarginChange();
             }
         });
-        ivRightAdd.setOnClickListener(v -> {
+        binding.ivRightAdd.setOnClickListener(v -> {
             int tem = setting.getPaddingRight() + 1;
             if (tem >= 0 && tem <= 100) {
                 setting.setPaddingRight(tem);
@@ -245,7 +177,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onMarginChange();
             }
         });
-        ivRightMinus.setOnClickListener(v -> {
+        binding.ivRightMinus.setOnClickListener(v -> {
             int tem = setting.getPaddingRight() - 1;
             if (tem >= 0 && tem <= 100) {
                 setting.setPaddingRight(tem);
@@ -253,7 +185,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onMarginChange();
             }
         });
-        ivTopAdd.setOnClickListener(v -> {
+        binding.ivTopAdd.setOnClickListener(v -> {
             int tem = setting.getPaddingTop() + 1;
             if (tem >= 0 && tem <= 100) {
                 setting.setPaddingTop(tem);
@@ -261,7 +193,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onMarginChange();
             }
         });
-        ivTopMinus.setOnClickListener(v -> {
+        binding.ivTopMinus.setOnClickListener(v -> {
             int tem = setting.getPaddingTop() - 1;
             if (tem >= 0 && tem <= 100) {
                 setting.setPaddingTop(tem);
@@ -269,7 +201,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onMarginChange();
             }
         });
-        ivBottomAdd.setOnClickListener(v -> {
+        binding.ivBottomAdd.setOnClickListener(v -> {
             int tem = setting.getPaddingBottom() + 1;
             if (tem >= 0 && tem <= 100) {
                 setting.setPaddingBottom(tem);
@@ -277,7 +209,7 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onMarginChange();
             }
         });
-        ivBottomMinus.setOnClickListener(v -> {
+        binding.ivBottomMinus.setOnClickListener(v -> {
             int tem = setting.getPaddingBottom() - 1;
             if (tem >= 0 && tem <= 100) {
                 setting.setPaddingBottom(tem);
@@ -285,23 +217,23 @@ public class CustomizeComMenu extends FrameLayout {
                 callback.onMarginChange();
             }
         });
-        sbLeftProgress.setOnSeekBarChangeListener(onPaddingChange);
-        sbRightProgress.setOnSeekBarChangeListener(onPaddingChange);
-        sbTopProgress.setOnSeekBarChangeListener(onPaddingChange);
-        sbBottomProgress.setOnSeekBarChangeListener(onPaddingChange);
+        binding.sbLeftProgress.setOnSeekBarChangeListener(onPaddingChange);
+        binding.sbRightProgress.setOnSeekBarChangeListener(onPaddingChange);
+        binding.sbTopProgress.setOnSeekBarChangeListener(onPaddingChange);
+        binding.sbBottomProgress.setOnSeekBarChangeListener(onPaddingChange);
 
-        tvNormalCom.setOnClickListener(v -> {
+        binding.tvNormalCom.setOnClickListener(v -> {
             setting.setTightCom(false);
             initSelect();
             callback.onRefreshUI();
         });
-        tvTightCom.setOnClickListener(v -> {
+        binding.tvTightCom.setOnClickListener(v -> {
             setting.setTightCom(true);
             initSelect();
             callback.onRefreshUI();
             DialogCreator.createTipDialog(getContext(), getContext().getResources().getString(R.string.tight_com_tip));
         });
-        tvReset.setOnClickListener(v -> {
+        binding.tvReset.setOnClickListener(v -> {
             setting.setLineMultiplier(1);
             setting.setParagraphSize(0.9f);
             setting.setTextLetterSpacing(0);
@@ -317,42 +249,42 @@ public class CustomizeComMenu extends FrameLayout {
 
     private void initLine(){
         int line = (int) (setting.getLineMultiplier() * 10);
-        initProgress(tvLineSpacing, sbLineProgress, String.format("行间距(%s)", line), line + 3);
+        initProgress(binding.tvLineSpacing, binding.sbLineProgress, String.format("行间距(%s)", line), line + 3);
     }
 
     private void initPara(){
         int para = (int) (setting.getParagraphSize() * 10);
-        initProgress(tvParaSpacing, sbParaProgress, String.format("段间距(%s)", para), para);
+        initProgress(binding.tvParaSpacing, binding.sbParaProgress, String.format("段间距(%s)", para), para);
     }
 
     private void initText(){
         int text = (int) (setting.getTextLetterSpacing() * 100);
-        initProgress(tvTextSpacing, sbTextProgress, String.format("字间距(%s)", text), text + 20);
+        initProgress(binding.tvTextSpacing, binding.sbTextProgress, String.format("字间距(%s)", text), text + 20);
     }
 
     private void initLeft(){
         int left = setting.getPaddingLeft();
-        initProgress(tvLeftSpacing, sbLeftProgress, String.format("左边距(%s)", left), left);
+        initProgress(binding.tvLeftSpacing, binding.sbLeftProgress, String.format("左边距(%s)", left), left);
     }
 
     private void initRight(){
         int right = setting.getPaddingRight();
-        initProgress(tvRightSpacing, sbRightProgress, String.format("右边距(%s)", right), right);
+        initProgress(binding.tvRightSpacing, binding.sbRightProgress, String.format("右边距(%s)", right), right);
     }
 
     private void initTop(){
         int top = setting.getPaddingTop();
-        initProgress(tvTopSpacing, sbTopProgress, String.format("上边距(%s)", top), top);
+        initProgress(binding.tvTopSpacing, binding.sbTopProgress, String.format("上边距(%s)", top), top);
     }
 
     private void initBottom(){
         int bottom = setting.getPaddingBottom();
-        initProgress(tvBottomSpacing, sbBottomProgress, String.format("下边距(%s)", bottom), bottom);
+        initProgress(binding.tvBottomSpacing, binding.sbBottomProgress, String.format("下边距(%s)", bottom), bottom);
     }
 
     private void initSelect(){
-        tvTightCom.setSelected(setting.isTightCom());
-        tvNormalCom.setSelected(!setting.isTightCom());
+        binding.tvTightCom.setSelected(setting.isTightCom());
+        binding.tvNormalCom.setSelected(!setting.isTightCom());
     }
 
     private void initProgress(TextView tvSpacing, SeekBar sbProgress, String text, int value){

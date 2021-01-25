@@ -3,49 +3,45 @@ package xyz.fycz.myreader.ui.activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.NumberPicker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentTransaction;
 
-import butterknife.BindView;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.greendao.service.BookGroupService;
-import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.ui.dialog.FingerprintDialog;
-import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
-import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
+import xyz.fycz.myreader.databinding.ActivityMoreSettingBinding;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.ui.fragment.PrivateBooksFragment;
 import xyz.fycz.myreader.ui.fragment.WebDavFragment;
-import xyz.fycz.myreader.util.CyptoUtils;
-import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.FingerprintUtils;
+import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 
 import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
 
@@ -55,80 +51,8 @@ import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
  */
 
 public class MoreSettingActivity extends BaseActivity {
-    @BindView(R.id.sv_content)
-    ScrollView svContent;
-    @BindView(R.id.ll_webdav)
-    LinearLayout mLlWebdav;
-    @BindView(R.id.rl_volume)
-    RelativeLayout mRlVolume;
-    @BindView(R.id.sc_volume)
-    SwitchCompat mScVolume;
-    @BindView(R.id.rl_always_next)
-    RelativeLayout mRlAlwaysNext;
-    @BindView(R.id.sc_always_next)
-    SwitchCompat mScAlwaysNext;
-    @BindView(R.id.rl_show_status)
-    RelativeLayout mRlShowStatus;
-    @BindView(R.id.sc_show_status)
-    SwitchCompat mScShowStatus;
-    @BindView(R.id.rl_long_press)
-    RelativeLayout mRlLongPress;
-    @BindView(R.id.sc_long_press)
-    SwitchCompat mScLongPress;
-    @BindView(R.id.rl_content_replace)
-    RelativeLayout mRlContentReplace;
-    @BindView(R.id.rl_read_aloud_volume_turn_page)
-    RelativeLayout mRlReadAloudVolumeTurnPage;
-    @BindView(R.id.sc_read_aloud_volume_turn_page)
-    SwitchCompat mScReadAloudVolumeTurnPage;
-    @BindView(R.id.rl_no_menu_title)
-    RelativeLayout mRlNoMenuTitle;
-    @BindView(R.id.sc_no_menu_title)
-    SwitchCompat mScNoMenuTitle;
-    @BindView(R.id.rl_reset_screen)
-    RelativeLayout mRlResetScreen;
-    @BindView(R.id.sc_reset_screen)
-    Spinner mScResetScreen;
-    @BindView(R.id.rl_auto_refresh)
-    RelativeLayout mRlAutoRefresh;
-    @BindView(R.id.sc_auto_refresh)
-    SwitchCompat mScAutoRefresh;
-    @BindView(R.id.ll_book_sort)
-    LinearLayout mLlBookSort;
-    @BindView(R.id.tv_book_sort)
-    TextView mTvBookSort;
-    @BindView(R.id.rl_private_bookcase)
-    RelativeLayout mRlPrivateBookcase;
-    @BindView(R.id.ll_close_refresh)
-    LinearLayout mLlCloseRefresh;
-    @BindView(R.id.ll_disable_source)
-    LinearLayout mLlDisableSource;
-    @BindView(R.id.ll_thread_num)
-    LinearLayout mLlThreadNum;
-    @BindView(R.id.tv_thread_num)
-    TextView mTvThreadNum;
-    @BindView(R.id.iv_match_chapter_tip)
-    ImageView mIvMatchChapterTip;
-    @BindView(R.id.rl_match_chapter)
-    RelativeLayout mRlMatchChapter;
-    @BindView(R.id.sc_match_chapter)
-    SwitchCompat mScMatchChapter;
-    @BindView(R.id.rl_match_chapter_suitability)
-    RelativeLayout mRlMatchChapterSuitability;
-    @BindView(R.id.sc_match_chapter_suitability)
-    Spinner mScMatchChapterSuitability;
-    @BindView(R.id.rl_cathe_gap)
-    RelativeLayout mRlCatheGap;
-    @BindView(R.id.sc_cathe_gap)
-    Spinner mScCatheGap;
-    @BindView(R.id.rl_delete_cathe)
-    RelativeLayout mRlDeleteCathe;
-    @BindView(R.id.ll_download_all)
-    LinearLayout mLlDownloadAll;
-    /*@BindView(R.id.rl_bookstore)
-    RelativeLayout mRlBookstore;
-    @BindView(R.id.sc_bookstore)
-    SwitchCompat mScBookstore;*/
+
+    private ActivityMoreSettingBinding binding;
 
     private boolean needRefresh;
     private boolean upMenu;
@@ -165,8 +89,9 @@ public class MoreSettingActivity extends BaseActivity {
     private BaseFragment curFragment;
 
     @Override
-    protected int getContentId() {
-        return R.layout.activity_more_setting;
+    protected void bindView() {
+        binding = ActivityMoreSettingBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
 
     @Override
@@ -213,16 +138,16 @@ public class MoreSettingActivity extends BaseActivity {
         super.initWidget();
         initSwitchStatus();
         if (sortStyle == 1) {
-            mTvBookSort.setText(getString(R.string.time_sort));
+            binding.tvBookSort.setText(getString(R.string.time_sort));
         } else if (sortStyle == 2) {
-            mTvBookSort.setText(getString(R.string.book_name_sort));
+            binding.tvBookSort.setText(getString(R.string.book_name_sort));
         }
         if (isMatchChapter) {
-            mRlMatchChapterSuitability.setVisibility(View.VISIBLE);
+            binding.rlMatchChapterSuitability.setVisibility(View.VISIBLE);
         } else {
-            mRlMatchChapterSuitability.setVisibility(View.GONE);
+            binding.rlMatchChapterSuitability.setVisibility(View.GONE);
         }
-        mTvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
+        binding.tvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
     }
 
     @Override
@@ -254,21 +179,21 @@ public class MoreSettingActivity extends BaseActivity {
     }
 
     private void initSwitchStatus() {
-        mScVolume.setChecked(isVolumeTurnPage);
-        mScAlwaysNext.setChecked(alwaysNext);
-        mScMatchChapter.setChecked(isMatchChapter);
-        mScAutoRefresh.setChecked(autoRefresh);
-        mScShowStatus.setChecked(isShowStatusBar);
-        mScLongPress.setChecked(isLongPress);
-        mScNoMenuTitle.setChecked(noMenuTitle);
-        mScReadAloudVolumeTurnPage.setChecked(readAloudVolumeTurnPage);
+        binding.scVolume.setChecked(isVolumeTurnPage);
+        binding.scAlwaysNext.setChecked(alwaysNext);
+        binding.scMatchChapter.setChecked(isMatchChapter);
+        binding.scAutoRefresh.setChecked(autoRefresh);
+        binding.scShowStatus.setChecked(isShowStatusBar);
+        binding.scLongPress.setChecked(isLongPress);
+        binding.scNoMenuTitle.setChecked(noMenuTitle);
+        binding.scReadAloudVolumeTurnPage.setChecked(readAloudVolumeTurnPage);
     }
 
     @Override
     protected void initClick() {
         super.initClick();
-        mLlWebdav.setOnClickListener(v -> {
-            svContent.setVisibility(View.GONE);
+        binding.llWebdav.setOnClickListener(v -> {
+            binding.svContent.setVisibility(View.GONE);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             if (mWebDavFragment == null) {
                 mWebDavFragment = new WebDavFragment();
@@ -281,31 +206,31 @@ public class MoreSettingActivity extends BaseActivity {
             setUpToolbar();
         });
 
-        mRlVolume.setOnClickListener(
+        binding.rlVolume.setOnClickListener(
                 (v) -> {
                     if (isVolumeTurnPage) {
                         isVolumeTurnPage = false;
                     } else {
                         isVolumeTurnPage = true;
                     }
-                    mScVolume.setChecked(isVolumeTurnPage);
+                    binding.scVolume.setChecked(isVolumeTurnPage);
                     mSetting.setVolumeTurnPage(isVolumeTurnPage);
                     SysManager.saveSetting(mSetting);
                 }
         );
-        mRlAlwaysNext.setOnClickListener(
+        binding.rlAlwaysNext.setOnClickListener(
                 (v) -> {
                     if (alwaysNext) {
                         alwaysNext = false;
                     } else {
                         alwaysNext = true;
                     }
-                    mScAlwaysNext.setChecked(alwaysNext);
+                    binding.scAlwaysNext.setChecked(alwaysNext);
                     mSetting.setAlwaysNext(alwaysNext);
                     SysManager.saveSetting(mSetting);
                 }
         );
-        mRlShowStatus.setOnClickListener(
+        binding.rlShowStatus.setOnClickListener(
                 (v) -> {
                     needRefresh = true;
                     if (isShowStatusBar) {
@@ -313,12 +238,12 @@ public class MoreSettingActivity extends BaseActivity {
                     } else {
                         isShowStatusBar = true;
                     }
-                    mScShowStatus.setChecked(isShowStatusBar);
+                    binding.scShowStatus.setChecked(isShowStatusBar);
                     mSetting.setShowStatusBar(isShowStatusBar);
                     SysManager.saveSetting(mSetting);
                 }
         );
-        mRlLongPress.setOnClickListener(
+        binding.rlLongPress.setOnClickListener(
                 (v) -> {
                     needRefresh = false;
                     if (isLongPress) {
@@ -326,25 +251,25 @@ public class MoreSettingActivity extends BaseActivity {
                     } else {
                         isLongPress = true;
                     }
-                    mScLongPress.setChecked(isLongPress);
+                    binding.scLongPress.setChecked(isLongPress);
                     mSetting.setCanSelectText(isLongPress);
                     SysManager.saveSetting(mSetting);
                 }
         );
-        mRlContentReplace.setOnClickListener(v -> startActivity(new Intent(this, RuleActivity.class)));
-        mRlReadAloudVolumeTurnPage.setOnClickListener(
+        binding.rlContentReplace.setOnClickListener(v -> startActivity(new Intent(this, RuleActivity.class)));
+        binding.rlReadAloudVolumeTurnPage.setOnClickListener(
                 (v) -> {
                     if (readAloudVolumeTurnPage) {
                         readAloudVolumeTurnPage = false;
                     } else {
                         readAloudVolumeTurnPage = true;
                     }
-                    mScReadAloudVolumeTurnPage.setChecked(readAloudVolumeTurnPage);
+                    binding.scReadAloudVolumeTurnPage.setChecked(readAloudVolumeTurnPage);
                     mSetting.setReadAloudVolumeTurnPage(readAloudVolumeTurnPage);
                     SysManager.saveSetting(mSetting);
                 }
         );
-        mRlNoMenuTitle.setOnClickListener(
+        binding.rlNoMenuTitle.setOnClickListener(
                 (v) -> {
                     upMenu = true;
                     if (noMenuTitle) {
@@ -352,13 +277,13 @@ public class MoreSettingActivity extends BaseActivity {
                     } else {
                         noMenuTitle = true;
                     }
-                    mScNoMenuTitle.setChecked(noMenuTitle);
+                    binding.scNoMenuTitle.setChecked(noMenuTitle);
                     mSetting.setNoMenuChTitle(noMenuTitle);
                     SysManager.saveSetting(mSetting);
                 }
         );
 
-        mLlBookSort.setOnClickListener(v -> {
+        binding.llBookSort.setOnClickListener(v -> {
             MyAlertDialog.build(this)
                     .setTitle(getString(R.string.book_sort))
                     .setSingleChoiceItems(R.array.book_sort, sortStyle, (dialog, which) -> {
@@ -366,40 +291,40 @@ public class MoreSettingActivity extends BaseActivity {
                         mSetting.setSortStyle(sortStyle);
                         SysManager.saveSetting(mSetting);
                         if (sortStyle == 0) {
-                            mTvBookSort.setText(getString(R.string.manual_sort));
+                            binding.tvBookSort.setText(getString(R.string.manual_sort));
                             if (!SharedPreUtils.getInstance().getBoolean("manualSortTip")) {
                                 DialogCreator.createTipDialog(this, "可在书架编辑状态下长按移动书籍进行排序！");
                                 SharedPreUtils.getInstance().putBoolean("manualSortTip", true);
                             }
                         } else if (sortStyle == 1) {
-                            mTvBookSort.setText(getString(R.string.time_sort));
+                            binding.tvBookSort.setText(getString(R.string.time_sort));
                         } else if (sortStyle == 2) {
-                            mTvBookSort.setText(getString(R.string.book_name_sort));
+                            binding.tvBookSort.setText(getString(R.string.book_name_sort));
                         }
                         dialog.dismiss();
                     }).setNegativeButton("取消", null).show();
         });
 
-        mRlPrivateBookcase.setOnClickListener(v -> {
+        binding.rlPrivateBookcase.setOnClickListener(v -> {
             MyAlertDialog.showPrivateVerifyDia(this, needGoTo -> {
                 showPrivateBooksFragment();
             });
         });
 
-        mRlAutoRefresh.setOnClickListener(
+        binding.rlAutoRefresh.setOnClickListener(
                 (v) -> {
                     if (autoRefresh) {
                         autoRefresh = false;
                     } else {
                         autoRefresh = true;
                     }
-                    mScAutoRefresh.setChecked(autoRefresh);
+                    binding.scAutoRefresh.setChecked(autoRefresh);
                     mSetting.setRefreshWhenStart(autoRefresh);
                     SysManager.saveSetting(mSetting);
                 }
         );
 
-        mLlCloseRefresh.setOnClickListener(v -> {
+        binding.llCloseRefresh.setOnClickListener(v -> {
             MyApplication.runOnUiThread(() -> {
                 if (mCloseRefreshDia != null) {
                     mCloseRefreshDia.show();
@@ -444,7 +369,7 @@ public class MoreSettingActivity extends BaseActivity {
             });
         });
 
-        mLlDisableSource.setOnClickListener(v -> {
+        binding.llDisableSource.setOnClickListener(v -> {
             if (mDisableSourceDia != null) {
                 mDisableSourceDia.show();
                 return;
@@ -490,7 +415,7 @@ public class MoreSettingActivity extends BaseActivity {
                     });
         });
 
-        mLlThreadNum.setOnClickListener(v -> {
+        binding.llThreadNum.setOnClickListener(v -> {
             View view = LayoutInflater.from(this).inflate(R.layout.dialog_number_picker, null);
             NumberPicker threadPick = view.findViewById(R.id.number_picker);
             threadPick.setMaxValue(1024);
@@ -505,28 +430,28 @@ public class MoreSettingActivity extends BaseActivity {
                     .setPositiveButton("确定", (dialog, which) -> {
                         threadNum = threadPick.getValue();
                         SharedPreUtils.getInstance().putInt(getString(R.string.threadNum), threadNum);
-                        mTvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
+                        binding.tvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
                     }).setNegativeButton("取消", null)
                     .show();
         });
 
-        mRlMatchChapter.setOnClickListener(
+        binding.rlMatchChapter.setOnClickListener(
                 (v) -> {
                     if (isMatchChapter) {
                         isMatchChapter = false;
-                        mRlMatchChapterSuitability.setVisibility(View.GONE);
+                        binding.rlMatchChapterSuitability.setVisibility(View.GONE);
                     } else {
                         isMatchChapter = true;
-                        mRlMatchChapterSuitability.setVisibility(View.VISIBLE);
+                        binding.rlMatchChapterSuitability.setVisibility(View.VISIBLE);
                     }
-                    mScMatchChapter.setChecked(isMatchChapter);
+                    binding.scMatchChapter.setChecked(isMatchChapter);
                     mSetting.setMatchChapter(isMatchChapter);
                     SysManager.saveSetting(mSetting);
                 }
         );
 
 
-        mLlDownloadAll.setOnClickListener(v -> {
+        binding.llDownloadAll.setOnClickListener(v -> {
             MyApplication.runOnUiThread(() -> {
                 if (mDownloadAllDia != null) {
                     mDownloadAllDia.show();
@@ -573,13 +498,13 @@ public class MoreSettingActivity extends BaseActivity {
             });
         });
 
-        mIvMatchChapterTip.setOnClickListener(v -> DialogCreator.createTipDialog(this, "智能匹配", getString(R.string.match_chapter_tip)));
+        binding.ivMatchChapterTip.setOnClickListener(v -> DialogCreator.createTipDialog(this, "智能匹配", getString(R.string.match_chapter_tip)));
 
-        mRlMatchChapterSuitability.setOnClickListener(v -> mScMatchChapterSuitability.performClick());
-        mRlResetScreen.setOnClickListener(v -> mScResetScreen.performClick());
-        mRlCatheGap.setOnClickListener(v -> mScCatheGap.performClick());
+        binding.rlMatchChapterSuitability.setOnClickListener(v -> binding.scMatchChapterSuitability.performClick());
+        binding.rlResetScreen.setOnClickListener(v -> binding.scResetScreen.performClick());
+        binding.rlCatheGap.setOnClickListener(v -> binding.scCatheGap.performClick());
 
-        mRlDeleteCathe.setOnClickListener(v -> {
+        binding.rlDeleteCathe.setOnClickListener(v -> {
             MyApplication.runOnUiThread(() -> {
                 File catheFile = getCacheDir();
                 String catheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(catheFile));
@@ -630,7 +555,7 @@ public class MoreSettingActivity extends BaseActivity {
             setResult(AppCompatActivity.RESULT_OK, result);
             super.finish();
         } else {
-            svContent.setVisibility(View.VISIBLE);
+            binding.svContent.setVisibility(View.VISIBLE);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.hide(curFragment);
             ft.commit();
@@ -645,7 +570,7 @@ public class MoreSettingActivity extends BaseActivity {
         ArrayAdapter<CharSequence> resetScreenAdapter = ArrayAdapter.createFromResource(this,
                 R.array.reset_screen_time, android.R.layout.simple_spinner_item);
         resetScreenAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mScResetScreen.setAdapter(resetScreenAdapter);
+        binding.scResetScreen.setAdapter(resetScreenAdapter);
 
         int resetScreenSelection = 0;
         switch (resetScreenTime) {
@@ -662,8 +587,8 @@ public class MoreSettingActivity extends BaseActivity {
                 resetScreenSelection = 3;
                 break;
         }
-        mScResetScreen.setSelection(resetScreenSelection);
-        mScResetScreen.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        binding.scResetScreen.setSelection(resetScreenSelection);
+        binding.scResetScreen.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
@@ -693,7 +618,7 @@ public class MoreSettingActivity extends BaseActivity {
         ArrayAdapter<CharSequence> matchSuiAdapter = ArrayAdapter.createFromResource(this,
                 R.array.match_chapter_suitability, android.R.layout.simple_spinner_item);
         matchSuiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mScMatchChapterSuitability.setAdapter(matchSuiAdapter);
+        binding.scMatchChapterSuitability.setAdapter(matchSuiAdapter);
 
         if (matchChapterSuitability == 0.0) {
             matchChapterSuitability = 0.7f;
@@ -702,9 +627,9 @@ public class MoreSettingActivity extends BaseActivity {
         }
         int matchSuiSelection = (int) (matchChapterSuitability * 10 - 5);
 
-        mScMatchChapterSuitability.setSelection(matchSuiSelection);
+        binding.scMatchChapterSuitability.setSelection(matchSuiSelection);
 
-        mScMatchChapterSuitability.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        binding.scMatchChapterSuitability.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 matchChapterSuitability = (position + 5) * 1f / 10f;
@@ -721,7 +646,7 @@ public class MoreSettingActivity extends BaseActivity {
         ArrayAdapter<CharSequence> catheGapAdapter = ArrayAdapter.createFromResource(this,
                 R.array.cathe_chapter_gap, android.R.layout.simple_spinner_item);
         catheGapAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mScCatheGap.setAdapter(catheGapAdapter);
+        binding.scCatheGap.setAdapter(catheGapAdapter);
 
         if (catheCap == 0) {
             catheCap = 150;
@@ -730,9 +655,9 @@ public class MoreSettingActivity extends BaseActivity {
         }
         int catheGapSelection = catheCap / 50 - 1;
 
-        mScCatheGap.setSelection(catheGapSelection);
+        binding.scCatheGap.setSelection(catheGapSelection);
 
-        mScCatheGap.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        binding.scCatheGap.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 catheCap = (position + 1) * 50;
@@ -769,7 +694,7 @@ public class MoreSettingActivity extends BaseActivity {
     }
 
     private void showPrivateBooksFragment(){
-        svContent.setVisibility(View.GONE);
+        binding.svContent.setVisibility(View.GONE);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if (mPrivateBooksFragment == null) {
             mPrivateBooksFragment = new PrivateBooksFragment();
