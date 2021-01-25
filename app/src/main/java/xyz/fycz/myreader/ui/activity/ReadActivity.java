@@ -28,12 +28,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,8 +36,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gyf.immersionbar.ImmersionBar;
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
 
@@ -51,8 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import butterknife.BindView;
-import butterknife.OnClick;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
@@ -60,6 +51,7 @@ import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
+import xyz.fycz.myreader.databinding.ActivityReadBinding;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.enums.Font;
@@ -120,58 +112,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private static final String TAG = ReadActivity.class.getSimpleName();
 
     /*****************************View***********************************/
-    @BindView(R.id.rl_content)
-    RelativeLayout rlContent;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.read_abl_top_menu)
-    AppBarLayout readAblTopMenu;
-    @BindView(R.id.ll_chapter_view)
-    LinearLayout chapterView;
-    @BindView(R.id.tv_chapter_title_top)
-    TextView chapterTitle;
-    @BindView(R.id.tv_chapter_url)
-    TextView chapterUrl;
-    @BindView(R.id.read_pv_content)
-    PageView pageView;
-    @BindView(R.id.pb_loading)
-    ProgressBar pbLoading;
-    @BindView(R.id.cursor_left)
-    ImageView cursorLeft;
-    @BindView(R.id.cursor_right)
-    ImageView cursorRight;
-    @BindView(R.id.read_tv_page_tip)
-    TextView readTvPageTip;
-    @BindView(R.id.read_tv_pre_chapter)
-    TextView readTvPreChapter;
-    @BindView(R.id.read_sb_chapter_progress)
-    SeekBar readSbChapterProgress;
-    @BindView(R.id.read_tv_next_chapter)
-    TextView readTvNextChapter;
-    @BindView(R.id.read_tv_category)
-    TextView readTvCategory;
-    @BindView(R.id.btn_night_mode)
-    FloatingActionButton readBtnNightMode;
-    @BindView(R.id.read_tv_brightness_eye)
-    TextView readTvBrightnessEye;
-    @BindView(R.id.read_tv_setting)
-    TextView readTvSetting;
-    @BindView(R.id.read_ll_bottom_menu)
-    LinearLayout readLlBottomMenu;
-    @BindView(R.id.read_tv_listen_book)
-    TextView readTvListenBook;
-    @BindView(R.id.read_setting_menu)
-    ReadSettingMenu readSettingMenu;
-    @BindView(R.id.read_customize_menu)
-    CustomizeComMenu customizeComMenu;
-    @BindView(R.id.read_auto_page_menu)
-    AutoPageMenu autoPageMenu;
-    @BindView(R.id.read_customize_layout_menu)
-    CustomizeLayoutMenu customizeLayoutMenu;
-    @BindView(R.id.read_brightness_eye_menu)
-    BrightnessEyeMenu brightnessEyeMenu;
-    @BindView(R.id.vwNavigationBar)
-    View vwNavigationBar;
+    private ActivityReadBinding binding;
 
     /***************************variable*****************************/
     private Book mBook;
@@ -270,7 +211,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                                 e.getMessage());
                         e.printStackTrace();
                     }
-                    pbLoading.setVisibility(View.GONE);
+                    binding.pbLoading.setVisibility(View.GONE);
                     break;
                 case 3:
                     break;
@@ -299,7 +240,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     mPageLoader.chapterError();
                     break;
                 case 8:
-                    pbLoading.setVisibility(View.GONE);
+                    binding.pbLoading.setVisibility(View.GONE);
                     break;
                 case 9:
                     ToastUtils.showInfo("正在后台缓存书籍，具体进度可查看通知栏！");
@@ -314,11 +255,13 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     };
 
 
-    /**************************override***********************************/
     @Override
-    protected int getContentId() {
-        return R.layout.activity_read;
+    protected void bindView() {
+        binding = ActivityReadBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
+
+    /**************************override***********************************/
 
 
     @Override
@@ -379,7 +322,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
         mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
 
-        mPageLoader = pageView.getPageLoader(mBook, mReadCrawler, mSetting);
+        mPageLoader = binding.readPvContent.getPageLoader(mBook, mReadCrawler, mSetting);
         //Dialog
         mSourceDialog = new SourceExchangeDialog(this, mBook);
     }
@@ -389,13 +332,13 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         super.initWidget();
         ImmersionBar.with(this).fullScreen(true).init();
         //隐藏StatusBar
-        pageView.post(
+        binding.readPvContent.post(
                 this::hideSystemBar
         );
         if (!mSetting.isBrightFollowSystem()) {
             BrightUtil.setBrightness(this, mSetting.getBrightProgress());
         }
-        pbLoading.setVisibility(View.VISIBLE);
+        binding.pbLoading.setVisibility(View.VISIBLE);
         initEyeView();
         initSettingListener();
         initTopMenu();
@@ -408,7 +351,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     @Override
     protected void initClick() {
         super.initClick();
-        pageView.setTouchListener(new PageView.TouchListener() {
+        binding.readPvContent.setTouchListener(new PageView.TouchListener() {
             @Override
             public boolean onTouch() {
                 screenOffTimerStart();
@@ -441,14 +384,14 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
             @Override
             public void onTouchClearCursor() {
-                cursorLeft.setVisibility(View.INVISIBLE);
-                cursorRight.setVisibility(View.INVISIBLE);
+                binding.cursorLeft.setVisibility(View.INVISIBLE);
+                binding.cursorRight.setVisibility(View.INVISIBLE);
                 longPressMenu.hidePopupListWindow();
             }
 
             @Override
             public void onLongPress() {
-                if (!pageView.isRunning()) {
+                if (!binding.readPvContent.isRunning()) {
                     selectTextCursorShow();
                     showAction();
                 }
@@ -518,11 +461,11 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 }
         );
 
-        readSbChapterProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        binding.readSbChapterProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    readTvPageTip.setText((progress + 1) + "/" + (seekBar.getMax() + 1));
+                    binding.readTvPageTip.setText((progress + 1) + "/" + (seekBar.getMax() + 1));
                 }
             }
 
@@ -568,7 +511,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             startActivity(intent);
         });
 
-        readTvListenBook.setOnClickListener(v -> {
+        binding.readTvListenBook.setOnClickListener(v -> {
             if (mSetting.getPageMode() == PageMode.SCROLL) {
                 ToastUtils.showWarring("朗读暂不支持滚动翻页模式!");
                 return;
@@ -585,12 +528,54 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             mAudioPlayerDialog.show();
         });
         initReadLongPressPop();
-        cursorLeft.setOnTouchListener(this);
-        cursorRight.setOnTouchListener(this);
-        rlContent.setOnTouchListener(this);
+        binding.cursorLeft.setOnTouchListener(this);
+        binding.cursorRight.setOnTouchListener(this);
+        binding.rlContent.setOnTouchListener(this);
     }
 
-
+    protected void initBottomMenuClick() {
+        //设置
+        binding.readTvSetting.setOnClickListener(v -> {
+            toggleMenu(false);
+            binding.readSettingMenu.startAnimation(mBottomInAnim);
+            binding.readSettingMenu.setVisibility(VISIBLE);
+        });
+        //上一章
+        binding.readTvPreChapter.setOnClickListener(v -> mPageLoader.skipPreChapter());
+        //下一章
+        binding.readTvNextChapter.setOnClickListener(v -> mPageLoader.skipNextChapter());
+        //护眼
+        binding.readTvBrightnessEye.setOnClickListener(v -> {
+            hideReadMenu();
+            binding.readBrightnessEyeMenu.initWidget();
+            binding.readBrightnessEyeMenu.setVisibility(VISIBLE);
+            binding.readBrightnessEyeMenu.startAnimation(mBottomInAnim);
+        });
+        //目录
+        binding.readTvCategory.setOnClickListener(v -> {
+            //切换菜单
+            toggleMenu(true);
+            //跳转
+            mHandler.postDelayed(() -> {
+                Intent intent = new Intent(this, CatalogActivity.class);
+                intent.putExtra(APPCONST.BOOK, mBook);
+                this.startActivityForResult(intent, APPCONST.REQUEST_CHAPTER_PAGE);
+            }, mBottomOutAnim.getDuration());
+        });
+        //跳转链接
+        binding.llChapterView.setOnClickListener(v -> {
+            if (mChapters != null && mChapters.size() != 0) {
+                Chapter curChapter = mChapters.get(mPageLoader.getChapterPos());
+                String url = curChapter.getUrl();
+                if (!"本地书籍".equals(mBook.getType()) && !StringHelper.isEmpty(url)) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    Uri uri = Uri.parse(url);
+                    intent.setData(uri);
+                    startActivity(intent);
+                }
+            }
+        });
+    }
     @Override
     protected void processLogic() {
         super.processLogic();
@@ -620,13 +605,13 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         boolean isVolumeTurnPage = SysManager.getSetting().isVolumeTurnPage();
-        if (readAblTopMenu.getVisibility() != View.VISIBLE &&
-                customizeLayoutMenu.getVisibility() != View.VISIBLE &&
-                autoPageMenu.getVisibility() != View.VISIBLE &&
-                customizeComMenu.getVisibility() != View.VISIBLE &&
-                readSettingMenu.getVisibility() != View.VISIBLE &&
-                brightnessEyeMenu.getVisibility() != View.VISIBLE) {
-            if (pageView.getSelectMode() != PageView.SelectMode.Normal) {
+        if (binding.readAblTopMenu.getVisibility() != View.VISIBLE &&
+                binding.readCustomizeLayoutMenu.getVisibility() != View.VISIBLE &&
+                binding.readAutoPageMenu.getVisibility() != View.VISIBLE &&
+                binding.readCustomizeMenu.getVisibility() != View.VISIBLE &&
+                binding.readSettingMenu.getVisibility() != View.VISIBLE &&
+                binding.readBrightnessEyeMenu.getVisibility() != View.VISIBLE) {
+            if (binding.readPvContent.getSelectMode() != PageView.SelectMode.Normal) {
                 clearSelect();
             }
             switch (keyCode) {
@@ -747,52 +732,46 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_change_source:
-                mSourceDialog.show();
-                break;
-            case R.id.action_reload:
-                isPrev = false;
-                if (!"本地书籍".equals(mBook.getType())) {
-                    mChapterService.deleteChapterCacheFile(mChapters.get(mPageLoader.getChapterPos()));
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_change_source) {
+            mSourceDialog.show();
+        } else if (itemId == R.id.action_reload) {
+            isPrev = false;
+            if (!"本地书籍".equals(mBook.getType())) {
+                mChapterService.deleteChapterCacheFile(mChapters.get(mPageLoader.getChapterPos()));
+            }
+            mPageLoader.refreshChapter(mChapters.get(mPageLoader.getChapterPos()));
+        } else if (itemId == R.id.action_add_bookmark) {
+            if (mChapters == null || mChapters.size() == 0) {
+                if ("本地书籍".equals(mBook.getType())) {
+                    ToastUtils.showWarring("请等待章节拆分完成后再添加书签");
+                } else {
+                    ToastUtils.showError("章节目录为空，添加书签失败!");
                 }
-                mPageLoader.refreshChapter(mChapters.get(mPageLoader.getChapterPos()));
-                break;
-            case R.id.action_add_bookmark:
-                if (mChapters == null || mChapters.size() == 0) {
-                    if ("本地书籍".equals(mBook.getType())) {
-                        ToastUtils.showWarring("请等待章节拆分完成后再添加书签");
-                    } else {
-                        ToastUtils.showError("章节目录为空，添加书签失败!");
-                    }
-                    return true;
-                }
-                Chapter curChapter = mChapters.get(mPageLoader.getChapterPos());
-                BookMark bookMark = new BookMark();
-                bookMark.setBookId(mBook.getId());
-                bookMark.setTitle(curChapter.getTitle());
-                bookMark.setBookMarkChapterNum(mPageLoader.getChapterPos());
-                bookMark.setBookMarkReadPosition(mPageLoader.getPagePos());
-                mBookMarkService.addOrUpdateBookMark(bookMark);
-                DialogCreator.createTipDialog(this, "《" + mBook.getName() +
-                        "》：" + bookMark.getTitle() + "[" + (bookMark.getBookMarkReadPosition() + 1) +
-                        "]\n书签添加成功，书签列表可在目录界面查看！");
                 return true;
-            case R.id.action_replace_content:
-                Intent ruleIntent = new Intent(this, RuleActivity.class);
-                startActivityForResult(ruleIntent, APPCONST.REQUEST_REFRESH_READ_UI);
-                break;
-            case R.id.action_copy_content:
-                new CopyContentDialog(this, mPageLoader.getContent()).show();
-                break;
-            case R.id.action_open_link:
-                Uri uri = Uri.parse(mBook.getChapterUrl());
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intent);
-                break;
-            case R.id.action_download:
-                download();
-                break;
+            }
+            Chapter curChapter = mChapters.get(mPageLoader.getChapterPos());
+            BookMark bookMark = new BookMark();
+            bookMark.setBookId(mBook.getId());
+            bookMark.setTitle(curChapter.getTitle());
+            bookMark.setBookMarkChapterNum(mPageLoader.getChapterPos());
+            bookMark.setBookMarkReadPosition(mPageLoader.getPagePos());
+            mBookMarkService.addOrUpdateBookMark(bookMark);
+            DialogCreator.createTipDialog(this, "《" + mBook.getName() +
+                    "》：" + bookMark.getTitle() + "[" + (bookMark.getBookMarkReadPosition() + 1) +
+                    "]\n书签添加成功，书签列表可在目录界面查看！");
+            return true;
+        } else if (itemId == R.id.action_replace_content) {
+            Intent ruleIntent = new Intent(this, RuleActivity.class);
+            startActivityForResult(ruleIntent, APPCONST.REQUEST_REFRESH_READ_UI);
+        } else if (itemId == R.id.action_copy_content) {
+            new CopyContentDialog(this, mPageLoader.getContent()).show();
+        } else if (itemId == R.id.action_open_link) {
+            Uri uri = Uri.parse(mBook.getChapterUrl());
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        } else if (itemId == R.id.action_download) {
+            download();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -844,11 +823,11 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     break;
                 case APPCONST.REQUEST_SELECT_BG:
                     String bgPath = getPath(this, data.getData());
-                    customizeLayoutMenu.setCustomBg(bgPath);
+                    binding.readCustomizeLayoutMenu.setCustomBg(bgPath);
                     break;
                 case APPCONST.REQUEST_IMPORT_LAYOUT:
                     String zipPath = getPath(this, data.getData());
-                    customizeLayoutMenu.zip2Layout(zipPath);
+                    binding.readCustomizeLayoutMenu.zip2Layout(zipPath);
                     break;
             }
         }
@@ -875,7 +854,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 break;
         }
         SysManager.saveSetting(mSetting);
-        customizeLayoutMenu.upColor();
+        binding.readCustomizeLayoutMenu.upColor();
     }
 
     /**
@@ -906,11 +885,11 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         if (mChapters != null && mChapters.size() != 0) {
             Chapter curChapter = mChapters.get(mPageLoader.getChapterPos());
             String url = curChapter.getUrl();
-            chapterTitle.setText(curChapter.getTitle());
-            chapterUrl.setText(StringHelper.isEmpty(url) ? curChapter.getId() : url);
-            readSbChapterProgress.setProgress(mPageLoader.getPagePos());
-            readSbChapterProgress.setMax(mPageLoader.getAllPagePos() - 1);
-            readTvPageTip.setText((readSbChapterProgress.getProgress() + 1) + "/" + (readSbChapterProgress.getMax() + 1));
+            binding.tvChapterTitleTop.setText(curChapter.getTitle());
+            binding.tvChapterUrl.setText(StringHelper.isEmpty(url) ? curChapter.getId() : url);
+            binding.readSbChapterProgress.setProgress(mPageLoader.getPagePos());
+            binding.readSbChapterProgress.setMax(mPageLoader.getAllPagePos() - 1);
+            binding.readTvPageTip.setText(String.format("%s/%s", binding.readSbChapterProgress.getProgress() + 1 ,binding.readSbChapterProgress.getMax() + 1));
         }
     }
     /************************书籍相关******************************/
@@ -1138,7 +1117,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 ToastUtils.showWarring("该章节无内容！");
                 return;
             }
-            pbLoading.setVisibility(View.VISIBLE);
+            binding.pbLoading.setVisibility(View.VISIBLE);
             getChapterContent(mChapters.get(chapterPos), new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
@@ -1237,13 +1216,13 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      */
     private void initTopMenu() {
         int statusBarHeight = ImmersionBar.getStatusBarHeight(this);
-        readAblTopMenu.setPadding(0, statusBarHeight, 0, 0);
+        binding.readAblTopMenu.setPadding(0, statusBarHeight, 0, 0);
         if (mSetting.isNoMenuChTitle()) {
-            chapterView.setVisibility(GONE);
-            toolbar.getLayoutParams().height = 60 + ImmersionBar.getStatusBarHeight(this);
+            binding.llChapterView.setVisibility(GONE);
+            binding.toolbar.getLayoutParams().height = ScreenUtils.dpToPx(60) + ImmersionBar.getStatusBarHeight(this);
         } else {
-            chapterView.setVisibility(VISIBLE);
-            toolbar.getLayoutParams().height = 45 + ImmersionBar.getStatusBarHeight(this);
+            binding.llChapterView.setVisibility(VISIBLE);
+            binding.toolbar.getLayoutParams().height = ScreenUtils.dpToPx(45) + ImmersionBar.getStatusBarHeight(this);
         }
     }
 
@@ -1254,23 +1233,23 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         //判断是否全屏
         //if (mSetting.getHideStatusBar()) {
         if (!mSetting.isDayStyle()) {
-            readBtnNightMode.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_sun));
+            binding.btnNightMode.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_sun));
         }
-        readBtnNightMode.setOnClickListener(v -> changeNightAndDaySetting(mSetting.isDayStyle()));
+        binding.btnNightMode.setOnClickListener(v -> changeNightAndDaySetting(mSetting.isDayStyle()));
         if (true) {
             //还需要设置mBottomMenu的底部高度
             if (ImmersionBar.hasNavigationBar(this)) {
                 int height = ImmersionBar.getNavigationBarHeight(this);
-                vwNavigationBar.getLayoutParams().height = height;
-                readSettingMenu.setNavigationBarHeight(height);
-                customizeComMenu.setNavigationBarHeight(height);
-                customizeLayoutMenu.setNavigationBarHeight(height);
-                autoPageMenu.setNavigationBarHeight(height);
-                brightnessEyeMenu.setNavigationBarHeight(height);
+                binding.vwNavigationBar.getLayoutParams().height = height;
+                binding.readSettingMenu.setNavigationBarHeight(height);
+                binding.readCustomizeMenu.setNavigationBarHeight(height);
+                binding.readCustomizeLayoutMenu.setNavigationBarHeight(height);
+                binding.readAutoPageMenu.setNavigationBarHeight(height);
+                binding.readBrightnessEyeMenu.setNavigationBarHeight(height);
             }
         } else {
             //设置mBottomMenu的底部距离
-            vwNavigationBar.getLayoutParams().height = 0;
+            binding.vwNavigationBar.getLayoutParams().height = 0;
         }
     }
 
@@ -1282,33 +1261,33 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private boolean hideReadMenu() {
         hideSystemBar();
         boolean flag = false;
-        if (readAblTopMenu.getVisibility() == VISIBLE) {
+        if (binding.readAblTopMenu.getVisibility() == VISIBLE) {
             toggleMenu(true);
             flag = true;
         }
-        if (readSettingMenu.getVisibility() == View.VISIBLE) {
-            readSettingMenu.setVisibility(GONE);
-            readSettingMenu.startAnimation(mBottomOutAnim);
+        if (binding.readSettingMenu.getVisibility() == View.VISIBLE) {
+            binding.readSettingMenu.setVisibility(GONE);
+            binding.readSettingMenu.startAnimation(mBottomOutAnim);
             flag = true;
         }
-        if (customizeComMenu.getVisibility() == VISIBLE) {
-            customizeComMenu.setVisibility(GONE);
-            customizeComMenu.startAnimation(mBottomOutAnim);
+        if (binding.readCustomizeMenu.getVisibility() == VISIBLE) {
+            binding.readCustomizeMenu.setVisibility(GONE);
+            binding.readCustomizeMenu.startAnimation(mBottomOutAnim);
             flag = true;
         }
-        if (customizeLayoutMenu.getVisibility() == VISIBLE) {
-            customizeLayoutMenu.setVisibility(GONE);
-            customizeLayoutMenu.startAnimation(mBottomOutAnim);
+        if (binding.readCustomizeLayoutMenu.getVisibility() == VISIBLE) {
+            binding.readCustomizeLayoutMenu.setVisibility(GONE);
+            binding.readCustomizeLayoutMenu.startAnimation(mBottomOutAnim);
             flag = true;
         }
-        if (autoPageMenu.getVisibility() == VISIBLE) {
-            autoPageMenu.setVisibility(GONE);
-            autoPageMenu.startAnimation(mBottomOutAnim);
+        if (binding.readAutoPageMenu.getVisibility() == VISIBLE) {
+            binding.readAutoPageMenu.setVisibility(GONE);
+            binding.readAutoPageMenu.startAnimation(mBottomOutAnim);
             flag = true;
         }
-        if (brightnessEyeMenu.getVisibility() == VISIBLE) {
-            brightnessEyeMenu.setVisibility(GONE);
-            brightnessEyeMenu.startAnimation(mBottomOutAnim);
+        if ( binding.readBrightnessEyeMenu.getVisibility() == VISIBLE) {
+            binding.readBrightnessEyeMenu.setVisibility(GONE);
+            binding.readBrightnessEyeMenu.startAnimation(mBottomOutAnim);
             flag = true;
         }
         return flag;
@@ -1324,12 +1303,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
     public void toggleMenu(boolean hideStatusBar, boolean home) {
         initMenuAnim();
-        if (readAblTopMenu.getVisibility() == View.VISIBLE) {
+        if (binding.readAblTopMenu.getVisibility() == View.VISIBLE) {
             //关闭
-            readAblTopMenu.startAnimation(mTopOutAnim);
-            readLlBottomMenu.startAnimation(mBottomOutAnim);
-            readAblTopMenu.setVisibility(GONE);
-            readLlBottomMenu.setVisibility(GONE);
+            binding.readAblTopMenu.startAnimation(mTopOutAnim);
+            binding.readLlBottomMenu.startAnimation(mBottomOutAnim);
+            binding.readAblTopMenu.setVisibility(GONE);
+            binding.readLlBottomMenu.setVisibility(GONE);
             if (hideStatusBar) {
                 hideSystemBar();
             }
@@ -1342,14 +1321,14 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             }
         }
         if (autoPage) {
-            autoPageMenu.setVisibility(VISIBLE);
-            autoPageMenu.startAnimation(mBottomInAnim);
+            binding.readAutoPageMenu.setVisibility(VISIBLE);
+            binding.readAutoPageMenu.startAnimation(mBottomInAnim);
             return;
         }
-        readAblTopMenu.setVisibility(View.VISIBLE);
-        readLlBottomMenu.setVisibility(View.VISIBLE);
-        readAblTopMenu.startAnimation(mTopInAnim);
-        readLlBottomMenu.startAnimation(mBottomInAnim);
+        binding.readAblTopMenu.setVisibility(View.VISIBLE);
+        binding.readLlBottomMenu.setVisibility(View.VISIBLE);
+        binding.readAblTopMenu.startAnimation(mTopInAnim);
+        binding.readLlBottomMenu.startAnimation(mBottomInAnim);
         showSystemBar();
     }
 
@@ -1370,7 +1349,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
     private void hideSystemBar() {
         //隐藏
-        if (readAblTopMenu.getVisibility() != VISIBLE || (mAudioPlayerDialog != null && !mAudioPlayerDialog.isShowing())) {
+        if (binding.readAblTopMenu.getVisibility() != VISIBLE || (mAudioPlayerDialog != null && !mAudioPlayerDialog.isShowing())) {
             if (!mSetting.isShowStatusBar()) {
                 SystemBarUtils.hideStableStatusBar(this);
             }
@@ -1384,8 +1363,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 初始化详细设置
      */
     private void initSettingListener() {
-        readSettingMenu.setOnClickListener(null);
-        readSettingMenu.setListener(this, new ReadSettingMenu.Callback() {
+        binding.readSettingMenu.setOnClickListener(null);
+        binding.readSettingMenu.setListener(this, new ReadSettingMenu.Callback() {
             @Override
             public void onRefreshUI() {
                 mHandler.sendEmptyMessage(5);
@@ -1436,14 +1415,14 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 }, mBottomOutAnim.getDuration());
             }
         });
-        customizeComMenu.setOnClickListener(null);
-        customizeComMenu.setListener(new CustomizeComMenu.Callback() {
+        binding.readCustomizeMenu.setOnClickListener(null);
+        binding.readCustomizeMenu.setListener(new CustomizeComMenu.Callback() {
             @Override
             public void onTextPChange() {
                 mPageLoader.setTextSize();
                 mSetting.setComposition(0);
                 SysManager.saveSetting(mSetting);
-                readSettingMenu.initComposition();
+                binding.readSettingMenu.initComposition();
             }
 
             @Override
@@ -1451,7 +1430,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 mPageLoader.upMargin();
                 mSetting.setComposition(0);
                 SysManager.saveSetting(mSetting);
-                readSettingMenu.initComposition();
+                binding.readSettingMenu.initComposition();
             }
 
             @Override
@@ -1465,18 +1444,16 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 mPageLoader.upMargin();
                 mSetting.setComposition(1);
                 SysManager.saveSetting(mSetting);
-                readSettingMenu.initComposition();
+                binding.readSettingMenu.initComposition();
                 ToastUtils.showInfo("已重置各间距为默认值");
             }
         });
-        autoPageMenu.setOnClickListener(null);
-        autoPageMenu.setListener(new AutoPageMenu.Callback() {
+        binding.readAutoPageMenu.setOnClickListener(null);
+        binding.readAutoPageMenu.setListener(new AutoPageMenu.Callback() {
             @Override
             public void onSpeedChange() {
-                if (pageView != null) {
-                    pageView.autoPageOnSpeedChange();
-                    autoPage();
-                }
+                binding.readPvContent.autoPageOnSpeedChange();
+                autoPage();
             }
 
             @Override
@@ -1486,8 +1463,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 hideReadMenu();
             }
         });
-        customizeLayoutMenu.setOnClickListener(null);
-        customizeLayoutMenu.setListener(this, new CustomizeLayoutMenu.Callback() {
+        binding.readCustomizeLayoutMenu.setOnClickListener(null);
+        binding.readCustomizeLayoutMenu.setListener(this, new CustomizeLayoutMenu.Callback() {
             @Override
             public void upBg() {
                 mPageLoader.refreshUi();
@@ -1495,12 +1472,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
             @Override
             public void upStyle() {
-                readSettingMenu.initStyleImage();
+                binding.readSettingMenu.initStyleImage();
             }
 
         });
-        brightnessEyeMenu.setOnClickListener(null);
-        brightnessEyeMenu.setListener(this, new BrightnessEyeMenu.Callback() {
+        binding.readBrightnessEyeMenu.setOnClickListener(null);
+        binding.readBrightnessEyeMenu.setListener(this, new BrightnessEyeMenu.Callback() {
             @Override
             public void onProtectEyeChange() {
                 if (mSetting.isProtectEye()) {
@@ -1567,58 +1544,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         }
     }
 
-    @OnClick({R.id.read_tv_setting, R.id.read_tv_pre_chapter
-            , R.id.read_tv_next_chapter, R.id.read_tv_brightness_eye})
-    protected void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.read_tv_setting:  //设置
-                toggleMenu(false);
-                readSettingMenu.startAnimation(mBottomInAnim);
-                readSettingMenu.setVisibility(VISIBLE);
-                break;
-            case R.id.read_tv_pre_chapter:  //前一章
-                mPageLoader.skipPreChapter();
-                break;
-            case R.id.read_tv_next_chapter:  //后一章
-                mPageLoader.skipNextChapter();
-                break;
-            case R.id.read_tv_brightness_eye:
-                hideReadMenu();
-                brightnessEyeMenu.initWidget();
-                brightnessEyeMenu.setVisibility(VISIBLE);
-                brightnessEyeMenu.startAnimation(mBottomInAnim);
-                break;
-        }
-    }
-
-    /**
-     * 跳转到目录
-     */
-    @OnClick(R.id.read_tv_category)
-    protected void goToCatalog() {
-        //切换菜单
-        toggleMenu(true);
-        //跳转
-        mHandler.postDelayed(() -> {
-            Intent intent = new Intent(this, CatalogActivity.class);
-            intent.putExtra(APPCONST.BOOK, mBook);
-            this.startActivityForResult(intent, APPCONST.REQUEST_CHAPTER_PAGE);
-        }, mBottomOutAnim.getDuration());
-    }
-
-    @OnClick(R.id.ll_chapter_view)
-    protected void gotoUrl() {
-        if (mChapters != null && mChapters.size() != 0) {
-            Chapter curChapter = mChapters.get(mPageLoader.getChapterPos());
-            String url = curChapter.getUrl();
-            if (!"本地书籍".equals(mBook.getType()) && !StringHelper.isEmpty(url)) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                Uri uri = Uri.parse(url);
-                intent.setData(uri);
-                startActivity(intent);
-            }
-        }
-    }
 
     protected void download() {
         if (!isCollected) {
@@ -1629,17 +1554,17 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     }
 
     public void showCustomizeMenu() {
-        customizeComMenu.initWidget();
-        customizeComMenu.setVisibility(VISIBLE);
-        customizeComMenu.startAnimation(mBottomInAnim);
+        binding.readCustomizeMenu.initWidget();
+        binding.readCustomizeMenu.setVisibility(VISIBLE);
+        binding.readCustomizeMenu.startAnimation(mBottomInAnim);
     }
 
     public void showCustomizeLayoutMenu() {
         hideReadMenu();
 
-        customizeLayoutMenu.upColor();
-        customizeLayoutMenu.setVisibility(VISIBLE);
-        customizeLayoutMenu.startAnimation(mBottomInAnim);
+        binding.readCustomizeLayoutMenu.upColor();
+        binding.readCustomizeLayoutMenu.setVisibility(VISIBLE);
+        binding.readCustomizeLayoutMenu.startAnimation(mBottomInAnim);
     }
 
     /****************息屏相关*****************/
@@ -1939,26 +1864,26 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     v.postInvalidate();
 
                     //移动过程中要画线
-                    pageView.setSelectMode(PageView.SelectMode.SelectMoveForward);
+                    binding.readPvContent.setSelectMode(PageView.SelectMode.SelectMoveForward);
 
-                    int hh = cursorLeft.getHeight();
-                    int ww = cursorLeft.getWidth();
+                    int hh = binding.cursorLeft.getHeight();
+                    int ww = binding.cursorLeft.getWidth();
 
                     if (v.getId() == R.id.cursor_left) {
-                        pageView.setFirstSelectTxtChar(pageView.getCurrentTxtChar(lastX + ww, lastY - hh));
-                        if (pageView.getFirstSelectTxtChar() != null) {
-                            cursorLeft.setX(pageView.getFirstSelectTxtChar().getTopLeftPosition().x - ww);
-                            cursorLeft.setY(pageView.getFirstSelectTxtChar().getBottomLeftPosition().y);
+                        binding.readPvContent.setFirstSelectTxtChar(binding.readPvContent.getCurrentTxtChar(lastX + ww, lastY - hh));
+                        if (binding.readPvContent.getFirstSelectTxtChar() != null) {
+                            binding.cursorLeft.setX(binding.readPvContent.getFirstSelectTxtChar().getTopLeftPosition().x - ww);
+                            binding.cursorLeft.setY(binding.readPvContent.getFirstSelectTxtChar().getBottomLeftPosition().y);
                         }
                     } else {
-                        pageView.setLastSelectTxtChar(pageView.getCurrentTxtChar(lastX - ww, lastY - hh));
-                        if (pageView.getLastSelectTxtChar() != null) {
-                            cursorRight.setX(pageView.getLastSelectTxtChar().getBottomRightPosition().x);
-                            cursorRight.setY(pageView.getLastSelectTxtChar().getBottomRightPosition().y);
+                        binding.readPvContent.setLastSelectTxtChar(binding.readPvContent.getCurrentTxtChar(lastX - ww, lastY - hh));
+                        if (binding.readPvContent.getLastSelectTxtChar() != null) {
+                            binding.cursorRight.setX(binding.readPvContent.getLastSelectTxtChar().getBottomRightPosition().x);
+                            binding.cursorRight.setY(binding.readPvContent.getLastSelectTxtChar().getBottomRightPosition().y);
                         }
                     }
 
-                    pageView.invalidate();
+                    binding.readPvContent.invalidate();
 
                     break;
                 case MotionEvent.ACTION_UP:
@@ -1977,19 +1902,19 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      */
     public void showAction() {
         float x, y;
-        if (cursorLeft.getX() - cursorRight.getX() > 0){
-            x = cursorRight.getX() + (cursorLeft.getX() - cursorRight.getX()) / 2 + ScreenUtils.dpToPx(12);
+        if (binding.cursorLeft.getX() - binding.cursorRight.getX() > 0){
+            x = binding.cursorRight.getX() + (binding.cursorLeft.getX() - binding.cursorRight.getX()) / 2 + ScreenUtils.dpToPx(12);
         }else {
-            x = cursorLeft.getX() + (cursorRight.getX() - cursorLeft.getX()) / 2 + ScreenUtils.dpToPx(12);
+            x = binding.cursorLeft.getX() + (binding.cursorRight.getX() - binding.cursorLeft.getX()) / 2 + ScreenUtils.dpToPx(12);
         }
-        if ((cursorLeft.getY() - ScreenUtils.spToPx(mSetting.getReadWordSize()) - ScreenUtils.dpToPx(60)) < 0) {
+        if ((binding.cursorLeft.getY() - ScreenUtils.spToPx(mSetting.getReadWordSize()) - ScreenUtils.dpToPx(60)) < 0) {
             longPressMenu.setShowBottom(true);
-            y = cursorLeft.getY() + cursorLeft.getHeight() * 3 / 5;
+            y = binding.cursorLeft.getY() + binding.cursorLeft.getHeight() * 3 / 5;
         } else {
             longPressMenu.setShowBottom(false);
-            y = cursorLeft.getY() - ScreenUtils.spToPx(mSetting.getReadWordSize()) - ScreenUtils.dpToPx(5);
+            y = binding.cursorLeft.getY() - ScreenUtils.spToPx(mSetting.getReadWordSize()) - ScreenUtils.dpToPx(5);
         }
-        longPressMenu.showPopupListWindow(rlContent, 0, x, y,
+        longPressMenu.showPopupListWindow(binding.rlContent, 0, x, y,
                 longPressMenuItems, longPressMenuListener);
     }
 
@@ -1997,12 +1922,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 显示
      */
     private void selectTextCursorShow() {
-        if (pageView.getFirstSelectTxtChar() == null || pageView.getLastSelectTxtChar() == null)
+        if (binding.readPvContent.getFirstSelectTxtChar() == null || binding.readPvContent.getLastSelectTxtChar() == null)
             return;
         //show Cursor on current position
         cursorShow();
         //set current word selected
-        pageView.invalidate();
+        binding.readPvContent.invalidate();
 
 //        hideSnackBar();
     }
@@ -2011,15 +1936,15 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 显示选择
      */
     private void cursorShow() {
-        cursorLeft.setVisibility(View.VISIBLE);
-        cursorRight.setVisibility(View.VISIBLE);
-        int hh = cursorLeft.getHeight();
-        int ww = cursorLeft.getWidth();
-        if (pageView.getFirstSelectTxtChar() != null) {
-            cursorLeft.setX(pageView.getFirstSelectTxtChar().getTopLeftPosition().x - ww);
-            cursorLeft.setY(pageView.getFirstSelectTxtChar().getBottomLeftPosition().y);
-            cursorRight.setX(pageView.getFirstSelectTxtChar().getBottomRightPosition().x);
-            cursorRight.setY(pageView.getFirstSelectTxtChar().getBottomRightPosition().y);
+        binding.cursorLeft.setVisibility(View.VISIBLE);
+        binding.cursorRight.setVisibility(View.VISIBLE);
+        int hh = binding.cursorLeft.getHeight();
+        int ww = binding.cursorLeft.getWidth();
+        if (binding.readPvContent.getFirstSelectTxtChar() != null) {
+            binding.cursorLeft.setX(binding.readPvContent.getFirstSelectTxtChar().getTopLeftPosition().x - ww);
+            binding.cursorLeft.setY(binding.readPvContent.getFirstSelectTxtChar().getBottomLeftPosition().y);
+            binding.cursorRight.setX(binding.readPvContent.getFirstSelectTxtChar().getBottomRightPosition().x);
+            binding.cursorRight.setY(binding.readPvContent.getFirstSelectTxtChar().getBottomRightPosition().y);
         }
     }
 
@@ -2052,7 +1977,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 switch (position) {
                     case 0:
                         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clipData = ClipData.newPlainText(null, pageView.getSelectStr());
+                        ClipData clipData = ClipData.newPlainText(null, binding.readPvContent.getSelectStr());
                         if (clipboard != null) {
                             clipboard.setPrimaryClip(clipData);
                             ToastUtils.showInfo("所选内容已经复制到剪贴板");
@@ -2063,7 +1988,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         ReplaceRuleBean oldRuleBean = new ReplaceRuleBean();
                         oldRuleBean.setReplaceSummary("");
                         oldRuleBean.setEnable(true);
-                        oldRuleBean.setRegex(pageView.getSelectStr().trim());
+                        oldRuleBean.setRegex(binding.readPvContent.getSelectStr().trim());
                         oldRuleBean.setIsRegex(false);
                         oldRuleBean.setReplacement("");
                         oldRuleBean.setSerialNumber(0);
@@ -2077,12 +2002,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         replaceDialog.show(getSupportFragmentManager(), "replaceRule");
                         break;
                     case 2:
-                        selectString = pageView.getSelectStr();
+                        selectString = binding.readPvContent.getSelectStr();
                         speak(ReadActivity.this, selectString);
                         clearSelect();
                         break;
                     case 3:
-                        selectString = StringUtils.deleteWhitespace(pageView.getSelectStr());
+                        selectString = StringUtils.deleteWhitespace(binding.readPvContent.getSelectStr());
                         MyAlertDialog.build(ReadActivity.this)
                                 .setTitle(R.string.search)
                                 .setItems(R.array.search_way, (dialog, which) -> {
@@ -2113,7 +2038,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         clearSelect();
                         break;
                     case 4:
-                        selectString = pageView.getSelectStr();
+                        selectString = binding.readPvContent.getSelectStr();
                         ShareUtils.share(ReadActivity.this, selectString);
                         clearSelect();
                         break;
@@ -2126,10 +2051,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 清除选择
      */
     private void clearSelect() {
-        cursorLeft.setVisibility(View.INVISIBLE);
-        cursorRight.setVisibility(View.INVISIBLE);
+        binding.cursorLeft.setVisibility(View.INVISIBLE);
+        binding.cursorRight.setVisibility(View.INVISIBLE);
         longPressMenu.hidePopupListWindow();
-        pageView.clearSelect();
+        binding.readPvContent.clearSelect();
     }
 
     private TextToSpeech textToSpeech;

@@ -3,20 +3,19 @@ package xyz.fycz.myreader.ui.fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 
 import java.util.List;
 
-import butterknife.BindView;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.databinding.FragmentPrivateBookcaseBinding;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.greendao.service.BookService;
@@ -34,27 +33,16 @@ import xyz.fycz.myreader.util.utils.FingerprintUtils;
  * @date 2021/1/9 13:53
  */
 public class PrivateBooksFragment extends BaseFragment {
-    @BindView(R.id.rl_private_bookcase)
-    RelativeLayout mRlPrivateBookcase;
-    @BindView(R.id.sc_private_bookcase)
-    SwitchCompat mScPrivateBookcase;
-    @BindView(R.id.ll_content)
-    LinearLayout mLlContent;
-    @BindView(R.id.ll_hide_books)
-    LinearLayout mLlHideBooks;
-    @BindView(R.id.rl_change_pwd)
-    RelativeLayout mRlChangePwd;
-    @BindView(R.id.rl_fingerprint)
-    RelativeLayout mRlFingerprint;
-    @BindView(R.id.sc_fingerprint)
-    SwitchCompat mScFingerprint;
+
+    private FragmentPrivateBookcaseBinding binding;
 
     private boolean openPrivate;
     private boolean openFingerprint;
 
     @Override
-    protected int getContentId() {
-        return R.layout.fragment_private_bookcase;
+    protected View bindView(LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentPrivateBookcaseBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -67,28 +55,28 @@ public class PrivateBooksFragment extends BaseFragment {
     @Override
     protected void initWidget(Bundle savedInstanceState) {
         super.initWidget(savedInstanceState);
-        mScPrivateBookcase.setChecked(openPrivate);
-        mScFingerprint.setChecked(openFingerprint);
-        if (openPrivate) mLlContent.setVisibility(View.VISIBLE);
+        binding.scPrivateBookcase.setChecked(openPrivate);
+        binding.scFingerprint.setChecked(openFingerprint);
+        if (openPrivate) binding.llContent.setVisibility(View.VISIBLE);
     }
 
     @Override
     protected void initClick() {
         super.initClick();
-        mRlPrivateBookcase.setOnClickListener(v -> {
+        binding.rlPrivateBookcase.setOnClickListener(v -> {
             if (openPrivate) {
                 DialogCreator.createCommonDialog(getContext(), "关闭私密书架",
                         "确定要关闭私密书架吗？\n注意：这将会删除私密书架中的全部书籍！",
                         true, (dialog, which) -> {
                             BookGroupService.getInstance().deletePrivateGroup();
                             SharedPreUtils.getInstance().putString("privatePwd", "");
-                            mLlContent.setVisibility(View.GONE);
+                            binding.llContent.setVisibility(View.GONE);
                             openPrivate = !openPrivate;
                             openFingerprint = false;
                             SharedPreUtils.getInstance().putBoolean("openPrivate", openPrivate);
                             SharedPreUtils.getInstance().putBoolean("openFingerprint", openFingerprint);
-                            mScPrivateBookcase.setChecked(openPrivate);
-                            mScFingerprint.setChecked(openFingerprint);
+                            binding.scPrivateBookcase.setChecked(openPrivate);
+                            binding.scFingerprint.setChecked(openFingerprint);
                         }, null);
             } else {
                 final String[] pwd = new String[1];
@@ -100,15 +88,15 @@ public class PrivateBooksFragment extends BaseFragment {
                             BookGroupService.getInstance().createPrivateGroup();
                             SharedPreUtils.getInstance().putString("privatePwd", CyptoUtils.encode(APPCONST.KEY, pwd[0]));
                             dialog.dismiss();
-                            mLlContent.setVisibility(View.VISIBLE);
+                            binding.llContent.setVisibility(View.VISIBLE);
                             openPrivate = !openPrivate;
                             SharedPreUtils.getInstance().putBoolean("openPrivate", openPrivate);
-                            mScPrivateBookcase.setChecked(openPrivate);
+                            binding.scPrivateBookcase.setChecked(openPrivate);
                         });
             }
         });
 
-        mLlHideBooks.setOnClickListener(v -> {
+        binding.llHideBooks.setOnClickListener(v -> {
             MyApplication.runOnUiThread(() -> {
                 String privateGroupId = SharedPreUtils.getInstance().getString("privateGroupId");
                 List<Book> mBooks = BookService.getInstance().getAllBooks();
@@ -162,7 +150,7 @@ public class PrivateBooksFragment extends BaseFragment {
             });
         });
 
-        mRlChangePwd.setOnClickListener(v -> {
+        binding.rlChangePwd.setOnClickListener(v -> {
             final String[] pwd = new String[1];
             MyAlertDialog.createInputDia(getContext(), getString(R.string.change_pwd),
                     "", "", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD,
@@ -171,21 +159,21 @@ public class PrivateBooksFragment extends BaseFragment {
                     (dialog, which) -> {
                         SharedPreUtils.getInstance().putString("privatePwd", CyptoUtils.encode(APPCONST.KEY, pwd[0]));
                         dialog.dismiss();
-                        mLlContent.setVisibility(View.VISIBLE);
+                        binding.llContent.setVisibility(View.VISIBLE);
                     });
         });
 
-        mRlFingerprint.setOnClickListener(
+        binding.rlFingerprint.setOnClickListener(
                 (v) -> {
                     if (openFingerprint) {
                         openFingerprint = false;
-                        mScFingerprint.setChecked(openFingerprint);
+                        binding.scFingerprint.setChecked(openFingerprint);
                         SharedPreUtils.getInstance().putBoolean("openFingerprint", openFingerprint);
                     } else {
                         if (!FingerprintUtils.supportFingerprint(getActivity())) return;
                         FingerprintDialog fd = new FingerprintDialog((AppCompatActivity) getActivity(),false, needGoTo -> {
                             openFingerprint = true;
-                            mScFingerprint.setChecked(openFingerprint);
+                            binding.scFingerprint.setChecked(openFingerprint);
                             SharedPreUtils.getInstance().putBoolean("openFingerprint", openFingerprint);
                         });
                         fd.setCancelable(false);
@@ -208,12 +196,12 @@ public class PrivateBooksFragment extends BaseFragment {
     public void init(){
         openPrivate = SharedPreUtils.getInstance().getBoolean("openPrivate");
         openFingerprint = SharedPreUtils.getInstance().getBoolean("openFingerprint");
-        mScPrivateBookcase.setChecked(openPrivate);
-        mScFingerprint.setChecked(openFingerprint);
+        binding.scPrivateBookcase.setChecked(openPrivate);
+        binding.scFingerprint.setChecked(openFingerprint);
         if (openPrivate) {
-            mLlContent.setVisibility(View.VISIBLE);
+            binding.llContent.setVisibility(View.VISIBLE);
         }else {
-            mLlContent.setVisibility(View.GONE);
+            binding.llContent.setVisibility(View.GONE);
         }
     }
 

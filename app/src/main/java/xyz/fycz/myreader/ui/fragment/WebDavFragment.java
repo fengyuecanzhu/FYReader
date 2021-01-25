@@ -4,13 +4,11 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
 import android.widget.NumberPicker;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -19,6 +17,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.databinding.FragmentWebdavSettingBinding;
 import xyz.fycz.myreader.model.storage.BackupRestoreUi;
 import xyz.fycz.myreader.model.storage.WebDavHelp;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -31,32 +30,18 @@ import xyz.fycz.myreader.util.ToastUtils;
  * @date 2021/1/9 12:08
  */
 public class WebDavFragment extends BaseFragment {
-    @BindView(R.id.webdav_setting_webdav_url)
-    LinearLayout llWebdavUrl;
-    @BindView(R.id.tv_webdav_url)
-    TextView tvWebdavUrl;
-    @BindView(R.id.webdav_setting_webdav_account)
-    LinearLayout llWebdavAccount;
-    @BindView(R.id.tv_webdav_account)
-    TextView tvWebdavAccount;
-    @BindView(R.id.webdav_setting_webdav_password)
-    LinearLayout llWebdavPassword;
-    @BindView(R.id.tv_webdav_password)
-    TextView tvWebdavPassword;
-    @BindView(R.id.webdav_setting_webdav_restore)
-    LinearLayout llWebdavRestore;
-    @BindView(R.id.ll_restore_num)
-    LinearLayout mLlRestoreNum;
-    @BindView(R.id.tv_restore_num)
-    TextView mTvRestoreNum;
+
+    private FragmentWebdavSettingBinding binding;
 
     private String webdavUrl;
     private String webdavAccount;
     private String webdavPassword;
     private int restoreNum;
+
     @Override
-    protected int getContentId() {
-        return R.layout.fragment_webdav_setting;
+    protected View bindView(LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentWebdavSettingBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -71,56 +56,56 @@ public class WebDavFragment extends BaseFragment {
     @Override
     protected void initWidget(Bundle savedInstanceState) {
         super.initWidget(savedInstanceState);
-        tvWebdavUrl.setText(webdavUrl);
-        tvWebdavAccount.setText(StringHelper.isEmpty(webdavAccount) ? "请输入WebDav账号" : webdavAccount);
-        tvWebdavPassword.setText(StringHelper.isEmpty(webdavPassword) ? "请输入WebDav授权密码" : "************");
-        mTvRestoreNum.setText(getString(R.string.cur_restore_list_num, restoreNum));
+        binding.tvWebdavUrl.setText(webdavUrl);
+        binding.tvWebdavAccount.setText(StringHelper.isEmpty(webdavAccount) ? "请输入WebDav账号" : webdavAccount);
+        binding.tvWebdavPassword.setText(StringHelper.isEmpty(webdavPassword) ? "请输入WebDav授权密码" : "************");
+        binding.tvRestoreNum.setText(getString(R.string.cur_restore_list_num, restoreNum));
     }
 
     @Override
     protected void initClick() {
         super.initClick();
         final String[] webdavTexts = new String[3];
-        llWebdavUrl.setOnClickListener(v -> {
+        binding.webdavSettingWebdavUrl.setOnClickListener(v -> {
             MyAlertDialog.createInputDia(getContext(), getString(R.string.webdav_url),
                     "", webdavUrl.equals(APPCONST.DEFAULT_WEB_DAV_URL) ?
                             "" : webdavUrl, InputType.TYPE_CLASS_TEXT,true, 100,
                     text -> webdavTexts[0] = text,
                     (dialog, which) -> {
                         webdavUrl = webdavTexts[0];
-                        tvWebdavUrl.setText(webdavUrl);
+                        binding.tvWebdavUrl.setText(webdavUrl);
                         SharedPreUtils.getInstance().putString("webdavUrl", webdavUrl);
                         dialog.dismiss();
                     }, null, "恢复默认", (dialog, which) -> {
                         webdavUrl = APPCONST.DEFAULT_WEB_DAV_URL;
-                        tvWebdavUrl.setText(webdavUrl);
+                        binding.tvWebdavUrl.setText(webdavUrl);
                         SharedPreUtils.getInstance().putString("webdavUrl", webdavUrl);
                     });
         });
-        llWebdavAccount.setOnClickListener(v -> {
+        binding.webdavSettingWebdavAccount.setOnClickListener(v -> {
             MyAlertDialog.createInputDia(getContext(), getString(R.string.webdav_account),
                     "", webdavAccount, true, 100,
                     text -> webdavTexts[1] = text,
                     (dialog, which) -> {
                         webdavAccount = webdavTexts[1];
-                        tvWebdavAccount.setText(webdavAccount);
+                        binding.tvWebdavAccount.setText(webdavAccount);
                         SharedPreUtils.getInstance().putString("webdavAccount", webdavAccount);
                         dialog.dismiss();
                     });
         });
-        llWebdavPassword.setOnClickListener(v -> {
+        binding.webdavSettingWebdavPassword.setOnClickListener(v -> {
             MyAlertDialog.createInputDia(getContext(), getString(R.string.webdav_password),
                     "", webdavPassword, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD,
                     true, 100,
                     text -> webdavTexts[2] = text,
                     (dialog, which) -> {
                         webdavPassword = webdavTexts[2];
-                        tvWebdavPassword.setText("************");
+                        binding.tvWebdavPassword.setText("************");
                         SharedPreUtils.getInstance().putString("webdavPassword", webdavPassword);
                         dialog.dismiss();
                     });
         });
-        llWebdavRestore.setOnClickListener(v -> {
+        binding.webdavSettingWebdavRestore.setOnClickListener(v -> {
             Single.create((SingleOnSubscribe<ArrayList<String>>) emitter -> {
                 emitter.onSuccess(WebDavHelp.INSTANCE.getWebDavFileNames());
             }).subscribeOn(Schedulers.io())
@@ -135,7 +120,7 @@ public class WebDavFragment extends BaseFragment {
                     });
         });
 
-        mLlRestoreNum.setOnClickListener(v -> {
+        binding.llRestoreNum.setOnClickListener(v -> {
             View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_number_picker, null);
             NumberPicker threadPick = view.findViewById(R.id.number_picker);
             threadPick.setMaxValue(100);
@@ -150,7 +135,7 @@ public class WebDavFragment extends BaseFragment {
                     .setPositiveButton("确定", (dialog, which) -> {
                         restoreNum = threadPick.getValue();
                         SharedPreUtils.getInstance().putInt("restoreNum", restoreNum);
-                        mTvRestoreNum.setText(getString(R.string.cur_restore_list_num, restoreNum));
+                        binding.tvRestoreNum.setText(getString(R.string.cur_restore_list_num, restoreNum));
                     }).setNegativeButton("取消", null)
                     .show();
         });

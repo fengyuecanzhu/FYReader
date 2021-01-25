@@ -3,30 +3,19 @@ package xyz.fycz.myreader.ui.popmenu;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.SysManager;
+import xyz.fycz.myreader.databinding.MenuAutoPageBinding;
 import xyz.fycz.myreader.entity.Setting;
 
 public class AutoPageMenu extends FrameLayout {
 
-    @BindView(R.id.tv_auto_scroll_speed)
-    TextView tvAutoPageSpeed;
-    @BindView(R.id.sb_auto_scroll_progress)
-    SeekBar sbAutoPageSpeed;
-    @BindView(R.id.tv_exit_auto_page)
-    TextView tvExitAutoPage;
-    @BindView(R.id.vwNavigationBar)
-    View vwNavigationBar;
+    private MenuAutoPageBinding binding;
 
     public AutoPageMenu(@NonNull Context context) {
         super(context);
@@ -44,18 +33,17 @@ public class AutoPageMenu extends FrameLayout {
     }
 
     private void init(Context context) {
-        View view = LayoutInflater.from(context).inflate(R.layout.menu_auto_page, this);
-        ButterKnife.bind(this, view);
+        binding = MenuAutoPageBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
     public void setListener(Callback callback) {
         Setting setting = SysManager.getSetting();
-        sbAutoPageSpeed.setProgress(110 - setting.getAutoScrollSpeed());
-        tvAutoPageSpeed.setText(String.format("翻页速度：%s %%", 110 - setting.getAutoScrollSpeed()));
-        sbAutoPageSpeed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        binding.sbAutoScrollProgress.setProgress(110 - setting.getAutoScrollSpeed());
+        binding.tvAutoScrollSpeed.setText(String.format("翻页速度：%s %%", 110 - setting.getAutoScrollSpeed()));
+        binding.sbAutoScrollProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                tvAutoPageSpeed.setText(String.format("翻页速度：%s %%", progress));
+                binding.tvAutoScrollSpeed.setText(String.format("翻页速度：%s %%", progress));
             }
 
             @Override
@@ -72,11 +60,11 @@ public class AutoPageMenu extends FrameLayout {
                 callback.onSpeedChange();
             }
         });
-        tvExitAutoPage.setOnClickListener(v -> callback.onExitClick());
+        binding.tvExitAutoPage.setOnClickListener(v -> callback.onExitClick());
     }
 
     public void setNavigationBarHeight(int height) {
-        vwNavigationBar.getLayoutParams().height = height;
+        binding.vwNavigationBar.getLayoutParams().height = height;
     }
 
     public interface Callback{

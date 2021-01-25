@@ -7,28 +7,20 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+
 import androidx.fragment.app.Fragment;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import xyz.fycz.myreader.R;
+
+import xyz.fycz.myreader.databinding.FragmentCatalogBinding;
 import xyz.fycz.myreader.ui.presenter.CatalogPresenter;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class CatalogFragment extends Fragment {
-    @BindView(R.id.rl_catalog)
-    RelativeLayout rlCatalog;
-    @BindView(R.id.lv_chapter_list)
-    ListView lvChapterList;
-    @BindView(R.id.change_sort)
-    FloatingActionButton fcChangeSort;
-    @BindView(R.id.pb_loading)
-    ProgressBar pbLoading;
 
-    Unbinder unbinder;
+    private FragmentCatalogBinding binding;
 
     private CatalogPresenter mCatalogPresent;
 
@@ -40,29 +32,27 @@ public class CatalogFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_catalog, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        binding = FragmentCatalogBinding.inflate(inflater, container, false);
         mCatalogPresent = new CatalogPresenter(this);
         mCatalogPresent.start();
-        return view;
+        return binding.getRoot();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
     }
 
     public RelativeLayout getRlCatalog() {
-        return rlCatalog;
+        return binding.rlCatalog;
     }
 
     public ListView getLvChapterList() {
-        return lvChapterList;
+        return binding.lvChapterList;
     }
 
     public FloatingActionButton getFcChangeSort() {
-        return fcChangeSort;
+        return binding.changeSort;
     }
 
     public CatalogPresenter getmCatalogPresent() {
@@ -70,6 +60,6 @@ public class CatalogFragment extends Fragment {
     }
 
     public ProgressBar getPbLoading() {
-        return pbLoading;
+        return binding.pbLoading;
     }
 }

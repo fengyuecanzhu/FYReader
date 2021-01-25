@@ -7,12 +7,15 @@
               android:orientation="vertical"
               tools:context=".ui.activity.AboutActivity">
 
-    <include layout="@layout/toolbar"/>
+    <include
+        layout="@layout/toolbar"/>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <include layout="@layout/layout_about_content" />
+        <include
+            android:id="@+id/il"
+            layout="@layout/layout_about_content" />
     </FrameLayout>
 
 </LinearLayout>

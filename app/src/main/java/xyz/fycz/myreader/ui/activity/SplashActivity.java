@@ -5,37 +5,30 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.app.ActivityCompat;
 
-import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
-
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.signature.ObjectKey;
 import com.gyf.immersionbar.ImmersionBar;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import butterknife.BindView;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.databinding.ActivitySplashBinding;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.DateHelper;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.PermissionsChecker;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.util.utils.MD5Utils;
@@ -52,8 +45,7 @@ public class SplashActivity extends BaseActivity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
-    @BindView(R.id.iv_splash)
-    AppCompatImageView ivSplash;
+    private ActivitySplashBinding binding;
 
     private PermissionsChecker mPermissionsChecker;
     private Thread myThread = new Thread() {//创建子线程
@@ -73,10 +65,10 @@ public class SplashActivity extends BaseActivity {
 
 
     @Override
-    protected int getContentId() {
-        return R.layout.activity_splash;
+    protected void bindView() {
+        binding = ActivitySplashBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -149,7 +141,7 @@ public class SplashActivity extends BaseActivity {
                     .load(this, imgFile)
                     .error(R.drawable.start)
                     .signature(new ObjectKey(splashLoadDate))
-                    .into(ivSplash);
+                    .into(binding.ivSplash);
         }
     }
 

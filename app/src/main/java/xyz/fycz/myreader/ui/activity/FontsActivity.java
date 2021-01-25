@@ -8,18 +8,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.ProgressBar;
+
 import androidx.appcompat.widget.Toolbar;
-import butterknife.BindView;
-import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.base.BaseActivity;
-import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.enums.Font;
-import xyz.fycz.myreader.ui.adapter.FontsAdapter;
-import xyz.fycz.myreader.util.IOUtils;
-import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,6 +18,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.databinding.ActivityFontsBinding;
+import xyz.fycz.myreader.enums.Font;
+import xyz.fycz.myreader.ui.adapter.FontsAdapter;
+import xyz.fycz.myreader.util.IOUtils;
+import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.FileUtils;
+
 import static xyz.fycz.myreader.util.UriFileUtil.getPath;
 
 /**
@@ -35,10 +35,7 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
  * @date 2020/9/19 12:04
  */
 public class FontsActivity extends BaseActivity {
-    @BindView(R.id.lv_fonts)
-    ListView lvFonts;
-    @BindView(R.id.pb_loading)
-    ProgressBar pbLoading;
+    private ActivityFontsBinding binding;
     private ArrayList<Font> mFonts;
     private FontsAdapter mFontsAdapter;
 
@@ -54,9 +51,11 @@ public class FontsActivity extends BaseActivity {
             }
         }
     };
+
     @Override
-    protected int getContentId() {
-        return R.layout.activity_fonts;
+    protected void bindView() {
+        binding = ActivityFontsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
 
     @Override
@@ -76,8 +75,8 @@ public class FontsActivity extends BaseActivity {
     protected void initWidget() {
         super.initWidget();
         mFontsAdapter = new FontsAdapter(this, R.layout.listview_font_item, mFonts, this);
-        lvFonts.setAdapter(mFontsAdapter);
-        pbLoading.setVisibility(View.GONE);
+        binding.lvFonts.setAdapter(mFontsAdapter);
+        binding.pbLoading.setVisibility(View.GONE);
     }
 
     private void initFonts() {

@@ -5,11 +5,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-import butterknife.BindView;
+
 import com.google.android.material.tabs.TabLayout;
-import xyz.fycz.myreader.R;
 
 import java.util.List;
+
+import xyz.fycz.myreader.R;
 
 /**
  * @author fengyue
@@ -18,10 +19,9 @@ import java.util.List;
 
 public abstract class BaseTabActivity extends BaseActivity {
     /**************View***************/
-    @BindView(R.id.tab_tl_indicator)
     protected TabLayout mTlIndicator;
-    @BindView(R.id.tab_vp)
     protected ViewPager mVp;
+
     /************Params*******************/
     private List<Fragment> mFragmentList;
     private List<String> mTitleList;
@@ -30,7 +30,14 @@ public abstract class BaseTabActivity extends BaseActivity {
     protected abstract List<Fragment> createTabFragments();
     protected abstract List<String> createTabTitles();
 
+    @Override
+    protected void bindView() {
+        mTlIndicator = findViewById(R.id.tab_tl_indicator);
+        mVp = findViewById(R.id.tab_vp);
+    }
+
     /*****************rewrite method***************************/
+
     @Override
     protected void initWidget() {
         super.initWidget();
@@ -60,6 +67,7 @@ public abstract class BaseTabActivity extends BaseActivity {
         if (mFragmentList.size() != mTitleList.size())
             throw new IllegalArgumentException("fragment and title size must equal");
     }
+
 
     /******************inner class*****************/
     class TabFragmentPageAdapter extends FragmentPagerAdapter {

@@ -13,45 +13,32 @@ import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+
 import androidx.appcompat.widget.Toolbar;
-import butterknife.BindView;
-import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.base.BaseActivity;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.databinding.ActivityLoginBinding;
+import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.util.CodeUtil;
 import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
-
-import java.util.HashMap;
-import java.util.Map;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 
 /**
  * @author fengyue
  * @date 2020/9/18 22:27
  */
 public class LoginActivity extends BaseActivity implements TextWatcher {
-    @BindView(R.id.et_user)
-    TextInputLayout user;
-    @BindView(R.id.et_password)
-    TextInputLayout password;
-    @BindView(R.id.bt_login)
-    Button loginBtn;
-    @BindView(R.id.tv_register)
-    TextView tvRegister;
-    @BindView(R.id.et_captcha)
-    TextInputLayout etCaptcha;
-    @BindView(R.id.iv_captcha)
-    ImageView ivCaptcha;
 
+    private ActivityLoginBinding binding;
     private String code;
 
     @SuppressLint("HandlerLeak")
@@ -61,7 +48,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    loginBtn.setEnabled(true);
+                    binding.btLogin.setEnabled(true);
                     break;
                 case 2:
                     createCaptcha();
@@ -70,9 +57,11 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
         }
     };
 
+
     @Override
-    protected int getContentId() {
-        return R.layout.activity_login;
+    protected void bindView() {
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
 
     @Override
@@ -92,22 +81,22 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
         super.initWidget();
         mHandler.sendMessage(mHandler.obtainMessage(2));
         String username = UserService.readUsername();
-        user.getEditText().setText(username);
-        user.getEditText().requestFocus(username.length());
+        binding.etUser.getEditText().setText(username);
+        binding.etUser.getEditText().requestFocus(username.length());
         //监听内容改变 -> 控制按钮的点击状态
-        user.getEditText().addTextChangedListener(this);
-        password.getEditText().addTextChangedListener(this);
-        etCaptcha.getEditText().addTextChangedListener(this);
+        binding.etUser.getEditText().addTextChangedListener(this);
+        binding.etPassword.getEditText().addTextChangedListener(this);
+        binding.etCaptcha.getEditText().addTextChangedListener(this);
     }
 
     @Override
     protected void initClick() {
         super.initClick();
-        ivCaptcha.setOnClickListener(v -> mHandler.sendMessage(mHandler.obtainMessage(2)));
+        binding.ivCaptcha.setOnClickListener(v -> mHandler.sendMessage(mHandler.obtainMessage(2)));
 
-        loginBtn.setOnClickListener(v -> {
+        binding.btLogin.setOnClickListener(v -> {
             mHandler.sendMessage(mHandler.obtainMessage(2));
-            if (!code.toLowerCase().equals(etCaptcha.getEditText().getText().toString().toLowerCase())){
+            if (!code.toLowerCase().equals(binding.etCaptcha.getEditText().getText().toString().toLowerCase())){
                 DialogCreator.createTipDialog(this, "验证码错误！");
                 return;
             }
@@ -116,9 +105,9 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
                 return;
             }
             ProgressDialog dialog = DialogCreator.createProgressDialog(this, null, "正在登陆...");
-            loginBtn.setEnabled(false);
-            final String loginName = user.getEditText().getText().toString().trim();
-            String loginPwd = password.getEditText().getText().toString();
+            binding.btLogin.setEnabled(false);
+            final String loginName = binding.etUser.getEditText().getText().toString().trim();
+            String loginPwd = binding.etPassword.getEditText().getText().toString();
             final Map<String, String> userLoginInfo = new HashMap<>();
             userLoginInfo.put("loginName", loginName);
             userLoginInfo.put("loginPwd", CyptoUtils.encode(APPCONST.KEY, loginPwd));
@@ -157,7 +146,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
 
         });
 
-        tvRegister.setOnClickListener(v -> {
+        binding.tvRegister.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
@@ -166,7 +155,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
     public void createCaptcha() {
         code = CodeUtil.getInstance().createCode();
         Bitmap codeBitmap = CodeUtil.getInstance().createBitmap(code);
-        ivCaptcha.setImageBitmap(codeBitmap);
+        binding.ivCaptcha.setImageBitmap(codeBitmap);
     }
 
 
@@ -188,7 +177,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
                     (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
             //2.隐藏键盘
-            inputManager.hideSoftInputFromWindow(user.getWindowToken(),0);
+            inputManager.hideSoftInputFromWindow(binding.etUser.getWindowToken(),0);
 
             //3.取消焦点
             View focusView = getCurrentFocus();
@@ -218,14 +207,14 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
         //禁止输入中文
         StringUtils.isNotChinese(s);
         //判断两个输入框是否有内容
-        if (user.getEditText().getText().toString().length() > 0 &&
-                password.getEditText().getText().toString().length() > 0 &&
-                etCaptcha.getEditText().getText().toString().length() > 0){
+        if (binding.etUser.getEditText().getText().toString().length() > 0 &&
+                binding.etPassword.getEditText().getText().toString().length() > 0 &&
+                binding.etCaptcha.getEditText().getText().toString().length() > 0){
             //按钮可以点击
-            loginBtn.setEnabled(true);
+            binding.btLogin.setEnabled(true);
         }else{
             //按钮不能点击
-            loginBtn.setEnabled(false);
+            binding.btLogin.setEnabled(false);
         }
     }
 }

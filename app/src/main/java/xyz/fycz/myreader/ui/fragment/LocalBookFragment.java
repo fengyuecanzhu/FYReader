@@ -2,17 +2,18 @@ package xyz.fycz.myreader.ui.fragment;
 
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
-
 import android.os.Environment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import xyz.fycz.myreader.R;
+
+import xyz.fycz.myreader.databinding.FragmentLocalBookBinding;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.ui.adapter.FileSystemAdapter;
 import xyz.fycz.myreader.util.media.MediaStoreHelper;
 import xyz.fycz.myreader.widget.DividerItemDecoration;
-import xyz.fycz.myreader.widget.RefreshLayout;
 
 
 /**
@@ -22,14 +23,12 @@ import xyz.fycz.myreader.widget.RefreshLayout;
  */
 
 public class LocalBookFragment extends BaseFileFragment {
-    @BindView(R.id.refresh_layout)
-    RefreshLayout mRlRefresh;
-    @BindView(R.id.local_book_rv_content)
-    RecyclerView mRvContent;
+    private FragmentLocalBookBinding binding;
 
     @Override
-    protected int getContentId() {
-        return R.layout.fragment_local_book;
+    protected View bindView(LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentLocalBookBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -40,9 +39,9 @@ public class LocalBookFragment extends BaseFileFragment {
 
     private void setUpAdapter() {
         mAdapter = new FileSystemAdapter();
-        mRvContent.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRvContent.addItemDecoration(new DividerItemDecoration(getContext()));
-        mRvContent.setAdapter(mAdapter);
+        binding.localBookRvContent.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.localBookRvContent.addItemDecoration(new DividerItemDecoration(getContext()));
+        binding.localBookRvContent.setAdapter(mAdapter);
     }
 
     @Override
@@ -80,10 +79,10 @@ public class LocalBookFragment extends BaseFileFragment {
         MediaStoreHelper.getAllBookFile(getActivity(),
                 (files) -> {
                     if (files.isEmpty()) {
-                        mRlRefresh.showEmpty();
+                        binding.refreshLayout.showEmpty();
                     } else {
                         mAdapter.refreshItems(files);
-                        mRlRefresh.showFinish();
+                        binding.refreshLayout.showFinish();
                         //反馈
                         if (mListener != null) {
                             mListener.onCategoryChanged();

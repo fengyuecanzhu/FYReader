@@ -5,14 +5,14 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.widget.TextView;
+
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
-import butterknife.BindView;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.URLCONST;
+import xyz.fycz.myreader.databinding.ActivityAboutBinding;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
@@ -23,26 +23,12 @@ import xyz.fycz.myreader.util.ToastUtils;
  * @date 2020/9/18 22:21
  */
 public class AboutActivity extends BaseActivity {
-    @BindView(R.id.tv_version_name)
-    TextView tvVersionName;
-    @BindView(R.id.vm_author)
-    CardView vmAuthor;
-    @BindView(R.id.vw_share)
-    CardView vmShare;
-    @BindView(R.id.vw_update)
-    CardView vmUpdate;
-    @BindView(R.id.vw_update_log)
-    CardView vmUpdateLog;
-    @BindView(R.id.vw_qq)
-    CardView vmQQ;
-    @BindView(R.id.vw_git)
-    CardView vmGit;
-    @BindView(R.id.vw_disclaimer)
-    CardView vmDisclaimer;
+    private ActivityAboutBinding binding;
 
     @Override
-    protected int getContentId() {
-        return R.layout.activity_about;
+    protected void bindView() {
+        binding = ActivityAboutBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
 
     @Override
@@ -56,14 +42,14 @@ public class AboutActivity extends BaseActivity {
     @Override
     protected void initWidget() {
         super.initWidget();
-        tvVersionName.setText("风月读书v" + MyApplication.getStrVersionName());
+        binding.il.tvVersionName.setText("风月读书v" + MyApplication.getStrVersionName());
     }
 
     @Override
     protected void initClick() {
         super.initClick();
         ClipboardManager mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        vmAuthor.setOnClickListener(v -> {
+        binding.il.vmAuthor.setOnClickListener(v -> {
             //数据
             ClipData mClipData = ClipData.newPlainText("Label", "fy@fycz.xyz");
             //把数据设置到剪切板上
@@ -71,11 +57,11 @@ public class AboutActivity extends BaseActivity {
             mClipboardManager.setPrimaryClip(mClipData);
             ToastUtils.showSuccess("邮箱复制成功！");
         });
-        vmShare.setOnClickListener(v -> ShareUtils.share(this, getString(R.string.share_text) +
+        binding.il.vwShare.setOnClickListener(v -> ShareUtils.share(this, getString(R.string.share_text) +
                 SharedPreUtils.getInstance().getString(getString(R.string.downloadLink), URLCONST.LAN_ZOUS_URL)));
-        vmUpdate.setOnClickListener(v -> MyApplication.checkVersionByServer(this, true, null));
-        vmUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));
-        vmQQ.setOnClickListener(v -> {
+        binding.il.vwUpdate.setOnClickListener(v -> MyApplication.checkVersionByServer(this, true, null));
+        binding.il.vwUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));
+        binding.il.vwQq.setOnClickListener(v -> {
             if (!MyApplication.joinQQGroup(this,"8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")){
                 //数据
                 ClipData mClipData = ClipData.newPlainText("Label", "1085028304");
@@ -85,8 +71,8 @@ public class AboutActivity extends BaseActivity {
                 ToastUtils.showError("未安装手Q或安装的版本不支持！\n已复制QQ群号，您可自行前往QQ添加！");
             }
         });
-        vmGit.setOnClickListener(v -> openIntent(Intent.ACTION_VIEW, getString(R.string.this_github_url)));
-        vmDisclaimer.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "免责声明", "disclaimer.fy"));
+        binding.il.vwGit.setOnClickListener(v -> openIntent(Intent.ACTION_VIEW, getString(R.string.this_github_url)));
+        binding.il.vwDisclaimer.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "免责声明", "disclaimer.fy"));
 
     }
 

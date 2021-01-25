@@ -7,16 +7,15 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.AppCompatImageView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import xyz.fycz.myreader.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import xyz.fycz.myreader.databinding.DialogBookSourceBinding;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.model.SearchEngine;
@@ -25,10 +24,6 @@ import xyz.fycz.myreader.ui.adapter.SourceExchangeAdapter;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.widget.RefreshProgressBar;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * 换源dialog
  */
@@ -36,18 +31,8 @@ import java.util.List;
 public class SourceExchangeDialog extends Dialog {
 
     private static final String TAG = "SourceExchangeDialog";
-    /*@BindView(R.id.dialog_tv_title)
-    TextView dialogTvTitle;*/
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.iv_refresh_search)
-    AppCompatImageView ivRefreshSearch;
-    @BindView(R.id.iv_stop_search)
-    AppCompatImageView ivStopSearch;
-    @BindView(R.id.rpb)
-    RefreshProgressBar rpb;
-    @BindView(R.id.dialog_rv_content)
-    RecyclerView dialogRvContent;
+
+    private DialogBookSourceBinding binding;
 
     private SearchEngine searchEngine;
     private SourceExchangeAdapter mAdapter;
@@ -90,8 +75,8 @@ public class SourceExchangeDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_book_source);
-        ButterKnife.bind(this);
+        binding = DialogBookSourceBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         setUpWindow();
         initData();
         initClick();
@@ -103,8 +88,8 @@ public class SourceExchangeDialog extends Dialog {
         //执行业务逻辑
         if (aBooks.size() == 0) {
             searchEngine.search(mShelfBook.getName(), mShelfBook.getAuthor());
-            ivStopSearch.setVisibility(View.VISIBLE);
-            rpb.setIsAutoLoading(true);
+            binding.ivStopSearch.setVisibility(View.VISIBLE);
+            binding.rpb.setIsAutoLoading(true);
         }else {
             if (mAdapter.getItemCount() == 0) {
                 mAdapter.addItems(aBooks);
@@ -128,8 +113,8 @@ public class SourceExchangeDialog extends Dialog {
      * 初始化数据
      */
     private void initData() {
-        toolbar.setTitle(mShelfBook.getName());
-        toolbar.setSubtitle(mShelfBook.getAuthor());
+        binding.it.toolbar.setTitle(mShelfBook.getName());
+        binding.it.toolbar.setSubtitle(mShelfBook.getAuthor());
         //dialogTvTitle.setText(mShelfBook.getName() + "(" + mShelfBook.getAuthor() + ")");
 
         if (aBooks == null) {
@@ -137,8 +122,8 @@ public class SourceExchangeDialog extends Dialog {
         }
 
         mAdapter = new SourceExchangeAdapter();
-        dialogRvContent.setLayoutManager(new LinearLayoutManager(mActivity));
-        dialogRvContent.setAdapter(mAdapter);
+        binding.dialogRvContent.setLayoutManager(new LinearLayoutManager(mActivity));
+        binding.dialogRvContent.setAdapter(mAdapter);
 
         searchEngine = new SearchEngine();
         searchEngine.initSearchEngine(ReadCrawlerUtil.getReadCrawlers());
@@ -149,8 +134,8 @@ public class SourceExchangeDialog extends Dialog {
             @Override
             public void loadMoreFinish(Boolean isAll) {
                 synchronized (RefreshProgressBar.class) {
-                    rpb.setIsAutoLoading(false);
-                    ivStopSearch.setVisibility(View.GONE);
+                    binding.rpb.setIsAutoLoading(false);
+                    binding.ivStopSearch.setVisibility(View.GONE);
                 }
             }
 
@@ -199,10 +184,10 @@ public class SourceExchangeDialog extends Dialog {
             dismiss();
         });
 
-        ivStopSearch.setOnClickListener(v -> searchEngine.stopSearch());
-        ivRefreshSearch.setOnClickListener(v -> {
+        binding.ivStopSearch.setOnClickListener(v -> searchEngine.stopSearch());
+        binding.ivRefreshSearch.setOnClickListener(v -> {
             searchEngine.stopSearch();
-            ivStopSearch.setVisibility(View.VISIBLE);
+            binding.ivStopSearch.setVisibility(View.VISIBLE);
             mAdapter.clear();
             aBooks.clear();
             mAdapter.notifyDataSetChanged();

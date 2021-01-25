@@ -5,17 +5,17 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
 import android.view.Menu;
 import android.view.MenuItem;
-import androidx.annotation.LayoutRes;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -26,9 +26,6 @@ import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.util.StatusBarUtil;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-
 /**
  * @author fengyue
  * @date 2020/8/12 20:02
@@ -37,17 +34,15 @@ public abstract class BaseActivity extends AppCompatActivity {
     private static final int INVALID_VAL = -1;
 
     protected CompositeDisposable mDisposable;
-    //ButterKnife
-    protected Toolbar mToolbar;
 
-    private Unbinder unbinder;
+    protected Toolbar mToolbar;
 
     private int curNightMode;
     /****************************abstract area*************************************/
-
-    @LayoutRes
-    protected abstract int getContentId();
-
+    /**
+     * 绑定视图
+     */
+    protected abstract void bindView();
     /************************init area************************************/
     protected void addDisposable(Disposable d){
         if (mDisposable == null){
@@ -55,6 +50,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
         mDisposable.add(d);
     }
+
 
     /**
      * 配置Toolbar
@@ -108,8 +104,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initTheme();
         ActivityManage.addActivity(this);
-        setContentView(getContentId());
-        unbinder = ButterKnife.bind(this);
+        bindView();
         initData(savedInstanceState);
         initToolbar();
         initWidget();
@@ -138,7 +133,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ActivityManage.removeActivity(this);
-        unbinder.unbind();
         if (mDisposable != null){
             mDisposable.dispose();
         }
