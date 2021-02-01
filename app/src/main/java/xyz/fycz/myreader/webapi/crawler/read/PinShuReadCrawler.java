@@ -19,7 +19,9 @@ import java.util.ArrayList;
 /**
  * @author fengyue
  * @date 2020/5/19 19:50
+ * 已失效
  */
+@Deprecated
 public class PinShuReadCrawler implements ReadCrawler, BookInfoCrawler {
     public static final String NAME_SPACE = "https://www.vodtw.com";
     public static final String NOVEL_SEARCH = "https://www.vodtw.com/Book/Search.aspx?SearchKey={key}&SearchClass=1";
@@ -119,7 +121,7 @@ public class PinShuReadCrawler implements ReadCrawler, BookInfoCrawler {
             book.setAuthor(info.get(1).text());
             book.setType(info.get(3).text());
             book.setNewestChapterTitle(info.get(4).text());
-            book.setSource(BookSource.pinshu.toString());
+            book.setSource("pinshu");
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

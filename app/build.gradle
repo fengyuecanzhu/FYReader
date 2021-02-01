@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'//greendao插件dependencies
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 def releaseTime() {
     return new Date().format("yy.MMddHH", TimeZone.getTimeZone("GMT+08:00"))
@@ -52,7 +51,7 @@ def versionN = getVersionName()
 
 android {
     compileSdkVersion 29
-    buildToolsVersion '30.0.3'
+    buildToolsVersion '29.0.3'
     defaultConfig {
         applicationId "xyz.fycz.myreader"
         minSdkVersion 21
@@ -78,6 +77,7 @@ android {
             ndk {
                 abiFilters "x86", "armeabi", "armeabi-v7a"
             }
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         android.applicationVariants.all { variant ->
             variant.outputs.all {
@@ -195,6 +195,9 @@ dependencies {
     implementation "com.afollestad.material-dialogs:input:$dialog_version"
     implementation "com.afollestad.material-dialogs:files:$dialog_version"
     implementation "com.afollestad.material-dialogs:bottomsheets:$dialog_version"*/
+
+    //kongzueDialog
+    //implementation 'com.kongzue.dialog_v3:dialog:3.2.5'
 }
 
 greendao {

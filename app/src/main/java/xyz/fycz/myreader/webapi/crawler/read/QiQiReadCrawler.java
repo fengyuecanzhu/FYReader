@@ -15,7 +15,10 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 import java.util.ArrayList;
 
-
+/**
+ * 已失效
+ */
+@Deprecated
 public class QiQiReadCrawler implements ReadCrawler {
     public static final String NAME_SPACE = "https://www.qq717.com";
     public static final String NOVEL_SEARCH = "https://www.qq717.com/search.php?keyword={key}";
@@ -120,7 +123,7 @@ public class QiQiReadCrawler implements ReadCrawler {
                 book.setNewestChapterTitle(element.getElementsByTag("p").get(4).getElementsByTag("a").first().text());
                 book.setImgUrl(element.getElementsByTag("img").first().attr("src"));
                 book.setDesc(element.getElementsByClass("result-game-item-desc").text());
-                book.setSource(BookSource.qiqi.toString());
+                book.setSource("qiqi");
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }

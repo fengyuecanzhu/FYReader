@@ -16,7 +16,9 @@ import xyz.fycz.myreader.webapi.crawler.read.XS7ReadCrawler;
 /**
  * @author fengyue
  * @date 2020/11/28 22:43
+ * 已失效
  */
+@Deprecated
 public class XS7Rank extends FindCrawler {
     private FindCrawler xs7 = new XS7ReadCrawler();
     public static final String CHARSET = "GBK";

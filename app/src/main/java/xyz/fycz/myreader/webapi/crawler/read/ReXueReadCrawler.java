@@ -17,7 +17,10 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
-
+/**
+ * 已失效
+ */
+@Deprecated
 public class ReXueReadCrawler implements ReadCrawler {
     public static final String NAME_SPACE = "https://www.rexue.org";
     public static final String NOVEL_SEARCH = "https://www.rexue.org/search.php?key={key}";
@@ -155,7 +158,7 @@ public class ReXueReadCrawler implements ReadCrawler {
                 String imgUrl = li.getElementsByTag("img").attr("data-original");
                 book.setImgUrl(!imgUrl.contains("http") ? "https:" + imgUrl : imgUrl);
                 book.setChapterUrl(NAME_SPACE + as.get(1).attr("href"));
-                book.setSource(BookSource.rexue.toString());
+                book.setSource("rexue");
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }
@@ -168,7 +171,7 @@ public class ReXueReadCrawler implements ReadCrawler {
 
     public Book getBookInfo(Document doc, Book book) {
         //小说源
-        book.setSource(BookSource.rexue.toString());
+        book.setSource("rexue");
         //图片url
         String imgUrl = doc.select("meta[property=og:image]").attr("content");
         book.setImgUrl(imgUrl);

@@ -118,7 +118,7 @@ public class PinShuReadCrawler2 implements ReadCrawler, BookInfoCrawler {
             Elements info = element.getElementsByTag("a");
             book.setName(info.get(1).text());
             book.setChapterUrl(NAME_SPACE + info.get(0).attr("href"));
-            book.setSource(BookSource.pinshu.toString());
+            book.setSource("pinshu");
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

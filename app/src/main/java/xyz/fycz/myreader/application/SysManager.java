@@ -116,12 +116,15 @@ public class SysManager {
                 ReadCrawlerUtil.addReadCrawler(BookSource.laoyao, BookSource.xingxing, BookSource.shiguang, BookSource.xiagu, BookSource.hongchen);
                 Log.d("SourceVersion", "" + 1);
             case 2:
-                ReadCrawlerUtil.addReadCrawler(BookSource.rexue, BookSource.chuanqi);
+                //ReadCrawlerUtil.addReadCrawler(BookSource.rexue, BookSource.chuanqi);
+                ReadCrawlerUtil.addReadCrawler(BookSource.chuanqi);
                 Log.d("SourceVersion", "" + 2);
             case 3:
                 ReadCrawlerUtil.resetReadCrawlers();
                 Log.d("SourceVersion", "" + 3);
-
+            case 4:
+                ReadCrawlerUtil.removeReadCrawler("qiqi", "rexue", "pinshu");
+                Log.d("SourceVersion", "" + 4);
         }
         setting.setSourceVersion(APPCONST.SOURCE_VERSION);
         saveSetting(setting);
