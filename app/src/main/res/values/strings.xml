@@ -209,6 +209,9 @@
     <string name="read_chuanqi">传奇小说</string>
     <string name="read_xiagu">峡谷文学</string>
     <string name="read_hongchen">红尘小说</string>
+    <string name="read_bijian">笔尖小说</string>
+    <string name="read_yanqinglou">言情楼</string>
+    <string name="read_wolong">卧龙小说</string>
     <string name="read_chaoxing">超星图书·实体</string>
     <string name="read_zuopin">作品集·实体</string>
     <string name="read_cangshu99">99藏书·实体</string>

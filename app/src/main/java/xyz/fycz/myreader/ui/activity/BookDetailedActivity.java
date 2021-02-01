@@ -458,6 +458,7 @@ public class BookDetailedActivity extends BaseActivity {
 
                 @Override
                 public void onError(Exception e) {
+                    e.printStackTrace();
                     ToastUtils.showError("最新章节加载失败！");
                 }
             });

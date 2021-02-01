@@ -74,7 +74,7 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <!--<RelativeLayout
             android:id="@+id/find_rl_xs7_top"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -90,7 +90,7 @@
                 android:textSize="@dimen/text_normal_size"
                 android:text="@string/read_xs7"/>
 
-        </RelativeLayout>
+        </RelativeLayout>-->
 
         <RelativeLayout
                 android:layout_width="match_parent"
@@ -232,7 +232,7 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <!--<RelativeLayout
             android:id="@+id/find_rl_xs7_store"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -248,6 +248,6 @@
                 android:textSize="@dimen/text_normal_size"
                 android:text="@string/read_xs7"/>
 
-        </RelativeLayout>
+        </RelativeLayout>-->
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
