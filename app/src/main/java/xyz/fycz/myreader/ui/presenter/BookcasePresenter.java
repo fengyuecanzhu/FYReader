@@ -653,7 +653,8 @@ public class BookcasePresenter implements BasePresenter {
         MyApplication.getApplication().newThread(() -> {
             ArrayList<Book> needDownloadBooks = new ArrayList<>();
             for (Book book : mBooks) {
-                if (!BookSource.pinshu.toString().equals(book.getSource()) && !"本地书籍".equals(book.getType())
+                //if (!BookSource.pinshu.toString().equals(book.getSource()) && !"本地书籍".equals(book.getType())
+                if (!"本地书籍".equals(book.getType())
                         && book.getIsDownLoadAll()) {
                     needDownloadBooks.add(book);
                 }

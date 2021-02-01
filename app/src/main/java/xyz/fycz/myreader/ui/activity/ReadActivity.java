@@ -483,6 +483,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             }
         });
 
+        initBottomMenuClick();
+
         mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
             Book bookTem = (Book) mBook.clone();
             bookTem.setChapterUrl(bean.getChapterUrl());
@@ -1219,10 +1221,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         binding.readAblTopMenu.setPadding(0, statusBarHeight, 0, 0);
         if (mSetting.isNoMenuChTitle()) {
             binding.llChapterView.setVisibility(GONE);
-            binding.toolbar.getLayoutParams().height = ScreenUtils.dpToPx(60) + ImmersionBar.getStatusBarHeight(this);
+            binding.toolbar.getLayoutParams().height = 60 + ImmersionBar.getStatusBarHeight(this);
         } else {
             binding.llChapterView.setVisibility(VISIBLE);
-            binding.toolbar.getLayoutParams().height = ScreenUtils.dpToPx(45) + ImmersionBar.getStatusBarHeight(this);
+            binding.toolbar.getLayoutParams().height = 45 + ImmersionBar.getStatusBarHeight(this);
         }
     }
 

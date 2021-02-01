@@ -19,8 +19,8 @@ import java.util.List;
 
 
 public class SoNovelReadCrawler implements ReadCrawler, BookInfoCrawler {
-    public static final String NAME_SPACE = "https://www.soxscc.com";
-    public static final String NOVEL_SEARCH = "https://www.soxscc.com/search.html,searchtype=all&searchkey={key}&action=search&submit= 搜  索 ";
+    public static final String NAME_SPACE = "https://www.soxs.cc";
+    public static final String NOVEL_SEARCH = "https://www.soxs.cc/search.html,searchtype=all&searchkey={key}&action=search&submit= 搜  索 ";
     public static final String CHARSET = "UTF-8";
     public static final String SEARCH_CHARSET = "UTF-8";
 
