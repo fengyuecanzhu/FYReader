@@ -1,10 +1,14 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
 import android.text.Html;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import java.util.ArrayList;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -13,12 +17,10 @@ import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
-import java.util.ArrayList;
 
-
-public class MiQuReadCrawler implements ReadCrawler, BookInfoCrawler {
-    public static final String NAME_SPACE = "https://www.meegoq.com";
-    public static final String NOVEL_SEARCH = "https://www.meegoq.com/search.htm?keyword={key}";
+public class BiJianReadCrawler implements ReadCrawler {
+    public static final String NAME_SPACE = "http://www.bjcan.com";
+    public static final String NOVEL_SEARCH = "http://www.bjcan.com/home/search/index.html?keyword={key}";
     public static final String CHARSET = "UTF-8";
     public static final String SEARCH_CHARSET = "UTF-8";
 
@@ -55,12 +57,12 @@ public class MiQuReadCrawler implements ReadCrawler, BookInfoCrawler {
      */
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
-        Element divContent = doc.getElementById("content");
+        Element divContent = doc.getElementsByClass("read-content").first();
         if (divContent != null) {
             String content = Html.fromHtml(divContent.html()).toString();
             char c = 160;
             String spaec = "" + c;
-            content = content.replace(spaec, "  ").replace("applyChapterSetting();", "");
+            content = content.replace(spaec, "  ");
             return content;
         } else {
             return "";
@@ -76,15 +78,14 @@ public class MiQuReadCrawler implements ReadCrawler, BookInfoCrawler {
     public ArrayList<Chapter> getChaptersFromHtml(String html) {
         ArrayList<Chapter> chapters = new ArrayList<>();
         Document doc = Jsoup.parse(html);
-        Element divList = doc.getElementsByClass("mulu").first();
+        Element divList = doc.getElementsByClass("attentions").get(1);
         Elements elementsByTag = divList.getElementsByTag("a");
-        int i = 0;
-        for (int j = 9; j < elementsByTag.size(); j++) {
-            Element a = elementsByTag.get(j);
+        for (int i = 0; i < elementsByTag.size(); i++) {
+            Element a = elementsByTag.get(i);
             String title = a.text();
-            String url = "http:" + a.attr("href");
+            String url = a.attr("href");
             Chapter chapter = new Chapter();
-            chapter.setNumber(i++);
+            chapter.setNumber(i);
             chapter.setTitle(title);
             chapter.setUrl(url);
             chapters.add(chapter);
@@ -94,47 +95,38 @@ public class MiQuReadCrawler implements ReadCrawler, BookInfoCrawler {
 
     /**
      * 从搜索html中得到书列表
-     *
-     * @param html
-     * @return
+     *<li>
+     *    <a class="pic" href="http://www.bjcan.com/book/74544.html" target="_blank"><img class="lazy" src="http://www.bjcan.com/uploads/novel/20200907/b38cea14e4a3de1e876395e378c1e544.jpeg" alt="大主宰：灵玖"></a>
+     *    <h5 class="tit"><a href="http://www.bjcan.com/book/74544.html" target="_blank">大主宰：灵玖</a></h5>
+     *    <p class="info">作者：<span>霞露</span><span>分类：其他</span><i class="serial">连载中</i></p>
+     *    <p class="intro">简介：她，身负系统，莫名来到了大主宰的时空，成为了聚灵族的最后族人。在她还对周围的情况一片模糊的时候，她遇到了林静这个小恶魔。拜林静所赐，她还遇到了武祖，成为了武柤的小徒弟。参与了灵路，遇到了牧尘和洛璃，她默默的在心中问着自己那一直在划水的系统：&ldquo;你的活来了，说吧，我该干什么？&rdquo;</p>
+     *    <a class="view" href="http://www.bjcan.com/book/74544.html" target="_blank">小说详情</a>
+     *</li>
      */
     public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);
-        Elements divs = doc.getElementsByClass("lastest");
+        Elements divs = doc.getElementsByClass("book-list");
         Element div = divs.get(0);
         Elements elementsByTag = div.getElementsByTag("li");
-        for (int i = 1; i < elementsByTag.size() - 1; i++) {
+        for (int i = 0; i < elementsByTag.size(); i++) {
             Element element = elementsByTag.get(i);
+            Elements as = element.getElementsByTag("a");
+            Elements ps = element.getElementsByTag("p");
             Book book = new Book();
-            Element info = element.getElementsByClass("n2").first();
-            book.setName(info.text());
-            book.setInfoUrl("http:" + info.getElementsByTag("a").attr("href"));
-            book.setChapterUrl("http:" + info.getElementsByTag("a").attr("href").replace("info", "book"));
-            book.setAuthor(element.getElementsByClass("a2").first().text());
-            book.setType(element.getElementsByClass("nt").first().text());
-            book.setNewestChapterTitle(element.getElementsByClass("c2").first().text());
-            book.setSource(BookSource.miqu.toString());
+            book.setImgUrl(element.getElementsByTag("img").attr("src"));
+            book.setName(as.get(1).text());
+            Elements spans = ps.get(0).getElementsByTag("span");
+            book.setAuthor(spans.get(0).text());
+            book.setType(spans.get(1).text().replace("分类：", ""));
+            book.setChapterUrl(as.get(2).attr("href"));
+            book.setDesc(ps.get(1).text());
+            book.setNewestChapterTitle("");
+            book.setSource(BookSource.bijian.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }
         return books;
-    }
-
-    /**
-     * 获取书籍详细信息
-     *
-     * @param book
-     */
-    public Book getBookInfo(String html, Book book) {
-        Document doc = Jsoup.parse(html);
-        Element img = doc.getElementsByClass("cover").first();
-        book.setImgUrl(img.getElementsByTag("img").get(0).attr("src"));
-
-        String desc = doc.select("meta[property=og:description]").attr("content");
-        book.setDesc(desc);
-
-        return book;
     }
 
 }

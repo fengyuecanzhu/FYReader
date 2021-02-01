@@ -279,6 +279,7 @@ public class MyApplication extends Application {
                 String updateContent = "";
                 String downloadLink = null;
                 boolean isForceUpdate = false;
+                int forceUpdateVersion;
                 StringBuilder s = new StringBuilder();
                 newestVersion = Integer.parseInt(contents[0].substring(contents[0].indexOf(":") + 1));
                 isForceUpdate = Boolean.parseBoolean(contents[1].substring(contents[1].indexOf(":") + 1));
@@ -294,6 +295,12 @@ public class MyApplication extends Application {
                 spu.putString("splashImageUrl", contents[6].substring(contents[6].indexOf(":") + 1));
                 spu.putString("splashImageMD5", contents[7].substring(contents[7].indexOf(":") + 1));
 
+                forceUpdateVersion = Integer.parseInt(contents[8].substring(contents[8].indexOf(":") + 1));
+                spu.putInt("forceUpdateVersion", forceUpdateVersion);
+
+                int versionCode = getVersionCode();
+
+                isForceUpdate = isForceUpdate && forceUpdateVersion > versionCode;
                 if (!StringHelper.isEmpty(downloadLink)) {
                     spu.putString(getmContext().getString(R.string.downloadLink), downloadLink);
                 } else {
@@ -304,7 +311,6 @@ public class MyApplication extends Application {
                     s.append(string);
                     s.append("\n");
                 }
-                int versionCode = getVersionCode();
                 Log.i("检查更新，最新版本", newestVersion + "");
                 if (newestVersion > versionCode) {
                     MyApplication m = new MyApplication();

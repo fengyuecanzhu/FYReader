@@ -124,6 +124,7 @@ public class SysManager {
                 Log.d("SourceVersion", "" + 3);
             case 4:
                 ReadCrawlerUtil.removeReadCrawler("qiqi", "rexue", "pinshu");
+                ReadCrawlerUtil.addReadCrawler(BookSource.bijian, BookSource.yanqinglou, BookSource.wolong);
                 Log.d("SourceVersion", "" + 4);
         }
         setting.setSourceVersion(APPCONST.SOURCE_VERSION);

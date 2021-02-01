@@ -36,13 +36,13 @@ public class FindFragment extends BaseFragment {
         super.initClick();
         binding.findRlQidianTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false)));
         binding.findRlQidianNsTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(true)));
-        binding.findRlXs7Top.setOnClickListener(v -> comeToBookstore(new XS7Rank()));
+        //binding.findRlXs7Top.setOnClickListener(v -> comeToBookstore(new XS7Rank()));
         binding.findRlQidianSort.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false, true)));
         binding.findRlQidianNsSort.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(true, true)));
         binding.findRlQb5Store.setOnClickListener(v -> comeToBookstore(new QB5ReadCrawler()));
         binding.findRlBen100Store.setOnClickListener(v -> comeToBookstore(new Ben100ReadCrawler()));
         binding.findRlMiaoquStore.setOnClickListener(v -> comeToBookstore(new MiaoBiReadCrawler()));
-        binding.findRlXs7Store.setOnClickListener(v -> comeToBookstore(new XS7ReadCrawler()));
+        //binding.findRlXs7Store.setOnClickListener(v -> comeToBookstore(new XS7ReadCrawler()));
     }
 
 
