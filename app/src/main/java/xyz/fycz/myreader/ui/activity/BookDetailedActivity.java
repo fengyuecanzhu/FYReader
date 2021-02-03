@@ -58,6 +58,7 @@ import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.util.IOUtils;
+import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -494,23 +495,29 @@ public class BookDetailedActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if ("本地书籍".equals(mBook.getType())) {
-            return false;
+            getMenuInflater().inflate(R.menu.menu_book_detail_local, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.menu_book_detail, menu);
         }
-        getMenuInflater().inflate(R.menu.menu_book_detail, menu);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem isUpdate = menu.findItem(R.id.action_is_update);
-        MenuItem groupSetting = menu.findItem(R.id.action_group_setting);
-        if (isCollected) {
-            isUpdate.setVisible(true);
-            //groupSetting.setVisible(true);
-            isUpdate.setChecked(!mBook.getIsCloseUpdate());
+        if ("本地书籍".equals(mBook.getType())) {
+            MenuItem groupSetting = menu.findItem(R.id.action_group_setting);
+            groupSetting.setVisible(isCollected);
         } else {
-            isUpdate.setVisible(false);
-            groupSetting.setVisible(false);
+            MenuItem isUpdate = menu.findItem(R.id.action_is_update);
+            MenuItem groupSetting = menu.findItem(R.id.action_group_setting);
+            if (isCollected) {
+                isUpdate.setVisible(true);
+                groupSetting.setVisible(true);
+                isUpdate.setChecked(!mBook.getIsCloseUpdate());
+            } else {
+                isUpdate.setVisible(false);
+                groupSetting.setVisible(false);
+            }
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -632,7 +639,23 @@ public class BookDetailedActivity extends BaseActivity {
     /**
      * 分享书籍
      */
+
     private void shareBook() {
+        if ("本地书籍".equals(mBook.getType())) {
+            File file = new File(mBook.getChapterUrl());
+            if (!file.exists()){
+                ToastUtils.showWarring("书籍源文件不存在，无法分享！");
+                return;
+            }
+            try {
+                ShareUtils.share(this, file, mBook.getName() + ".txt", "text/plain");
+            } catch (Exception e) {
+                String dest = APPCONST.SHARE_FILE_DIR + File.separator + mBook.getName() + ".txt";
+                FileUtils.copy(mBook.getChapterUrl(), dest);
+                ShareUtils.share(this, new File(dest), mBook.getName() + ".txt", "text/plain");
+            }
+            return;
+        }
         ToastUtils.showInfo("正在生成分享图片");
         Single.create((SingleOnSubscribe<File>) emitter -> {
             // 使用url
@@ -660,16 +683,17 @@ public class BookDetailedActivity extends BaseActivity {
             }
             emitter.onSuccess(share);
         }).compose(RxUtils::toSimpleSingle)
-          .subscribe(new MySingleObserver<File>() {
-              @Override
-              public void onSuccess(@NonNull File File) {
-                  share(File);
-              }
-          });
+                .subscribe(new MySingleObserver<File>() {
+                    @Override
+                    public void onSuccess(@NonNull File File) {
+                        share(File);
+                    }
+                });
     }
 
     /**
      * 生成分享图片
+     *
      * @param QRCode
      * @return
      */
@@ -745,21 +769,16 @@ public class BookDetailedActivity extends BaseActivity {
 
     /**
      * 分享生成的图片
+     *
      * @param share
      */
     private void share(File share) {
-        //noinspection ResultOfMethodCallIgnored
-        share.setReadable(true, false);
-        Uri contentUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", share);
-        final Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-        intent.setType("image/png");
-        startActivity(Intent.createChooser(intent, "分享书籍"));
+        ShareUtils.share(this, share, "分享书籍", "image/png");
     }
 
     /**
      * 绘制简介
+     *
      * @param lines
      * @param textPaint
      * @param canvas
@@ -777,6 +796,7 @@ public class BookDetailedActivity extends BaseActivity {
 
     /**
      * 生成简介lines
+     *
      * @param width
      * @param textPaint
      * @return

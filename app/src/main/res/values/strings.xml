@@ -335,6 +335,8 @@
     <string name="delete_ban_rule">删除禁用规则</string>
     <string name="import_rule">导入规则</string>
     <string name="help">帮助</string>
+    <string name="refresh_books">更新目录</string>
+    <string name="finish">完成</string>
 
     <string-array name="reset_screen_time">
         <item>常亮</item>

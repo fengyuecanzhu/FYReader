@@ -1,148 +1,147 @@
-<com.scwang.smartrefresh.layout.SmartRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/srl_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorBackground"
-        tools:context="xyz.fycz.myreader.ui.fragment.BookcaseFragment">
+<com.scwang.smartrefresh.layout.SmartRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/srl_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context="xyz.fycz.myreader.ui.fragment.BookcaseFragment">
+
     <com.scwang.smartrefresh.header.MaterialHeader
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:scrollbars="none">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
 
         <LinearLayout
-                android:id="@+id/ll_no_data_tips"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="10dp"
-                android:visibility="gone">
+            android:id="@+id/ll_no_data_tips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
 
             <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    app:tint="@color/textSecondary"
-                    app:srcCompat="@drawable/ic_vector_add_bookcase"/>
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                app:srcCompat="@drawable/ic_vector_add_bookcase"
+                app:tint="@color/textSecondary" />
 
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="当前无任何书籍，点击添加"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="16sp"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="当前无任何书籍，点击添加"
+                android:textColor="@color/textSecondary"
+                android:textSize="16sp" />
         </LinearLayout>
 
         <xyz.fycz.myreader.widget.custom.DragSortGridView
-                android:id="@+id/gv_book"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnWidth="100dp"
-                android:horizontalSpacing="10dp"
-                android:listSelector="@android:color/transparent"
-                android:numColumns="auto_fit"
-                android:scrollbars="none"
-                android:padding="5dp"
-                android:verticalSpacing="10dp">
-        </xyz.fycz.myreader.widget.custom.DragSortGridView>
+            android:id="@+id/gv_book"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/rl_book_edit"
+            android:layout_alignParentTop="true"
+            android:columnWidth="100dp"
+            android:gravity="center"
+            android:horizontalSpacing="10dp"
+            android:listSelector="@android:color/transparent"
+            android:numColumns="auto_fit"
+            android:scrollbars="none"
+            android:verticalSpacing="10dp" />
 
         <RelativeLayout
-                android:id="@+id/rl_download_tip"
-                android:layout_width="match_parent"
-                android:layout_height="39dp"
-                android:layout_alignParentBottom="true"
-                android:background="@color/colorForeground"
-                android:visibility="gone">
+            android:id="@+id/rl_download_tip"
+            android:layout_width="match_parent"
+            android:layout_height="39dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorForeground"
+            android:visibility="gone">
 
             <ProgressBar
-                    android:layout_width="match_parent"
-                    android:layout_height="4dp"
-                    android:layout_alignParentTop="true"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:id="@+id/pb_download"
-                    android:max="100"
-            />
+                android:id="@+id/pb_download"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_alignParentTop="true"
+                android:max="100" />
 
             <TextView
-                    android:id="@+id/tv_download_tip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/textSecondary"
-                    android:text="正在初始化..."
-                    android:gravity="center_vertical|start"
-                    android:maxLines="1"
-                    android:textSize="14sp"
-                    android:paddingStart="15dp"/>
+                android:id="@+id/tv_download_tip"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|start"
+                android:maxLines="1"
+                android:paddingStart="15dp"
+                android:text="正在初始化..."
+                android:textColor="@color/textSecondary"
+                android:textSize="14sp" />
 
             <TextView
-                    android:id="@+id/tv_stop_download"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="14sp"
-                    android:text="@string/stop_download_tip"
-                    android:layout_alignParentEnd="true"
-                    android:gravity="center_vertical"
-                    android:paddingEnd="15dp"
-                    android:paddingStart="15dp"
-                    android:visibility="gone"/>
+                android:id="@+id/tv_stop_download"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:gravity="center_vertical"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:text="@string/stop_download_tip"
+                android:textColor="@color/colorAccent"
+                android:textSize="14sp"
+                android:visibility="gone" />
         </RelativeLayout>
 
         <RelativeLayout
-                android:id="@+id/rl_book_edit"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:paddingRight="10dp"
-                android:layout_alignParentBottom="true"
-                android:background="@color/colorForeground"
-                android:gravity="center_vertical"
-                android:visibility="gone">
+            android:id="@+id/rl_book_edit"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorForeground"
+            android:gravity="center_vertical"
+            android:paddingEnd="10dp"
+            android:visibility="gone">
 
             <CheckBox
-                    android:id="@+id/book_selected_all"
-                    android:layout_width="120dp"
-                    android:layout_height="40dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="15dp"
-                    android:text="全选"
-                    android:textSize="15dp"
-                    android:textColor="@color/textSecondary"
-                    android:theme="@style/MyCheckBox" />
+                android:id="@+id/book_selected_all"
+                android:layout_width="120dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:text="全选"
+                android:textColor="@color/textSecondary"
+                android:textSize="15dp"
+                android:theme="@style/MyCheckBox" />
 
             <Button
-                    android:id="@+id/book_add_group"
-                    android:layout_width="90dp"
-                    android:layout_height="35dp"
-                    android:minWidth="110dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:enabled="false"
-                    android:clickable="false"
-                    android:background="@drawable/selector_btn_add"
-                    android:textColor="@color/selector_btn_file_add"
-                    android:text="加入分组" />
+                android:id="@+id/book_add_group"
+                android:layout_width="90dp"
+                android:layout_height="35dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/selector_btn_add"
+                android:clickable="false"
+                android:enabled="false"
+                android:minWidth="110dp"
+                android:text="加入分组"
+                android:textColor="@color/selector_btn_file_add" />
 
             <Button
-                    android:id="@+id/book_btn_delete"
-                    android:layout_width="90dp"
-                    android:layout_height="35dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="15dp"
-                    android:enabled="false"
-                    android:clickable="false"
-                    android:background="@drawable/selector_btn_add"
-                    android:textColor="@color/selector_btn_file_add"
-                    android:layout_toLeftOf="@id/book_add_group"
-                    android:text="删除/移除"/>
+                android:id="@+id/book_btn_delete"
+                android:layout_width="90dp"
+                android:layout_height="35dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="15dp"
+                android:layout_toLeftOf="@id/book_add_group"
+                android:background="@drawable/selector_btn_add"
+                android:clickable="false"
+                android:enabled="false"
+                android:text="删除/移除"
+                android:textColor="@color/selector_btn_file_add" />
         </RelativeLayout>
     </RelativeLayout>
 </com.scwang.smartrefresh.layout.SmartRefreshLayout>

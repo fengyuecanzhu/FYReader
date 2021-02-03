@@ -54,11 +54,7 @@ public class BookcaseFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            mBookcasePresenter.getData();
-        } else {
-            mBookcasePresenter.init();
-        }
+        mBookcasePresenter.init();
     }
 
     public LinearLayout getLlNoDataTips() {

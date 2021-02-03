@@ -2,24 +2,33 @@ package xyz.fycz.myreader.webapi.crawler.read;
 
 import android.text.Html;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.util.utils.StringUtils;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
 public class YanQingLouReadCrawler implements ReadCrawler {
     public static final String NAME_SPACE = "http://www.yanqinglou.com";
     public static final String NOVEL_SEARCH = "http://www.yanqinglou.com/Home/Search,action=search&q={key}";
+    public static final String AJAX_CONTENT = "http://www.yanqinglou.com/home/index/ajaxchapter";
     public static final String CHARSET = "UTF-8";
     public static final String SEARCH_CHARSET = "UTF-8";
 
@@ -48,6 +57,19 @@ public class YanQingLouReadCrawler implements ReadCrawler {
         return SEARCH_CHARSET;
     }
 
+    /*
+    var preview_page = "/lishi/220987/60.html";
+	var next_page = "/lishi/220987/62.html";
+	var index_page = "/lishi/220987/";
+	var article_id = "220987";
+	var chapter_id = "61";
+	var nextcid = "62";
+	var prevcid = "60";
+	var articlename = "临高启明";
+	var chaptername = "第十五节 遇伏";
+	var hash = "38e338d183600e17";
+	var localpre = "www.yanqinglou.com";
+     */
     /**
      * 从html中获取章节正文
      *
@@ -61,10 +83,42 @@ public class YanQingLouReadCrawler implements ReadCrawler {
             String content = Html.fromHtml(divContent.html()).toString();
             char c = 160;
             String spaec = "" + c;
-            content = content.replace(spaec, "  ");
+            content = content.replace(spaec, "  ")
+                    .replaceAll("您可以.*最新章节！", "")
+                    .replaceAll("转码页面.*com/", "");
             return content;
         } else {
             return "";
+        }
+    }
+
+    /*
+    id: 220987
+    eKey: fe9535a08b53e929
+    cid: 62
+    basecid: 62
+     */
+    public void getAjaxContent(String html, ResultCallback callback){
+        String id = StringUtils.getSubString(html, "var article_id = \"", "\";");
+        String eKey = StringUtils.getSubString(html, "var hash = \"", "\";");
+        String cid = StringUtils.getSubString(html, "var chapter_id = \"", "\";");
+        String body = "id=" + id + "&eKey=" + eKey + "&cid=" + cid + "&basecid=" + cid;
+        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+        RequestBody requestBody = RequestBody.create(mediaType, body);
+        try {
+            String jsonStr = OkHttpUtils.getHtml(AJAX_CONTENT, requestBody, CHARSET);
+            JSONObject json = new JSONObject(jsonStr);
+            String content = json.getJSONObject("info").getString("content");
+            content = Html.fromHtml(content).toString();
+            char c = 160;
+            String spaec = "" + c;
+            content = content.replace(spaec, "  ")
+                    .replaceAll("您可以.*最新章节！", "")
+                    .replaceAll("转码页面.*com/", "");
+            callback.onFinish(content, 0);
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+            callback.onError(e);
         }
     }
 
@@ -122,7 +176,7 @@ public class YanQingLouReadCrawler implements ReadCrawler {
                 book.setType(divBook.getElementsByClass("author").get(1).text().replace("分类：", ""));
                 book.setNewestChapterTitle(as.get(3).text().replace("最近更新>>", ""));
                 book.setDesc(divBook.getElementsByClass("update").first().text().replace("简介：", ""));
-                book.setImgUrl(divBook.getElementsByTag("img").attr("src"));
+                book.setImgUrl(NAME_SPACE + divBook.getElementsByTag("img").attr("src"));
                 book.setChapterUrl(NAME_SPACE + as.get(0).attr("href"));
                 book.setSource(BookSource.yanqinglou.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
