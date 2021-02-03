@@ -9,6 +9,9 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -63,6 +66,8 @@ public class MainActivity extends BaseActivity {
     private BookcaseFragment mBookcaseFragment;
     private FindFragment mFindFragment;
     private MineFragment mMineFragment;
+    private Animation mBottomInAnim;
+    private Animation mBottomOutAnim;
 
     @Override
     protected void bindView() {
@@ -73,7 +78,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         boolean startFromSplash = getIntent().getBooleanExtra("startFromSplash", false);
-        if (!startFromSplash && BookGroupService.getInstance().curGroupIsPrivate()){
+        if (!startFromSplash && BookGroupService.getInstance().curGroupIsPrivate()) {
             SharedPreUtils.getInstance().putString(getString(R.string.curBookGroupId), "");
             SharedPreUtils.getInstance().putString(getString(R.string.curBookGroupName), "");
         }
@@ -130,7 +135,7 @@ public class MainActivity extends BaseActivity {
         super.initClick();
 
         mToolbar.setOnLongClickListener(v -> {
-            if (binding.viewPagerMain.getCurrentItem() == 0 && !BookGroupService.getInstance().curGroupIsPrivate()){
+            if (binding.viewPagerMain.getCurrentItem() == 0 && !BookGroupService.getInstance().curGroupIsPrivate()) {
                 goPrivateBookcase();
                 return true;
             }
@@ -237,8 +242,11 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean isEdit = mBookcaseFragment.getmBookcasePresenter() != null && mBookcaseFragment.getmBookcasePresenter().ismEditState();
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            menu.findItem(R.id.action_refresh).setVisible(!isEdit);
+        }
         if (binding.viewPagerMain.getCurrentItem() == 0) {
-
             if (mBookcaseFragment.getmBookcasePresenter() != null && mBookcaseFragment.getmBookcasePresenter().ismEditState()) {
                 menu.findItem(R.id.action_finish).setVisible(true);
                 menu.setGroupVisible(R.id.bookcase_menu, false);
@@ -270,8 +278,7 @@ public class MainActivity extends BaseActivity {
             startActivity(searchBookIntent);
             return true;
         } else if (itemId == R.id.action_finish) {
-            mBookcaseFragment.getmBookcasePresenter().cancelEdit();
-            invalidateOptionsMenu();
+            cancelEdit();
             return true;
         } else if (itemId == R.id.action_change_group || itemId == R.id.action_group_man) {
             if (!mBookcaseFragment.getmBookcasePresenter().hasOnGroupChangeListener()) {
@@ -280,8 +287,13 @@ public class MainActivity extends BaseActivity {
                     getSupportActionBar().setSubtitle(groupName);
                 });
             }
+        } else if (itemId == R.id.action_refresh) {
+            mBookcaseFragment.getmBookcasePresenter().initNoReadNum();
         } else if (itemId == R.id.action_edit) {
             invalidateOptionsMenu();
+            initMenuAnim();
+            binding.bottomNavigationView.setVisibility(View.GONE);
+            binding.bottomNavigationView.startAnimation(mBottomOutAnim);
         } else if (itemId == R.id.action_qr_scan) {
             Intent intent = new Intent(this, QRCodeScanActivity.class);
             startActivityForResult(intent, APPCONST.REQUEST_QR_SCAN);
@@ -292,8 +304,7 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (mBookcaseFragment.getmBookcasePresenter() != null && mBookcaseFragment.getmBookcasePresenter().ismEditState()) {
-            mBookcaseFragment.getmBookcasePresenter().cancelEdit();
-            invalidateOptionsMenu();
+            cancelEdit();
             return;
         }
         if (System.currentTimeMillis() - APPCONST.exitTime > APPCONST.exitConfirmTime) {
@@ -311,10 +322,10 @@ public class MainActivity extends BaseActivity {
         BookGroup bookGroup = BookGroupService.getInstance().getGroupById(curBookGroupId);
         if (bookGroup == null) {
             groupName = "";
-        }else {
+        } else {
             groupName = bookGroup.getName();
         }
-        if (binding.viewPagerMain.getCurrentItem() == 0){
+        if (binding.viewPagerMain.getCurrentItem() == 0) {
             getSupportActionBar().setSubtitle(groupName);
         }
 //        MyApplication.checkVersionByServer(this);
@@ -342,21 +353,21 @@ public class MainActivity extends BaseActivity {
                             String[] string = result.split("#", 2);
                             if (string.length == 2) {
                                 SharedBook sharedBook = GsonExtensionsKt.getGSON().fromJson(string[1], SharedBook.class);
-                                if (sharedBook != null && !StringHelper.isEmpty(sharedBook.getChapterUrl())){
+                                if (sharedBook != null && !StringHelper.isEmpty(sharedBook.getChapterUrl())) {
                                     Book book = SharedBook.sharedBookToBook(sharedBook);
                                     Intent intent = new Intent(this, BookDetailedActivity.class);
                                     intent.putExtra(APPCONST.BOOK, book);
                                     startActivity(intent);
-                                }else {
+                                } else {
                                     ToastUtils.showError("书籍加载失败");
                                 }
-                            }else {
+                            } else {
                                 try {
                                     Intent intent = new Intent(Intent.ACTION_VIEW);
                                     Uri uri = Uri.parse(result);
                                     intent.setData(uri);
                                     startActivity(intent);
-                                }catch (Exception e){
+                                } catch (Exception e) {
                                     ToastUtils.showError(e.getLocalizedMessage());
                                 }
                             }
@@ -449,7 +460,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void goPrivateBookcase(){
+    private void goPrivateBookcase() {
         MyAlertDialog.showPrivateVerifyDia(this, needGoTo -> {
             if (needGoTo) showPrivateBooks();
         });
@@ -458,7 +469,7 @@ public class MainActivity extends BaseActivity {
     /**
      * 显示私密书架
      */
-    private void showPrivateBooks(){
+    private void showPrivateBooks() {
         BookGroup bookGroup = BookGroupService.getInstance().
                 getGroupById(SharedPreUtils.getInstance().getString("privateGroupId"));
         groupName = bookGroup.getName();
@@ -469,6 +480,32 @@ public class MainActivity extends BaseActivity {
             reLoadFragment();
         }
         mBookcaseFragment.onResume();
+    }
+
+    /**
+     * 取消编辑状态
+     */
+    private void cancelEdit() {
+        mBookcaseFragment.getmBookcasePresenter().cancelEdit();
+        invalidateOptionsMenu();
+        initMenuAnim();
+        binding.bottomNavigationView.setVisibility(View.VISIBLE);
+        binding.bottomNavigationView.startAnimation(mBottomInAnim);
+    }
+
+    //初始化菜单动画
+    public void initMenuAnim() {
+        if (mBottomInAnim != null) return;
+        mBottomInAnim = AnimationUtils.loadAnimation(this, R.anim.slide_bottom_in);
+        mBottomOutAnim = AnimationUtils.loadAnimation(this, R.anim.slide_bottom_out);
+    }
+
+    public Animation getmBottomInAnim() {
+        return mBottomInAnim;
+    }
+
+    public Animation getmBottomOutAnim() {
+        return mBottomOutAnim;
     }
 
     public interface OnGroupChangeListener {

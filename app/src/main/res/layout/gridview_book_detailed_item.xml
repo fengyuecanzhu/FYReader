@@ -1,118 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        android:id="@+id/rl_book_item"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:orientation="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rl_book_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp">
 
     <LinearLayout
-            android:id="@+id/ll_book_item"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="5dp">
+        android:id="@+id/ll_book_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
         <CheckBox
-                android:id="@+id/cb_book_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:enabled="true"
-                android:clickable="false"
-                android:focusable="true"
-                android:paddingEnd="2dp"
-                android:theme="@style/MyCheckBox"
-                android:visibility="gone"/>
+            android:id="@+id/cb_book_select"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:clickable="false"
+            android:enabled="true"
+            android:focusable="true"
+            android:paddingEnd="2dp"
+            android:theme="@style/MyCheckBox"
+            android:visibility="gone" />
 
         <xyz.fycz.myreader.widget.CoverImageView
-                android:id="@+id/iv_book_img"
-                android:layout_width="64dp"
-                android:layout_height="88dp"
-                android:scaleType="fitXY"
-                app:srcCompat="@mipmap/default_cover" />
+            android:id="@+id/iv_book_img"
+            android:layout_width="64dp"
+            android:layout_height="88dp"
+            android:scaleType="fitXY"
+            app:srcCompat="@mipmap/default_cover" />
 
-        <LinearLayout android:id="@+id/ll_book_read"
-                      android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/ll_book_read"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
             <TextView
-                    android:id="@+id/tv_book_name"
-                    android:layout_width="wrap_content"
+                android:id="@+id/tv_book_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:padding="4dp"
+                android:text="bookname"
+                android:textColor="@color/textPrimary"
+                android:textSize="16dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:padding="3dp"
+                    app:srcCompat="@drawable/ic_author"
+                    app:tint="@color/textSecondary" />
+
+                <TextView
+                    android:id="@+id/tv_book_author"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:padding="4dp"
-                    android:text="bookname"
-                    android:textSize="16dp"
-                    android:textColor="@color/textPrimary"/>
-
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:padding="3dp"
-                        app:tint="@color/textSecondary"
-                        app:srcCompat="@drawable/ic_author"/>
-
-                <TextView
-                        android:id="@+id/tv_book_author"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:maxLines="1"
-                        android:text="辰东"
-                        android:textSize="12dp"
-                        android:textColor="@color/textSecondary"/>
+                    android:text="辰东"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12dp" />
             </LinearLayout>
+
             <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        app:tint="@color/textSecondary"
-                        android:padding="3dp"
-                        app:srcCompat="@drawable/ic_history"/>
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:padding="3dp"
+                    app:srcCompat="@drawable/ic_history"
+                    app:tint="@color/textSecondary" />
 
                 <TextView
-                        android:id="@+id/tv_book_history_chapter"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="第1章 xxxxxxxx"
-                        android:textSize="12dp"
-                        android:textColor="@color/textSecondary"/>
+                    android:id="@+id/tv_book_history_chapter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="第1章 xxxxxxxx"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12dp" />
             </LinearLayout>
+
             <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        app:tint="@color/textSecondary"
-                        android:padding="3dp"
-                        app:srcCompat="@drawable/ic_book_last"/>
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:padding="3dp"
+                    app:srcCompat="@drawable/ic_book_last"
+                    app:tint="@color/textSecondary" />
 
                 <TextView
-                        android:id="@+id/tv_book_newest_chapter"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="第999章 xxxxxxxx"
-                        android:textSize="12dp"
-                        android:textColor="@color/textSecondary"/>
+                    android:id="@+id/tv_book_newest_chapter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="第999章 xxxxxxxx"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12dp" />
             </LinearLayout>
 
         </LinearLayout>
@@ -122,28 +128,27 @@
 
 
     <xyz.fycz.myreader.widget.BadgeView
-            android:id="@+id/tv_no_read_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_margin="5dp"
-            android:includeFontPadding="false"
-            android:layout_marginRight="10dp"/>
+        android:id="@+id/tv_no_read_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_margin="5dp"
+        android:layout_marginRight="10dp"
+        android:includeFontPadding="false" />
 
     <ProgressBar
-            android:id="@+id/pb_loading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:visibility="gone"
-            android:layout_alignParentRight="true"
-            style="?android:attr/progressBarStyleSmall"
-    />
+        android:id="@+id/pb_loading"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:padding="10dp"
+        android:visibility="gone" />
 
-   <View
-            android:layout_width="fill_parent"
-            android:layout_height="0.5dp"
-            android:layout_alignParentBottom="true"
-            android:background="@color/sys_window_back"/>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/sys_window_back" />
 
 </RelativeLayout>

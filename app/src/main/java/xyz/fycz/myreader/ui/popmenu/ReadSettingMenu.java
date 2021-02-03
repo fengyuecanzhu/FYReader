@@ -100,7 +100,7 @@ public class ReadSettingMenu extends FrameLayout {
         //繁简切换
         binding.tvSwitchSt.setOnClickListener(v -> {
             initSwitchST(true);
-            callback.onRefreshUI();
+            callback.onRefreshPage();
         });
         //字体选择
         binding.tvTextFont.setOnClickListener(v -> callback.onFontClick());
@@ -195,7 +195,7 @@ public class ReadSettingMenu extends FrameLayout {
                         }
                         dialog.dismiss();
                         SysManager.saveSetting(setting);
-                        callback.onRefreshUI();
+                        callback.onPageModeChange();
                     }).show();
         });
         //横屏竖屏切换
@@ -344,6 +344,8 @@ public class ReadSettingMenu extends FrameLayout {
     }
 
     public interface Callback{
+        void onRefreshPage();
+        void onPageModeChange();
         void onRefreshUI();
         void onStyleChange();
         void onTextSizeChange();

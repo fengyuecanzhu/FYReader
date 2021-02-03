@@ -1,5 +1,7 @@
 package xyz.fycz.myreader.webapi;
 
+import android.util.Log;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -18,6 +20,7 @@ import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.FYReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.TianLaiReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.read.YanQingLouReadCrawler;
 
 import java.io.IOException;
 import java.util.List;
@@ -91,7 +94,14 @@ public class CommonApi extends BaseApi {
         getCommonReturnHtmlStringApi(url, null, charset, true, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
-                callback.onFinish(rc.getContentFormHtml((String) o), 0);
+                String html = (String) o;
+                String content = rc.getContentFormHtml(html);
+                if (rc instanceof YanQingLouReadCrawler && content.contains("正在加载")){
+                    YanQingLouReadCrawler yrc = (YanQingLouReadCrawler) rc;
+                    yrc.getAjaxContent(html, this);
+                }else {
+                    callback.onFinish(content, 0);
+                }
             }
 
             @Override

@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -74,8 +76,6 @@ public class BookcasePresenter implements BasePresenter {
 
     private final BookcaseFragment mBookcaseFragment;
     private final ArrayList<Book> mBooks = new ArrayList<>();//书目数组
-    private ArrayList<BookGroup> mBookGroups = new ArrayList<>();//书籍分组
-    private CharSequence[] mGroupNames;//书籍分组名称
     private BookcaseAdapter mBookcaseAdapter;
     private final BookService mBookService;
     private final ChapterService mChapterService;
@@ -117,7 +117,6 @@ public class BookcasePresenter implements BasePresenter {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
-    //    private ChapterService mChapterService;
     @SuppressLint("HandlerLeak")
     public final Handler mHandler = new Handler() {
         @Override
@@ -245,6 +244,7 @@ public class BookcasePresenter implements BasePresenter {
                             }
                             ToastUtils.showSuccess("书籍删除成功！");
                             init();
+                            mBookcaseAdapter.setCheckedAll(false);
                         }, null);
             }else {
                 DialogCreator.createCommonDialog(mMainActivity, "批量删除/移除书籍",
@@ -255,6 +255,7 @@ public class BookcasePresenter implements BasePresenter {
                             }
                             ToastUtils.showSuccess("书籍删除成功！");
                             init();
+                            mBookcaseAdapter.setCheckedAll(false);
                         }, (dialog, which) -> {
                             for (Book book : mBookcaseAdapter.getSelectBooks()) {
                                 book.setGroupId("");
@@ -262,6 +263,7 @@ public class BookcasePresenter implements BasePresenter {
                             }
                             ToastUtils.showSuccess("书籍已从分组中移除！");
                             init();
+                            mBookcaseAdapter.setCheckedAll(false);
                         });
             }
         });
@@ -272,6 +274,7 @@ public class BookcasePresenter implements BasePresenter {
                 @Override
                 public void change() {
                     init();
+                    mBookcaseAdapter.setCheckedAll(false);
                     if (hasOnGroupChangeListener())
                         ogcl.onChange();
                 }
@@ -288,7 +291,7 @@ public class BookcasePresenter implements BasePresenter {
     //获取数据
     public void getData() {
         init();
-        if (mSetting.isRefreshWhenStart() || android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if (mSetting.isRefreshWhenStart()) {
             mHandler.postDelayed(this::initNoReadNum, 500);
         }
     }
@@ -317,7 +320,22 @@ public class BookcasePresenter implements BasePresenter {
                     setBtnClickable(mBookcaseAdapter.getmCheckedCount() > 0);
                 });
                 mBookcaseFragment.getGvBook().setDragModel(-1);
-                mBookcaseFragment.getGvBook().setTouchClashparent(((MainActivity) (mBookcaseFragment.getActivity())).getViewPagerMain());
+                mBookcaseFragment.getGvBook().setTouchClashparent(mMainActivity.getViewPagerMain());
+                mBookcaseFragment.getGvBook().setOnDragSelectListener(new DragSortGridView.OnDragSelectListener() {
+                    @Override
+                    public void onDragSelect(View mirror) {
+                        if (mSetting.getBookcaseStyle() == BookcaseStyle.listMode){
+                            mirror.setBackgroundColor(mMainActivity.getResources().getColor(R.color.colorBackground));
+                        }else {
+                            mirror.setScaleX(1.05f);
+                        }
+                        mirror.setScaleY(1.05f);
+                    }
+
+                    @Override
+                    public void onPutDown(View itemView) {
+                    }
+                });
                 mBookcaseFragment.getGvBook().setAdapter(mBookcaseAdapter);
                 isBookcaseStyleChange = false;
             } else {
@@ -375,23 +393,8 @@ public class BookcasePresenter implements BasePresenter {
         }
     }
 
-    //初始化书籍分组
-    private void initBookGroups(boolean isAdd) {
-        mBookGroups.clear();
-        mBookGroups.addAll(mBookGroupService.getAllGroups());
-        mGroupNames = new CharSequence[isAdd ? mBookGroups.size() + 1 : mBookGroups.size()];
-        for (int i = 0; i < mBookGroups.size(); i++) {
-            String groupName = mBookGroups.get(i).getName();
-//            mGroupNames[i] = groupName.getBytes().length > 20 ? groupName.substring(0, 8) + "···" : groupName;
-            mGroupNames[i] = groupName;
-        }
-        if (isAdd) {
-            mGroupNames[mBookGroups.size()] = "添加分组";
-        }
-    }
-
     //检查书籍更新
-    private void initNoReadNum() {
+    public void initNoReadNum() {
         errorLoadingBooks.clear();
         finishLoadBookCount = 0;
         for (Book book : mBooks) {
@@ -557,6 +560,8 @@ public class BookcasePresenter implements BasePresenter {
                     mBookcaseFragment.getGvBook().setDragModel(DragSortGridView.DRAG_BY_LONG_CLICK);
                 }
                 mBookcaseFragment.getRlBookEdit().setVisibility(View.VISIBLE);
+                mMainActivity.initMenuAnim();
+                mBookcaseFragment.getRlBookEdit().startAnimation(mMainActivity.getmBottomInAnim());
                 setBtnClickable(false);
                 changeCheckedAllStatus();
                 mBookcaseAdapter.notifyDataSetChanged();
@@ -571,6 +576,8 @@ public class BookcasePresenter implements BasePresenter {
             mBookcaseFragment.getGvBook().setDragModel(-1);
             mBookcaseAdapter.setmEditState(false);
             mBookcaseFragment.getRlBookEdit().setVisibility(View.GONE);
+            mMainActivity.initMenuAnim();
+            mBookcaseFragment.getRlBookEdit().startAnimation(mMainActivity.getmBottomOutAnim());
             mBookcaseAdapter.notifyDataSetChanged();
         }
     }
@@ -976,4 +983,5 @@ public class BookcasePresenter implements BasePresenter {
             mBookcaseFragment.getmCbSelectAll().setText("全选");
         }
     }
+
 }

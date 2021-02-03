@@ -27,6 +27,7 @@ import xyz.fycz.myreader.enums.Language;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Chapter;
+import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.model.audio.ReadAloudService;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -150,10 +151,10 @@ public abstract class PageLoader {
     private int mBatteryLevel;
     //当前页面的背景
     private int mBgColor;
-    //繁简体
-    private Language language;
     // 当前章
     protected int mCurChapterPos = 0;
+    //是否向前翻页
+    protected boolean isPrev;
     //上一章的记录
     private int mLastChapterPos = 0;
     private int readTextLength; //已读字符数
@@ -212,9 +213,6 @@ public abstract class PageLoader {
         mPageMode = mSettingManager.getPageMode();
         //获取字体
         getFont(mSettingManager.getFont());
-        //获取繁简体
-        language = mSettingManager.getLanguage();
-//        mPageStyle = mSettingManager.getPageStyle();
         indent = StringUtils.repeat(StringUtils.halfToFull(" "), mSettingManager.getIntent());
 
         initBgBitmap();
@@ -319,6 +317,7 @@ public abstract class PageLoader {
      * @return
      */
     public boolean skipPreChapter() {
+        isPrev = false;
         if (!hasPrevChapter()) {
             return false;
         }
@@ -339,6 +338,7 @@ public abstract class PageLoader {
      * @return
      */
     public boolean skipNextChapter() {
+        isPrev = false;
         if (!hasNextChapter()) {
             return false;
         }
@@ -359,6 +359,7 @@ public abstract class PageLoader {
      * @param pos:从 0 开始。
      */
     public void skipToChapter(int pos) {
+        isPrev = false;
         // 设置参数
         mCurChapterPos = pos;
 
@@ -540,7 +541,7 @@ public abstract class PageLoader {
         refreshPagePara();
     }
 
-    private void refreshPagePara() {
+    public void refreshPagePara() {
         // 取消缓存
         mPreChapter = null;
         mNextChapter = null;
@@ -597,7 +598,7 @@ public abstract class PageLoader {
      */
     public void refreshChapter(Chapter chapter) {
         chapter.setContent(null);
-        getChapterContent(chapter);
+        ChapterService.getInstance().deleteChapterCacheFile(chapter);
         openChapter();
     }
 
@@ -755,6 +756,18 @@ public abstract class PageLoader {
         mPageView.drawCurPage(false);
     }
 
+    /**
+     * 解析章节并跳转到最后一页
+     */
+    protected void openChapterInLastPage() {
+        if (parseCurChapter()) {
+            mCurPage = getCurPage(getAllPagePos() - 1);
+        } else {
+            mCurPage = new TxtPage();
+        }
+        mPageView.drawCurPage(false);
+    }
+
     public void chapterError() {
         //加载错误
         mStatus = STATUS_ERROR;
@@ -838,12 +851,6 @@ public abstract class PageLoader {
      * @return
      */
     public abstract boolean hasChapterData(Chapter chapter);
-
-
-    /**
-     *
-     */
-    public abstract void getChapterContent(Chapter chapter);
 
     /***********************************default method***********************************************/
 
@@ -1985,6 +1992,14 @@ public abstract class PageLoader {
         return null;
     }
 
+    public boolean isPrev() {
+        return isPrev;
+    }
+
+    public void setPrev(boolean prev) {
+        isPrev = prev;
+    }
+
     /*****************************************interface*****************************************/
 
     public interface OnPageChangeListener {
@@ -1994,13 +2009,6 @@ public abstract class PageLoader {
          * @param pos:切换章节的序号
          */
         void onChapterChange(int pos);
-
-        /**
-         * 作用：请求加载章节内容
-         *
-         * @param requestChapters:需要下载的章节列表
-         */
-        void requestChapters(List<Chapter> requestChapters);
 
         /**
          * 作用：章节目录加载完成时候回调

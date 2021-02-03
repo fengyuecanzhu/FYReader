@@ -125,8 +125,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
     private boolean isCollected = true;//是否在书架中
 
-    private boolean isPrev;//是否向前翻页
-
     private boolean autoPage = false;//是否自动翻页
 
     private boolean loadFinish = false;
@@ -207,11 +205,9 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         mPageLoader.skipToChapter(chapterPos);
                         mPageLoader.skipToPage(pagePos);
                     } catch (Exception e) {
-                        ToastUtils.showError("章节跳转失败，请截图联系作者。\n" +
-                                e.getMessage());
+                        //ToastUtils.showError("章节跳转失败，请截图联系作者。\n" + e.getMessage());
                         e.printStackTrace();
                     }
-                    binding.pbLoading.setVisibility(View.GONE);
                     break;
                 case 3:
                     break;
@@ -227,7 +223,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     break;
                 case 6:
                     mPageLoader.openChapter();
-                    if (isPrev) {//判断是否向前翻页打开章节，如果是则打开自己后跳转到最后一页，否则不跳转
+                    if (mPageLoader.isPrev()) {//判断是否向前翻页打开章节，如果是则打开自己后跳转到最后一页，否则不跳转
                         try {//概率性异常（空指针异常）
                             mPageLoader.skipToPage(mPageLoader.getAllPagePos() - 1);
                         } catch (Exception e) {
@@ -365,12 +361,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
             @Override
             public void prePage() {
-                isPrev = true;
+                mPageLoader.setPrev(true);
             }
 
             @Override
             public void nextPage(boolean hasNextPage) {
-                isPrev = false;
+                mPageLoader.setPrev(false);
                 if (!hasNextPage) {
                     if (autoPage) {
                         autoPageStop();
@@ -402,30 +398,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 new PageLoader.OnPageChangeListener() {
                     @Override
                     public void onChapterChange(int pos) {
-                        lastLoad(pos);
-                        for (int i = 0; i < 5; i++) {
-                            preLoad(pos - 1 + i);
-                        }
                         mBook.setHistoryChapterId(mChapters.get(pos).getTitle());
-                        MyApplication.getApplication().newThread(() -> {
-                            if (mPageLoader == null) {
-                                return;
-                            }
-                            if (mPageLoader.getPageStatus() == PageLoader.STATUS_LOADING) {
-                                if (!NetworkUtils.isNetWorkAvailable()) {
-                                    mHandler.sendMessage(mHandler.obtainMessage(7));
-                                } else {
-                                    mHandler.sendMessage(mHandler.obtainMessage(6));
-                                }
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void requestChapters(List<Chapter> requestChapters) {
-                        /*for (final Chapter chapter : requestChapters){
-                            getChapterContent(chapter, null);
-                        }*/
                     }
 
                     @Override
@@ -578,6 +551,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             }
         });
     }
+
     @Override
     protected void processLogic() {
         super.processLogic();
@@ -738,7 +712,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         if (itemId == R.id.action_change_source) {
             mSourceDialog.show();
         } else if (itemId == R.id.action_reload) {
-            isPrev = false;
+            mPageLoader.setPrev(false);
             if (!"本地书籍".equals(mBook.getType())) {
                 mChapterService.deleteChapterCacheFile(mChapters.get(mPageLoader.getChapterPos()));
             }
@@ -891,7 +865,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             binding.tvChapterUrl.setText(StringHelper.isEmpty(url) ? curChapter.getId() : url);
             binding.readSbChapterProgress.setProgress(mPageLoader.getPagePos());
             binding.readSbChapterProgress.setMax(mPageLoader.getAllPagePos() - 1);
-            binding.readTvPageTip.setText(String.format("%s/%s", binding.readSbChapterProgress.getProgress() + 1 ,binding.readSbChapterProgress.getMax() + 1));
+            binding.readTvPageTip.setText(String.format("%s/%s", binding.readSbChapterProgress.getProgress() + 1, binding.readSbChapterProgress.getMax() + 1));
         }
     }
     /************************书籍相关******************************/
@@ -1087,20 +1061,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             if (hasChangeSource) {
                 mBookService.matchHistoryChapterPos(mBook, mChapters);
             }
-            getChapterContent(mChapters.get(mBook.getHisttoryChapterNum()), new ResultCallback() {
-                @Override
-                public void onFinish(Object o, int code) {
-//                            mChapters.get(mBook.getHisttoryChapterNum()).setContent((String) o);
-                    mChapterService.saveOrUpdateChapter(mChapters.get(mBook.getHisttoryChapterNum()), (String) o);
-                    mHandler.sendMessage(mHandler.obtainMessage(1));
-//                        getAllChapterData();
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    mHandler.sendMessage(mHandler.obtainMessage(1));
-                }
-            });
+            mHandler.sendMessage(mHandler.obtainMessage(1));
             initMenu();
         }
     }
@@ -1113,93 +1074,14 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * @param pagePos
      */
     private void skipToChapterAndPage(final int chapterPos, final int pagePos) {
-        isPrev = false;
+        mPageLoader.setPrev(false);
         if (StringHelper.isEmpty(mChapters.get(chapterPos).getContent())) {
             if ("本地书籍".equals(mBook.getType())) {
                 ToastUtils.showWarring("该章节无内容！");
                 return;
             }
-            binding.pbLoading.setVisibility(View.VISIBLE);
-            getChapterContent(mChapters.get(chapterPos), new ResultCallback() {
-                @Override
-                public void onFinish(Object o, int code) {
-                    mChapterService.saveOrUpdateChapter(mChapters.get(chapterPos), (String) o);
-                    mHandler.sendMessage(mHandler.obtainMessage(2, chapterPos, pagePos));
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    mHandler.sendMessage(mHandler.obtainMessage(2, chapterPos, pagePos));
-                    mHandler.sendEmptyMessage(10);
-                }
-            });
-        } else {
-            mHandler.sendMessage(mHandler.obtainMessage(2, chapterPos, pagePos));
         }
-    }
-
-    /**
-     * 获取章节内容
-     *
-     * @param chapter
-     * @param resultCallback
-     */
-    private void getChapterContent(final Chapter chapter, ResultCallback resultCallback) {
-        if (StringHelper.isEmpty(chapter.getBookId())) {
-            chapter.setId(mBook.getId());
-        }
-        if (!StringHelper.isEmpty(chapter.getContent())) {
-            if (resultCallback != null) {
-                resultCallback.onFinish(mChapterService.getChapterCatheContent(chapter), 0);
-            }
-        } else {
-            if ("本地书籍".equals(mBook.getType())) {
-                return;
-            }
-            if (resultCallback != null) {
-                CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler, resultCallback);
-            } else {
-                CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler, new ResultCallback() {
-                    @Override
-                    public void onFinish(final Object o, int code) {
-//                        chapter.setContent((String) o);
-                        mChapterService.saveOrUpdateChapter(chapter, (String) o);
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-
-                    }
-
-                });
-            }
-        }
-    }
-
-    /**
-     * 预加载下一章
-     */
-    private void preLoad(int position) {
-        if (position + 1 < mChapters.size()) {
-            Chapter chapter = mChapters.get(position + 1);
-            if (StringHelper.isEmpty(chapter.getContent())) {
-                mPageLoader.getChapterContent(chapter);
-            }
-        }
-    }
-
-    /**
-     * 预加载上一章
-     *
-     * @param position
-     */
-    private void lastLoad(int position) {
-        if (position > 0) {
-            Chapter chapter = mChapters.get(position - 1);
-            if (StringHelper.isEmpty(chapter.getContent())) {
-                mPageLoader.getChapterContent(chapter);
-            }
-        }
+        mHandler.sendMessage(mHandler.obtainMessage(2, chapterPos, pagePos));
     }
 
     /**
@@ -1287,7 +1169,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             binding.readAutoPageMenu.startAnimation(mBottomOutAnim);
             flag = true;
         }
-        if ( binding.readBrightnessEyeMenu.getVisibility() == VISIBLE) {
+        if (binding.readBrightnessEyeMenu.getVisibility() == VISIBLE) {
             binding.readBrightnessEyeMenu.setVisibility(GONE);
             binding.readBrightnessEyeMenu.startAnimation(mBottomOutAnim);
             flag = true;
@@ -1368,8 +1250,18 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         binding.readSettingMenu.setOnClickListener(null);
         binding.readSettingMenu.setListener(this, new ReadSettingMenu.Callback() {
             @Override
+            public void onRefreshPage() {
+                mPageLoader.refreshPagePara();
+            }
+
+            @Override
+            public void onPageModeChange() {
+                mPageLoader.setPageMode(mSetting.getPageMode());
+            }
+
+            @Override
             public void onRefreshUI() {
-                mHandler.sendEmptyMessage(5);
+                mPageLoader.refreshUi();
             }
 
             @Override
@@ -1675,7 +1567,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         }
         MyApplication.getApplication().newThread(() -> {
             for (Chapter chapter : needDownloadChapters) {
-                getChapterContent(chapter, new ResultCallback() {
+                if (StringHelper.isEmpty(chapter.getBookId())) {
+                    chapter.setId(mBook.getId());
+                }
+                CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler, new ResultCallback() {
                     @Override
                     public void onFinish(Object o, int code) {
                         downloadingChapter = chapter.getTitle();
@@ -1904,9 +1799,9 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      */
     public void showAction() {
         float x, y;
-        if (binding.cursorLeft.getX() - binding.cursorRight.getX() > 0){
+        if (binding.cursorLeft.getX() - binding.cursorRight.getX() > 0) {
             x = binding.cursorRight.getX() + (binding.cursorLeft.getX() - binding.cursorRight.getX()) / 2 + ScreenUtils.dpToPx(12);
-        }else {
+        } else {
             x = binding.cursorLeft.getX() + (binding.cursorRight.getX() - binding.cursorLeft.getX()) / 2 + ScreenUtils.dpToPx(12);
         }
         if ((binding.cursorLeft.getY() - ScreenUtils.spToPx(mSetting.getReadWordSize()) - ScreenUtils.dpToPx(60)) < 0) {

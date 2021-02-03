@@ -1,6 +1,11 @@
 package xyz.fycz.myreader.widget.page;
 
 
+import android.util.Log;
+
+import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
@@ -72,22 +77,6 @@ public class NetPageLoader extends PageLoader {
                 + File.separator + chapter.getTitle() + FileUtils.SUFFIX_FY);
         if (!file.exists()) return null;
         BufferedReader br = new BufferedReader(new FileReader(file));
-        /*try {
-            if (StringHelper.isEmpty(br.readLine())){
-                getChapterContent(chapter);
-                assert chapter.getContent() != null;
-                //保证chapter更新完毕,暂时先这么用着
-                for (int i = 0; i < 5; i++) {
-                    if (!StringHelper.isEmpty(chapter.getContent())){
-                        break;
-                    }
-                    Thread.sleep(1000);
-                }
-                return br;
-            }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }*/
         return br;
     }
 
@@ -135,12 +124,12 @@ public class NetPageLoader extends PageLoader {
     }
 
     /**
-     * 加载当前页的前面两个章节
+     * 加载当前页的前面一个章节
      */
     private void loadPrevChapter() {
         if (mPageChangeListener != null) {
             int end = mCurChapterPos;
-            int begin = end - 2;
+            int begin = end - 1;
             if (begin < 0) {
                 begin = 0;
             }
@@ -176,14 +165,14 @@ public class NetPageLoader extends PageLoader {
     }
 
     /**
-     * 加载当前页的后一个章节
+     * 加载当前页的后四个章节
      */
     private void loadNextChapter() {
         if (mPageChangeListener != null) {
 
-            // 提示加载后两章
+            // 提示加载后四章
             int begin = mCurChapterPos + 1;
-            int end = begin + 1;
+            int end = begin + 3;
 
             // 判断是否大于最后一章
             if (begin >= mChapterList.size()) {
@@ -220,7 +209,9 @@ public class NetPageLoader extends PageLoader {
         }
 
         if (!chapters.isEmpty()) {
-            mPageChangeListener.requestChapters(chapters);
+            for (Chapter chapter : chapters) {
+                getChapterContent(chapter);
+            }
         }
     }
 
@@ -242,10 +233,21 @@ public class NetPageLoader extends PageLoader {
                 public void onFinish(final Object o, int code) {
 //                    chapter.setContent((String) o);
                     mChapterService.saveOrUpdateChapter(chapter, (String) o);
+                    if (getPageStatus() == PageLoader.STATUS_LOADING) {
+                        MyApplication.runOnUiThread(() -> {
+                            if (isPrev) {
+                                openChapterInLastPage();
+                            } else {
+                                openChapter();
+                            }
+                        });
+                    }
                 }
+
                 @Override
                 public void onError(Exception e) {
-
+                    ToastUtils.showError("章节加载失败\n" + e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
             });
