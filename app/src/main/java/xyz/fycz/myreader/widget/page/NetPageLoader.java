@@ -20,11 +20,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by newbiechen on 17-5-29.
- * 网络页面加载器
- */
-
 public class NetPageLoader extends PageLoader {
     private static final String TAG = "PageFactory";
     private ChapterService mChapterService;
@@ -220,39 +215,30 @@ public class NetPageLoader extends PageLoader {
      *
      * @param chapter
      */
-    public void getChapterContent(final Chapter chapter) {
-        Chapter cacheChapter = mChapterService.findChapterByBookIdAndTitle(chapter.getBookId(), chapter.getTitle());
-        if (cacheChapter != null && hasChapterData(chapter)) {
-            chapter.setContent(APPCONST.BOOK_CACHE_PATH + chapter.getBookId()
-                    + File.separator + chapter.getTitle() + FileUtils.SUFFIX_FY);
-            chapter.setId(cacheChapter.getId());
-            mChapterService.saveOrUpdateChapter(chapter, null);
-        } else {
-            CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler, new ResultCallback() {
-                @Override
-                public void onFinish(final Object o, int code) {
-//                    chapter.setContent((String) o);
-                    mChapterService.saveOrUpdateChapter(chapter, (String) o);
-                    if (getPageStatus() == PageLoader.STATUS_LOADING) {
-                        MyApplication.runOnUiThread(() -> {
-                            if (isPrev) {
-                                openChapterInLastPage();
-                            } else {
-                                openChapter();
-                            }
-                        });
-                    }
+    public void getChapterContent(Chapter chapter) {
+        CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler, new ResultCallback() {
+            @Override
+            public void onFinish(final Object o, int code) {
+                mChapterService.saveOrUpdateChapter(chapter, (String) o);
+                if (getPageStatus() == PageLoader.STATUS_LOADING) {
+                    MyApplication.runOnUiThread(() -> {
+                        if (isPrev) {
+                            openChapterInLastPage();
+                        } else {
+                            openChapter();
+                        }
+                    });
                 }
+            }
 
-                @Override
-                public void onError(Exception e) {
-                    ToastUtils.showError("章节加载失败\n" + e.getLocalizedMessage());
-                    e.printStackTrace();
-                }
-
-            });
-        }
-
+            @Override
+            public void onError(Exception e) {
+                if (mCurChapterPos == chapter.getNumber())
+                    chapterError();
+                e.printStackTrace();
+            }
+        });
     }
+
 }
 
