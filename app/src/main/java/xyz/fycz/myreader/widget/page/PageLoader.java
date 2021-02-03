@@ -55,12 +55,13 @@ public abstract class PageLoader {
 
     // 当前页面的状态
     public static final int STATUS_LOADING = 1;         // 正在加载
-    public static final int STATUS_FINISH = 2;          // 加载完成
-    public static final int STATUS_ERROR = 3;           // 加载错误 (一般是网络加载情况)
-    public static final int STATUS_EMPTY = 4;           // 空数据
-    public static final int STATUS_PARING = 5;          // 正在解析 (装载本地数据)
-    public static final int STATUS_PARSE_ERROR = 6;     // 本地文件解析错误(暂未被使用)
-    public static final int STATUS_CATEGORY_EMPTY = 7;  // 获取到的目录为空
+    public static final int STATUS_LOADING_CHAPTER = 2; // 正在加载目录
+    public static final int STATUS_FINISH = 3;          // 加载完成
+    public static final int STATUS_ERROR = 4;           // 加载错误 (一般是网络加载情况)
+    public static final int STATUS_EMPTY = 5;           // 空数据
+    public static final int STATUS_PARING = 6;          // 正在解析 (装载本地数据)
+    public static final int STATUS_PARSE_ERROR = 7;     // 本地文件解析错误(暂未被使用)
+    public static final int STATUS_CATEGORY_EMPTY = 8;  // 获取到的目录为空
     // 默认的显示参数配置
     public static final int DEFAULT_MARGIN_HEIGHT = 28;
     public static final int DEFAULT_MARGIN_WIDTH = 15;
@@ -721,7 +722,7 @@ public abstract class PageLoader {
 
         // 如果章节目录没有准备好
         if (!isChapterListPrepare) {
-            mStatus = STATUS_LOADING;
+            mStatus = STATUS_LOADING_CHAPTER;
             mPageView.drawCurPage(false);
             return;
         }
@@ -1007,13 +1008,16 @@ public abstract class PageLoader {
             String tip = "";
             switch (mStatus) {
                 case STATUS_LOADING:
-                    tip = "正在拼命加载中...";
+                    tip = "正在加载章节内容...";
+                    break;
+                case STATUS_LOADING_CHAPTER:
+                    tip = "正在加载目录列表...";
                     break;
                 case STATUS_ERROR:
-                    tip = "加载失败(点击边缘重试)";
+                    tip = "章节内容加载失败";
                     break;
                 case STATUS_EMPTY:
-                    tip = "文章内容为空";
+                    tip = "章节内容为空";
                     break;
                 case STATUS_PARING:
                     tip = "正在拆分章节请等待...";
@@ -1305,6 +1309,8 @@ public abstract class PageLoader {
         mCancelPage = mCurPage;
         if (parsePrevChapter()) {
             mCurPage = getPrevLastPage();
+            if (mStatus == STATUS_LOADING)
+                mStatus = STATUS_FINISH;
         } else {
             mCurPage = new TxtPage();
         }
@@ -1378,6 +1384,8 @@ public abstract class PageLoader {
         // 解析下一章数据
         if (parseNextChapter()) {
             mCurPage = mCurChapter.getPage(0);
+            if (mStatus == STATUS_LOADING)
+                mStatus = STATUS_FINISH;
         } else {
             mCurPage = new TxtPage();
         }
@@ -1998,6 +2006,10 @@ public abstract class PageLoader {
 
     public void setPrev(boolean prev) {
         isPrev = prev;
+    }
+
+    public void setmStatus(int mStatus) {
+        this.mStatus = mStatus;
     }
 
     /*****************************************interface*****************************************/

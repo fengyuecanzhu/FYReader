@@ -222,14 +222,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     }
                     break;
                 case 6:
-                    mPageLoader.openChapter();
-                    if (mPageLoader.isPrev()) {//判断是否向前翻页打开章节，如果是则打开自己后跳转到最后一页，否则不跳转
-                        try {//概率性异常（空指针异常）
-                            mPageLoader.skipToPage(mPageLoader.getAllPagePos() - 1);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    mPageLoader.setmStatus(PageLoader.STATUS_LOADING);
                     break;
                 case 7:
                     ToastUtils.showWarring("无网络连接！");
@@ -1000,9 +993,11 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     }
                 });
             } else {
+                mPageLoader.setmStatus(PageLoader.STATUS_LOADING_CHAPTER);
                 CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler, false, new ResultCallback() {
                     @Override
                     public void onFinish(Object o, int code) {
+                        mPageLoader.setmStatus(PageLoader.STATUS_LOADING);
                         ArrayList<Chapter> chapters = (ArrayList<Chapter>) o;
                         updateAllOldChapterData(chapters);
                         initChapters();
