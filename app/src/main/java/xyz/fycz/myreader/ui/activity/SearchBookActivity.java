@@ -20,6 +20,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -28,10 +32,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySearchBookBinding;
 import xyz.fycz.myreader.entity.SearchBookBean;
@@ -49,6 +58,8 @@ import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
+import xyz.fycz.myreader.webapi.BaseApi;
 import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -92,6 +103,8 @@ public class SearchBookActivity extends BaseActivity {
     private static String[] suggestion = {"第一序列", "大道朝天", "伏天氏", "终极斗罗", "我师兄实在太稳健了", "烂柯棋缘", "诡秘之主"};
     private static String[] suggestion2 = {"不朽凡人", "圣墟", "我是至尊", "龙王传说", "太古神王", "一念永恒", "雪鹰领主", "大主宰"};
 
+    private boolean showHot;
+
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -132,8 +145,7 @@ public class SearchBookActivity extends BaseActivity {
         super.initData(savedInstanceState);
         mSetting = SysManager.getSetting();
         mSearchHistoryService = SearchHistoryService.getInstance();
-        Collections.addAll(mSuggestions, suggestion);
-
+        showHot = !MyApplication.isApkInDebug(this);
         searchEngine = new SearchEngine();
         searchEngine.setOnSearchListener(new SearchEngine.OnSearchListener() {
             @Override
@@ -163,9 +175,11 @@ public class SearchBookActivity extends BaseActivity {
         });
     }
 
+
     @Override
     protected void initWidget() {
         super.initWidget();
+        initSuggestionList();
         binding.etSearchKey.requestFocus();//get the focus
         //enter事件
         binding.etSearchKey.setOnEditorActionListener((textView, i, keyEvent) -> {
@@ -238,7 +252,6 @@ public class SearchBookActivity extends BaseActivity {
             stopSearch();
             mHandler.sendMessage(mHandler.obtainMessage(1));
         });
-        initSuggestionBook();
         initHistoryList();
     }
 
@@ -247,9 +260,7 @@ public class SearchBookActivity extends BaseActivity {
         super.initClick();
 
         //换一批点击事件
-        binding.renewImage.setOnClickListener(new RenewSuggestionBook());
-        //换一批点击事件
-        binding.renewText.setOnClickListener(new RenewSuggestionBook());
+        binding.llRefreshSuggestBooks.setOnClickListener(new RenewSuggestionBook());
 
         //搜索按钮点击事件
         binding.tvSearchConform.setOnClickListener(view -> mHandler.sendMessage(mHandler.obtainMessage(1)));
@@ -292,9 +303,18 @@ public class SearchBookActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (!showHot) menu.findItem(R.id.action_hot).setVisible(true);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_disable_source) {
             showDisableSourceDia();
+        }else if (item.getItemId() == R.id.action_hot){
+            showHot = !showHot;
+            initSuggestionList();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -348,18 +368,68 @@ public class SearchBookActivity extends BaseActivity {
     /**
      * 初始化建议书目
      */
-    private void initSuggestionBook() {
-        binding.tgSuggestBook.setTags(suggestion);
+    private void initSuggestionList() {
+        if (!showHot){
+            binding.tgSuggestBook.setTags(suggestion);
+        }else {
+            SharedPreUtils spu = SharedPreUtils.getInstance();
+            String cookie = spu.getString(getString(R.string.qdCookie), "");
+            String url = "https://m.qidian.com/majax/search/auto?kw=&";
+            if (cookie.equals("")) {
+                url += "_csrfToken=eXRDlZxmRDLvFAmdgzqvwWAASrxxp2WkVlH4ZM7e";
+            } else {
+                url += cookie.split(";")[0];
+            }
+            BaseApi.getCommonReturnHtmlStringApi(url, null, "utf-8", true, new ResultCallback() {
+                @Override
+                public void onFinish(Object o, int code) {
+                    parseSuggestionList((String) o);
+                    if (mSuggestions.size() > 0) {
+                        MyApplication.runOnUiThread(() -> binding.tgSuggestBook.setTags(mSuggestions.subList(0, 5)));
+                    } else {
+                        MyApplication.runOnUiThread(() -> binding.llSuggestBooksView.setVisibility(View.GONE));
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    MyApplication.runOnUiThread(() -> binding.llSuggestBooksView.setVisibility(View.GONE));
+                }
+            });
+        }
+    }
+
+    private void parseSuggestionList(String jsonStr) {
+        try {
+            JSONObject json = new JSONObject(jsonStr);
+            JSONArray names = json.getJSONObject("data").getJSONArray("popWords");
+            for (int i = 0; i < names.length(); i++) {
+                mSuggestions.add(names.getJSONObject(i).getString("name"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private class RenewSuggestionBook implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            String[] s = binding.tgSuggestBook.getTags();
-            if (Arrays.equals(s, suggestion)) {
-                binding.tgSuggestBook.setTags(suggestion2);
-            } else {
-                binding.tgSuggestBook.setTags(suggestion);
+            if (!showHot) {
+                String[] s = binding.tgSuggestBook.getTags();
+                if (Arrays.equals(s, suggestion)) {
+                    binding.tgSuggestBook.setTags(suggestion2);
+                } else {
+                    binding.tgSuggestBook.setTags(suggestion);
+                }
+            }else {
+                if (mSuggestions.size() > 0) {
+                    String[] s = binding.tgSuggestBook.getTags();
+                    if (s[0].equals(mSuggestions.get(0))) {
+                        binding.tgSuggestBook.setTags(mSuggestions.subList(5, 10));
+                    } else {
+                        binding.tgSuggestBook.setTags(mSuggestions.subList(0, 5));
+                    }
+                }
             }
         }
     }
@@ -407,7 +477,7 @@ public class SearchBookActivity extends BaseActivity {
         /*for (ReadCrawler readCrawler : readCrawlers) {
             searchBookByCrawler(readCrawler, readCrawler.getSearchCharset());
         }*/
-        searchEngine.initSearchEngine(ReadCrawlerUtil.getReadCrawlers());
+        searchEngine.initSearchEngine(readCrawlers);
         searchEngine.search(searchKey);
     }
 

@@ -1,52 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/colorBackground"
-        android:fitsSystemWindows="true"
-        tools:context="xyz.fycz.myreader.ui.activity.SearchBookActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context="xyz.fycz.myreader.ui.activity.SearchBookActivity">
 
-    <include layout="@layout/toolbar"/>
+    <include layout="@layout/toolbar" />
+
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingBottom="10dp"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:paddingTop="10dp">
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="10dp">
 
         <EditText
-                android:id="@+id/et_search_key"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_weight="2"
-                android:background="@drawable/search_et_backcolor"
-                android:hint="输入关键词"
-                android:paddingLeft="10dp"
-                android:textColor="@color/textPrimary"
-                android:imeOptions="actionSearch"
-        />
+            android:id="@+id/et_search_key"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_weight="2"
+            android:background="@drawable/search_et_backcolor"
+            android:hint="输入关键词"
+            android:imeOptions="actionSearch"
+            android:paddingLeft="10dp"
+            android:textColor="@color/textPrimary" />
 
 
         <TextView
-                android:id="@+id/tv_search_conform"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_weight="8"
-                android:background="@drawable/search_btn_backcolor"
-                android:gravity="center"
-                android:text="搜索"
-                android:textColor="@color/textPrimaryInverted"
-                android:textSize="18sp"/>
+            android:id="@+id/tv_search_conform"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_weight="8"
+            android:background="@drawable/search_btn_backcolor"
+            android:gravity="center"
+            android:text="搜索"
+            android:textColor="@color/textPrimaryInverted"
+            android:textSize="18sp" />
     </LinearLayout>
+
     <RadioGroup
         android:id="@+id/rg_search_filter"
         android:layout_width="match_parent"
@@ -58,78 +58,82 @@
             android:id="@+id/rb_all_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/textPrimary"
-            android:textSize="@dimen/text_small_size"
             android:checked="true"
-            android:text="@string/all" />
+            android:text="@string/all"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_small_size" />
+
         <androidx.appcompat.widget.AppCompatRadioButton
             android:id="@+id/rb_fuzzy_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/textPrimary"
-            android:textSize="@dimen/text_small_size"
             android:layout_marginStart="10dp"
             android:checked="true"
-            android:text="@string/fuzzy_search" />
+            android:text="@string/fuzzy_search"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_small_size" />
 
         <androidx.appcompat.widget.AppCompatRadioButton
             android:id="@+id/rb_precise_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/textPrimary"
-            android:textSize="@dimen/text_small_size"
             android:layout_marginStart="10dp"
-            android:text="@string/precise_search" />
+            android:text="@string/precise_search"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_small_size" />
     </RadioGroup>
+
     <xyz.fycz.myreader.widget.RefreshProgressBar
-            android:id="@+id/rpb"
-            android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:visibility="visible"/>
+        android:id="@+id/rpb"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:visibility="visible" />
 
     <LinearLayout
-            android:id="@+id/ll_suggest_books_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorForeground"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="10dp">
+        android:id="@+id/ll_suggest_books_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorForeground"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="5dp">
 
         <me.gujun.android.taggroup.TagGroup
-                android:id="@+id/tg_suggest_book"
-                style="@style/TagGroup"
-                android:layout_marginTop="10dp"
-                app:atg_pressedBackgroundColor="@color/colorForeground"
-                app:atg_backgroundColor="@color/background_card"
-                app:atg_borderColor="@color/background_card"
-                app:atg_horizontalPadding="10dp"
-                app:atg_textColor="@color/textPrimary"
-                app:atg_textSize="14sp"
-                app:atg_verticalSpacing="10dp"/>
+            android:id="@+id/tg_suggest_book"
+            style="@style/TagGroup"
+            android:layout_marginTop="5dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            app:atg_backgroundColor="@color/colorBackground"
+            app:atg_borderColor="@color/colorForeground"
+            app:atg_horizontalPadding="5dp"
+            app:atg_pressedBackgroundColor="@color/colorForeground"
+            app:atg_textColor="@color/textPrimary"
+            app:atg_textSize="14sp"
+            app:atg_verticalSpacing="5dp" />
 
         <LinearLayout
-                android:id="@+id/ll_refresh_suggest_books"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+            android:id="@+id/ll_refresh_suggest_books"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <ImageView
-                    android:id="@+id/renew_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_refresh"
-                    app:tint="@color/textPrimary"/>
+                android:id="@+id/renew_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_refresh"
+                app:tint="@color/textPrimary" />
 
             <TextView
-                    android:id="@+id/renew_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="换一批"
-                    android:textColor="@color/textPrimary"
-                    android:textSize="14sp"/>
+                android:id="@+id/renew_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="换一批"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp" />
 
 
         </LinearLayout>
@@ -138,62 +142,66 @@
     </LinearLayout>
 
     <LinearLayout
-            android:id="@+id/ll_history_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorForeground"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="10dp">
+        android:id="@+id/ll_history_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorForeground"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="5dp">
 
         <ListView
-                android:id="@+id/lv_history_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:divider="@color/nothing"
-                android:fadingEdge="none"
-                android:overScrollMode="never"
-                android:scrollbars="none">
+            android:id="@+id/lv_history_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:divider="@color/nothing"
+            android:fadingEdge="none"
+            android:overScrollMode="never"
+            android:scrollbars="none">
 
         </ListView>
+
         <LinearLayout
-                android:id="@+id/ll_clear_history"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
+            android:id="@+id/ll_clear_history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    app:tint="@color/textPrimary"
-                    app:srcCompat="@drawable/ic_clear"/>
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                app:srcCompat="@drawable/ic_clear"
+                app:tint="@color/textPrimary" />
 
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="清空历史记录"
-                    android:textColor="@color/textPrimary"
-                    android:textSize="14sp"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="清空历史记录"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp" />
 
 
         </LinearLayout>
 
 
     </LinearLayout>
+
     <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3">
+
+        <com.scwang.smartrefresh.layout.SmartRefreshLayout
+            android:id="@+id/srl_search_book_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="3">
-        <com.scwang.smartrefresh.layout.SmartRefreshLayout
-                android:id="@+id/srl_search_book_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:descendantFocusability="blocksDescendants">
+            android:descendantFocusability="blocksDescendants">
+
             <com.scwang.smartrefresh.header.MaterialHeader
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
             <!--<ListView
                     android:id="@+id/lv_search_books_list"
                     android:layout_width="match_parent"
@@ -212,26 +220,26 @@
                     android:padding="5dp">
             </xyz.fycz.myreader.custom.DragSortGridView>-->
             <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_search_books_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:visibility="visible" />
+                android:id="@+id/rv_search_books_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:visibility="visible" />
         </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fabSearchStop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginEnd="30dp"
-                android:layout_marginBottom="30dp"
-                android:src="@drawable/ic_stop_black_24dp"
-                app:elevation="5dp"
-                app:fabSize="mini"
-                app:layout_anchorGravity="right|bottom"
-                android:visibility="gone"/>
+            android:id="@+id/fabSearchStop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="30dp"
+            android:src="@drawable/ic_stop_black_24dp"
+            android:visibility="gone"
+            app:elevation="5dp"
+            app:fabSize="mini"
+            app:layout_anchorGravity="right|bottom" />
     </RelativeLayout>
 </LinearLayout>
 

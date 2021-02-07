@@ -83,15 +83,11 @@ public class MiaoBiReadCrawler extends FindCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ").replaceAll("您可以在.*最新章节！|\\\\", "");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ").replaceAll("您可以在.*最新章节！|\\\\", "");
+        return content;
     }
 
     /**
@@ -129,22 +125,22 @@ public class MiaoBiReadCrawler extends FindCrawler implements ReadCrawler {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);
 //        try {
-            Element div = doc.getElementById("sitembox");
-            Elements dls = div.getElementsByTag("dl");
-            for (Element dl : dls){
-                Elements as = dl.getElementsByTag("a");
-                Book book = new Book();
-                book.setName(as.get(1).text());
-                book.setAuthor(as.get(3).text());
-                book.setType(as.get(2).text());
-                book.setNewestChapterTitle(as.get(4).text());
-                book.setDesc(dl.getElementsByClass("book_des").first().text());
-                book.setImgUrl(as.first().getElementsByTag("img").attr("src"));
-                book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("novel", "read").replace(".html", "/"));
-                book.setSource(BookSource.miaobi.toString());
-                SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
-                books.add(sbb, book);
-            }
+        Element div = doc.getElementById("sitembox");
+        Elements dls = div.getElementsByTag("dl");
+        for (Element dl : dls) {
+            Elements as = dl.getElementsByTag("a");
+            Book book = new Book();
+            book.setName(as.get(1).text());
+            book.setAuthor(as.get(3).text());
+            book.setType(as.get(2).text());
+            book.setNewestChapterTitle(as.get(4).text());
+            book.setDesc(dl.getElementsByClass("book_des").first().text());
+            book.setImgUrl(as.first().getElementsByTag("img").attr("src"));
+            book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("novel", "read").replace(".html", "/"));
+            book.setSource(BookSource.miaobi.toString());
+            SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
+            books.add(sbb, book);
+        }
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
@@ -155,7 +151,7 @@ public class MiaoBiReadCrawler extends FindCrawler implements ReadCrawler {
     public List<BookType> getBookTypes() {
         initBookTypes();
         List<BookType> bookTypes = new ArrayList<>();
-        for (String name : mBookTypes.keySet()){
+        for (String name : mBookTypes.keySet()) {
             BookType bookType = new BookType();
             bookType.setTypeName(name);
             bookType.setUrl(mBookTypes.get(name));
@@ -165,7 +161,7 @@ public class MiaoBiReadCrawler extends FindCrawler implements ReadCrawler {
         return bookTypes;
     }
 
-    private void initBookTypes(){
+    private void initBookTypes() {
         mBookTypes.put("玄幻奇幻", "https://www.imiaobige.com/xuanhuan/1.html");
         mBookTypes.put("武侠仙侠", "https://www.imiaobige.com/wuxia/1.html");
         mBookTypes.put("都市生活", "https://www.imiaobige.com/dushi/1.html");
@@ -189,7 +185,7 @@ public class MiaoBiReadCrawler extends FindCrawler implements ReadCrawler {
         Document doc = Jsoup.parse(html);
         Element div = doc.getElementById("sitebox");
         Elements dls = div.getElementsByTag("dl");
-        for (Element dl : dls){
+        for (Element dl : dls) {
             Book book = new Book();
             Elements as = dl.getElementsByTag("a");
             book.setName(as.get(1).text());
@@ -208,7 +204,7 @@ public class MiaoBiReadCrawler extends FindCrawler implements ReadCrawler {
 
     @Override
     public boolean getTypePage(BookType curType, int page) {
-        if (page > curType.getPageSize()){
+        if (page > curType.getPageSize()) {
             return true;
         }
         curType.setUrl(curType.getUrl().substring(0, curType.getUrl().lastIndexOf("/") + 1) + page + ".html");

@@ -1,10 +1,12 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
 import android.text.Html;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -18,10 +20,12 @@ import java.util.ArrayList;
 
 
 public class BiQuGe44ReadCrawler implements ReadCrawler, BookInfoCrawler {
-    public static final String NAME_SPACE = "https://www.wqge.cc";
-    public static final String NOVEL_SEARCH = "https://www.wqge.cc/modules/article/search.php?searchkey={key}";
+    public static final String NAME_SPACE = "http://www.wqge.net";
+//    public static final String NAME_SPACE = "https://www.wqge.cc";
+    public static final String NOVEL_SEARCH = "http://www.wqge.net/modules/article/search.php?searchkey={key}";
     public static final String CHARSET = "GBK";
     public static final String SEARCH_CHARSET = "utf-8";
+
     @Override
     public String getSearchLink() {
         return NOVEL_SEARCH;
@@ -36,10 +40,12 @@ public class BiQuGe44ReadCrawler implements ReadCrawler, BookInfoCrawler {
     public String getNameSpace() {
         return NAME_SPACE;
     }
+
     @Override
     public Boolean isPost() {
         return false;
     }
+
     @Override
     public String getSearchCharset() {
         return SEARCH_CHARSET;
@@ -47,21 +53,18 @@ public class BiQuGe44ReadCrawler implements ReadCrawler, BookInfoCrawler {
 
     /**
      * 从html中获取章节正文
+     *
      * @param html
      * @return
      */
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**
@@ -83,7 +86,7 @@ public class BiQuGe44ReadCrawler implements ReadCrawler, BookInfoCrawler {
             Elements as = dd.getElementsByTag("a");
             if (as.size() > 0) {
                 Element a = as.get(0);
-                String title = a.text() ;
+                String title = a.text();
                 if (!StringHelper.isEmpty(lastTile) && title.equals(lastTile)) {
                     continue;
                 }
@@ -101,6 +104,7 @@ public class BiQuGe44ReadCrawler implements ReadCrawler, BookInfoCrawler {
 
     /**
      * 从搜索html中得到书列表
+     *
      * @param html
      * @return
      */
@@ -127,9 +131,10 @@ public class BiQuGe44ReadCrawler implements ReadCrawler, BookInfoCrawler {
 
     /**
      * 获取书籍详细信息
+     *
      * @param book
      */
-    public Book getBookInfo(String html, Book book){
+    public Book getBookInfo(String html, Book book) {
         Document doc = Jsoup.parse(html);
         Element img = doc.getElementById("fmimg");
         book.setImgUrl(img.getElementsByTag("img").get(0).attr("src"));

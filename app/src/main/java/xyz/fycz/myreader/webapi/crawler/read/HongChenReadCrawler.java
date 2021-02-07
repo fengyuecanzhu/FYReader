@@ -58,25 +58,21 @@ public class HongChenReadCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("txt");
-        if (divContent != null) {
-            Elements aDiv = divContent.getElementsByTag("dd");
-            StringBuilder sb = new StringBuilder();
-            Collections.sort(aDiv, (o1, o2) -> Integer.parseInt(o1.attr("data-id")) -
-                    Integer.parseInt(o2.attr("data-id")));
-            for (int i = 0; i < aDiv.size(); i++) {
-                Element dd = aDiv.get(i);
-                if (i == aDiv.size() - 1) break;
-                sb.append(Html.fromHtml(dd.html()).toString());
-                sb.append("\n");
-            }
-            String content = sb.toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
+        Elements aDiv = divContent.getElementsByTag("dd");
+        StringBuilder sb = new StringBuilder();
+        Collections.sort(aDiv, (o1, o2) -> Integer.parseInt(o1.attr("data-id")) -
+                Integer.parseInt(o2.attr("data-id")));
+        for (int i = 0; i < aDiv.size(); i++) {
+            Element dd = aDiv.get(i);
+            if (i == aDiv.size() - 1) break;
+            sb.append(Html.fromHtml(dd.html()).toString());
+            sb.append("\n");
         }
+        String content = sb.toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**
@@ -130,24 +126,24 @@ public class HongChenReadCrawler implements ReadCrawler {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);
 //        try {
-            Element div = doc.getElementsByClass("s-b-list").first();
-            Elements dls = div.getElementsByTag("dl");
-            for (Element dl : dls){
-                Elements as = dl.getElementsByTag("a");
-                Book book = new Book();
-                book.setName(as.get(1).text());
-                book.setAuthor(as.get(2).text());
-                book.setType(as.get(3).text());
-                book.setNewestChapterTitle(as.get(4).text().replace("最近更新 ", ""));
-                book.setDesc(dl.getElementsByClass("big-book-info").first().text());
-                String imgUrl = dl.getElementsByTag("img").attr("data-original");
-                book.setImgUrl(imgUrl);
-                //https://www.zuxs.net/zu/1140.html -> https://www.zuxs.net/zu/1/1140/
-                book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("zu/", "zu/1/").replace(".html", "/"));
-                book.setSource(BookSource.hongchen.toString());
-                SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
-                books.add(sbb, book);
-            }
+        Element div = doc.getElementsByClass("s-b-list").first();
+        Elements dls = div.getElementsByTag("dl");
+        for (Element dl : dls) {
+            Elements as = dl.getElementsByTag("a");
+            Book book = new Book();
+            book.setName(as.get(1).text());
+            book.setAuthor(as.get(2).text());
+            book.setType(as.get(3).text());
+            book.setNewestChapterTitle(as.get(4).text().replace("最近更新 ", ""));
+            book.setDesc(dl.getElementsByClass("big-book-info").first().text());
+            String imgUrl = dl.getElementsByTag("img").attr("data-original");
+            book.setImgUrl(imgUrl);
+            //https://www.zuxs.net/zu/1140.html -> https://www.zuxs.net/zu/1/1140/
+            book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("zu/", "zu/1/").replace(".html", "/"));
+            book.setSource(BookSource.hongchen.toString());
+            SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
+            books.add(sbb, book);
+        }
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }

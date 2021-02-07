@@ -226,7 +226,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     break;
                 case 7:
                     ToastUtils.showWarring("无网络连接！");
-                    mPageLoader.chapterError();
+                    mPageLoader.chapterError("无网络连接！");
                     break;
                 case 8:
                     binding.pbLoading.setVisibility(View.GONE);
@@ -235,10 +235,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     ToastUtils.showInfo("正在后台缓存书籍，具体进度可查看通知栏！");
                     notificationUtil.requestNotificationPermissionDialog(ReadActivity.this);
                     break;
-                case 10:
-                    if (mPageLoader != null) {
-                        mPageLoader.chapterError();
-                    }
             }
         }
     };

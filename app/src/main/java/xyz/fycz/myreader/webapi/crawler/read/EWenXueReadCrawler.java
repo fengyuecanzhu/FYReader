@@ -7,6 +7,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -16,19 +18,12 @@ import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
-import java.util.ArrayList;
 
-/**
- * @author fengyue
- * @date 2020/5/19 19:50
- * 已失效
- */
-@Deprecated
-public class PinShuReadCrawler implements ReadCrawler, BookInfoCrawler {
-    public static final String NAME_SPACE = "https://www.vodtw.com";
-    public static final String NOVEL_SEARCH = "https://www.vodtw.com/Book/Search.aspx?SearchKey={key}&SearchClass=1";
-    public static final String CHARSET = "gbk";
-    public static final String SEARCH_CHARSET = "gbk";
+public class EWenXueReadCrawler implements ReadCrawler, BookInfoCrawler {
+    public static final String NAME_SPACE = "http://ewenxue.org";
+    public static final String NOVEL_SEARCH = "http://ewenxue.org/search.htm?keyword={key}";
+    public static final String CHARSET = "GBK";
+    public static final String SEARCH_CHARSET = "utf-8";
 
     @Override
     public String getSearchLink() {
@@ -63,13 +58,12 @@ public class PinShuReadCrawler implements ReadCrawler, BookInfoCrawler {
      */
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
-        Element divContent = doc.getElementById("BookText");
+        Element divContent = doc.getElementById("cContent");
         String content = Html.fromHtml(divContent.html()).toString();
         char c = 160;
         String spaec = "" + c;
-        content = content.replace(spaec, "  ").replace("品书网", "")
-                .replace("手机阅读", "");
-        return StringHelper.IgnoreCaseReplace(content, "www.vodtw.com", "");
+        content = content.replace(spaec, "  ").replace("setFontSize();", "");
+        return content;
     }
 
     /**
@@ -81,13 +75,14 @@ public class PinShuReadCrawler implements ReadCrawler, BookInfoCrawler {
     public ArrayList<Chapter> getChaptersFromHtml(String html) {
         ArrayList<Chapter> chapters = new ArrayList<>();
         Document doc = Jsoup.parse(html);
-        String readUrl = doc.select("meta[property=og:novel:read_url]")
-                .attr("content").replace("index.html", "");
-        Element divList = doc.getElementsByClass("insert_list").get(0);
+        String readUrl = NAME_SPACE + doc.select(".breadcrumb").first()
+                .select("a").last().attr("href");
+        Element divList = doc.getElementById("chapters-list");
         String lastTile = null;
         int i = 0;
         Elements elementsByTag = divList.getElementsByTag("a");
-        for (Element a : elementsByTag) {
+        for (int j = 0; j < elementsByTag.size(); j++) {
+            Element a = elementsByTag.get(j);
             String title = a.text();
             if (!StringHelper.isEmpty(lastTile) && title.equals(lastTile)) {
                 continue;
@@ -96,7 +91,7 @@ public class PinShuReadCrawler implements ReadCrawler, BookInfoCrawler {
             chapter.setNumber(i++);
             chapter.setTitle(title);
             String url = readUrl + a.attr("href");
-            chapter.setUrl(url.replace(".la", ".com"));
+            chapter.setUrl(url);
             chapters.add(chapter);
             lastTile = title;
         }
@@ -107,22 +102,29 @@ public class PinShuReadCrawler implements ReadCrawler, BookInfoCrawler {
      * 从搜索html中得到书列表
      *
      * @param html
-     * @return
+     * @return <li class="list-group-item clearfix">
+     * 	<div class="col-xs-1"><i class="tag-blue">玄幻</i></div>
+     * 	<div class="col-xs-3"><a href="/xs/163283/">大主宰</a></div>
+     * 	<div class="col-xs-4"><a href="/xs/163283/56818254.htm">第一千三十二章 七阳截天杖</a></div>
+     * 	<div class="col-xs-2">天蚕土豆</div>
+     * 	<div class="col-xs-2"><span class="time">2019-07-05 16:03</span></div>
+     * </li>
      */
     public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);
-        Element div = doc.getElementById("Content");
-        Elements elementsSelected = div.select("[id=CListTitle]");
-        for (Element element : elementsSelected) {
+        Elements elements = doc.getElementsByClass("clearfix");
+        for (int i = 1; i < elements.size(); i++) {
+            Element element = elements.get(i);
             Book book = new Book();
-            Elements info = element.getElementsByTag("a");
-            book.setName(info.get(0).text());
-            book.setChapterUrl(NAME_SPACE + info.get(0).attr("href"));
-            book.setAuthor(info.get(1).text());
-            book.setType(info.get(3).text());
-            book.setNewestChapterTitle(info.get(4).text());
-            book.setSource("pinshu");
+            Elements info = element.getElementsByTag("div");
+            book.setName(info.get(1).text());
+            book.setInfoUrl(NAME_SPACE + info.get(1).getElementsByTag("a").attr("href"));
+            book.setChapterUrl(book.getInfoUrl() + "mulu.htm");
+            book.setAuthor(info.get(3).text());
+            book.setNewestChapterTitle(info.get(2).text());
+            book.setType(info.get(0).text());
+            book.setSource(BookSource.ewenxue.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }
@@ -136,10 +138,13 @@ public class PinShuReadCrawler implements ReadCrawler, BookInfoCrawler {
      */
     public Book getBookInfo(String html, Book book) {
         Document doc = Jsoup.parse(html);
-        Element img = doc.getElementsByClass("bookpic").get(0);
-        book.setImgUrl(img.getElementsByTag("img").get(0).attr("src"));
-        Element desc = doc.getElementsByClass("bookintro").get(0);
-        book.setDesc(desc.text());
+        Element img = doc.getElementsByClass("img-thumbnail").first();
+        book.setImgUrl(img.attr("src"));
+        Element desc = doc.getElementById("all");
+        if (desc == null) {
+            desc = doc.getElementById("shot");
+        }
+        book.setDesc(desc.text().replace("[收起]", ""));
         return book;
     }
 

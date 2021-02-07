@@ -6,6 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -21,8 +22,9 @@ import java.util.ArrayList;
  */
 
 public class TianLaiReadCrawler implements ReadCrawler {
-    public static final String NAME_SPACE = "https://www.23txt.com";
-    public static final String NOVEL_SEARCH = "https://www.23txt.com/search.php?q={key}";
+    //    public static final String NAME_SPACE = "https://www.23txt.com";
+    public static final String NAME_SPACE = "https://www.233txt.com";
+    public static final String NOVEL_SEARCH = "https://www.233txt.com/search.php?q={key}";
     public static final String CHARSET = "GBK";
     public static final String SEARCH_CHARSET = "utf-8";
 
@@ -30,6 +32,7 @@ public class TianLaiReadCrawler implements ReadCrawler {
     public String getSearchLink() {
         return NOVEL_SEARCH;
     }
+
     @Override
     public String getCharset() {
         return CHARSET;
@@ -39,10 +42,12 @@ public class TianLaiReadCrawler implements ReadCrawler {
     public String getNameSpace() {
         return NAME_SPACE;
     }
+
     @Override
     public Boolean isPost() {
         return false;
     }
+
     @Override
     public String getSearchCharset() {
         return SEARCH_CHARSET;
@@ -57,16 +62,12 @@ public class TianLaiReadCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            content = content.replaceAll("笔趣阁.*最新章节！", "");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        content = content.replaceAll("笔趣阁.*最新章节！", "");
+        return content;
     }
 
     /**
@@ -83,7 +84,7 @@ public class TianLaiReadCrawler implements ReadCrawler {
         Element dl = divList.getElementsByTag("dl").get(0);
         String lastTile = null;
         int i = 0;
-        for(Element dd : dl.getElementsByTag("dd")){
+        for (Element dd : dl.getElementsByTag("dd")) {
             Elements as = dd.getElementsByTag("a");
             if (as.size() > 0) {
                 Element a = as.get(0);
@@ -97,7 +98,7 @@ public class TianLaiReadCrawler implements ReadCrawler {
                 String url = a.attr("href");
                 if (url.contains("files/article/html")) {
                     url = NAME_SPACE + url;
-                }else {
+                } else {
                     url = readUrl + url;
                 }
                 chapter.setUrl(url);

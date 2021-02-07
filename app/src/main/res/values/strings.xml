@@ -212,6 +212,12 @@
     <string name="read_bijian">笔尖小说</string>
     <string name="read_yanqinglou">言情楼</string>
     <string name="read_wolong">卧龙小说</string>
+    <string name="read_ewenxue">E文学</string>
+    <string name="read_shuhaige">书海阁</string>
+    <string name="read_luoqiu">落秋中文</string>
+    <string name="read_zw37">三七中文</string>
+    <string name="read_xbiquge">新笔趣阁</string>
+    <string name="read_zaishuyuan">斋书苑</string>
     <string name="read_chaoxing">超星图书·实体</string>
     <string name="read_zuopin">作品集·实体</string>
     <string name="read_cangshu99">99藏书·实体</string>
@@ -337,6 +343,7 @@
     <string name="help">帮助</string>
     <string name="refresh_books">更新目录</string>
     <string name="finish">完成</string>
+    <string name="hot_search">热搜</string>
 
     <string-array name="reset_screen_time">
         <item>常亮</item>

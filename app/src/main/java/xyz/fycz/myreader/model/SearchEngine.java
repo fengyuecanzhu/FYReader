@@ -61,6 +61,7 @@ public class SearchEngine {
      * 搜索引擎初始化
      */
     public void initSearchEngine(@NonNull List<ReadCrawler> sourceList) {
+        mSourceList.clear();
         mSourceList.addAll(sourceList);
         executorService = Executors.newFixedThreadPool(threadsNum);
         scheduler = Schedulers.from(executorService);

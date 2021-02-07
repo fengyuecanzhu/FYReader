@@ -58,15 +58,11 @@ public class XingXingReadCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("txt");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**
@@ -131,23 +127,23 @@ public class XingXingReadCrawler implements ReadCrawler {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);
 //        try {
-            Element div = doc.getElementsByClass("leftBox").first();
-            Elements lis = div.getElementsByTag("li");
-            for (Element li : lis){
-                Elements as = li.getElementsByTag("a");
-                Book book = new Book();
-                book.setName(as.get(1).text());
-                book.setAuthor(li.getElementsByTag("span").first().text());
-                book.setType(as.get(2).text());
-                book.setNewestChapterTitle(as.get(3).text());
-                book.setDesc(li.getElementsByClass("c").first().text().replace("内容介绍：", ""));
-                book.setUpdateDate(li.getElementsByClass("time2").first().text().replace("更新时间：", ""));
-                book.setImgUrl(li.getElementsByTag("img").attr("data-original"));
-                book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace(".html", "/"));
-                book.setSource(BookSource.xingxing.toString());
-                SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
-                books.add(sbb, book);
-            }
+        Element div = doc.getElementsByClass("leftBox").first();
+        Elements lis = div.getElementsByTag("li");
+        for (Element li : lis) {
+            Elements as = li.getElementsByTag("a");
+            Book book = new Book();
+            book.setName(as.get(1).text());
+            book.setAuthor(li.getElementsByTag("span").first().text());
+            book.setType(as.get(2).text());
+            book.setNewestChapterTitle(as.get(3).text());
+            book.setDesc(li.getElementsByClass("c").first().text().replace("内容介绍：", ""));
+            book.setUpdateDate(li.getElementsByClass("time2").first().text().replace("更新时间：", ""));
+            book.setImgUrl(li.getElementsByTag("img").attr("data-original"));
+            book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace(".html", "/"));
+            book.setSource(BookSource.xingxing.toString());
+            SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
+            books.add(sbb, book);
+        }
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }

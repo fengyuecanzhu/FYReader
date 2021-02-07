@@ -58,39 +58,46 @@ public class YanQingLouReadCrawler implements ReadCrawler {
     }
 
     /*
-    var preview_page = "/lishi/220987/60.html";
-	var next_page = "/lishi/220987/62.html";
-	var index_page = "/lishi/220987/";
-	var article_id = "220987";
-	var chapter_id = "61";
-	var nextcid = "62";
-	var prevcid = "60";
-	var articlename = "临高启明";
-	var chaptername = "第十五节 遇伏";
-	var hash = "38e338d183600e17";
-	var localpre = "www.yanqinglou.com";
-     */
-    /**
-     * 从html中获取章节正文
-     *
-     * @param html
-     * @return
+        var preview_page = "/lishi/220987/60.html";
+        var next_page = "/lishi/220987/62.html";
+        var index_page = "/lishi/220987/";
+        var article_id = "220987";
+        var chapter_id = "61";
+        var nextcid = "62";
+        var prevcid = "60";
+        var articlename = "临高启明";
+        var chaptername = "第十五节 遇伏";
+        var hash = "38e338d183600e17";
+        var localpre = "www.yanqinglou.com";
      */
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ")
-                    .replaceAll("您可以.*最新章节！", "")
-                    .replaceAll("转码页面.*com/", "");
-            return content;
-        } else {
-            return "";
+        String content = "";
+        content = Html.fromHtml(divContent.html()).toString();
+        try {
+            if (content.contains("正在加载") || content.contains("本章未完，点击下一页继续阅读")) {
+                content = getAjaxContent(html);
+            }
+            /*if (content.contains("本章未完，点击下一页继续阅读")){
+                String nextUrl = doc.select(".to_nextpage")
+                        .first().select("a").first()
+                        .attr("href");
+                content = content.replace("本章未完，点击下一页继续阅读", "")
+                        .replace("-->>", "");
+                content += getContentFormHtml(OkHttpUtils.getHtml(NAME_SPACE + nextUrl, CHARSET));
+            }*/
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
         }
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ")
+                .replaceAll("您可以.*最新章节！", "")
+                .replaceAll("转码页.*com/", "");
+        return content;
     }
+
 
     /*
     id: 220987
@@ -98,28 +105,18 @@ public class YanQingLouReadCrawler implements ReadCrawler {
     cid: 62
     basecid: 62
      */
-    public void getAjaxContent(String html, ResultCallback callback){
+    public String getAjaxContent(String html) throws IOException, JSONException {
         String id = StringUtils.getSubString(html, "var article_id = \"", "\";");
         String eKey = StringUtils.getSubString(html, "var hash = \"", "\";");
         String cid = StringUtils.getSubString(html, "var chapter_id = \"", "\";");
         String body = "id=" + id + "&eKey=" + eKey + "&cid=" + cid + "&basecid=" + cid;
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody requestBody = RequestBody.create(mediaType, body);
-        try {
-            String jsonStr = OkHttpUtils.getHtml(AJAX_CONTENT, requestBody, CHARSET);
-            JSONObject json = new JSONObject(jsonStr);
-            String content = json.getJSONObject("info").getString("content");
-            content = Html.fromHtml(content).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ")
-                    .replaceAll("您可以.*最新章节！", "")
-                    .replaceAll("转码页面.*com/", "");
-            callback.onFinish(content, 0);
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-            callback.onError(e);
-        }
+        String jsonStr = OkHttpUtils.getHtml(AJAX_CONTENT, requestBody, CHARSET);
+        JSONObject json = new JSONObject(jsonStr);
+        String content = json.getJSONObject("info").getString("content");
+        content = Html.fromHtml(content).toString();
+        return content;
     }
 
     /**
@@ -148,18 +145,18 @@ public class YanQingLouReadCrawler implements ReadCrawler {
 
     /**
      * 从搜索html中得到书列表
-     <div class="bookbox">
-         <div class="p10"><span class="num"> <a title="斗罗之大主宰" href="/hunlian/459337/"><img layout="fixed" width="90" height="120" src="https://www.biquduo.com/files/article/image/64/64075/64075s.jpg" alt="斗罗之大主宰" /></a> </span>
-         <div class="bookinfo">
-         <h4 class="bookname"><a title="斗罗之大主宰" href="/hunlian/459337/">斗罗之大主宰</a></h4>
-         <div class="author">作者：<a href="/writter/%E4%B8%8A%E5%BC%A6666.html" target="_blank" title="上弦666的作品大全">上弦666</a></div>
-         <div class="author">分类：婚恋</div>
-         <div class="cat"><span>更新到：</span><a href="/hunlian/459337/">最近更新>></a></div>
-         <div class="update"><span>简介：</span>叶辰，武魂，昊天锤的变异，大须弥锤！昊天锤本就是大陆第一器武魂，而武魂是大须弥锤的叶辰，会有多强？当</div>
-         </div>
-         <div class="delbutton"> <a class="del_but" title="斗罗之大主宰" href="/hunlian/459337/">阅读</a></div>
-         </div>
-     </div>
+     * <div class="bookbox">
+     * <div class="p10"><span class="num"> <a title="斗罗之大主宰" href="/hunlian/459337/"><img layout="fixed" width="90" height="120" src="https://www.biquduo.com/files/article/image/64/64075/64075s.jpg" alt="斗罗之大主宰" /></a> </span>
+     * <div class="bookinfo">
+     * <h4 class="bookname"><a title="斗罗之大主宰" href="/hunlian/459337/">斗罗之大主宰</a></h4>
+     * <div class="author">作者：<a href="/writter/%E4%B8%8A%E5%BC%A6666.html" target="_blank" title="上弦666的作品大全">上弦666</a></div>
+     * <div class="author">分类：婚恋</div>
+     * <div class="cat"><span>更新到：</span><a href="/hunlian/459337/">最近更新>></a></div>
+     * <div class="update"><span>简介：</span>叶辰，武魂，昊天锤的变异，大须弥锤！昊天锤本就是大陆第一器武魂，而武魂是大须弥锤的叶辰，会有多强？当</div>
+     * </div>
+     * <div class="delbutton"> <a class="del_but" title="斗罗之大主宰" href="/hunlian/459337/">阅读</a></div>
+     * </div>
+     * </div>
      */
     public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
@@ -182,7 +179,7 @@ public class YanQingLouReadCrawler implements ReadCrawler {
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }
-        }else {
+        } else {
             Book book = new Book();
             getBookInfo(doc, book);
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());

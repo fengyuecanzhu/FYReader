@@ -282,7 +282,7 @@ public class LocalPageLoader extends PageLoader {
             @Override
             public void onError(Throwable e) {
                 resultCallback.onError((Exception) e);
-                chapterError();
+                chapterError(e.getLocalizedMessage());
                 Log.d(TAG, "file load error:" + e.toString());
             }
         });

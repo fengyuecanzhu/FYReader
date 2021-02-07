@@ -5,33 +5,33 @@ import android.text.Html;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
+import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
-public class PiaoTianReadCrawler implements ReadCrawler, BookInfoCrawler {
-    public static final String NAME_SPACE = "https://www.piaotian.org";
-    public static final String NOVEL_SEARCH = "https://www.piaotian.org/modules/article/search.php?searchkey={key}&submit=%CB%D1%CB%F7";
-    public static final String CHARSET = "GBK";
+
+public class ZW37ReadCrawler implements ReadCrawler, BookInfoCrawler {
+    private static final String NAME_SPACE = "https://www.37zww.net";
+    private static final String NOVEL_SEARCH = "https://www.37zww.net/modules/article/search.php?searchtype=articlename&searchkey={key}";
+    private static final String CHARSET = "GBK";
     public static final String SEARCH_CHARSET = "GBK";
 
     @Override
     public String getSearchLink() {
         return NOVEL_SEARCH;
-    }
-
-    @Override
-    public String getCharset() {
-        return CHARSET;
     }
 
     @Override
@@ -45,48 +45,49 @@ public class PiaoTianReadCrawler implements ReadCrawler, BookInfoCrawler {
     }
 
     @Override
+    public String getCharset() {
+        return CHARSET;
+    }
+
+    @Override
     public String getSearchCharset() {
         return SEARCH_CHARSET;
     }
 
-    /**
-     * 从html中获取章节正文
-     *
-     * @param html
-     * @return
-     */
+
+    @Override
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
-        Element divContent = doc.getElementById("htmlContent");
+        Element divContent = doc.getElementById("content");
         String content = Html.fromHtml(divContent.html()).toString();
         char c = 160;
         String spaec = "" + c;
-        content = content.replace(spaec, "  ").replaceAll("飘天文学.*最新章节！", "");
+        content = content.replace(spaec, "  ");
         return content;
     }
 
-    /**
-     * 从html中获取章节列表
-     *
-     * @param html
-     * @return
-     */
+    @Override
     public ArrayList<Chapter> getChaptersFromHtml(String html) {
         ArrayList<Chapter> chapters = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         String readUrl = doc.select("meta[property=og:novel:read_url]").attr("content");
-        Element ul = doc.getElementsByClass("chapterlist").get(1);
-        Elements elementsByTag = ul.getElementsByTag("a");
+        Element divList = doc.getElementById("list");
+        String lastTile = null;
         int i = 0;
+        Elements elementsByTag = divList.getElementsByTag("a");
         for (int j = 0; j < elementsByTag.size(); j++) {
             Element a = elementsByTag.get(j);
             String title = a.text();
-            String url = a.attr("href");
+            if (!StringHelper.isEmpty(lastTile) && title.equals(lastTile)) {
+                continue;
+            }
             Chapter chapter = new Chapter();
             chapter.setNumber(i++);
             chapter.setTitle(title);
-            chapter.setUrl(readUrl + url);
+            String url = readUrl + a.attr("href");
+            chapter.setUrl(url);
             chapters.add(chapter);
+            lastTile = title;
         }
         return chapters;
     }
@@ -95,10 +96,17 @@ public class PiaoTianReadCrawler implements ReadCrawler, BookInfoCrawler {
      * 从搜索html中得到书列表
      *
      * @param html
-     * @return
+     * @return <tr>
+     * <td class="odd"><a href="https://www.37zww.net/1/1812/">斗罗大陆IV终极斗罗</a></td>
+     * <td class="even"><a href="https://www.37zww.net/1/1812/index.html" target="_blank"> 第一千五百八十一章 突破，真神级！</a></td>
+     * <td class="odd">唐家三少</td>
+     * <td class="even">8427K</td>
+     * <td class="odd" align="center">21-02-06</td>
+     * <td class="even" align="center">连载</td>
+     * </tr>
      */
     public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
-        ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
+        final ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);
         String urlType = doc.select("meta[property=og:type]").attr("content");
         if ("novel".equals(urlType)) {
@@ -106,24 +114,20 @@ public class PiaoTianReadCrawler implements ReadCrawler, BookInfoCrawler {
             Book book = new Book();
             book.setChapterUrl(readUrl);
             getBookInfo(html, book);
-            book.setSource(BookSource.paiotian.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         } else {
-            Elements divs = doc.getElementsByClass("grid");
-            Element div = divs.get(0);
-            Elements trs = div.getElementsByTag("tr");
-            for (int i = 1; i < trs.size(); i++) {
-                Element tr = trs.get(i);
+            Element div = doc.getElementById("main");
+            Elements elements = div.getElementsByTag("tr");
+            for (int i = 1; i < elements.size(); i++) {
+                Element element = elements.get(i);
                 Book book = new Book();
-                Elements info = tr.getElementsByTag("td");
+                Elements info = element.getElementsByTag("td");
                 book.setName(info.get(0).text());
-                book.setChapterUrl(info.get(0).getElementsByTag("a").attr("href"));
+                book.setChapterUrl(info.get(0).selectFirst("a").attr("href"));
                 book.setAuthor(info.get(2).text());
                 book.setNewestChapterTitle(info.get(1).text());
-                book.setUpdateDate(info.get(4).text());
-                book.setDesc("");
-                book.setSource(BookSource.paiotian.toString());
+                book.setSource(BookSource.zw37.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }
@@ -132,25 +136,35 @@ public class PiaoTianReadCrawler implements ReadCrawler, BookInfoCrawler {
     }
 
     /**
-     * 获取书籍详细信息
+     * 获取小说详细信息
      *
-     * @param book
+     * @param html
+     * @return
      */
     public Book getBookInfo(String html, Book book) {
         Document doc = Jsoup.parse(html);
-        Element name = doc.selectFirst("meta[property=og:novel:book_name]");
-        book.setName(name.attr("content"));
-        Element author = doc.selectFirst("meta[property=og:novel:author]");
-        book.setAuthor(author.attr("content"));
-        Element newestChapter = doc.selectFirst("meta[property=og:novel:latest_chapter_name]");
-        book.setNewestChapterTitle(newestChapter.attr("content"));
-        Element img = doc.selectFirst("meta[property=og:image]");
-        book.setImgUrl(img.attr("content"));
-        Element desc = doc.getElementsByClass("bookinfo_intro").first();
-        book.setDesc(desc.text());
-        Element type = doc.selectFirst("meta[property=og:novel:category]");
-        book.setType(type.attr("content"));
+        book.setSource(BookSource.zw37.toString());
+
+        String name = doc.select("meta[property=og:title]").attr("content");
+        book.setName(name);
+        String url = doc.select("meta[property=og:novel:read_url]").attr("content");
+        book.setChapterUrl(url);
+        String author = doc.select("meta[property=og:novel:author]").attr("content");
+        book.setAuthor(author);
+        String newestChapter = doc.select("meta[property=og:novel:latest_chapter_name]").attr("content");
+        book.setNewestChapterTitle(newestChapter);
+
+        String img = doc.select("meta[property=og:image]").attr("content");
+        book.setImgUrl(img);
+
+        String desc = doc.select("meta[property=og:description]").attr("content");
+        book.setDesc(desc);
+        //类型
+        String type = doc.select("meta[property=og:novel:category]").attr("content");
+        book.setType(type);
         return book;
+
     }
+
 
 }

@@ -34,7 +34,7 @@ public class CommonApi extends BaseApi {
      * @param url
      * @param callback
      */
-    public static void getBookChapters(String url, final ReadCrawler rc,  boolean isRefresh, final ResultCallback callback) {
+    public static void getBookChapters(String url, final ReadCrawler rc, boolean isRefresh, final ResultCallback callback) {
         String charset = rc.getCharset();
         getCommonReturnHtmlStringApi(url, null, charset, isRefresh, new ResultCallback() {
             @Override
@@ -48,7 +48,6 @@ public class CommonApi extends BaseApi {
             }
         });
     }
-
 
 
     /**
@@ -94,14 +93,7 @@ public class CommonApi extends BaseApi {
         getCommonReturnHtmlStringApi(url, null, charset, true, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
-                String html = (String) o;
-                String content = rc.getContentFormHtml(html);
-                if (rc instanceof YanQingLouReadCrawler && content.contains("正在加载")){
-                    YanQingLouReadCrawler yrc = (YanQingLouReadCrawler) rc;
-                    yrc.getAjaxContent(html, this);
-                }else {
-                    callback.onFinish(content, 0);
-                }
+                callback.onFinish(rc.getContentFormHtml((String) o), 0);
             }
 
             @Override
@@ -173,7 +165,7 @@ public class CommonApi extends BaseApi {
         String finalCharset = charset;
         return Observable.create(emitter -> {
             try {
-                if (rc.isPost()){
+                if (rc.isPost()) {
                     String url = rc.getSearchLink();
                     String[] urlInfo = url.split(",");
                     url = urlInfo[0];
@@ -181,7 +173,7 @@ public class CommonApi extends BaseApi {
                     MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                     RequestBody requestBody = RequestBody.create(mediaType, body);
                     emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset)));
-                }else {
+                } else {
                     emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(makeSearchUrl(rc.getSearchLink(), key), finalCharset)));
                 }
             } catch (Exception e) {
@@ -192,7 +184,7 @@ public class CommonApi extends BaseApi {
         });
     }
 
-    public static String makeSearchUrl(String url, String key){
+    public static String makeSearchUrl(String url, String key) {
         return url.replace("{key}", key);
     }
 
@@ -203,9 +195,9 @@ public class CommonApi extends BaseApi {
      */
     public static Observable<Book> getBookInfo(final Book book, final BookInfoCrawler bic) {
         String url;
-        if (StringHelper.isEmpty(book.getInfoUrl())){
+        if (StringHelper.isEmpty(book.getInfoUrl())) {
             url = book.getChapterUrl();
-        }else {
+        } else {
             url = book.getInfoUrl();
         }
         return Observable.create(emitter -> {
@@ -227,7 +219,7 @@ public class CommonApi extends BaseApi {
      */
     public static void getBookInfo(final Book book, final BookInfoCrawler bic, final ResultCallback callback) {
         String url = book.getInfoUrl();
-        if (StringHelper.isEmpty(url)){
+        if (StringHelper.isEmpty(url)) {
             url = book.getChapterUrl();
         }
         getCommonReturnHtmlStringApi(url, null, bic.getCharset(), false, new ResultCallback() {
@@ -256,6 +248,7 @@ public class CommonApi extends BaseApi {
             public void onFinish(final Object o, int code) {
                 LanZousApi.getKey((String) o, new ResultCallback() {
                     final String referer = (String) o;
+
                     @Override
                     public void onFinish(Object o, int code) {
                         LanZousApi.getUrl2((String) o, new ResultCallback() {

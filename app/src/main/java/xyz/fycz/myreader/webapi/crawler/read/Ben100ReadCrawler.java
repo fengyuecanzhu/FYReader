@@ -86,15 +86,11 @@ public class Ben100ReadCrawler extends FindCrawler implements ReadCrawler, BookI
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**
@@ -199,7 +195,7 @@ public class Ben100ReadCrawler extends FindCrawler implements ReadCrawler, BookI
             bookType.setTypeName(name);
             bookType.setUrl(url);
             bookTypes.add(bookType);
-            System.out.println("bookTypes.put(\""+ bookType.getTypeName() + "\", \"" + bookType.getUrl() + "\");");
+            System.out.println("bookTypes.put(\"" + bookType.getTypeName() + "\", \"" + bookType.getUrl() + "\");");
         }
         return bookTypes;
     }
@@ -208,7 +204,7 @@ public class Ben100ReadCrawler extends FindCrawler implements ReadCrawler, BookI
     public List<BookType> getBookTypes() {
         initBookTypes();
         List<BookType> bookTypes = new ArrayList<>();
-        for (String name : mBookTypes.keySet()){
+        for (String name : mBookTypes.keySet()) {
             BookType bookType = new BookType();
             bookType.setTypeName(name);
             bookType.setUrl(mBookTypes.get(name));
@@ -217,7 +213,7 @@ public class Ben100ReadCrawler extends FindCrawler implements ReadCrawler, BookI
         return bookTypes;
     }
 
-    private void initBookTypes(){
+    private void initBookTypes() {
         mBookTypes.put("世界名著", "https://www.100ben.net/shijiemingzhu/");
         mBookTypes.put("现代文学", "https://www.100ben.net/xiandaiwenxue/");
         mBookTypes.put("外国小说", "https://www.100ben.net/waiguoxiaoshuo/");
@@ -245,7 +241,8 @@ public class Ben100ReadCrawler extends FindCrawler implements ReadCrawler, BookI
             String page = pageDiv.getElementsByTag("a").last().text();
             String pageStr = page.replace("末页(", "").replace(")", "");
             bookType.setPageSize(Integer.parseInt(pageStr));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         Elements divs = doc.getElementsByClass("recommand");
         Element div = divs.get(0);

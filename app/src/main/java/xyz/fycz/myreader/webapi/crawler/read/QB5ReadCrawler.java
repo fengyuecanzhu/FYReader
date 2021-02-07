@@ -1,10 +1,12 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
 import android.text.Html;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.enums.BookSource;
@@ -37,10 +39,12 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
     public String getNameSpace() {
         return NAME_SPACE;
     }
+
     @Override
     public Boolean isPost() {
         return false;
     }
+
     @Override
     public String getCharset() {
         return CHARSET;
@@ -89,7 +93,8 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
                     BookType bookType = new BookType();
                     bookType.setTypeName(a.attr("title"));
                     bookType.setUrl(a.attr("href"));
-                    if (bookType.getTypeName().contains("首页") || bookType.getTypeName().contains("热门小说")) continue;
+                    if (bookType.getTypeName().contains("首页") || bookType.getTypeName().contains("热门小说"))
+                        continue;
                     if (!StringHelper.isEmpty(bookType.getTypeName())) {
                         bookTypes.add(bookType);
                     }
@@ -138,7 +143,8 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
         try {
             int pageSize = Integer.parseInt(doc.getElementsByClass("last").first().text());
             bookType.setPageSize(pageSize);
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
         String type = doc.select("meta[name=keywords]").attr("content").replace(",全本小说网", "");
         Element div = doc.getElementById("tlist");
         Elements uls = div.getElementsByTag("ul");
@@ -170,16 +176,12 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
         Element divBook = doc.getElementsByClass("nav-style").get(0);
         String bookName = divBook.getElementsByTag("a").get(1).attr("title");
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            content = content.replaceAll("全本小说.*最新章节！", "");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        content = content.replaceAll("全本小说.*最新章节！", "");
+        return content;
     }
 
 
@@ -276,16 +278,16 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
     }
 
 
-    public boolean getTypePage(BookType curType, int page){
-        if (curType.getPageSize() <= 0){
+    public boolean getTypePage(BookType curType, int page) {
+        if (curType.getPageSize() <= 0) {
             curType.setPageSize(10);
         }
-        if (page > curType.getPageSize()){
+        if (page > curType.getPageSize()) {
             return true;
         }
         if (!curType.getTypeName().equals("完本小说")) {
             curType.setUrl(curType.getUrl().substring(0, curType.getUrl().lastIndexOf("_") + 1) + page + "/");
-        }else {
+        } else {
             curType.setUrl(curType.getUrl().substring(0, curType.getUrl().lastIndexOf("/") + 1) + page);
         }
         return false;

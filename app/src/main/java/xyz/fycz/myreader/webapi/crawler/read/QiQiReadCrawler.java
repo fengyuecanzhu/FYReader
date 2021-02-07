@@ -5,6 +5,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -59,20 +60,16 @@ public class QiQiReadCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            StringBuilder sb = new StringBuilder();
-            for (TextNode textNode : divContent.textNodes()){
-                sb.append(textNode.text());
-                sb.append("\n");
-            }
-            String content = sb.toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ").replaceAll("奇奇小说全网.*com|更新最.*com\\\\/|哽噺.*com|www.*com\"", "");
-            return content;
-        } else {
-            return "";
+        StringBuilder sb = new StringBuilder();
+        for (TextNode textNode : divContent.textNodes()) {
+            sb.append(textNode.text());
+            sb.append("\n");
         }
+        String content = sb.toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ").replaceAll("奇奇小说全网.*com|更新最.*com\\\\/|哽噺.*com|www.*com\"", "");
+        return content;
     }
 
     /**

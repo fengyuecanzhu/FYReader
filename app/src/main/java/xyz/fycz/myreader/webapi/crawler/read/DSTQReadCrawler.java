@@ -57,15 +57,11 @@ public class DSTQReadCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**
@@ -105,7 +101,7 @@ public class DSTQReadCrawler implements ReadCrawler {
         try {
             Element div = doc.getElementsByClass("library").first();
             Elements lis = div.getElementsByTag("li");
-            for (Element li : lis){
+            for (Element li : lis) {
                 Elements as = li.getElementsByTag("a");
                 Book book = new Book();
                 book.setName(as.get(1).text());

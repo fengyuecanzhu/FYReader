@@ -1,11 +1,13 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
 import android.text.Html;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -57,20 +59,16 @@ public class QuanNovelReadCrawler implements ReadCrawler, BookInfoCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            StringBuilder sb = new StringBuilder();
-            for (TextNode textNode : divContent.textNodes()){
-                sb.append(textNode.text());
-                sb.append("\n");
-            }
-            String content = sb.toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ").replaceAll("\\s*您可以.*最.*章节.*", "");
-            return content;
-        } else {
-            return "";
+        StringBuilder sb = new StringBuilder();
+        for (TextNode textNode : divContent.textNodes()) {
+            sb.append(textNode.text());
+            sb.append("\n");
         }
+        String content = sb.toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ").replaceAll("\\s*您可以.*最.*章节.*", "");
+        return content;
     }
 
     /**

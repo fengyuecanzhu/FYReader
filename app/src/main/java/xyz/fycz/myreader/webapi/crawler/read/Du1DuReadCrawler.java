@@ -27,6 +27,7 @@ public class Du1DuReadCrawler implements ReadCrawler, BookInfoCrawler {
     public static final String NOVEL_SEARCH = "http://du1du.org/search.htm?keyword={key}";
     public static final String CHARSET = "GBK";
     public static final String SEARCH_CHARSET = "utf-8";
+
     @Override
     public String getSearchLink() {
         return NOVEL_SEARCH;
@@ -41,10 +42,12 @@ public class Du1DuReadCrawler implements ReadCrawler, BookInfoCrawler {
     public String getNameSpace() {
         return NAME_SPACE;
     }
+
     @Override
     public Boolean isPost() {
         return false;
     }
+
     @Override
     public String getSearchCharset() {
         return SEARCH_CHARSET;
@@ -52,26 +55,23 @@ public class Du1DuReadCrawler implements ReadCrawler, BookInfoCrawler {
 
     /**
      * 从html中获取章节正文
+     *
      * @param html
      * @return
      */
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("txtContent");
-        if (divContent != null) {
-            StringBuilder sb = new StringBuilder();
-            for (TextNode textNode : divContent.textNodes()){
-                sb.append(textNode.text());
-                sb.append("\n");
-            }
-            String content = sb.toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
+        StringBuilder sb = new StringBuilder();
+        for (TextNode textNode : divContent.textNodes()) {
+            sb.append(textNode.text());
+            sb.append("\n");
         }
+        String content = sb.toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**
@@ -101,6 +101,7 @@ public class Du1DuReadCrawler implements ReadCrawler, BookInfoCrawler {
 
     /**
      * 从搜索html中得到书列表
+     *
      * @param html
      * @return
      */
@@ -130,9 +131,10 @@ public class Du1DuReadCrawler implements ReadCrawler, BookInfoCrawler {
 
     /**
      * 获取书籍详细信息
+     *
      * @param book
      */
-    public Book getBookInfo(String html, Book book){
+    public Book getBookInfo(String html, Book book) {
         Document doc = Jsoup.parse(html);
         Element img = doc.selectFirst("meta[property=og:image]");
         book.setImgUrl(img.attr("content"));

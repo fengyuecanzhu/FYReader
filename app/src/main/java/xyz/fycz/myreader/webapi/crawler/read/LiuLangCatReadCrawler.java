@@ -26,8 +26,8 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
  */
 public class LiuLangCatReadCrawler implements ReadCrawler {
     public static final String NAME_SPACE = "http://m.liulangcat.com";
-    public static final String NOVEL_SEARCH  = "http://m.liulangcat.com/get/get_search_result.php?page=0&keyword={key}";
-//    public static final String NOVEL_SEARCH  = "http://www.liulangcat.com/search.php?k={key}&submit=搜索&wgxojg=wc0yz&uwzgzw=yi1p7&amlmvy=mcp50&rybwbm=1s0y7";
+    public static final String NOVEL_SEARCH = "http://m.liulangcat.com/get/get_search_result.php?page=0&keyword={key}";
+    //    public static final String NOVEL_SEARCH  = "http://www.liulangcat.com/search.php?k={key}&submit=搜索&wgxojg=wc0yz&uwzgzw=yi1p7&amlmvy=mcp50&rybwbm=1s0y7";
     public static final String CHARSET = "utf-8";
     public static final String SEARCH_CHARSET = "utf-8";
 
@@ -154,17 +154,13 @@ public class LiuLangCatReadCrawler implements ReadCrawler {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementsByClass("item_content").first();
         Element nameSpan = doc.getElementsByClass("top_categoryname").first();
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ").
-                    replace(nameSpan.text(), "").
-                    replace("主页", "").
-                    replace("目录", "");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ").
+                replace(nameSpan.text(), "").
+                replace("主页", "").
+                replace("目录", "");
+        return content;
     }
 }

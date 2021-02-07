@@ -1,10 +1,12 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
 import android.text.Html;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -55,15 +57,11 @@ public class JiuTaoReadCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ").replaceAll("您可以在.*最新章节！|\\\\", "");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ").replaceAll("您可以在.*最新章节！|\\\\", "");
+        return content;
     }
 
     /**
@@ -101,22 +99,22 @@ public class JiuTaoReadCrawler implements ReadCrawler {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);
 //        try {
-            Element div = doc.getElementsByClass("library").first();
-            Elements lis = div.getElementsByTag("li");
-            for (Element li : lis){
-                Elements as = li.getElementsByTag("a");
-                Book book = new Book();
-                book.setName(as.get(1).text());
-                book.setAuthor(as.get(2).text());
-                book.setType(as.get(3).text());
-                book.setNewestChapterTitle(as.get(4).text().replace("最新章节：", ""));
-                book.setDesc(li.getElementsByClass("intro").first().text());
-                book.setImgUrl(li.getElementsByTag("img").attr("src"));
-                book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace(".html", "/"));
-                book.setSource(BookSource.jiutao.toString());
-                SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
-                books.add(sbb, book);
-            }
+        Element div = doc.getElementsByClass("library").first();
+        Elements lis = div.getElementsByTag("li");
+        for (Element li : lis) {
+            Elements as = li.getElementsByTag("a");
+            Book book = new Book();
+            book.setName(as.get(1).text());
+            book.setAuthor(as.get(2).text());
+            book.setType(as.get(3).text());
+            book.setNewestChapterTitle(as.get(4).text().replace("最新章节：", ""));
+            book.setDesc(li.getElementsByClass("intro").first().text());
+            book.setImgUrl(li.getElementsByTag("img").attr("src"));
+            book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace(".html", "/"));
+            book.setSource(BookSource.jiutao.toString());
+            SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
+            books.add(sbb, book);
+        }
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
