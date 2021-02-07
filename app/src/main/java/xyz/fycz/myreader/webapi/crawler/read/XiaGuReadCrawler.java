@@ -58,25 +58,21 @@ public class XiaGuReadCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("txt");
-        if (divContent != null) {
-            Elements aDiv = divContent.getElementsByTag("dd");
-            StringBuilder sb = new StringBuilder();
-            Collections.sort(aDiv, (o1, o2) -> Integer.parseInt(o1.attr("data-id")) -
-                    Integer.parseInt(o2.attr("data-id")));
-            for (int i = 0; i < aDiv.size(); i++) {
-                Element dd = aDiv.get(i);
-                if (i == aDiv.size() - 1) break;
-                sb.append(Html.fromHtml(dd.html()).toString());
-                sb.append("\n");
-            }
-            String content = sb.toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
+        Elements aDiv = divContent.getElementsByTag("dd");
+        StringBuilder sb = new StringBuilder();
+        Collections.sort(aDiv, (o1, o2) -> Integer.parseInt(o1.attr("data-id")) -
+                Integer.parseInt(o2.attr("data-id")));
+        for (int i = 0; i < aDiv.size(); i++) {
+            Element dd = aDiv.get(i);
+            if (i == aDiv.size() - 1) break;
+            sb.append(Html.fromHtml(dd.html()).toString());
+            sb.append("\n");
         }
+        String content = sb.toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**
@@ -138,24 +134,24 @@ public class XiaGuReadCrawler implements ReadCrawler {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);
 //        try {
-            Element div = doc.getElementsByClass("subject-list").first();
-            Elements lis = div.getElementsByTag("li");
-            for (Element li : lis){
-                Elements as = li.getElementsByTag("a");
-                Book book = new Book();
-                book.setName(as.get(1).text());
-                book.setAuthor(as.get(2).text());
-                book.setType(as.get(3).text());
-                book.setNewestChapterTitle(as.get(4).text().replace("【最新章节】", ""));
-                book.setDesc(li.getElementsByTag("p").first().text());
-                String imgUrl = li.getElementsByTag("img").attr("data-original");
-                book.setImgUrl(!imgUrl.contains("http") ? "https:" + imgUrl : imgUrl);
-                //https://www.xiagu.org/xs/5584.html -> https://www.xiagu.org/read/5/5584/
-                book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("xs", "read/1").replace(".html", "/"));
-                book.setSource(BookSource.xiagu.toString());
-                SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
-                books.add(sbb, book);
-            }
+        Element div = doc.getElementsByClass("subject-list").first();
+        Elements lis = div.getElementsByTag("li");
+        for (Element li : lis) {
+            Elements as = li.getElementsByTag("a");
+            Book book = new Book();
+            book.setName(as.get(1).text());
+            book.setAuthor(as.get(2).text());
+            book.setType(as.get(3).text());
+            book.setNewestChapterTitle(as.get(4).text().replace("【最新章节】", ""));
+            book.setDesc(li.getElementsByTag("p").first().text());
+            String imgUrl = li.getElementsByTag("img").attr("data-original");
+            book.setImgUrl(!imgUrl.contains("http") ? "https:" + imgUrl : imgUrl);
+            //https://www.xiagu.org/xs/5584.html -> https://www.xiagu.org/read/5/5584/
+            book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("xs", "read/1").replace(".html", "/"));
+            book.setSource(BookSource.xiagu.toString());
+            SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
+            books.add(sbb, book);
+        }
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }

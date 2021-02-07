@@ -1,29 +1,30 @@
 package xyz.fycz.myreader.widget.page;
 
 
-import android.util.Log;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.ChapterService;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 public class NetPageLoader extends PageLoader {
     private static final String TAG = "PageFactory";
     private ChapterService mChapterService;
     private ReadCrawler mReadCrawler;
+    private List<Chapter> loadingChapters = new CopyOnWriteArrayList<>();
 
     public NetPageLoader(PageView pageView, Book collBook, ChapterService mChapterService,
                          ReadCrawler mReadCrawler, Setting setting) {
@@ -98,7 +99,10 @@ public class NetPageLoader extends PageLoader {
     boolean parseCurChapter() {
         boolean isRight = super.parseCurChapter();
 
-        if (mStatus == STATUS_LOADING) {
+        if (mStatus == STATUS_FINISH) {
+            loadPrevChapter();
+            loadNextChapter();
+        } else if (mStatus == STATUS_LOADING) {
             loadCurrentChapter();
         }
         return isRight;
@@ -195,15 +199,16 @@ public class NetPageLoader extends PageLoader {
 
         List<Chapter> chapters = new ArrayList<>();
 
-        // 过滤，哪些数据已经加载了
+        // 过滤，哪些数据已经加载了/正在加载
         for (int i = start; i <= end; ++i) {
             Chapter txtChapter = mChapterList.get(i);
-            if (!hasChapterData(txtChapter)) {
+            if (!hasChapterData(txtChapter) && !loadingChapters.contains(txtChapter)) {
                 chapters.add(txtChapter);
             }
         }
 
         if (!chapters.isEmpty()) {
+            loadingChapters.addAll(chapters);
             for (Chapter chapter : chapters) {
                 getChapterContent(chapter);
             }
@@ -219,8 +224,10 @@ public class NetPageLoader extends PageLoader {
         CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler, new ResultCallback() {
             @Override
             public void onFinish(final Object o, int code) {
+                loadingChapters.remove(chapter);
                 mChapterService.saveOrUpdateChapter(chapter, (String) o);
-                if (getPageStatus() == PageLoader.STATUS_LOADING) {
+                if (isClose()) return;
+                if (getPageStatus() == PageLoader.STATUS_LOADING && mCurChapterPos == chapter.getNumber()) {
                     MyApplication.runOnUiThread(() -> {
                         if (isPrev) {
                             openChapterInLastPage();
@@ -233,8 +240,10 @@ public class NetPageLoader extends PageLoader {
 
             @Override
             public void onError(Exception e) {
+                loadingChapters.remove(chapter);
+                if (isClose()) return;
                 if (mCurChapterPos == chapter.getNumber())
-                    chapterError();
+                    chapterError("请尝试重新加载或换源\n" + e.getLocalizedMessage());
                 e.printStackTrace();
             }
         });

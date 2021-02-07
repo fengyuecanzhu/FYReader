@@ -58,15 +58,11 @@ public class BiJianReadCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementsByClass("read-content").first();
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**
@@ -95,13 +91,13 @@ public class BiJianReadCrawler implements ReadCrawler {
 
     /**
      * 从搜索html中得到书列表
-     *<li>
-     *    <a class="pic" href="http://www.bjcan.com/book/74544.html" target="_blank"><img class="lazy" src="http://www.bjcan.com/uploads/novel/20200907/b38cea14e4a3de1e876395e378c1e544.jpeg" alt="大主宰：灵玖"></a>
-     *    <h5 class="tit"><a href="http://www.bjcan.com/book/74544.html" target="_blank">大主宰：灵玖</a></h5>
-     *    <p class="info">作者：<span>霞露</span><span>分类：其他</span><i class="serial">连载中</i></p>
-     *    <p class="intro">简介：她，身负系统，莫名来到了大主宰的时空，成为了聚灵族的最后族人。在她还对周围的情况一片模糊的时候，她遇到了林静这个小恶魔。拜林静所赐，她还遇到了武祖，成为了武柤的小徒弟。参与了灵路，遇到了牧尘和洛璃，她默默的在心中问着自己那一直在划水的系统：&ldquo;你的活来了，说吧，我该干什么？&rdquo;</p>
-     *    <a class="view" href="http://www.bjcan.com/book/74544.html" target="_blank">小说详情</a>
-     *</li>
+     * <li>
+     * <a class="pic" href="http://www.bjcan.com/book/74544.html" target="_blank"><img class="lazy" src="http://www.bjcan.com/uploads/novel/20200907/b38cea14e4a3de1e876395e378c1e544.jpeg" alt="大主宰：灵玖"></a>
+     * <h5 class="tit"><a href="http://www.bjcan.com/book/74544.html" target="_blank">大主宰：灵玖</a></h5>
+     * <p class="info">作者：<span>霞露</span><span>分类：其他</span><i class="serial">连载中</i></p>
+     * <p class="intro">简介：她，身负系统，莫名来到了大主宰的时空，成为了聚灵族的最后族人。在她还对周围的情况一片模糊的时候，她遇到了林静这个小恶魔。拜林静所赐，她还遇到了武祖，成为了武柤的小徒弟。参与了灵路，遇到了牧尘和洛璃，她默默的在心中问着自己那一直在划水的系统：&ldquo;你的活来了，说吧，我该干什么？&rdquo;</p>
+     * <a class="view" href="http://www.bjcan.com/book/74544.html" target="_blank">小说详情</a>
+     * </li>
      */
     public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();

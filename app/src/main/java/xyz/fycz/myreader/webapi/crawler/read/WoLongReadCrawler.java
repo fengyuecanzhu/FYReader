@@ -57,15 +57,11 @@ public class WoLongReadCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("contentsource");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**
@@ -95,19 +91,19 @@ public class WoLongReadCrawler implements ReadCrawler {
 
     /**
      * 从搜索html中得到书列表
-     <div>
-         <a href="http://www.paper027.com/novel/75432.html" target="_blank"><img class="img-rounded" src="http://www.paper027.com/uploads/novel/20190802/9883298e2e72ecfa53fabf0ef2e03e21.jpg"/></a>
-         <h2><a  href="http://www.paper027.com/novel/75432.html" target="_blank">大主宰之混子日常</a></h2>
-         <p class="text-muted"><span>錯過过错</span> <small>2019-08-06 19:14</small></p>
-     </div>
-     <div class="clearfix searchresult-info">
-         <p><a href="http://www.paper027.com/novel/75432.html" target="_blank">作者很懒，什么也没有留下。...</a></p>
-         <ul class="list-inline text-muted">
-         <li>11635人看过</li>
-         <li>标签：</li>
-         <li><a class="text-warning">同人衍生</a></li>
-         </ul>
-     </div>
+     * <div>
+     * <a href="http://www.paper027.com/novel/75432.html" target="_blank"><img class="img-rounded" src="http://www.paper027.com/uploads/novel/20190802/9883298e2e72ecfa53fabf0ef2e03e21.jpg"/></a>
+     * <h2><a  href="http://www.paper027.com/novel/75432.html" target="_blank">大主宰之混子日常</a></h2>
+     * <p class="text-muted"><span>錯過过错</span> <small>2019-08-06 19:14</small></p>
+     * </div>
+     * <div class="clearfix searchresult-info">
+     * <p><a href="http://www.paper027.com/novel/75432.html" target="_blank">作者很懒，什么也没有留下。...</a></p>
+     * <ul class="list-inline text-muted">
+     * <li>11635人看过</li>
+     * <li>标签：</li>
+     * <li><a class="text-warning">同人衍生</a></li>
+     * </ul>
+     * </div>
      */
     public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();

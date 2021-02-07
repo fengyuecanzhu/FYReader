@@ -81,15 +81,11 @@ public class XS7ReadCrawler extends FindCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ").replaceAll("一秒记住.*免费阅读！", "");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ").replaceAll("一秒记住.*免费阅读！", "");
+        return content;
     }
 
     /**
@@ -128,21 +124,21 @@ public class XS7ReadCrawler extends FindCrawler implements ReadCrawler {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);
 //        try {
-            Element alist = doc.getElementById("alist");
-            Elements divs = alist.select("#alistbox");
-            for (Element div : divs){
-                Elements as = div.getElementsByTag("a");
-                Book book = new Book();
-                book.setName(as.get(1).text());
-                book.setAuthor(div.getElementsByTag("span").first().text().replace("作者：", ""));
-                book.setNewestChapterTitle(as.get(2).text());
-                book.setDesc(div.getElementsByClass("intro").first().text());
-                book.setImgUrl(div.getElementsByTag("img").attr("src"));
-                book.setChapterUrl(as.get(1).attr("href"));
-                book.setSource(BookSource.xs7.toString());
-                SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
-                books.add(sbb, book);
-            }
+        Element alist = doc.getElementById("alist");
+        Elements divs = alist.select("#alistbox");
+        for (Element div : divs) {
+            Elements as = div.getElementsByTag("a");
+            Book book = new Book();
+            book.setName(as.get(1).text());
+            book.setAuthor(div.getElementsByTag("span").first().text().replace("作者：", ""));
+            book.setNewestChapterTitle(as.get(2).text());
+            book.setDesc(div.getElementsByClass("intro").first().text());
+            book.setImgUrl(div.getElementsByTag("img").attr("src"));
+            book.setChapterUrl(as.get(1).attr("href"));
+            book.setSource(BookSource.xs7.toString());
+            SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
+            books.add(sbb, book);
+        }
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
@@ -155,7 +151,7 @@ public class XS7ReadCrawler extends FindCrawler implements ReadCrawler {
         Document doc = Jsoup.parse(html);
         Element div = doc.getElementsByClass("subnav-hot").first();
         Elements as = div.getElementsByTag("a");
-        for (Element a : as){
+        for (Element a : as) {
             BookType bookType = new BookType();
             bookType.setUrl(a.attr("href"));
             bookType.setTypeName(a.text());
@@ -192,7 +188,7 @@ public class XS7ReadCrawler extends FindCrawler implements ReadCrawler {
         bookType.setPageSize(Integer.parseInt(last.text()));
         Element div = doc.getElementById("alist");
         Elements bDivs = div.select("div[id=alistbox]");
-        for (Element bDiv : bDivs){
+        for (Element bDiv : bDivs) {
             Book book = new Book();
             Element title = bDiv.getElementsByClass("title").first();
             Element sys = bDiv.getElementsByClass("sys").first();
@@ -212,7 +208,7 @@ public class XS7ReadCrawler extends FindCrawler implements ReadCrawler {
 
     @Override
     public boolean getTypePage(BookType curType, int page) {
-        if (page != 1 && page > curType.getPageSize()){
+        if (page != 1 && page > curType.getPageSize()) {
             return true;
         }
         curType.setUrl(curType.getUrl().substring(0, curType.getUrl().lastIndexOf("_") + 1) + page + ".html");

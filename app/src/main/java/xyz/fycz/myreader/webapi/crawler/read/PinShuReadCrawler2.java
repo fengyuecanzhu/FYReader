@@ -1,10 +1,12 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
 import android.text.Html;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -41,10 +43,12 @@ public class PinShuReadCrawler2 implements ReadCrawler, BookInfoCrawler {
     public String getNameSpace() {
         return NAME_SPACE;
     }
+
     @Override
     public Boolean isPost() {
         return false;
     }
+
     @Override
     public String getSearchCharset() {
         return SEARCH_CHARSET;
@@ -59,16 +63,12 @@ public class PinShuReadCrawler2 implements ReadCrawler, BookInfoCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("BookText");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ").replace("品书网", "")
-            .replace("手机阅读", "");
-            return StringHelper.IgnoreCaseReplace(content, "www.vodtw.com", "");
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ").replace("品书网", "")
+                .replace("手机阅读", "");
+        return StringHelper.IgnoreCaseReplace(content, "www.vodtw.com", "");
     }
 
     /**

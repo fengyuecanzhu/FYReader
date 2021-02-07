@@ -5,6 +5,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -56,20 +57,16 @@ public class YunZhongReadCrawler implements ReadCrawler, BookInfoCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementsByClass("box_box").first();
-        if (divContent != null) {
-            StringBuilder sb = new StringBuilder();
-            for (TextNode textNode : divContent.textNodes()){
-                sb.append(textNode.text());
-                sb.append("\n");
-            }
-            String content = sb.toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
+        StringBuilder sb = new StringBuilder();
+        for (TextNode textNode : divContent.textNodes()) {
+            sb.append(textNode.text());
+            sb.append("\n");
         }
+        String content = sb.toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**
@@ -110,23 +107,23 @@ public class YunZhongReadCrawler implements ReadCrawler, BookInfoCrawler {
     public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
 //        try {
-            Document doc = Jsoup.parse(html);
-            Elements divs = doc.getElementsByClass("ul_b_list");
-            Element div = divs.get(0);
-            Elements elementsByTag = div.getElementsByTag("li");
-            for (Element element : elementsByTag) {
-                Book book = new Book();
-                Element info = element.getElementsByTag("h2").first();
-                book.setName(info.getElementsByTag("a").first().text());
-                book.setType(info.getElementsByTag("span").first().text());
-                book.setAuthor(element.getElementsByClass("state").first().text().replaceAll("作者.|类型.*", ""));
-                book.setImgUrl(NAME_SPACE + element.getElementsByClass("pic").first().getElementsByTag("img").first().attr("src"));
-                book.setChapterUrl(NAME_SPACE + element.getElementsByTag("a").first().attr("href"));
-                book.setNewestChapterTitle("");
-                book.setSource(BookSource.yunzhong.toString());
-                SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
-                books.add(sbb, book);
-            }
+        Document doc = Jsoup.parse(html);
+        Elements divs = doc.getElementsByClass("ul_b_list");
+        Element div = divs.get(0);
+        Elements elementsByTag = div.getElementsByTag("li");
+        for (Element element : elementsByTag) {
+            Book book = new Book();
+            Element info = element.getElementsByTag("h2").first();
+            book.setName(info.getElementsByTag("a").first().text());
+            book.setType(info.getElementsByTag("span").first().text());
+            book.setAuthor(element.getElementsByClass("state").first().text().replaceAll("作者.|类型.*", ""));
+            book.setImgUrl(NAME_SPACE + element.getElementsByClass("pic").first().getElementsByTag("img").first().attr("src"));
+            book.setChapterUrl(NAME_SPACE + element.getElementsByTag("a").first().attr("href"));
+            book.setNewestChapterTitle("");
+            book.setSource(BookSource.yunzhong.toString());
+            SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
+            books.add(sbb, book);
+        }
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }

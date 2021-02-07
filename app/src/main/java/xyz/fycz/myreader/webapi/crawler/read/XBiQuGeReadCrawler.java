@@ -7,6 +7,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -15,12 +17,10 @@ import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
-import java.util.ArrayList;
 
-
-public class MiQuReadCrawler implements ReadCrawler, BookInfoCrawler {
-    public static final String NAME_SPACE = "https://www.meegoq.com";
-    public static final String NOVEL_SEARCH = "https://www.meegoq.com/search.htm?keyword={key}";
+public class XBiQuGeReadCrawler implements ReadCrawler {
+    public static final String NAME_SPACE = "https://www.xquge.com";
+    public static final String NOVEL_SEARCH = "https://www.xquge.com/search?keyword={key}&sign=";
     public static final String CHARSET = "UTF-8";
     public static final String SEARCH_CHARSET = "UTF-8";
 
@@ -74,13 +74,13 @@ public class MiQuReadCrawler implements ReadCrawler, BookInfoCrawler {
     public ArrayList<Chapter> getChaptersFromHtml(String html) {
         ArrayList<Chapter> chapters = new ArrayList<>();
         Document doc = Jsoup.parse(html);
-        Element divList = doc.getElementsByClass("mulu").first();
+        Element divList = doc.getElementsByClass("catelog_list").last();
         Elements elementsByTag = divList.getElementsByTag("a");
         int i = 0;
-        for (int j = 9; j < elementsByTag.size(); j++) {
+        for (int j = 0; j < elementsByTag.size(); j++) {
             Element a = elementsByTag.get(j);
             String title = a.text();
-            String url = "http:" + a.attr("href");
+            String url = a.attr("href");
             Chapter chapter = new Chapter();
             chapter.setNumber(i++);
             chapter.setTitle(title);
@@ -94,45 +94,53 @@ public class MiQuReadCrawler implements ReadCrawler, BookInfoCrawler {
      * 从搜索html中得到书列表
      *
      * @param html
-     * @return
+     * @return <li>
+     *     <div class="rank_items">
+     *         <div class="items_l"><a href="https://www.xquge.com/book/5661.html" class="book_img"><img
+     *                 src="//static.xquge.com/Public/upload/book/201912/23/22/5715770830115e0060832a553.jpg?v=2020060502"
+     *                 alt="绝世元尊"></a></div>
+     *         <div class="items_center">
+     *             <div class="rank_bkname"><a href="https://www.xquge.com/book/5661.html">异界大主宰</a></div>
+     *             <div class="rank_bkinfo"><span class="author">范范的萧</span><span>玄幻奇幻</span><span>连载</span>
+     *             </div>
+     *             <div class="rank_bkbrief">
+     *                 “怎么回事？”    冷尧一脸茫然、这是哪儿、他看着这个陌生的的环境，一时不知所错……    啊！！！    冷尧看着自己有一双粗大而又充满爆发力的大手，每个细胞都充满爆发力。    这具身体不是自己的，难道我穿越了？    ……    ……    ……                              </div>
+     *             <div class="rank_bkother">
+     *                 <div class="rank_bktime">2020-08-28 04:24</div>
+     *                 <div class="rank_newpage"><a href="https://www.xquge.com/book/5661/98087932.html">更新章节：新书《苍山牧云记》以发布</a>
+     *                 </div>
+     *             </div>
+     *         </div>
+     *         <div class="items_rig">
+     *             <a href="https://www.xquge.com/book/5661.html" class="bk_brief_btn">书籍详情</a></div>
+     *     </div>
+     * </li>
      */
     public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);
-        Elements divs = doc.getElementsByClass("lastest");
+        Elements divs = doc.getElementsByClass("rank_ullist");
         Element div = divs.get(0);
         Elements elementsByTag = div.getElementsByTag("li");
-        for (int i = 1; i < elementsByTag.size() - 1; i++) {
+        for (int i = 0; i < elementsByTag.size(); i++) {
             Element element = elementsByTag.get(i);
             Book book = new Book();
-            Element info = element.getElementsByClass("n2").first();
-            book.setName(info.text());
-            book.setInfoUrl("http:" + info.getElementsByTag("a").attr("href"));
-            book.setChapterUrl("http:" + info.getElementsByTag("a").attr("href").replace("info", "book"));
-            book.setAuthor(element.getElementsByClass("a2").first().text());
-            book.setType(element.getElementsByClass("nt").first().text());
-            book.setNewestChapterTitle(element.getElementsByClass("c2").first().text());
-            book.setSource(BookSource.miqu.toString());
+            Elements as = element.getElementsByTag("a");
+            book.setName(as.get(1).text());
+            book.setChapterUrl(as.get(1).attr("href"));
+            book.setNewestChapterTitle(as.get(2).text().replace("更新章节：", ""));
+            String img = as.first().selectFirst("img").attr("src");
+            if (!img.contains("http")) img = "https:" + img;
+            book.setImgUrl(img);
+            Elements spans = element.selectFirst(".rank_bkinfo").select("span");
+            book.setAuthor(spans.first().text());
+            book.setType(spans.get(1).text());
+            book.setDesc(element.selectFirst(".rank_bkbrief").text());
+            book.setSource(BookSource.xbiquge.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }
         return books;
-    }
-
-    /**
-     * 获取书籍详细信息
-     *
-     * @param book
-     */
-    public Book getBookInfo(String html, Book book) {
-        Document doc = Jsoup.parse(html);
-        Element img = doc.getElementsByClass("cover").first();
-        book.setImgUrl(img.getElementsByTag("img").get(0).attr("src"));
-
-        String desc = doc.select("meta[property=og:description]").attr("content");
-        book.setDesc(desc);
-
-        return book;
     }
 
 }

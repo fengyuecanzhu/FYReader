@@ -1,10 +1,12 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
 import android.text.Html;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -55,15 +57,11 @@ public class CansShu99ReadCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("content");
-        if (divContent != null) {
-            String content = Html.fromHtml(divContent.html()).toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
-        }
+        String content = Html.fromHtml(divContent.html()).toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**
@@ -107,28 +105,28 @@ public class CansShu99ReadCrawler implements ReadCrawler {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);
 //        try {
-            Elements divs = doc.getElementsByClass("list_box");
-            Element div = divs.get(0);
-            Elements elementsByTag = div.getElementsByTag("li");
-            for (Element element : elementsByTag) {
-                Book book = new Book();
-                String name = element.getElementsByTag("h2").first().getElementsByTag("a").first().text();
-                book.setName(name);
-                String author = element.getElementsByTag("h4").first().getElementsByTag("a").first().text();
-                book.setAuthor(author);
-                String type = element.getElementsByTag("h4").get(1).getElementsByTag("a").text();
-                book.setType(type);
-                String desc = element.getElementsByClass("intro").first().text();
-                book.setDesc(desc);
-                String imgUrl = element.getElementsByTag("img").first().attr("src");
-                book.setImgUrl("http:" + imgUrl);
-                String chapterUrl = element.getElementsByTag("h2").first().getElementsByTag("a").first().attr("href");
-                book.setChapterUrl(NAME_SPACE + chapterUrl);
-                book.setNewestChapterTitle("");
-                book.setSource(BookSource.cangshu99.toString());
-                SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
-                books.add(sbb, book);
-            }
+        Elements divs = doc.getElementsByClass("list_box");
+        Element div = divs.get(0);
+        Elements elementsByTag = div.getElementsByTag("li");
+        for (Element element : elementsByTag) {
+            Book book = new Book();
+            String name = element.getElementsByTag("h2").first().getElementsByTag("a").first().text();
+            book.setName(name);
+            String author = element.getElementsByTag("h4").first().getElementsByTag("a").first().text();
+            book.setAuthor(author);
+            String type = element.getElementsByTag("h4").get(1).getElementsByTag("a").text();
+            book.setType(type);
+            String desc = element.getElementsByClass("intro").first().text();
+            book.setDesc(desc);
+            String imgUrl = element.getElementsByTag("img").first().attr("src");
+            book.setImgUrl("http:" + imgUrl);
+            String chapterUrl = element.getElementsByTag("h2").first().getElementsByTag("a").first().attr("href");
+            book.setChapterUrl(NAME_SPACE + chapterUrl);
+            book.setNewestChapterTitle("");
+            book.setSource(BookSource.cangshu99.toString());
+            SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
+            books.add(sbb, book);
+        }
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }

@@ -61,25 +61,21 @@ public class ReXueReadCrawler implements ReadCrawler {
     public String getContentFormHtml(String html) {
         Document doc = Jsoup.parse(html);
         Element divContent = doc.getElementById("txt");
-        if (divContent != null) {
-            Elements aDiv = divContent.getElementsByTag("dd");
-            StringBuilder sb = new StringBuilder();
-            Collections.sort(aDiv, (o1, o2) -> Integer.parseInt(o1.attr("data-id")) -
-                    Integer.parseInt(o2.attr("data-id")));
-            for (int i = 0; i < aDiv.size(); i++) {
-                Element dd = aDiv.get(i);
-                if (i == aDiv.size() - 1) break;
-                sb.append(Html.fromHtml(dd.html()).toString());
-                sb.append("\n");
-            }
-            String content = sb.toString();
-            char c = 160;
-            String spaec = "" + c;
-            content = content.replace(spaec, "  ");
-            return content;
-        } else {
-            return "";
+        Elements aDiv = divContent.getElementsByTag("dd");
+        StringBuilder sb = new StringBuilder();
+        Collections.sort(aDiv, (o1, o2) -> Integer.parseInt(o1.attr("data-id")) -
+                Integer.parseInt(o2.attr("data-id")));
+        for (int i = 0; i < aDiv.size(); i++) {
+            Element dd = aDiv.get(i);
+            if (i == aDiv.size() - 1) break;
+            sb.append(Html.fromHtml(dd.html()).toString());
+            sb.append("\n");
         }
+        String content = sb.toString();
+        char c = 160;
+        String spaec = "" + c;
+        content = content.replace(spaec, "  ");
+        return content;
     }
 
     /**

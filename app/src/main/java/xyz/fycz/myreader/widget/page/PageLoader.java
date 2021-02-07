@@ -17,6 +17,7 @@ import com.gyf.immersionbar.ImmersionBar;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.SingleOnSubscribe;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.MyApplication;
@@ -62,6 +63,8 @@ public abstract class PageLoader {
     public static final int STATUS_PARING = 6;          // 正在解析 (装载本地数据)
     public static final int STATUS_PARSE_ERROR = 7;     // 本地文件解析错误(暂未被使用)
     public static final int STATUS_CATEGORY_EMPTY = 8;  // 获取到的目录为空
+
+    private String errorMsg = "";
     // 默认的显示参数配置
     public static final int DEFAULT_MARGIN_HEIGHT = 28;
     public static final int DEFAULT_MARGIN_WIDTH = 15;
@@ -106,7 +109,9 @@ public abstract class PageLoader {
 //    private BookRecordBean mBookRecord;
     //缩进
     String indent;
-    private Disposable mPreLoadDisp;
+    private Disposable mPreLoadNextDisp;
+    private Disposable mPreLoadPrevDisp;
+    private CompositeDisposable compositeDisposable;
 
     /*****************params**************************/
     // 当前的状态
@@ -175,6 +180,7 @@ public abstract class PageLoader {
         mContext = pageView.getContext();
         mCollBook = collBook;
         mChapterList = new ArrayList<>(1);
+        compositeDisposable = new CompositeDisposable();
         // 获取配置管理器
         mSettingManager = setting;
         // 初始化数据
@@ -367,8 +373,11 @@ public abstract class PageLoader {
         // 将上一章的缓存设置为null
         mPreChapter = null;
         // 如果当前下一章缓存正在执行，则取消
-        if (mPreLoadDisp != null) {
-            mPreLoadDisp.dispose();
+        if (mPreLoadNextDisp != null) {
+            mPreLoadNextDisp.dispose();
+        }
+        if (mPreLoadPrevDisp != null) {
+            mPreLoadPrevDisp.dispose();
         }
         // 将下一章缓存设置为null
         mNextChapter = null;
@@ -769,9 +778,10 @@ public abstract class PageLoader {
         mPageView.drawCurPage(false);
     }
 
-    public void chapterError() {
+    public void chapterError(String msg) {
         //加载错误
         mStatus = STATUS_ERROR;
+        errorMsg = msg;
         mPageView.drawCurPage(false);
     }
 
@@ -782,8 +792,11 @@ public abstract class PageLoader {
         isChapterListPrepare = false;
         isClose = true;
 
-        if (mPreLoadDisp != null) {
-            mPreLoadDisp.dispose();
+        if (mPreLoadNextDisp != null) {
+            mPreLoadNextDisp.dispose();
+        }
+        if (mPreLoadPrevDisp != null) {
+            mPreLoadPrevDisp.dispose();
         }
 
         clearList(mChapterList);
@@ -1014,7 +1027,7 @@ public abstract class PageLoader {
                     tip = "正在加载目录列表...";
                     break;
                 case STATUS_ERROR:
-                    tip = "章节内容加载失败";
+                    tip = "章节内容加载失败\n" + errorMsg;
                     break;
                 case STATUS_EMPTY:
                     tip = "章节内容为空";
@@ -1029,14 +1042,17 @@ public abstract class PageLoader {
                     tip = "目录列表为空";
                     break;
             }
-
-            //将提示语句放到正中间
-            Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
-            float textHeight = fontMetrics.top - fontMetrics.bottom;
-            float textWidth = mTextPaint.measureText(tip);
-            float pivotX = (mDisplayWidth - textWidth) / 2;
-            float pivotY = (mDisplayHeight - textHeight) / 2;
-            canvas.drawText(tip, pivotX, pivotY, mTextPaint);
+            if (mStatus == STATUS_ERROR) {
+                drawErrorMsg(canvas, tip, 0);
+            } else {
+                //将提示语句放到正中间
+                Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
+                float textHeight = fontMetrics.top - fontMetrics.bottom;
+                float textWidth = mTextPaint.measureText(tip);
+                float pivotX = (mDisplayWidth - textWidth) / 2;
+                float pivotY = (mDisplayHeight - textHeight) / 2;
+                canvas.drawText(tip, pivotX, pivotY, mTextPaint);
+            }
         } else {
             float top;
             if (mPageMode == PageMode.SCROLL) {
@@ -1224,6 +1240,22 @@ public abstract class PageLoader {
         }
     }
 
+    private void drawErrorMsg(Canvas canvas, String msg, float offset) {
+        float textInterval = mTextInterval + mTextPaint.getTextSize();
+        Layout tempLayout = new StaticLayout(msg, mTextPaint, mVisibleWidth, Layout.Alignment.ALIGN_NORMAL, 0, 0, false);
+        List<String> linesData = new ArrayList<>();
+        for (int i = 0; i < tempLayout.getLineCount(); i++) {
+            linesData.add(msg.substring(tempLayout.getLineStart(i), tempLayout.getLineEnd(i)));
+        }
+        float pivotY = (mDisplayHeight - textInterval * linesData.size()) / 2f - offset;
+        for (String str : linesData) {
+            float textWidth = mTextPaint.measureText(str);
+            float pivotX = (mDisplayWidth - textWidth) / 2;
+            canvas.drawText(str, pivotX, pivotY, mTextPaint);
+            pivotY += textInterval;
+        }
+    }
+
     //判断是不是d'hou
     private boolean isFirstLineOfParagraph(String line) {
         return line.length() > 3 && line.charAt(0) == (char) 12288 && line.charAt(1) == (char) 12288;
@@ -1343,6 +1375,8 @@ public abstract class PageLoader {
         } else {
             dealLoadPageList(prevChapter);
         }
+        // 预加载上一页面
+        preLoadPrevChapter();
         return mCurChapter != null;
     }
 
@@ -1404,7 +1438,8 @@ public abstract class PageLoader {
     boolean parseCurChapter() {
         // 解析数据
         dealLoadPageList(mCurChapterPos);
-        // 预加载下一页面
+        // 预加载上一页和下一页面
+        preLoadPrevChapter();
         preLoadNextChapter();
         return mCurChapter != null;
     }
@@ -1475,6 +1510,41 @@ public abstract class PageLoader {
         }
     }
 
+    // 预加载上一章
+    private void preLoadPrevChapter() {
+        int prevChapter = mCurChapterPos - 1;
+
+        // 如果不存在下一章，且下一章没有数据，则不进行加载。
+        if (!hasPrevChapter()
+                || !hasChapterData(mChapterList.get(prevChapter))) {
+            return;
+        }
+        //如果之前正在加载则取消
+        if (mPreLoadPrevDisp != null) {
+            mPreLoadPrevDisp.dispose();
+        }
+
+        //调用异步进行预加载加载
+        Single.create((SingleOnSubscribe<TxtChapter>) e -> e.onSuccess(loadPageList(prevChapter)))
+                .compose(RxUtils::toSimpleSingle)
+                .subscribe(new SingleObserver<TxtChapter>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        mPreLoadPrevDisp = d;
+                    }
+
+                    @Override
+                    public void onSuccess(TxtChapter txtChapter) {
+                        mPreChapter = txtChapter;
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        //无视错误
+                    }
+                });
+    }
+
     // 预加载下一章
     private void preLoadNextChapter() {
         int nextChapter = mCurChapterPos + 1;
@@ -1485,8 +1555,8 @@ public abstract class PageLoader {
             return;
         }
         //如果之前正在加载则取消
-        if (mPreLoadDisp != null) {
-            mPreLoadDisp.dispose();
+        if (mPreLoadNextDisp != null) {
+            mPreLoadNextDisp.dispose();
         }
 
         //调用异步进行预加载加载
@@ -1495,7 +1565,7 @@ public abstract class PageLoader {
                 .subscribe(new SingleObserver<TxtChapter>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-                        mPreLoadDisp = d;
+                        mPreLoadNextDisp = d;
                     }
 
                     @Override

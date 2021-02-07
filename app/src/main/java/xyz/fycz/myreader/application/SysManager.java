@@ -126,6 +126,11 @@ public class SysManager {
                 ReadCrawlerUtil.removeReadCrawler("qiqi", "rexue", "pinshu");
                 ReadCrawlerUtil.addReadCrawler(BookSource.bijian, BookSource.yanqinglou, BookSource.wolong);
                 Log.d("SourceVersion", "" + 4);
+            case 5:
+                ReadCrawlerUtil.addReadCrawler(BookSource.ewenxue, BookSource.shuhaige,
+                        BookSource.luoqiu, BookSource.zw37, BookSource.xbiquge,
+                        BookSource.zaishuyuan);
+                Log.d("SourceVersion", "" + 5);
         }
         setting.setSourceVersion(APPCONST.SOURCE_VERSION);
         saveSetting(setting);
