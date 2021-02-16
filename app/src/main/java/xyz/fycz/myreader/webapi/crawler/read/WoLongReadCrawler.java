@@ -10,7 +10,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -121,7 +121,7 @@ public class WoLongReadCrawler implements ReadCrawler {
             book.setChapterUrl(as.get(1).attr("href").replace("novel", "home/chapter/lists/id"));
             book.setDesc(as.get(2).text());
             book.setNewestChapterTitle("");
-            book.setSource(BookSource.wolong.toString());
+            book.setSource(LocalBookSource.wolong.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

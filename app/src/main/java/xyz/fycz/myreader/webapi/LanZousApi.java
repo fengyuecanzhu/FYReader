@@ -3,7 +3,7 @@ package xyz.fycz.myreader.webapi;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.util.SharedPreUtils;
@@ -94,7 +94,7 @@ public class LanZousApi {
         SharedPreUtils spu = SharedPreUtils.getInstance();
         String lanzousKeyStart = "var pposturl = '";
         try {
-            lanzousKeyStart = spu.getString(MyApplication.getmContext().getString(R.string.lanzousKeyStart));
+            lanzousKeyStart = spu.getString(App.getmContext().getString(R.string.lanzousKeyStart));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -121,7 +121,7 @@ public class LanZousApi {
      *
      */
     public static void getRedirectUrl(final String path, final ResultCallback callback) {
-        MyApplication.getApplication().newThread(() -> {
+        App.getApplication().newThread(() -> {
             HttpURLConnection conn = null;
             try {
                 conn = (HttpURLConnection) new URL(path)

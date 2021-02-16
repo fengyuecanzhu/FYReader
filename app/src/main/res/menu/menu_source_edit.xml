@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_save"
+        android:icon="@drawable/ic_save"
+        app:showAsAction="always"
+        android:title="@string/save"/>
+
+    <item android:id="@+id/action_debug"
+        android:icon="@drawable/ic_debug"
+        app:showAsAction="always"
+        android:title="@string/debug">
+        <menu>
+            <item android:id="@+id/action_debug_search"
+                android:title="@string/debug_search"/>
+            <item android:id="@+id/action_debug_info"
+                android:title="@string/debug_info"/>
+            <item android:id="@+id/action_debug_toc"
+                android:title="@string/debug_toc"/>
+            <item android:id="@+id/action_debug_content"
+                android:title="@string/debug_content"/>
+        </menu>
+    </item>
+
+</menu>

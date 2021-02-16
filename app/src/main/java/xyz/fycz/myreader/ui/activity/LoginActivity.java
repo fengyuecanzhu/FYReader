@@ -29,6 +29,7 @@ import xyz.fycz.myreader.util.CodeUtil;
 import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.util.utils.ProgressUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 
@@ -104,7 +105,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
                 ToastUtils.showError("无网络连接！");
                 return;
             }
-            ProgressDialog dialog = DialogCreator.createProgressDialog(this, null, "正在登陆...");
+            ProgressUtils.show(this, "正在登陆...");
             binding.btLogin.setEnabled(false);
             final String loginName = binding.etUser.getEditText().getText().toString().trim();
             String loginPwd = binding.etPassword.getEditText().getText().toString();
@@ -130,7 +131,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
                         ToastUtils.showSuccess(resultName);
                     } else {
                         mHandler.sendMessage(mHandler.obtainMessage(1));
-                        dialog.dismiss();
+                        ProgressUtils.dismiss();
                         ToastUtils.showWarring(resultName);
                     }
 
@@ -140,7 +141,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
                 public void onError(Exception e) {
                     ToastUtils.showError("登录失败\n" + e.getLocalizedMessage());
                     mHandler.sendMessage(mHandler.obtainMessage(1));
-                    dialog.dismiss();
+                    ProgressUtils.dismiss();
                 }
             });
 
@@ -216,5 +217,11 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
             //按钮不能点击
             binding.btLogin.setEnabled(false);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ProgressUtils.dismiss();
     }
 }

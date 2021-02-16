@@ -10,7 +10,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -75,7 +75,7 @@ public class EWenXueReadCrawler implements ReadCrawler, BookInfoCrawler {
     public ArrayList<Chapter> getChaptersFromHtml(String html) {
         ArrayList<Chapter> chapters = new ArrayList<>();
         Document doc = Jsoup.parse(html);
-        String readUrl = NAME_SPACE + doc.select(".breadcrumb").first()
+        String readUrl = doc.select(".breadcrumb").first()
                 .select("a").last().attr("href");
         Element divList = doc.getElementById("chapters-list");
         String lastTile = null;
@@ -119,12 +119,12 @@ public class EWenXueReadCrawler implements ReadCrawler, BookInfoCrawler {
             Book book = new Book();
             Elements info = element.getElementsByTag("div");
             book.setName(info.get(1).text());
-            book.setInfoUrl(NAME_SPACE + info.get(1).getElementsByTag("a").attr("href"));
+            book.setInfoUrl(info.get(1).getElementsByTag("a").attr("href"));
             book.setChapterUrl(book.getInfoUrl() + "mulu.htm");
             book.setAuthor(info.get(3).text());
             book.setNewestChapterTitle(info.get(2).text());
             book.setType(info.get(0).text());
-            book.setSource(BookSource.ewenxue.toString());
+            book.setSource(LocalBookSource.ewenxue.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

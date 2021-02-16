@@ -9,13 +9,16 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.PopupMenu;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,16 +31,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
-import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
-import io.reactivex.SingleOnSubscribe;
-import io.reactivex.annotations.NonNull;
+import me.gujun.android.taggroup.TagGroup;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
@@ -45,9 +43,10 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySearchBookBinding;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.SearchHistory;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
+import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.greendao.service.SearchHistoryService;
 import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -58,7 +57,6 @@ import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.BaseApi;
 import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
@@ -84,21 +82,14 @@ public class SearchBookActivity extends BaseActivity {
 
     private SearchHistoryAdapter mSearchHistoryAdapter;
 
-    private int curThreadCount;
-
     private int allThreadCount;
-
-    private boolean isStopSearch;
-
-    private int inputConfirm = 0;//搜索输入确认
-    private int confirmTime = 1000;//搜索输入确认时间（毫秒）
 
     private SearchEngine searchEngine;
 
     private Setting mSetting;
 
-    //选择禁用更新书源对话框
-    private AlertDialog mDisableSourceDia;
+    private Menu menu;
+
 
     private static String[] suggestion = {"第一序列", "大道朝天", "伏天氏", "终极斗罗", "我师兄实在太稳健了", "烂柯棋缘", "诡秘之主"};
     private static String[] suggestion2 = {"不朽凡人", "圣墟", "我是至尊", "龙王传说", "太古神王", "一念永恒", "雪鹰领主", "大主宰"};
@@ -145,7 +136,7 @@ public class SearchBookActivity extends BaseActivity {
         super.initData(savedInstanceState);
         mSetting = SysManager.getSetting();
         mSearchHistoryService = SearchHistoryService.getInstance();
-        showHot = !MyApplication.isApkInDebug(this);
+        showHot = !App.isApkInDebug(this);
         searchEngine = new SearchEngine();
         searchEngine.setOnSearchListener(new SearchEngine.OnSearchListener() {
             @Override
@@ -157,7 +148,6 @@ public class SearchBookActivity extends BaseActivity {
             @Override
             public void loadMoreSearchBook(ConcurrentMultiValueMap<SearchBookBean, Book> items) {
                 mBooks.addAll(items);
-                curThreadCount--;
                 mSearchBookAdapter.addAll(new ArrayList<>(items.keySet()), searchKey);
                 mHandler.sendMessage(mHandler.obtainMessage(2));
             }
@@ -169,7 +159,6 @@ public class SearchBookActivity extends BaseActivity {
 
             @Override
             public void searchBookError(Throwable throwable) {
-                curThreadCount = 0;
                 mHandler.sendMessage(mHandler.obtainMessage(2));
             }
         });
@@ -299,6 +288,8 @@ public class SearchBookActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
+        this.menu = menu;
+        initSourceGroupMenu();
         return true;
     }
 
@@ -310,68 +301,108 @@ public class SearchBookActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_disable_source) {
-            showDisableSourceDia();
-        }else if (item.getItemId() == R.id.action_hot){
+        if (item.getItemId() == R.id.action_hot) {
             showHot = !showHot;
             initSuggestionList();
+        } else if (item.getItemId() == R.id.action_source_man) {
+            startActivityForResult(new Intent(this, BookSourceActivity.class),
+                    APPCONST.REQUEST_BOOK_SOURCE);
+        } else {
+            if (item.getGroupId() == R.id.source_group) {
+                item.setChecked(true);
+                SharedPreUtils sp = SharedPreUtils.getInstance();
+                if (getString(R.string.all_source).equals(item.getTitle().toString())) {
+                    sp.putString("searchGroup", "");
+                } else {
+                    sp.putString("searchGroup", item.getTitle().toString());
+                }
+            }
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void showDisableSourceDia() {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == APPCONST.REQUEST_BOOK_SOURCE) {
+                initSourceGroupMenu();
+            }
+        }
+    }
+
+    /**
+     * 初始化书源分组菜单
+     */
+    public void initSourceGroupMenu() {
+        if (menu == null) return;
+        String searchGroup = SharedPreUtils.getInstance().getString("");
+        menu.removeGroup(R.id.source_group);
+        MenuItem item = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.all_source);
+        MenuItem localItem = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.local_source);
+        if ("".equals(searchGroup)) {
+            item.setChecked(true);
+        }else if (getString(R.string.local_source).equals(searchGroup)){
+            localItem.setChecked(true);
+        }
+        List<String> groupList = BookSourceManager.getEnableNoLocalGroupList();
+        for (String groupName : groupList) {
+            item = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, groupName);
+            if (groupName.equals(searchGroup)) item.setChecked(true);
+        }
+        menu.setGroupCheckable(R.id.source_group, true, true);
+    }
+
+    /*private void showDisableSourceDia() {
         if (mDisableSourceDia != null) {
             mDisableSourceDia.show();
             return;
         }
-
-        HashMap<CharSequence, Boolean> mSources = ReadCrawlerUtil.getDisableSources();
-        CharSequence[] mSourcesName = new CharSequence[mSources.keySet().size()];
-        boolean[] isDisables = new boolean[mSources.keySet().size()];
+        List<BookSource> sources = BookSourceManager.getAllBookSourceByOrderNum();
+        CharSequence[] mSourcesName = new CharSequence[sources.size()];
+        boolean[] isDisables = new boolean[sources.size()];
         int dSourceCount = 0;
         int i = 0;
-        for (CharSequence sourceName : mSources.keySet()) {
-            mSourcesName[i] = sourceName;
-            Boolean isDisable = mSources.get(sourceName);
-            if (isDisable == null) isDisable = false;
+        for (BookSource source : sources) {
+            mSourcesName[i] = source.getSourceName();
+            boolean isDisable = !source.getEnable();
             if (isDisable) dSourceCount++;
             isDisables[i++] = isDisable;
         }
 
         mDisableSourceDia = new MultiChoiceDialog().create(this, "选择禁用的书源",
                 mSourcesName, isDisables, dSourceCount, (dialog, which) -> {
-                    SharedPreUtils spu = SharedPreUtils.getInstance();
-                    StringBuilder sb = new StringBuilder();
-                    for (CharSequence sourceName : mSources.keySet()) {
-                        if (!mSources.get(sourceName)) {
-                            sb.append(BookSource.getFromName(String.valueOf(sourceName)));
-                            sb.append(",");
-                        }
-                    }
-                    if (sb.lastIndexOf(",") >= 0) sb.deleteCharAt(sb.lastIndexOf(","));
-                    spu.putString(getString(R.string.searchSource), sb.toString());
+                    BookSourceManager.saveDatas(sources)
+                            .subscribe(new MySingleObserver<Boolean>() {
+                                @Override
+                                public void onSuccess(@NonNull Boolean aBoolean) {
+                                    if (aBoolean){
+                                        ToastUtils.showSuccess("保存成功");
+                                    }
+                                }
+                            });
                 }, null, new DialogCreator.OnMultiDialogListener() {
                     @Override
                     public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
-                        mSources.put(mSourcesName[which], isChecked);
+                        sources.get(which).setEnable(!isChecked);
                     }
 
                     @Override
                     public void onSelectAll(boolean isSelectAll) {
-                        for (CharSequence sourceName : mSources.keySet()) {
-                            mSources.put(sourceName, isSelectAll);
+                        for (BookSource source : sources) {
+                            source.setEnable(!isSelectAll);
                         }
                     }
                 });
-    }
+    }*/
 
     /**
      * 初始化建议书目
      */
     private void initSuggestionList() {
-        if (!showHot){
+        if (!showHot) {
             binding.tgSuggestBook.setTags(suggestion);
-        }else {
+        } else {
             SharedPreUtils spu = SharedPreUtils.getInstance();
             String cookie = spu.getString(getString(R.string.qdCookie), "");
             String url = "https://m.qidian.com/majax/search/auto?kw=&";
@@ -385,15 +416,15 @@ public class SearchBookActivity extends BaseActivity {
                 public void onFinish(Object o, int code) {
                     parseSuggestionList((String) o);
                     if (mSuggestions.size() > 0) {
-                        MyApplication.runOnUiThread(() -> binding.tgSuggestBook.setTags(mSuggestions.subList(0, 5)));
+                        App.runOnUiThread(() -> binding.tgSuggestBook.setTags(mSuggestions.subList(0, 5)));
                     } else {
-                        MyApplication.runOnUiThread(() -> binding.llSuggestBooksView.setVisibility(View.GONE));
+                        App.runOnUiThread(() -> binding.llSuggestBooksView.setVisibility(View.GONE));
                     }
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    MyApplication.runOnUiThread(() -> binding.llSuggestBooksView.setVisibility(View.GONE));
+                    App.runOnUiThread(() -> binding.llSuggestBooksView.setVisibility(View.GONE));
                 }
             });
         }
@@ -421,7 +452,7 @@ public class SearchBookActivity extends BaseActivity {
                 } else {
                     binding.tgSuggestBook.setTags(suggestion);
                 }
-            }else {
+            } else {
                 if (mSuggestions.size() > 0) {
                     String[] s = binding.tgSuggestBook.getTags();
                     if (s[0].equals(mSuggestions.get(0))) {
@@ -466,14 +497,14 @@ public class SearchBookActivity extends BaseActivity {
         initSearchList();
         mBooksBean.clear();
         mBooks.clear();
-        ArrayList<ReadCrawler> readCrawlers = ReadCrawlerUtil.getReadCrawlers();
+        List<ReadCrawler> readCrawlers = ReadCrawlerUtil
+                .getEnableReadCrawlers(SharedPreUtils.getInstance().getString("searchGroup"));
         allThreadCount = readCrawlers.size();
         if (allThreadCount == 0) {
             ToastUtils.showWarring("当前书源已全部禁用，无法搜索！");
             binding.rpb.setIsAutoLoading(false);
             return;
         }
-        curThreadCount = allThreadCount;
         /*for (ReadCrawler readCrawler : readCrawlers) {
             searchBookByCrawler(readCrawler, readCrawler.getSearchCharset());
         }*/
@@ -488,7 +519,6 @@ public class SearchBookActivity extends BaseActivity {
         binding.rpb.setIsAutoLoading(true);
         binding.fabSearchStop.setVisibility(View.VISIBLE);
         if (StringHelper.isEmpty(searchKey)) {
-            isStopSearch = true;
             stopSearch();
             binding.rpb.setIsAutoLoading(false);
             binding.rvSearchBooksList.setVisibility(View.GONE);
@@ -497,10 +527,7 @@ public class SearchBookActivity extends BaseActivity {
             binding.rvSearchBooksList.setAdapter(null);
             binding.srlSearchBookList.setEnableRefresh(false);
         } else {
-            isStopSearch = false;
-
-            mSearchBookAdapter = new SearchBookAdapter(mBooks, searchEngine);
-
+            mSearchBookAdapter = new SearchBookAdapter(mBooks, searchEngine, searchKey);
             binding.rvSearchBooksList.setAdapter(mSearchBookAdapter);
             //进入书籍详情页
             mSearchBookAdapter.setOnItemClickListener((view, pos) -> {
@@ -515,7 +542,7 @@ public class SearchBookActivity extends BaseActivity {
             getData();
             mSearchHistoryService.addOrUpadteHistory(searchKey);
             //收起软键盘
-            InputMethodManager imm = (InputMethodManager) MyApplication.getmContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) App.getmContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             assert imm != null;
             imm.hideSoftInputFromWindow(binding.etSearchKey.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
@@ -535,37 +562,8 @@ public class SearchBookActivity extends BaseActivity {
         }
     }
 
-    private void searchBookByCrawler(ReadCrawler rc, String charset) {
-        String searchKey = this.searchKey;
-        if (charset.toLowerCase().equals("gbk")) {
-            try {
-                searchKey = URLEncoder.encode(this.searchKey, charset);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }
-        CommonApi.search(searchKey, rc, new ResultCallback() {
-            @Override
-            public void onFinish(Object o, int code) {
-                ConcurrentMultiValueMap<SearchBookBean, Book> sbb =
-                        (ConcurrentMultiValueMap<SearchBookBean, Book>) o;
-                mBooks.addAll(sbb);
-                curThreadCount--;
-                mHandler.sendMessage(mHandler.obtainMessage(2));
-            }
-
-            @Override
-            public void onError(Exception e) {
-                curThreadCount--;
-                mHandler.sendMessage(mHandler.obtainMessage(2));
-            }
-        });
-    }
-
-
     @Override
     protected void onDestroy() {
-        isStopSearch = true;
         stopSearch();
         for (int i = 0; i < 9; i++) {
             mHandler.removeMessages(i + 1);

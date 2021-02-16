@@ -1,9 +1,8 @@
 package xyz.fycz.myreader.ui.adapter;
 
-import android.app.Activity;
 import android.text.TextUtils;
 
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.adapter.BaseListAdapter;
 import xyz.fycz.myreader.base.adapter.IViewHolder;
@@ -24,23 +23,21 @@ import java.util.List;
 public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
     private ConcurrentMultiValueMap<SearchBookBean, Book> mBooks;
     private SearchEngine searchEngine;
+    private String keyWord;
 
-    public SearchBookAdapter(ConcurrentMultiValueMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine) {
+    public SearchBookAdapter(ConcurrentMultiValueMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord) {
         this.mBooks = mBooks;
         this.searchEngine = searchEngine;
-    }
-
-    public SearchBookAdapter(ConcurrentMultiValueMap<SearchBookBean, Book> mBooks) {
-        this.mBooks = mBooks;
+        this.keyWord = keyWord;
     }
 
     @Override
     protected IViewHolder<SearchBookBean> createViewHolder(int viewType) {
-        return new SearchBookHolder(mBooks, searchEngine);
+        return new SearchBookHolder(mBooks, searchEngine, keyWord);
     }
 
-    public synchronized void addAll(List<SearchBookBean> newDataS, String keyWord) {
-        List<SearchBookBean> copyDataS = mList;
+    public void addAll(List<SearchBookBean> newDataS, String keyWord) {
+        List<SearchBookBean> copyDataS = new ArrayList<>(getItems());
         List<SearchBookBean> filterDataS = new ArrayList<>();
 
         switch (SysManager.getSetting().getSearchFilter()) {
@@ -110,7 +107,12 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
                     }
                 }
             }
-            MyApplication.runOnUiThread(this::notifyDataSetChanged);
+            synchronized (this) {
+                App.runOnUiThread(() -> {
+                    mList = copyDataS;
+                    notifyDataSetChanged();
+                });
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.bookstore.BookType;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -104,7 +104,7 @@ public class BiQuGeReadCrawler implements ReadCrawler, BookInfoCrawler {
                     book.setName(a.attr("title"));
                     book.setChapterUrl(a.attr("href"));
                     book.setAuthor(scanS5.html());
-                    book.setSource(BookSource.biquge.toString());
+                    book.setSource(LocalBookSource.biquge.toString());
                     books.add(book);
                 }
             }
@@ -134,7 +134,7 @@ public class BiQuGeReadCrawler implements ReadCrawler, BookInfoCrawler {
                 book.setNewestChapterTitle(scanS3.text());
                 book.setAuthor(scanS4.text());
                 book.setUpdateDate(scanS5.text());
-                book.setSource(BookSource.biquge.toString());
+                book.setSource(LocalBookSource.biquge.toString());
                 books.add(book);
             }
         }
@@ -181,7 +181,7 @@ public class BiQuGeReadCrawler implements ReadCrawler, BookInfoCrawler {
                 book.setChapterUrl(info.get(1).getElementsByTag("a").attr("href"));
                 book.setAuthor(info.get(3).text());
                 book.setNewestChapterTitle(info.get(2).text());
-                book.setSource(BookSource.biquge.toString());
+                book.setSource(LocalBookSource.biquge.toString());
                 book.setType(info.get(0).text());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
@@ -198,7 +198,7 @@ public class BiQuGeReadCrawler implements ReadCrawler, BookInfoCrawler {
      */
     public Book getBookInfo(String html, Book book) {
         //小说源
-        book.setSource(BookSource.biquge.toString());
+        book.setSource(LocalBookSource.biquge.toString());
         Document doc = Jsoup.parse(html);
         //图片url
         Element divImg = doc.getElementById("fmimg");

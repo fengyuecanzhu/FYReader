@@ -7,23 +7,19 @@ import net.ricecode.similarity.JaroWinklerStrategy;
 import net.ricecode.similarity.StringSimilarityService;
 import net.ricecode.similarity.StringSimilarityServiceImpl;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.gen.BookDao;
-import xyz.fycz.myreader.greendao.gen.ChapterDao;
 import xyz.fycz.myreader.util.*;
 import xyz.fycz.myreader.greendao.GreenDaoManager;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 
-import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -116,7 +112,7 @@ public class BookService extends BaseService {
     public void addBook(Book book) {
         book.setSortCode(0);
         book.setGroupSort(0);
-        book.setGroupId(SharedPreUtils.getInstance().getString(MyApplication.getmContext().getString(R.string.curBookGroupId), ""));
+        book.setGroupId(SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.curBookGroupId), ""));
         if (StringHelper.isEmpty(book.getId())) {
             book.setId(StringHelper.getStringRandom(25));
         }
@@ -333,7 +329,7 @@ public class BookService extends BaseService {
     public boolean matchHistoryChapterPos(Book book, ArrayList<Chapter> mChapters) {
         float matchSui = SysManager.getSetting().getMatchChapterSuitability();
         int index = getDurChapter(book.getHisttoryChapterNum(), book.getChapterTotalNum(), book.getHistoryChapterId(), mChapters);
-        assert book.getHistoryChapterId() != null;
+        if (book.getHistoryChapterId() == null) return false;
         String oldName = StringUtils.deleteWhitespace(book.getHistoryChapterId());
         String newName = StringUtils.deleteWhitespace(mChapters.get(index).getTitle());
         /*int i1 = getChapterNum(oldName);

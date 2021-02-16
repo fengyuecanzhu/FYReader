@@ -37,7 +37,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <application
-            android:name=".application.MyApplication"
+            android:name=".application.App"
             android:allowBackup="true"
             android:alwaysRetainTaskState="true"
             android:icon="@mipmap/ic_launcher"
@@ -101,11 +101,14 @@
         <activity android:name=".ui.activity.FileSystemActivity"/>
 
         <activity android:name=".ui.activity.FeedbackActivity"/>
-        <activity android:name=".ui.activity.RuleActivity"/>
+        <activity android:name=".ui.activity.ReplaceRuleActivity"/>
 
         <activity android:name=".ui.activity.MoreSettingActivity"/>
         <activity android:name=".ui.activity.BookstoreActivity"/>
         <activity android:name=".ui.activity.QRCodeScanActivity"/>
+        <activity android:name=".ui.activity.BookSourceActivity"/>
+        <activity android:name=".ui.activity.SourceEditActivity"/>
+        <activity android:name=".ui.activity.SourceDebugActivity"/>
 
         <receiver android:name=".util.notification.NotificationClickReceiver"/>
         <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver"/>

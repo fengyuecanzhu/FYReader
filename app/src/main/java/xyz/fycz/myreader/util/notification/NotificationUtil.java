@@ -12,7 +12,7 @@ import android.provider.Settings;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 
@@ -38,7 +38,7 @@ public class NotificationUtil {
     }
 
     public NotificationUtil() {
-        notificationManager = (NotificationManager) MyApplication.getmContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager = (NotificationManager) App.getmContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
     }
 
@@ -48,7 +48,7 @@ public class NotificationUtil {
 
     @TargetApi(26)
     public void createNotificationChannel(String channelId, String channelName) {
-        NotificationManager notificationManager = (NotificationManager) MyApplication.getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) App.getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW);
         channel.enableLights(true);//是否在桌面icon右上角展示小红点
         channel.setLightColor(Color.RED);//小红点颜色
@@ -57,14 +57,14 @@ public class NotificationUtil {
     }
 
     public NotificationCompat.Builder build(String channelId){
-        return new NotificationCompat.Builder(MyApplication.getmContext(), channelId);
+        return new NotificationCompat.Builder(App.getmContext(), channelId);
     }
 
     public void sendDownloadNotification(String title, String text, PendingIntent pendingIntent){
         NotificationCompat.Builder builder = build(APPCONST.channelIdDownload)
                 .setSmallIcon(R.drawable.ic_download)
                 //通知栏大图标
-                .setLargeIcon(BitmapFactory.decodeResource(MyApplication.getApplication().getResources(), R.mipmap.ic_launcher))
+                .setLargeIcon(BitmapFactory.decodeResource(App.getApplication().getResources(), R.mipmap.ic_launcher))
                 .setOngoing(true)
                 //点击通知后自动清除
                 .setAutoCancel(true)
@@ -78,9 +78,9 @@ public class NotificationUtil {
     }
 
     public PendingIntent getChancelPendingIntent(Class<?> clz) {
-        Intent intent = new Intent(MyApplication.getmContext(), clz);
+        Intent intent = new Intent(App.getmContext(), clz);
         intent.setAction(CANCEL_ACTION);
-        return PendingIntent.getBroadcast(MyApplication.getmContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(App.getmContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     public void cancel(int id){

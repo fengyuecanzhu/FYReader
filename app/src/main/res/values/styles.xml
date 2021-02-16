@@ -196,4 +196,11 @@
         <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
         <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
     </style>
+
+
+    //
+    <declare-styleable name="CodeView">
+        <attr name="cv_font_size" format="integer"/>
+        <attr name="cv_zoom_enable" format="boolean"/>
+    </declare-styleable>
 </resources>

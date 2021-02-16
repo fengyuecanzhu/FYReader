@@ -9,7 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -116,7 +116,7 @@ public class ChaoXingReadCrawler implements ReadCrawler {
                 book.setNewestChapterTitle("");
                 book.setChapterUrl(CHAPTERS_URL + bookJson.getInt("course_Id"));
                 book.setDesc(DESC);
-                book.setSource(BookSource.chaoxing.toString());
+                book.setSource(LocalBookSource.chaoxing.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }

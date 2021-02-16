@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:orientation="vertical">
+	<!--指示器-->
+	<com.google.android.material.appbar.AppBarLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<androidx.appcompat.widget.Toolbar
+			android:id="@+id/toolbar"
+			android:layout_width="match_parent"
+			android:layout_height="45dp"
+			android:background="@color/colorPrimary"
+			android:minHeight="?attr/actionBarSize"
+			android:fitsSystemWindows="true"
+			app:titleTextAppearance="@style/toolbar_title_textStyle"
+			app:subtitleTextAppearance="@style/toolbar_subtitle_textStyle"
+			android:theme="?attr/actionBarStyle">
+
+			<com.google.android.material.tabs.TabLayout
+				android:id="@+id/tab_tl_indicator"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="9"
+				app:tabIndicatorColor="@color/colorAccent"
+				app:tabIndicatorHeight="2dp"
+				app:tabIndicatorFullWidth="true"
+				app:tabSelectedTextColor="@color/textPrimaryInverted"
+				app:tabTextColor="@color/translucent_text"
+				app:tabTextAppearance="@style/TabLayoutTextStyle"/>
+		</androidx.appcompat.widget.Toolbar>
+
+	</com.google.android.material.appbar.AppBarLayout>
+	<androidx.viewpager.widget.ViewPager
+		android:id="@+id/tab_vp"
+		android:layout_width="match_parent"
+		android:layout_height="0dp"
+		android:layout_weight="1">
+	</androidx.viewpager.widget.ViewPager>
+
+</LinearLayout>

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -147,8 +147,8 @@ public class XiaGuReadCrawler implements ReadCrawler {
             String imgUrl = li.getElementsByTag("img").attr("data-original");
             book.setImgUrl(!imgUrl.contains("http") ? "https:" + imgUrl : imgUrl);
             //https://www.xiagu.org/xs/5584.html -> https://www.xiagu.org/read/5/5584/
-            book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("xs", "read/1").replace(".html", "/"));
-            book.setSource(BookSource.xiagu.toString());
+            book.setChapterUrl(as.get(1).attr("href").replace("xs", "read/1").replace(".html", "/"));
+            book.setSource(LocalBookSource.xiagu.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

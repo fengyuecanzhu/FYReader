@@ -9,7 +9,7 @@ import android.net.Uri;
 import androidx.appcompat.widget.Toolbar;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityAboutBinding;
@@ -42,7 +42,7 @@ public class AboutActivity extends BaseActivity {
     @Override
     protected void initWidget() {
         super.initWidget();
-        binding.il.tvVersionName.setText("风月读书v" + MyApplication.getStrVersionName());
+        binding.il.tvVersionName.setText("风月读书v" + App.getStrVersionName());
     }
 
     @Override
@@ -59,10 +59,10 @@ public class AboutActivity extends BaseActivity {
         });
         binding.il.vwShare.setOnClickListener(v -> ShareUtils.share(this, getString(R.string.share_text) +
                 SharedPreUtils.getInstance().getString(getString(R.string.downloadLink), URLCONST.LAN_ZOUS_URL)));
-        binding.il.vwUpdate.setOnClickListener(v -> MyApplication.checkVersionByServer(this, true, null));
+        binding.il.vwUpdate.setOnClickListener(v -> App.checkVersionByServer(this, true, null));
         binding.il.vwUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));
         binding.il.vwQq.setOnClickListener(v -> {
-            if (!MyApplication.joinQQGroup(this,"8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")){
+            if (!App.joinQQGroup(this,"8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")){
                 //数据
                 ClipData mClipData = ClipData.newPlainText("Label", "1085028304");
                 //把数据设置到剪切板上

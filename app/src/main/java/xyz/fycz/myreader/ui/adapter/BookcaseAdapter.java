@@ -1,7 +1,6 @@
 package xyz.fycz.myreader.ui.adapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.widget.*;
 
 import java.io.BufferedReader;
@@ -13,7 +12,7 @@ import java.io.IOException;
 import java.util.*;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -49,10 +48,10 @@ public abstract class BookcaseAdapter extends DragAdapter {
     protected BookcasePresenter mBookcasePresenter;
     protected boolean isGroup;
     protected String[] menu = {
-            MyApplication.getmContext().getResources().getString(R.string.menu_book_Top),
-            MyApplication.getmContext().getResources().getString(R.string.menu_book_download),
-            MyApplication.getmContext().getResources().getString(R.string.menu_book_cache),
-            MyApplication.getmContext().getResources().getString(R.string.menu_book_delete)
+            App.getmContext().getResources().getString(R.string.menu_book_Top),
+            App.getmContext().getResources().getString(R.string.menu_book_download),
+            App.getmContext().getResources().getString(R.string.menu_book_cache),
+            App.getmContext().getResources().getString(R.string.menu_book_delete)
     };
 
 

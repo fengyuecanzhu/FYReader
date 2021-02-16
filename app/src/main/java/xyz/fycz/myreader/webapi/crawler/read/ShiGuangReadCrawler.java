@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -94,7 +94,7 @@ public class ShiGuangReadCrawler implements ReadCrawler {
             Chapter chapter = new Chapter();
             chapter.setNumber(i++);
             chapter.setTitle(title);
-            chapter.setUrl(NAME_SPACE + url);
+            chapter.setUrl(url);
             chapters.add(chapter);
         }
         return chapters;
@@ -152,8 +152,8 @@ public class ShiGuangReadCrawler implements ReadCrawler {
                 book.setUpdateDate(li.getElementsByClass("right").first().getElementsByTag("span").text());
                 String imgUrl = li.getElementsByTag("img").attr("data-original");
                 book.setImgUrl(imgUrl);
-                book.setChapterUrl(NAME_SPACE + as.get(1).attr("href"));
-                book.setSource(BookSource.shiguang.toString());
+                book.setChapterUrl(as.get(1).attr("href"));
+                book.setSource(LocalBookSource.shiguang.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }
@@ -166,7 +166,7 @@ public class ShiGuangReadCrawler implements ReadCrawler {
 
     public Book getBookInfo(Document doc, Book book) {
         //小说源
-        book.setSource(BookSource.shiguang.toString());
+        book.setSource(LocalBookSource.shiguang.toString());
         //图片url
         String imgUrl = doc.select("meta[property=og:image]").attr("content");
         book.setImgUrl(imgUrl);

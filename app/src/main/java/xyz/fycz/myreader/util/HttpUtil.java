@@ -8,7 +8,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import okhttp3.*;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.TrustAllCerts;
 import xyz.fycz.myreader.webapi.callback.HttpCallback;
 import xyz.fycz.myreader.webapi.callback.JsonCallback;
@@ -247,7 +247,7 @@ public class HttpUtil {
     }
 
     public static void sendGetRequest_okHttp(final String address, boolean isRefresh, final HttpCallback callback) {
-        MyApplication.getApplication().newThread(() -> {
+        App.getApplication().newThread(() -> {
         /*   HttpURLConnection connection = null;
            try {
                URL url = new URL(address);
@@ -312,7 +312,7 @@ public class HttpUtil {
                         .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36");
                 if (address.contains("qidian.com")) {
                     SharedPreUtils spu = SharedPreUtils.getInstance();
-                    String cookie = spu.getString(MyApplication.getmContext().getString(R.string.qdCookie), "");
+                    String cookie = spu.getString(App.getmContext().getString(R.string.qdCookie), "");
                     if (cookie.equals("")) {
                         requestBuilder.addHeader("cookie", "_csrfToken=eXRDlZxmRDLvFAmdgzqvwWAASrxxp2WkVlH4ZM7e; newstatisticUUID=1595991935_2026387981");
                     } else {
@@ -337,7 +337,7 @@ public class HttpUtil {
      * @param callback
      */
     public static void sendPostRequest(final String address, final String output, final HttpCallback callback) {
-        MyApplication.getApplication().newThread(new Runnable() {
+        App.getApplication().newThread(new Runnable() {
             HttpURLConnection connection = null;
 
             @Override
@@ -479,7 +479,7 @@ public class HttpUtil {
                 requestBody.addFormDataPart(valueOf(entry.getKey()), valueOf(entry.getValue()));
             }
         }
-        Request request = new Request.Builder().url(url).post(requestBody.build()).tag(MyApplication.getApplication()).build();
+        Request request = new Request.Builder().url(url).post(requestBody.build()).tag(App.getApplication()).build();
         // readTimeout("请求超时时间" , 时间单位);
         client.newBuilder().readTimeout(5000, TimeUnit.MILLISECONDS).build().newCall(request).enqueue(new Callback() {
             @Override

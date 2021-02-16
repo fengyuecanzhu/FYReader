@@ -5,8 +5,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
-import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.model.source.BookSourceManager;
 
 /**
  * @author fengyue
@@ -30,7 +30,7 @@ public class SourceExchangeHolder extends ViewHolderImpl<Book> {
 
     @Override
     public void onBind(Book data, int pos) {
-        sourceTvTitle.setText(BookSource.fromString(data.getSource()).text);
+        sourceTvTitle.setText(BookSourceManager.getSourceNameByStr(data.getSource()));
         sourceTvChapter.setText(data.getNewestChapterTitle());
         if (Boolean.parseBoolean(data.getNewestChapterId()))
             sourceIv.setVisibility(View.VISIBLE);

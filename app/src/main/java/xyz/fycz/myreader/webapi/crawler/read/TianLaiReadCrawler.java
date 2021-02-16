@@ -8,7 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -97,7 +97,7 @@ public class TianLaiReadCrawler implements ReadCrawler {
                 chapter.setTitle(title);
                 String url = a.attr("href");
                 if (url.contains("files/article/html")) {
-                    url = NAME_SPACE + url;
+                    url = url;
                 } else {
                     url = readUrl + url;
                 }
@@ -130,7 +130,7 @@ public class TianLaiReadCrawler implements ReadCrawler {
             book.setImgUrl(img.attr("src"));
             Element title = element.getElementsByClass("result-item-title result-game-item-title").get(0);
             book.setName(title.child(0).attr("title"));
-            book.setChapterUrl(NAME_SPACE + title.child(0).attr("href"));
+            book.setChapterUrl(title.child(0).attr("href"));
             Element desc = element.getElementsByClass("result-game-item-desc").get(0);
             book.setDesc(desc.text());
             Element info = element.getElementsByClass("result-game-item-info").get(0);
@@ -148,7 +148,7 @@ public class TianLaiReadCrawler implements ReadCrawler {
                     book.setNewestChapterTitle(newChapter.text());
                 }
             }
-            book.setSource(BookSource.tianlai.toString());
+            book.setSource(LocalBookSource.tianlai.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

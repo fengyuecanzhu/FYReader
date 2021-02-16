@@ -21,7 +21,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.util.StatusBarUtil;
@@ -91,7 +91,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void setNightTheme(boolean isNightMode) {
         Setting setting = SysManager.getSetting();
         setting.setDayStyle(!isNightMode);
-        MyApplication.getApplication().initNightTheme();
+        App.getApplication().initNightTheme();
     }
 
 

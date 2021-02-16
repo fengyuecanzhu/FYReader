@@ -5,10 +5,16 @@
         android:id="@+id/action_hot"
         android:title="@string/hot_search"
         android:visible="false"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
+
     <item
-        android:id="@+id/action_disable_source"
-        android:title="@string/disable_source"
-        app:showAsAction="always" />
+        android:id="@+id/action_source_man"
+        android:title="@string/book_source_man"
+        app:showAsAction="never"/>
+
+    <group android:id="@+id/source_group">
+
+    </group>
+
 
 </menu>

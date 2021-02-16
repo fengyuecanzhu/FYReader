@@ -1,16 +1,17 @@
 package xyz.fycz.myreader.ui.dialog;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,7 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputLayout;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.util.CyptoUtils;
@@ -57,7 +58,7 @@ public class MyAlertDialog {
         if (!StringHelper.isEmpty(initText)) editText.setText(initText);
         editText.requestFocus();
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        MyApplication.getHandler().postDelayed(() -> imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED), 220);
+        App.getHandler().postDelayed(() -> imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED), 220);
         AlertDialog inputDia;
         if (neutralBtn == null) {
             inputDia = build(context)
@@ -207,6 +208,16 @@ public class MyAlertDialog {
                                 }
                             });
                 });
+    }
+
+    public static void showTipDialogWithLink(Context context, int msgId){
+        showTipDialogWithLink(context,"提示", msgId);
+    }
+    public static void showTipDialogWithLink(Context context, String title, int msgId){
+        TextView view = (TextView) LayoutInflater.from(context).inflate(R.layout.dialog_textview, null);
+        view.setText(msgId);
+        view.setMovementMethod(LinkMovementMethod.getInstance());
+        build(context).setTitle(title).setView(view).setPositiveButton("知道了", null).show();
     }
 
     public interface OnVerify {

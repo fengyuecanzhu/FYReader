@@ -34,18 +34,14 @@ public class Book implements Serializable {
     private String imgUrl;//封面图片url
     private String desc;//简介
     private String author;//作者
-    @Nullable
     private String type;//类型(本地书籍为：本地书籍)
     private String updateDate;//更新时间
-    @Nullable
+    private String wordCount;
+    private String status;
     private String newestChapterId;//最新章节id
-    @Nullable
     private String newestChapterTitle;//最新章节标题
-    @Nullable
     private String newestChapterUrl;//最新章节url
-    @Nullable
     private String historyChapterId;//上次关闭时的章节ID
-    @Nullable
     private int histtoryChapterNum;//上次关闭时的章节数
 
     private int sortCode;//排序编码
@@ -74,13 +70,13 @@ public class Book implements Serializable {
 
     private long lastReadTime;
 
-    @Generated(hash = 1269102537)
+    @Generated(hash = 1963023743)
     public Book(String id, String name, String chapterUrl, String infoUrl, String imgUrl, String desc,
-            String author, String type, String updateDate, String newestChapterId, String newestChapterTitle,
-            String newestChapterUrl, String historyChapterId, int histtoryChapterNum, int sortCode, int noReadNum,
-            int chapterTotalNum, int lastReadPosition, String source, boolean isCloseUpdate,
-            boolean isDownLoadAll, String groupId, int groupSort, String tag, Boolean replaceEnable,
-            long lastReadTime) {
+            String author, String type, String updateDate, String wordCount, String status,
+            String newestChapterId, String newestChapterTitle, String newestChapterUrl, String historyChapterId,
+            int histtoryChapterNum, int sortCode, int noReadNum, int chapterTotalNum, int lastReadPosition,
+            String source, boolean isCloseUpdate, boolean isDownLoadAll, String groupId, int groupSort,
+            String tag, Boolean replaceEnable, long lastReadTime) {
         this.id = id;
         this.name = name;
         this.chapterUrl = chapterUrl;
@@ -90,6 +86,8 @@ public class Book implements Serializable {
         this.author = author;
         this.type = type;
         this.updateDate = updateDate;
+        this.wordCount = wordCount;
+        this.status = status;
         this.newestChapterId = newestChapterId;
         this.newestChapterTitle = newestChapterTitle;
         this.newestChapterUrl = newestChapterUrl;
@@ -321,6 +319,26 @@ public class Book implements Serializable {
 
     public void setLastReadTime(long lastReadTime) {
         this.lastReadTime = lastReadTime;
+    }
+
+
+    public String getWordCount() {
+        return this.wordCount;
+    }
+
+
+    public void setWordCount(String wordCount) {
+        this.wordCount = wordCount;
+    }
+
+
+    public String getStatus() {
+        return this.status;
+    }
+
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 

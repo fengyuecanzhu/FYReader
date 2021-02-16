@@ -8,7 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -108,7 +108,7 @@ public class ZuoPinReadCrawler implements ReadCrawler, BookInfoCrawler {
             book.setNewestChapterTitle("");
             book.setImgUrl(element.getElementsByTag("img").first().attr("src"));
             book.setDesc(element.getElementsByTag("p").first().text());
-            book.setSource(BookSource.zuopin.toString());
+            book.setSource(LocalBookSource.zuopin.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

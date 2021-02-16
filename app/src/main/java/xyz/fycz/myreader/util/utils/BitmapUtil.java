@@ -20,7 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class BitmapUtil {
@@ -368,7 +368,7 @@ public class BitmapUtil {
      */
     public static Bitmap stackBlur(Bitmap srcBitmap) {
         if (srcBitmap == null) return null;
-        RenderScript rs = RenderScript.create(MyApplication.getApplication());
+        RenderScript rs = RenderScript.create(App.getApplication());
         Bitmap blurredBitmap = srcBitmap.copy(Config.ARGB_8888, true);
 
         //分配用于渲染脚本的内存

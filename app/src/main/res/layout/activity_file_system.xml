@@ -17,7 +17,7 @@
 	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="52dp"
-		android:paddingRight="10dp"
+		android:paddingEnd="10dp"
 		android:gravity="center_vertical">
 
 
@@ -27,8 +27,8 @@
 				android:layout_height="40dp"
 				android:layout_centerVertical="true"
 				android:layout_marginStart="15dp"
-				android:text="全选"
-				android:textSize="15dp"
+				android:text="@string/select_all"
+				android:textSize="15sp"
 				android:textColor="@color/textSecondary"
 				android:theme="@style/MyCheckBox" />
 
@@ -37,21 +37,21 @@
 			android:layout_width="wrap_content"
 			android:layout_height="35dp"
 			android:minWidth="110dp"
-			android:layout_alignParentRight="true"
+			android:layout_alignParentEnd="true"
 			android:layout_centerVertical="true"
 			android:background="@drawable/selector_btn_add"
 			android:textColor="@color/selector_btn_file_add"
-			android:text="加入书架" />
+			android:text="@string/file_add_shelf" />
 
 		<Button
 			android:id="@+id/file_system_btn_delete"
 			android:layout_width="70dp"
 			android:layout_height="35dp"
 			android:layout_centerVertical="true"
-			android:layout_marginRight="15dp"
+			android:layout_marginEnd="15dp"
 			android:background="@drawable/selector_btn_add"
 			android:textColor="@color/selector_btn_file_add"
-			android:layout_toLeftOf="@id/file_system_btn_add_book"
-			android:text="删除"/>
+			android:layout_toStartOf="@id/file_system_btn_add_book"
+			android:text="@string/delete"/>
 	</RelativeLayout>
 </LinearLayout>

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -228,7 +228,7 @@ public class NetPageLoader extends PageLoader {
                 mChapterService.saveOrUpdateChapter(chapter, (String) o);
                 if (isClose()) return;
                 if (getPageStatus() == PageLoader.STATUS_LOADING && mCurChapterPos == chapter.getNumber()) {
-                    MyApplication.runOnUiThread(() -> {
+                    App.runOnUiThread(() -> {
                         if (isPrev) {
                             openChapterInLastPage();
                         } else {
@@ -243,7 +243,7 @@ public class NetPageLoader extends PageLoader {
                 loadingChapters.remove(chapter);
                 if (isClose()) return;
                 if (mCurChapterPos == chapter.getNumber())
-                    chapterError("请尝试重新加载或换源\n" + e.getLocalizedMessage());
+                    App.runOnUiThread(() -> chapterError("请尝试重新加载或换源\n" + e.getLocalizedMessage()));
                 e.printStackTrace();
             }
         });

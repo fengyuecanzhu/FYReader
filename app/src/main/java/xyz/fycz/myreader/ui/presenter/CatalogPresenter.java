@@ -4,9 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BasePresenter;
-import xyz.fycz.myreader.util.llog.LLog;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.CatalogActivity;
@@ -69,7 +68,7 @@ public class CatalogPresenter implements BasePresenter {
                         public void onFinish(Object o, int code) {
                             mChapters = (ArrayList<Chapter>) o;
 
-                            MyApplication.runOnUiThread(() -> {
+                            App.runOnUiThread(() -> {
                                 mCatalogFragment.getPbLoading().setVisibility(View.GONE);
                                 initChapterTitleList();
                             });
@@ -80,7 +79,7 @@ public class CatalogPresenter implements BasePresenter {
                         public void onError(Exception e) {
                             e.printStackTrace();
                             ToastUtils.showError("章节目录加载失败！\n" + e.getLocalizedMessage());
-                            MyApplication.runOnUiThread(() -> mCatalogFragment.getPbLoading().setVisibility(View.GONE));
+                            App.runOnUiThread(() -> mCatalogFragment.getPbLoading().setVisibility(View.GONE));
                         }
                     });
         }

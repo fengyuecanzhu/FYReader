@@ -9,6 +9,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 
+import java.io.IOException;
+
+import xyz.fycz.myreader.model.source.MatcherAnalyzer;
+import xyz.fycz.myreader.util.utils.OkHttpUtils;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -27,9 +32,18 @@ public class ExampleInstrumentedTest {
 
     @Test
     public void test() {
-        //ReadService readService = new ReadService();
-        //readService.initSynthesizer();
-        //readService.startSynthesizer("科幻电影是我们从小就爱看的电影题材，我们也都梦想过生活在那样的科幻世界里。科幻片，顾名思义即“科学幻想片”，是“以科学幻想为内容的故事片，其基本特点是从今天已知的科学原理和科学成就出发，对未来的世界或遥远的过去的情景作幻想式的描述。”");
+        try {
+            String str = OkHttpUtils.getHtml("https://www.xiaobiquge.com/29/29787/101469886.html", "gbk");
+            MatcherAnalyzer analyzer = new MatcherAnalyzer();
+            String rule = "<div class=\"logo\"><text></div>##@e(<text>,小笔趣阁){@a(<text> + 风月读书)}";
+            /*List<String> list = analyzer.matcherInnerString(rule, str);
+            for (String s : list) {
+                System.out.println(s);
+            }*/
+            System.out.println(analyzer.getInnerText(rule, str));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

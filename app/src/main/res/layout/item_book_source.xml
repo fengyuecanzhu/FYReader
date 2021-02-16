@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="@color/colorForeground"
+    android:clickable="true"
+    android:focusable="true"
+    app:ios="true"
+    app:leftSwipe="true"
+    app:swipeEnable="true">
+
+    <RelativeLayout
+        android:id="@+id/rl_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/selectableItemBackground"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/cb_source_select"
+            android:visibility="gone"
+            android:layout_alignParentStart="true"
+            style="@style/MyCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/tv_source_name"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@+id/cb_source_select"
+            android:ellipsize="end"
+            android:textSize="@dimen/text_normal_size"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:text="@string/summary"
+            android:textColor="@color/textPrimary" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_swipe_left"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/ic_swipe_left"
+            app:tint="@color/textAssist" />
+
+    </RelativeLayout>
+
+
+    <!-- 以下都是侧滑菜单的内容依序排列 -->
+    <Button
+        android:id="@+id/bt_top"
+        android:layout_width="65dp"
+        android:layout_height="match_parent"
+        android:background="@color/md_deep_purple_300"
+        android:text="@string/top"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/bt_ban"
+        android:layout_width="65dp"
+        android:layout_height="match_parent"
+        android:background="@color/md_blue_500"
+        android:text="@string/ban"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/bt_share"
+        android:layout_width="65dp"
+        android:layout_height="match_parent"
+        android:background="@color/md_yellow_800"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="@string/share"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/btnDelete"
+        android:layout_width="65dp"
+        android:layout_height="match_parent"
+        android:background="@color/md_red_500"
+        android:text="@string/delete"
+        android:textColor="@android:color/white" />
+
+</xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout>

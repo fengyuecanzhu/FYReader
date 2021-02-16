@@ -10,9 +10,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.text.TextUtils;
 
-import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.util.ToastUtils;
-
 /**
  * 剪切板读写工具
  */

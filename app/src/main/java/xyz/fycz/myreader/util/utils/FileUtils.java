@@ -33,7 +33,7 @@ import java.util.List;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.StringHelper;
@@ -76,12 +76,12 @@ public class FileUtils {
     //获取Cache文件夹
     public static String getCachePath(){
         if (isSdCardExist()){
-            return MyApplication.getmContext()
+            return App.getmContext()
                     .getExternalCacheDir()
                     .getAbsolutePath();
         }
         else{
-            return MyApplication.getmContext()
+            return App.getmContext()
                     .getCacheDir()
                     .getAbsolutePath();
         }

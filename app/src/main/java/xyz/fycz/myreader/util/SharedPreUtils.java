@@ -3,7 +3,7 @@ package xyz.fycz.myreader.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 
 import java.util.Map;
 
@@ -18,7 +18,7 @@ public class SharedPreUtils {
     private SharedPreferences.Editor sharedWritable;
 
     private SharedPreUtils(){
-        sharedReadable = MyApplication.getmContext()
+        sharedReadable = App.getmContext()
                 .getSharedPreferences(SHARED_NAME, Context.MODE_MULTI_PROCESS);
         sharedWritable = sharedReadable.edit();
     }

@@ -8,13 +8,18 @@ import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
+import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.greendao.GreenDaoManager;
 import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.gen.ReplaceRuleBeanDao;
 import xyz.fycz.myreader.util.utils.GsonUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 
@@ -162,10 +167,22 @@ public class ReplaceRuleManager {
     }
 
     public static void delDataS(List<ReplaceRuleBean> replaceRuleBeans) {
-        for (ReplaceRuleBean replaceRuleBean : replaceRuleBeans) {
-            GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().delete(replaceRuleBean);
-        }
+        if (replaceRuleBeans == null) return;
+        GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().deleteInTx(replaceRuleBeans);
         refreshDataS();
+    }
+
+    public static Single<Boolean> toTop(ReplaceRuleBean bean) {
+        return Single.create((SingleOnSubscribe<Boolean>) e -> {
+            List<ReplaceRuleBean> beans = getAllRules();
+            for (int i = 0; i < beans.size(); i++) {
+                beans.get(i).setSerialNumber(i + 1);
+            }
+            bean.setSerialNumber(0);
+            GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplaceInTx(beans);
+            GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplace(bean);
+            e.onSuccess(true);
+        }).compose(RxUtils::toSimpleSingle);
     }
 
     private static void refreshDataS() {
@@ -184,13 +201,12 @@ public class ReplaceRuleManager {
             return importReplaceRuleO(text)
                     .compose(RxUtils::toSimpleSingle);
         }
-        /*if (NetworkUtils.isUrl(text)) {
-            return BaseModelImpl.getInstance().getRetrofitString(StringUtils.getBaseUrl(text), "utf-8")
-                    .create(IHttpGetApi.class)
-                    .get(text, AnalyzeHeaders.getMap(null))
-                    .flatMap(rsp -> importReplaceRuleO(rsp.body()))
+        if (NetworkUtils.isUrl(text)) {
+            String finalText = text;
+            return Observable.create((ObservableOnSubscribe<String>) emitter -> emitter.onNext(OkHttpUtils.getHtml(finalText)))
+                    .flatMap(ReplaceRuleManager::importReplaceRuleO)
                     .compose(RxUtils::toSimpleSingle);
-        }*/
+        }
         return Observable.error(new Exception("不是Json或Url格式"));
     }
 

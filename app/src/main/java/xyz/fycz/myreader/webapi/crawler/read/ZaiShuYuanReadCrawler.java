@@ -8,16 +8,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.entity.bookstore.BookType;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
@@ -87,7 +83,7 @@ public class ZaiShuYuanReadCrawler implements ReadCrawler {
             Chapter chapter = new Chapter();
             chapter.setNumber(i++);
             chapter.setTitle(title);
-            chapter.setUrl(NAME_SPACE + url);
+            chapter.setUrl(url);
             chapters.add(chapter);
         }
         return chapters;
@@ -129,8 +125,8 @@ public class ZaiShuYuanReadCrawler implements ReadCrawler {
                 book.setAuthor(spans.get(0).text());
                 book.setType(spans.get(2).text());
                 book.setDesc(dl.getElementsByClass("book_des").first().text());
-                book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("novel", "read").replace(".html", "/"));
-                book.setSource(BookSource.zaishuyuan.toString());
+                book.setChapterUrl(as.get(1).attr("href").replace("novel", "read").replace(".html", "/"));
+                book.setSource(LocalBookSource.zaishuyuan.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }
@@ -139,7 +135,7 @@ public class ZaiShuYuanReadCrawler implements ReadCrawler {
     }
 
     private void getBookInfo(Document doc, Book book) {
-        book.setSource(BookSource.zaishuyuan.toString());
+        book.setSource(LocalBookSource.zaishuyuan.toString());
 
         String name = doc.select("meta[property=og:title]").attr("content");
         book.setName(name);

@@ -1,6 +1,5 @@
 package xyz.fycz.myreader.ui.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -13,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
@@ -28,11 +27,11 @@ import xyz.fycz.myreader.util.ToastUtils;
 public class BookcaseDragAdapter extends BookcaseAdapter {
     ViewHolder viewHolder = null;
     protected String[] menu = {
-            MyApplication.getmContext().getResources().getString(R.string.menu_book_detail),
-            MyApplication.getmContext().getResources().getString(R.string.menu_book_Top),
-            MyApplication.getmContext().getResources().getString(R.string.menu_book_download),
-            MyApplication.getmContext().getResources().getString(R.string.menu_book_cache),
-            MyApplication.getmContext().getResources().getString(R.string.menu_book_delete)
+            App.getmContext().getResources().getString(R.string.menu_book_detail),
+            App.getmContext().getResources().getString(R.string.menu_book_Top),
+            App.getmContext().getResources().getString(R.string.menu_book_download),
+            App.getmContext().getResources().getString(R.string.menu_book_cache),
+            App.getmContext().getResources().getString(R.string.menu_book_delete)
     };
     public BookcaseDragAdapter(Context context, int textViewResourceId, ArrayList<Book> objects,
                                boolean editState, BookcasePresenter bookcasePresenter, boolean isGroup) {
@@ -136,7 +135,7 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
                                                 downloadBook(book);
                                                 break;
                                             case 3:
-                                                MyApplication.getApplication().newThread(new Runnable() {
+                                                App.getApplication().newThread(new Runnable() {
                                                     @Override
                                                     public void run() {
                                                         try {

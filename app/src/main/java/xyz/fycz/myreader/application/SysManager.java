@@ -2,14 +2,16 @@ package xyz.fycz.myreader.application;
 
 import android.util.Log;
 
+import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.enums.BookcaseStyle;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.util.CacheHelper;
+import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 
-import static xyz.fycz.myreader.application.MyApplication.getVersionCode;
+import static xyz.fycz.myreader.application.App.getVersionCode;
 
 
 public class SysManager {
@@ -109,28 +111,32 @@ public class SysManager {
         switch (setting.getSourceVersion()) {
             case 0:
             default:
-                ReadCrawlerUtil.addReadCrawler(BookSource.miaobi, BookSource.dstq, BookSource.xs7, BookSource.du1du, BookSource.paiotian);
+                ReadCrawlerUtil.addReadCrawler(LocalBookSource.miaobi, LocalBookSource.dstq, LocalBookSource.xs7, LocalBookSource.du1du, LocalBookSource.paiotian);
                 ReadCrawlerUtil.removeReadCrawler("cangshu99");
                 Log.d("SourceVersion", "" + 0);
             case 1:
-                ReadCrawlerUtil.addReadCrawler(BookSource.laoyao, BookSource.xingxing, BookSource.shiguang, BookSource.xiagu, BookSource.hongchen);
+                ReadCrawlerUtil.addReadCrawler(LocalBookSource.laoyao, LocalBookSource.xingxing, LocalBookSource.shiguang, LocalBookSource.xiagu, LocalBookSource.hongchen);
                 Log.d("SourceVersion", "" + 1);
             case 2:
-                //ReadCrawlerUtil.addReadCrawler(BookSource.rexue, BookSource.chuanqi);
-                ReadCrawlerUtil.addReadCrawler(BookSource.chuanqi);
+                //ReadCrawlerUtil.addReadCrawler(LocalBookSource.rexue, LocalBookSource.chuanqi);
+                ReadCrawlerUtil.addReadCrawler(LocalBookSource.chuanqi);
                 Log.d("SourceVersion", "" + 2);
             case 3:
                 ReadCrawlerUtil.resetReadCrawlers();
                 Log.d("SourceVersion", "" + 3);
             case 4:
                 ReadCrawlerUtil.removeReadCrawler("qiqi", "rexue", "pinshu");
-                ReadCrawlerUtil.addReadCrawler(BookSource.bijian, BookSource.yanqinglou, BookSource.wolong);
+                ReadCrawlerUtil.addReadCrawler(LocalBookSource.bijian, LocalBookSource.yanqinglou, LocalBookSource.wolong);
                 Log.d("SourceVersion", "" + 4);
             case 5:
-                ReadCrawlerUtil.addReadCrawler(BookSource.ewenxue, BookSource.shuhaige,
-                        BookSource.luoqiu, BookSource.zw37, BookSource.xbiquge,
-                        BookSource.zaishuyuan);
+                ReadCrawlerUtil.addReadCrawler(LocalBookSource.ewenxue, LocalBookSource.shuhaige,
+                        LocalBookSource.luoqiu, LocalBookSource.zw37, LocalBookSource.xbiquge,
+                        LocalBookSource.zaishuyuan);
                 Log.d("SourceVersion", "" + 5);
+            case 6:
+                SharedPreUtils.getInstance().putString(App.getmContext().getString(R.string.searchSource), "");
+                Log.d("SourceVersion", "" + 5);
+                break;
         }
         setting.setSourceVersion(APPCONST.SOURCE_VERSION);
         saveSetting(setting);

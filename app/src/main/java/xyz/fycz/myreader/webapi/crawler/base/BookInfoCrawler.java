@@ -7,6 +7,7 @@ import xyz.fycz.myreader.greendao.entity.Book;
  * @date 2020/5/19 19:50
  */
 public interface BookInfoCrawler {
+    String getNameSpace();
     String getCharset();
     Book getBookInfo(String html, Book book);
 }

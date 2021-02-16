@@ -126,7 +126,7 @@ public class SourceExchangeDialog extends Dialog {
         binding.dialogRvContent.setAdapter(mAdapter);
 
         searchEngine = new SearchEngine();
-        searchEngine.initSearchEngine(ReadCrawlerUtil.getReadCrawlers());
+        searchEngine.initSearchEngine(ReadCrawlerUtil.getEnableReadCrawlers());
     }
 
     private void initClick() {

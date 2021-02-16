@@ -4,7 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import xyz.fycz.myreader.application.MyApplication;
+
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.crawler.*;
@@ -127,7 +128,7 @@ public class ChangeSourceDialog {
                     oneBook = cmvm.getValue(sbb, 0);
                     threadCount--;
                     mHandler.sendMessage(mHandler.obtainMessage(1));
-                    MyApplication.getApplication().shutdownThreadPool();
+                    App.getApplication().shutdownThreadPool();
                     return;
                 }
                 if (rc instanceof BookInfoCrawler) {

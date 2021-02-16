@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="bottom_navigation_view">
+
+    <group android:id="@+id/non_edit_mode">
+        <item
+            android:id="@+id/action_edit"
+            android:title="@string/edit_mode" />
+
+        <item
+            android:id="@+id/action_export"
+            android:title="@string/export_all" />
+
+        <item
+            android:id="@+id/action_share"
+            android:title="@string/share_all" />
+
+        <item
+            android:id="@+id/action_reverse"
+            android:title="@string/reverse_source" />
+
+        <item
+            android:id="@+id/action_delete"
+            android:title="@string/delete_ban_source" />
+    </group>
+    <group android:id="@+id/edit_mode"
+        android:visible="false">
+        <item
+            android:id="@+id/action_finish"
+            android:title="@string/finish_edit" />
+
+        <item
+            android:id="@+id/action_select_all"
+            android:title="@string/select_all" />
+        <item
+            android:id="@+id/action_reverse_selected"
+            android:title="@string/reverse_selected" />
+
+        <item
+            android:id="@+id/action_export_selected"
+            android:title="@string/export_selected" />
+
+        <item
+            android:id="@+id/action_share_selected"
+            android:title="@string/share_selected" />
+
+        <item
+            android:id="@+id/action_reverse_enable_selected"
+            android:title="@string/reverse_enable_selected" />
+
+        <item
+            android:id="@+id/action_delete_selected"
+            android:title="@string/delete_selected" />
+
+    </group>
+</menu>

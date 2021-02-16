@@ -8,10 +8,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -139,8 +138,8 @@ public class XingXingReadCrawler implements ReadCrawler {
             book.setDesc(li.getElementsByClass("c").first().text().replace("内容介绍：", ""));
             book.setUpdateDate(li.getElementsByClass("time2").first().text().replace("更新时间：", ""));
             book.setImgUrl(li.getElementsByTag("img").attr("data-original"));
-            book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace(".html", "/"));
-            book.setSource(BookSource.xingxing.toString());
+            book.setChapterUrl(as.get(1).attr("href").replace(".html", "/"));
+            book.setSource(LocalBookSource.xingxing.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

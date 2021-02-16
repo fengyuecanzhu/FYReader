@@ -1,6 +1,5 @@
 package xyz.fycz.myreader.ui.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -15,7 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
@@ -154,7 +153,7 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
                                         downloadBook(book);
                                         break;
                                     case 2:
-                                        MyApplication.getApplication().newThread(() -> {
+                                        App.getApplication().newThread(() -> {
                                             try {
                                                 if (unionChapterCathe(book)) {
                                                     DialogCreator.createTipDialog(mContext,

@@ -8,7 +8,7 @@ import androidx.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.util.SharedPreUtils;
 
 /**
@@ -59,7 +59,7 @@ public class AudioMngHelper {
         if(sInstance == null){
             synchronized (SharedPreUtils.class){
                 if (sInstance == null){
-                    sInstance = new AudioMngHelper(MyApplication.getmContext());
+                    sInstance = new AudioMngHelper(App.getmContext());
                 }
             }
         }

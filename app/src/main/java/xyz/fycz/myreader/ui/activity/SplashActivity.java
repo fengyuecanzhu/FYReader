@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySplashBinding;
@@ -93,7 +93,7 @@ public class SplashActivity extends BaseActivity {
 
     private void start(){
         if (BookGroupService.getInstance().curGroupIsPrivate()) {
-            MyApplication.runOnUiThread(() ->{
+            App.runOnUiThread(() ->{
                 MyAlertDialog.showPrivateVerifyDia(SplashActivity.this, needGoTo -> {
                     myThread.start();
                 }, () -> {
@@ -146,7 +146,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void downLoadImage() {
-        MyApplication.getApplication().newThread(() -> {
+        App.getApplication().newThread(() -> {
             String url = SharedPreUtils.getInstance().getString("splashImageUrl", "");
             if (!url.equals("")) {
                 InputStream is = null;

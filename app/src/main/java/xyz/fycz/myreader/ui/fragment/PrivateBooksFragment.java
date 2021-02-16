@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.List;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentPrivateBookcaseBinding;
@@ -97,7 +97,7 @@ public class PrivateBooksFragment extends BaseFragment {
         });
 
         binding.llHideBooks.setOnClickListener(v -> {
-            MyApplication.runOnUiThread(() -> {
+            App.runOnUiThread(() -> {
                 String privateGroupId = SharedPreUtils.getInstance().getString("privateGroupId");
                 List<Book> mBooks = BookService.getInstance().getAllBooks();
 

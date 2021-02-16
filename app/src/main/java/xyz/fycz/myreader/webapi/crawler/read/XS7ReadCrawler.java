@@ -12,7 +12,7 @@ import java.util.List;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.bookstore.BookType;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -135,7 +135,7 @@ public class XS7ReadCrawler extends FindCrawler implements ReadCrawler {
             book.setDesc(div.getElementsByClass("intro").first().text());
             book.setImgUrl(div.getElementsByTag("img").attr("src"));
             book.setChapterUrl(as.get(1).attr("href"));
-            book.setSource(BookSource.xs7.toString());
+            book.setSource(LocalBookSource.xs7.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }
@@ -200,7 +200,7 @@ public class XS7ReadCrawler extends FindCrawler implements ReadCrawler {
             book.setDesc(intro.text());
             book.setType(bookType.getTypeName());
             book.setChapterUrl(title.getElementsByTag("a").first().attr("href"));
-            book.setSource(BookSource.xs7.toString());
+            book.setSource(LocalBookSource.xs7.toString());
             books.add(book);
         }
         return books;
