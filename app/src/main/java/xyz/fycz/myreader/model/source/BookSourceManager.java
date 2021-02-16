@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +23,9 @@ import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.gen.BookSourceDao;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.GsonUtils;
+import xyz.fycz.myreader.util.utils.MeUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
@@ -129,7 +132,7 @@ public class BookSourceManager {
     private static BookSource getDefaultSource() {
         BookSource bookSource = new BookSource();
         bookSource.setSourceUrl("xyz.fycz.myreader.webapi.crawler.read.FYReadCrawler");
-        bookSource.setSourceName("风月小说");
+        bookSource.setSourceName("未知书源");
         bookSource.setSourceEName("fynovel");
         bookSource.setSourceGroup("内置书源");
         return bookSource;
@@ -140,7 +143,7 @@ public class BookSourceManager {
      *
      * @return
      */
-    private static BookSource getLocalSource() {
+    public static BookSource getLocalSource() {
         BookSource bookSource = new BookSource();
         bookSource.setSourceEName("local");
         bookSource.setSourceName("本地书籍");
@@ -367,9 +370,10 @@ public class BookSourceManager {
             source1.setSourceGroup("内置书源");
             source1.setEnable(isEmpty || searchSource.contains(source.toString()));
             source1.setSourceUrl(ReadCrawlerUtil.getReadCrawlerClz(source.toString()));
-            BookSourceManager.addBookSource(source1);
+            source1.setOrderNum(0);
+            GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplace(source1);
         }
-        BookSourceManager.addBookSource(MatcherAnalyzer.getTestSource());
-        BookSourceManager.addBookSource(MatcherAnalyzer.getTestSource2());
+        BookSourceManager.importBookSourceFromJson(FileUtils.readAssertFile(App.getmContext(),
+                "ReferenceSources.json"));
     }
 }

@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.StringHelper;
 
@@ -355,8 +357,6 @@ public class FileUtils {
                 outStream.write(buffer, 0, length);
             }
             outStream.flush();
-            outStream.close();
-            inStream.close();
             return outStream.toString();
         } catch (IOException e) {
             Log.i("FileTest", e.getMessage());
@@ -364,6 +364,25 @@ public class FileUtils {
             IOUtils.close(inStream, outStream);
         }
         return null;
+    }
+
+    public static String readAssertFile(Context context, String assetName){
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(context.getAssets().open(assetName)));
+            StringBuilder assetText = new StringBuilder();
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                assetText.append(line);
+                assetText.append("\n");
+            }
+            return assetText.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            IOUtils.close(br);
+        }
+        return "";
     }
 
 

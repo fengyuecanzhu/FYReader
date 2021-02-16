@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -117,7 +118,9 @@ public class ReplaceDialog extends DialogFragment {
      * 选择书源
      */
     private void selectSource(){
-        List<BookSource> mSources = BookSourceManager.getAllBookSourceByOrderNum();
+        List<BookSource> mSources = new ArrayList<>();
+        mSources.add(BookSourceManager.getLocalSource());
+        mSources.addAll(BookSourceManager.getAllBookSourceByOrderNum());
         CharSequence[] mSourcesName = new CharSequence[mSources.size()];
         HashMap<CharSequence, Boolean> mSelectSources = new LinkedHashMap<>();
         boolean[] isSelects = new boolean[mSources.size()];
