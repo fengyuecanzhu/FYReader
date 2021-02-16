@@ -24,7 +24,7 @@
 * 软件中有两种书源，内置书源和DIY书源
   * 内置书源为java类，需要编译
   * DIY书源为用户自定义书源，可在软件内以特定规则书写的书源
-  * ![内置书源说明](./source/LocalSource.md)  ![DIY书源说明](./source/DIYSource.md)
+  * [内置书源说明](./source/LocalSource.md)  [DIY书源说明](./source/DIYSource.md)
 
 #### 二、关于发现界面
 
