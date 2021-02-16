@@ -7,7 +7,7 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -118,9 +118,9 @@ public class YunZhongReadCrawler implements ReadCrawler, BookInfoCrawler {
             book.setType(info.getElementsByTag("span").first().text());
             book.setAuthor(element.getElementsByClass("state").first().text().replaceAll("作者.|类型.*", ""));
             book.setImgUrl(NAME_SPACE + element.getElementsByClass("pic").first().getElementsByTag("img").first().attr("src"));
-            book.setChapterUrl(NAME_SPACE + element.getElementsByTag("a").first().attr("href"));
+            book.setChapterUrl(element.getElementsByTag("a").first().attr("href"));
             book.setNewestChapterTitle("");
-            book.setSource(BookSource.yunzhong.toString());
+            book.setSource(LocalBookSource.yunzhong.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

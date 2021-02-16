@@ -8,13 +8,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.entity.bookstore.BookType;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -127,7 +123,7 @@ public class ZW37ReadCrawler implements ReadCrawler, BookInfoCrawler {
                 book.setChapterUrl(info.get(0).selectFirst("a").attr("href"));
                 book.setAuthor(info.get(2).text());
                 book.setNewestChapterTitle(info.get(1).text());
-                book.setSource(BookSource.zw37.toString());
+                book.setSource(LocalBookSource.zw37.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }
@@ -143,7 +139,7 @@ public class ZW37ReadCrawler implements ReadCrawler, BookInfoCrawler {
      */
     public Book getBookInfo(String html, Book book) {
         Document doc = Jsoup.parse(html);
-        book.setSource(BookSource.zw37.toString());
+        book.setSource(LocalBookSource.zw37.toString());
 
         String name = doc.select("meta[property=og:title]").attr("content");
         book.setName(name);

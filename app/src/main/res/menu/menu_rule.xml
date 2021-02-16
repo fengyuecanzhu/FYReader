@@ -1,29 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="bottom_navigation_view">
-
     <item
-            android:id="@+id/action_add_rule"
-            android:icon="@drawable/ic_add"
-            android:title="@string/add_rule"/>
+        android:id="@+id/action_search"
+        android:title="@string/common_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_add_rule"
+        android:icon="@drawable/ic_add"
+        android:title="@string/add_rule" />
     <item
         android:id="@+id/action_import"
         android:icon="@drawable/ic_import"
-        android:title="@string/import_rule"/>
+        android:title="@string/import_rule" />
 
     <item
-            android:id="@+id/action_export"
-            android:icon="@drawable/ic_export"
-            android:title="@string/export_all"/>
+        android:id="@+id/action_export"
+        android:icon="@drawable/ic_export"
+        android:title="@string/export_all" />
     <item
-            android:id="@+id/action_reverse"
-            android:icon="@drawable/ic_reverse"
-            android:title="@string/reverse_rule"/>
+        android:id="@+id/action_reverse"
+        android:icon="@drawable/ic_reverse"
+        android:title="@string/reverse_rule" />
 
     <item
         android:id="@+id/action_delete"
         android:icon="@drawable/ic_delete"
-        android:title="@string/delete_ban_rule"/>
+        android:title="@string/delete_ban_rule" />
 
 </menu>

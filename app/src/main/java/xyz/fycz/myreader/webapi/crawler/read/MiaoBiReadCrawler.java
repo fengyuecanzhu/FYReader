@@ -13,7 +13,7 @@ import java.util.List;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.bookstore.BookType;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -109,7 +109,7 @@ public class MiaoBiReadCrawler extends FindCrawler implements ReadCrawler {
             Chapter chapter = new Chapter();
             chapter.setNumber(i++);
             chapter.setTitle(title);
-            chapter.setUrl(NAME_SPACE + url);
+            chapter.setUrl(url);
             chapters.add(chapter);
         }
         return chapters;
@@ -136,8 +136,8 @@ public class MiaoBiReadCrawler extends FindCrawler implements ReadCrawler {
             book.setNewestChapterTitle(as.get(4).text());
             book.setDesc(dl.getElementsByClass("book_des").first().text());
             book.setImgUrl(as.first().getElementsByTag("img").attr("src"));
-            book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("novel", "read").replace(".html", "/"));
-            book.setSource(BookSource.miaobi.toString());
+            book.setChapterUrl(as.get(1).attr("href").replace("novel", "read").replace(".html", "/"));
+            book.setSource(LocalBookSource.miaobi.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }
@@ -194,9 +194,9 @@ public class MiaoBiReadCrawler extends FindCrawler implements ReadCrawler {
             book.setNewestChapterTitle(as.get(3).text());
             book.setDesc(dl.getElementsByClass("book_des").first().text());
             book.setImgUrl(as.first().getElementsByTag("img").attr("src"));
-            book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("novel", "read").replace(".html", "/"));
+            book.setChapterUrl(as.get(1).attr("href").replace("novel", "read").replace(".html", "/"));
             book.setUpdateDate(dl.getElementsByClass("uptime").first().text());
-            book.setSource(BookSource.miaobi.toString());
+            book.setSource(LocalBookSource.miaobi.toString());
             books.add(book);
         }
         return books;

@@ -10,7 +10,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -83,7 +83,7 @@ public class DSTQReadCrawler implements ReadCrawler {
             Chapter chapter = new Chapter();
             chapter.setNumber(i++);
             chapter.setTitle(title);
-            chapter.setUrl(NAME_SPACE + url);
+            chapter.setUrl(url);
             chapters.add(chapter);
         }
         return chapters;
@@ -110,8 +110,8 @@ public class DSTQReadCrawler implements ReadCrawler {
                 book.setNewestChapterTitle(as.get(4).text().replace("最新章节：", ""));
                 book.setDesc(li.getElementsByClass("intro").first().text());
                 book.setImgUrl(li.getElementsByTag("img").attr("src"));
-                book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace(".html", "/"));
-                book.setSource(BookSource.dstq.toString());
+                book.setChapterUrl(as.get(1).attr("href").replace(".html", "/"));
+                book.setSource(LocalBookSource.dstq.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }

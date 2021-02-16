@@ -51,6 +51,7 @@ public class SearchBookBean {
         if (author == null){
             return name.equals(that.name);
         }
+        if (name == null) return false;
         return name.equals(that.name) &&
                 author.equals(that.author);
     }

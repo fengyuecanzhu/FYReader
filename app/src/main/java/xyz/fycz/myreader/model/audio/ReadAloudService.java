@@ -19,7 +19,6 @@ import android.speech.tts.UtteranceProgressListener;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -30,7 +29,7 @@ import java.util.List;
 import java.util.Locale;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.util.SharedPreUtils;
@@ -287,9 +286,9 @@ public class ReadAloudService extends Service {
 
     private void initTTS() {
         if (textToSpeech == null)
-            textToSpeech = new TextToSpeech(MyApplication.getmContext(), new TTSListener());
+            textToSpeech = new TextToSpeech(App.getmContext(), new TTSListener());
         if (textToSpeech_ui == null)
-            textToSpeech_ui = new TextToSpeech(MyApplication.getmContext(), new TTSUIListener());
+            textToSpeech_ui = new TextToSpeech(App.getmContext(), new TTSUIListener());
         if (mParams == null) {
             mParams = new HashMap();
             mParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM, "3");

@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.fragment.app.DialogFragment;
 
 import java.util.HashMap;
@@ -22,15 +21,14 @@ import java.util.List;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
-import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.model.ReplaceRuleManager;
-import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 
 /**
  * @author fengyue
@@ -119,7 +117,7 @@ public class ReplaceDialog extends DialogFragment {
      * 选择书源
      */
     private void selectSource(){
-        List<String> mSources = ReadCrawlerUtil.getAllSources();
+        List<BookSource> mSources = BookSourceManager.getAllBookSourceByOrderNum();
         CharSequence[] mSourcesName = new CharSequence[mSources.size()];
         HashMap<CharSequence, Boolean> mSelectSources = new LinkedHashMap<>();
         boolean[] isSelects = new boolean[mSources.size()];
@@ -128,21 +126,26 @@ public class ReplaceDialog extends DialogFragment {
 
         String selectSource = etRuleSource.getText().toString();
 
-        for (CharSequence sourceName : mSources) {
-            mSourcesName[i] = sourceName;
-            String source = BookSource.getFromName(String.valueOf(sourceName));
-            boolean isSelect = selectSource.contains(source);
+        for (BookSource source : mSources) {
+            mSourcesName[i] = source.getSourceName();
+            String sourceStr;
+            if (StringHelper.isEmpty(source.getSourceEName())){
+                sourceStr = source.getSourceUrl();
+            }else {
+                sourceStr = source.getSourceEName();
+            }
+            boolean isSelect = selectSource.contains(sourceStr);
             if (isSelect) sSourceCount++;
-            mSelectSources.put(mSourcesName[i], isSelect);
+            mSelectSources.put(sourceStr, isSelect);
             isSelects[i++] = isSelect;
         }
 
         new MultiChoiceDialog().create(activity, "选择书源",
                 mSourcesName, isSelects, sSourceCount, (dialog, which) -> {
                     StringBuilder sb = new StringBuilder();
-                    for (CharSequence sourceName : mSelectSources.keySet()) {
-                        if (mSelectSources.get(sourceName)) {
-                            sb.append(BookSource.getFromName(String.valueOf(sourceName)));
+                    for (CharSequence sourceStr : mSelectSources.keySet()) {
+                        if (mSelectSources.get(sourceStr)) {
+                            sb.append(sourceStr);
                             sb.append(",");
                         }
                     }
@@ -151,13 +154,20 @@ public class ReplaceDialog extends DialogFragment {
                 }, null, new DialogCreator.OnMultiDialogListener() {
                     @Override
                     public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
-                        mSelectSources.put(mSourcesName[which], isChecked);
+                        BookSource source = mSources.get(which);
+                        String sourceStr;
+                        if (StringHelper.isEmpty(source.getSourceEName())){
+                            sourceStr = source.getSourceUrl();
+                        }else {
+                            sourceStr = source.getSourceEName();
+                        }
+                        mSelectSources.put(sourceStr, isChecked);
                     }
 
                     @Override
                     public void onSelectAll(boolean isSelectAll) {
-                        for (CharSequence sourceName : mSelectSources.keySet()) {
-                            mSelectSources.put(sourceName, isSelectAll);
+                        for (CharSequence sourceStr : mSelectSources.keySet()) {
+                            mSelectSources.put(sourceStr, isSelectAll);
                         }
                     }
                 });

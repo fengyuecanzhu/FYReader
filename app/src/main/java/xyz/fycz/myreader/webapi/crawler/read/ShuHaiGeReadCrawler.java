@@ -1,7 +1,5 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
-import android.text.Html;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -99,7 +97,7 @@ public class ShuHaiGeReadCrawler implements ReadCrawler, BookInfoCrawler {
             Chapter chapter = new Chapter();
             chapter.setNumber(i++);
             chapter.setTitle(title);
-            String url = NAME_SPACE + a.attr("href");
+            String url = a.attr("href");
             chapter.setUrl(url);
             chapters.add(chapter);
             lastTile = title;
@@ -150,11 +148,11 @@ public class ShuHaiGeReadCrawler implements ReadCrawler, BookInfoCrawler {
             Book book = new Book();
             Elements info = element.getElementsByTag("span");
             book.setName(info.get(1).text());
-            book.setChapterUrl(NAME_SPACE + info.get(1).getElementsByTag("a").attr("href"));
+            book.setChapterUrl(info.get(1).getElementsByTag("a").attr("href"));
             book.setAuthor(info.get(3).text());
             book.setNewestChapterTitle(info.get(2).text());
             book.setType(info.get(0).getElementsByTag("a").first().text());
-            book.setSource(BookSource.shuhaige.toString());
+            book.setSource(LocalBookSource.shuhaige.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

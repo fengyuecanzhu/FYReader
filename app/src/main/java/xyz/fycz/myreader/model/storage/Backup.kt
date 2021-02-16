@@ -8,12 +8,11 @@ import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import xyz.fycz.myreader.application.MyApplication
+import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.application.SysManager
 import xyz.fycz.myreader.base.observer.MySingleObserver
 import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.greendao.GreenDaoManager
-import xyz.fycz.myreader.greendao.service.BookMarkService
 import xyz.fycz.myreader.greendao.service.BookService
 import xyz.fycz.myreader.greendao.service.SearchHistoryService
 import xyz.fycz.myreader.util.SharedPreUtils
@@ -26,7 +25,7 @@ import java.util.concurrent.TimeUnit
 
 object Backup {
 
-    val backupPath = MyApplication.getApplication().filesDir.absolutePath + File.separator + "backup"
+    val backupPath = App.getApplication().filesDir.absolutePath + File.separator + "backup"
 
     val defaultPath by lazy {
         APPCONST.BACKUP_FILE_DIR
@@ -52,9 +51,9 @@ object Backup {
         }
         val path = SharedPreUtils.getInstance().getString("backupPath", defaultPath)
         if (path == null) {
-            backup(MyApplication.getmContext(), defaultPath, null, true)
+            backup(App.getmContext(), defaultPath, null, true)
         } else {
-            backup(MyApplication.getmContext(), path, null, true)
+            backup(App.getmContext(), path, null, true)
         }
     }
 

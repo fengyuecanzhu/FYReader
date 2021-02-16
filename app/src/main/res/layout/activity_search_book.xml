@@ -107,7 +107,6 @@
             app:atg_backgroundColor="@color/colorBackground"
             app:atg_borderColor="@color/colorForeground"
             app:atg_horizontalPadding="5dp"
-            app:atg_pressedBackgroundColor="@color/colorForeground"
             app:atg_textColor="@color/textPrimary"
             app:atg_textSize="14sp"
             app:atg_verticalSpacing="5dp" />

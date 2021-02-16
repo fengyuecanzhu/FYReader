@@ -19,8 +19,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_delete" />
-                            <entry key="sourceFile" value="F:\SVG图标\删 除.svg" />
+                            <entry key="outputName" value="ic_debug" />
+                            <entry key="sourceFile" value="F:\SVG图标\debug.svg" />
                           </map>
                         </option>
                       </PersistentState>

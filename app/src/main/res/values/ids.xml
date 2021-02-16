@@ -2,6 +2,8 @@
 <resources>
 
     <item name="first" type="id" />
+    <item name="tag1" type="id" />
+    <item name="tag2" type="id" />
 
     <item type="id" name="status_bar"/>
 </resources>

@@ -10,11 +10,10 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
@@ -136,7 +135,7 @@ public class XBiQuGeReadCrawler implements ReadCrawler {
             book.setAuthor(spans.first().text());
             book.setType(spans.get(1).text());
             book.setDesc(element.selectFirst(".rank_bkbrief").text());
-            book.setSource(BookSource.xbiquge.toString());
+            book.setSource(LocalBookSource.xbiquge.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

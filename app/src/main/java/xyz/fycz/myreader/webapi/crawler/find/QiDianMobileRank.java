@@ -1,13 +1,12 @@
 package xyz.fycz.myreader.webapi.crawler.find;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.entity.bookstore.QDBook;
@@ -140,7 +139,7 @@ public class QiDianMobileRank extends FindCrawler {
             }
             url = url.replace("{sex}", !isFemale ? sex[0] : sex[1]);
             SharedPreUtils spu = SharedPreUtils.getInstance();
-            String cookie = spu.getString(MyApplication.getmContext().getString(R.string.qdCookie), "");
+            String cookie = spu.getString(App.getmContext().getString(R.string.qdCookie), "");
             if (!cookie.equals("")) {
                 url = url.replace("{cookie}", StringHelper.getSubString(cookie, "_csrfToken=", ";"));
             } else {
@@ -256,7 +255,7 @@ public class QiDianMobileRank extends FindCrawler {
 
 
     public void initCookie(Context mContext, ResultCallback rc) {
-        MyApplication.getApplication().newThread(() -> {
+        App.getApplication().newThread(() -> {
             BufferedReader br = null;
             try {
                 br = new BufferedReader(new InputStreamReader(mContext.getAssets().open("_csrfToken.fy")));

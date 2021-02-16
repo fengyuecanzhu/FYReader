@@ -15,13 +15,12 @@ import java.util.ArrayList;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
@@ -85,7 +84,7 @@ public class YanQingLouReadCrawler implements ReadCrawler {
                         .attr("href");
                 content = content.replace("本章未完，点击下一页继续阅读", "")
                         .replace("-->>", "");
-                content += getContentFormHtml(OkHttpUtils.getHtml(NAME_SPACE + nextUrl, CHARSET));
+                content += getContentFormHtml(OkHttpUtils.getHtml(nextUrl, CHARSET));
             }*/
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -137,7 +136,7 @@ public class YanQingLouReadCrawler implements ReadCrawler {
             Chapter chapter = new Chapter();
             chapter.setNumber(i);
             chapter.setTitle(title);
-            chapter.setUrl(NAME_SPACE + url);
+            chapter.setUrl(url);
             chapters.add(chapter);
         }
         return chapters;
@@ -174,8 +173,8 @@ public class YanQingLouReadCrawler implements ReadCrawler {
                 book.setNewestChapterTitle(as.get(3).text().replace("最近更新>>", ""));
                 book.setDesc(divBook.getElementsByClass("update").first().text().replace("简介：", ""));
                 book.setImgUrl(NAME_SPACE + divBook.getElementsByTag("img").attr("src"));
-                book.setChapterUrl(NAME_SPACE + as.get(0).attr("href"));
-                book.setSource(BookSource.yanqinglou.toString());
+                book.setChapterUrl(as.get(0).attr("href"));
+                book.setSource(LocalBookSource.yanqinglou.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }
@@ -209,7 +208,7 @@ public class YanQingLouReadCrawler implements ReadCrawler {
 
         String url = doc.select("meta[property=og:novel:read_url]").attr("content");
         book.setChapterUrl(url);
-        book.setSource(BookSource.yanqinglou.toString());
+        book.setSource(LocalBookSource.yanqinglou.toString());
     }
 
 

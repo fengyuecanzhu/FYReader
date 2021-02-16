@@ -8,7 +8,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -117,7 +116,7 @@ public class PinShuReadCrawler2 implements ReadCrawler, BookInfoCrawler {
             Book book = new Book();
             Elements info = element.getElementsByTag("a");
             book.setName(info.get(1).text());
-            book.setChapterUrl(NAME_SPACE + info.get(0).attr("href"));
+            book.setChapterUrl(info.get(0).attr("href"));
             book.setSource("pinshu");
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);

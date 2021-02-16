@@ -8,7 +8,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
-import xyz.fycz.myreader.application.MyApplication;
+
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.MainActivity;
@@ -48,7 +49,7 @@ public class APPDownloadTip {
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if (!MyApplication.isDestroy(activity)) {
+            if (!App.isDestroy(activity)) {
                 switch (msg.what) {
                     case 1:
                         mBookcaseFragment.getTvDownloadTip().setText("获取下载链接失败，请前往浏览器下载！");
@@ -81,7 +82,7 @@ public class APPDownloadTip {
                     error();
                     return;
                 }
-                MyApplication.getApplication().newThread(() -> {
+                App.getApplication().newThread(() -> {
                     HttpURLConnection con = null;
                     InputStream is = null;
                     FileOutputStream fos = null;

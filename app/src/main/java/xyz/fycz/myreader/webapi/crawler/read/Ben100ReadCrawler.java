@@ -1,7 +1,6 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
 import android.text.Html;
-import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,7 +9,7 @@ import org.jsoup.select.Elements;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.bookstore.BookType;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -114,7 +113,7 @@ public class Ben100ReadCrawler extends FindCrawler implements ReadCrawler, BookI
                 Chapter chapter = new Chapter();
                 chapter.setNumber(i++);
                 chapter.setTitle(title);
-                String url = NAME_SPACE + a.attr("href");
+                String url = a.attr("href");
                 chapter.setUrl(url);
                 chapters.add(chapter);
             }
@@ -146,12 +145,12 @@ public class Ben100ReadCrawler extends FindCrawler implements ReadCrawler, BookI
             String imgUrl = element.getElementsByTag("img").first().attr("src");
             book.setImgUrl(imgUrl);
             String chapterUrl = element.getElementsByClass("titles").first().getElementsByTag("a").first().attr("href");
-            book.setChapterUrl(NAME_SPACE + chapterUrl);
+            book.setChapterUrl(chapterUrl);
             String desc = element.getElementsByClass("intro").first().text();
             book.setDesc(desc);
             book.setNewestChapterTitle("");
             book.setIsCloseUpdate(true);
-            book.setSource(BookSource.ben100.toString());
+            book.setSource(LocalBookSource.ben100.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }
@@ -256,12 +255,12 @@ public class Ben100ReadCrawler extends FindCrawler implements ReadCrawler, BookI
             String imgUrl = element.getElementsByTag("img").first().attr("src");
             book.setImgUrl(imgUrl);
             String chapterUrl = element.getElementsByClass("titles").first().getElementsByTag("a").first().attr("href");
-            book.setChapterUrl(chapterUrl.contains("http") ? chapterUrl : NAME_SPACE + chapterUrl);
+            book.setChapterUrl(chapterUrl);
             String desc = element.getElementsByClass("intro").first().text();
             book.setDesc(desc);
             book.setNewestChapterTitle("");
             book.setType(bookType.getTypeName());
-            book.setSource(BookSource.ben100.toString());
+            book.setSource(LocalBookSource.ben100.toString());
             books.add(book);
         }
         return books;

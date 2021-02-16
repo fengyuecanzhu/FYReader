@@ -20,11 +20,10 @@ import io.reactivex.SingleOnSubscribe;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.enums.Font;
-import xyz.fycz.myreader.enums.Language;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -233,7 +232,7 @@ public abstract class PageLoader {
             if (bgPath == null) {
                 return;
             }
-            Resources resources = MyApplication.getApplication().getResources();
+            Resources resources = App.getApplication().getResources();
             DisplayMetrics dm = resources.getDisplayMetrics();
             int width = dm.widthPixels;
             int height = dm.heightPixels;

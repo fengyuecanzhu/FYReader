@@ -11,7 +11,7 @@ import android.webkit.WebViewClient;
 import androidx.appcompat.widget.Toolbar;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.databinding.ActivityFeedbackBinding;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
@@ -66,14 +66,14 @@ public class FeedbackActivity extends BaseActivity {
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 super.onReceivedError(view, request, error);
-                if (!MyApplication.isDestroy(FeedbackActivity.this))
+                if (!App.isDestroy(FeedbackActivity.this))
                     binding.refreshLayout.showError();
             }
         });
         binding.wvFeedback.setWebChromeClient(new WebChromeClient(){
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                if (newProgress == 100 && !MyApplication.isDestroy(FeedbackActivity.this)){
+                if (newProgress == 100 && !App.isDestroy(FeedbackActivity.this)){
                     binding.refreshLayout.showFinish();
                 }
             }});

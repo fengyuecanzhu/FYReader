@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+
 import androidx.core.content.FileProvider;
 
 import xyz.fycz.myreader.R;
@@ -17,11 +18,11 @@ import xyz.fycz.myreader.R;
 import java.io.File;
 
 
-
 public class UriFileUtil {
 
     /**
      * 获取URI
+     *
      * @param context
      * @param file
      * @return
@@ -42,7 +43,7 @@ public class UriFileUtil {
     public static String getRealPathFromUri(Context context, Uri contentUri) {
         Cursor cursor = null;
         try {
-            String[] proj = { MediaStore.Images.Media.DATA };
+            String[] proj = {MediaStore.Images.Media.DATA};
             cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             cursor.moveToFirst();
@@ -65,7 +66,7 @@ public class UriFileUtil {
             data = uri.getPath();
         } else if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
             Cursor cursor = context.getContentResolver().query(uri,
-                    new String[] { MediaStore.Images.ImageColumns.DATA }, null, null, null);
+                    new String[]{MediaStore.Images.ImageColumns.DATA}, null, null, null);
             if (null != cursor) {
                 if (cursor.moveToFirst()) {
                     int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
@@ -78,30 +79,23 @@ public class UriFileUtil {
         }
         return data;
     }
+
     /**
-
      * Get a file path from a Uri. This will get the the path for Storage Access
-
+     * <p>
      * Framework Documents, as well as the _data field for the MediaStore and
-
+     * <p>
      * other file-based ContentProviders.
-
      *
-
      * @param context The context.
-
-     * @param uri The Uri to query.
-
+     * @param uri     The Uri to query.
      * @author paulburke
-
      */
 
     public static String getPath(final Context context, final Uri uri) {
 
 
-
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-
 
 
         // DocumentProvider
@@ -119,13 +113,11 @@ public class UriFileUtil {
                 final String type = split[0];
 
 
-
                 if ("primary".equalsIgnoreCase(type)) {
 
                     return Environment.getExternalStorageDirectory() + "/" + split[1];
 
                 }
-
 
 
                 // TODO handle non-primary volumes
@@ -137,13 +129,11 @@ public class UriFileUtil {
             else if (isDownloadsDocument(uri)) {
 
 
-
                 final String id = DocumentsContract.getDocumentId(uri);
 
                 final Uri contentUri = ContentUris.withAppendedId(
 
                         Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-
 
 
                 return getDataColumn(context, contentUri, null, null);
@@ -159,7 +149,6 @@ public class UriFileUtil {
                 final String[] split = docId.split(":");
 
                 final String type = split[0];
-
 
 
                 Uri contentUri = null;
@@ -179,15 +168,13 @@ public class UriFileUtil {
                 }
 
 
-
                 final String selection = "_id=?";
 
-                final String[] selectionArgs = new String[] {
+                final String[] selectionArgs = new String[]{
 
                         split[1]
 
                 };
-
 
 
                 return getDataColumn(context, contentUri, selection, selectionArgs);
@@ -213,37 +200,26 @@ public class UriFileUtil {
         }
 
 
-
         return null;
 
     }
 
 
-
     /**
-
      * Get the value of the data column for this Uri. This is useful for
-
+     * <p>
      * MediaStore Uris, and other file-based ContentProviders.
-
      *
-
-     * @param context The context.
-
-     * @param uri The Uri to query.
-
-     * @param selection (Optional) Filter used in the query.
-
+     * @param context       The context.
+     * @param uri           The Uri to query.
+     * @param selection     (Optional) Filter used in the query.
      * @param selectionArgs (Optional) Selection arguments used in the query.
-
      * @return The value of the _data column, which is typically a file path.
-
      */
 
     public static String getDataColumn(Context context, Uri uri, String selection,
 
                                        String[] selectionArgs) {
-
 
 
         Cursor cursor = null;
@@ -255,7 +231,6 @@ public class UriFileUtil {
                 column
 
         };
-
 
 
         try {
@@ -285,15 +260,9 @@ public class UriFileUtil {
     }
 
 
-
-
-
     /**
-
      * @param uri The Uri to check.
-
      * @return Whether the Uri authority is ExternalStorageProvider.
-
      */
 
     public static boolean isExternalStorageDocument(Uri uri) {
@@ -303,13 +272,9 @@ public class UriFileUtil {
     }
 
 
-
     /**
-
      * @param uri The Uri to check.
-
      * @return Whether the Uri authority is DownloadsProvider.
-
      */
 
     public static boolean isDownloadsDocument(Uri uri) {
@@ -319,13 +284,9 @@ public class UriFileUtil {
     }
 
 
-
     /**
-
      * @param uri The Uri to check.
-
      * @return Whether the Uri authority is MediaProvider.
-
      */
 
     public static boolean isMediaDocument(Uri uri) {

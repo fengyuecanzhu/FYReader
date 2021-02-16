@@ -46,14 +46,14 @@ import java.util.Locale;
 
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityReadBinding;
 import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.enums.Font;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookMark;
@@ -427,7 +427,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    binding.readTvPageTip.setText((progress + 1) + "/" + (seekBar.getMax() + 1));
+                    binding.readTvPageTip.setText(String.format("%s/%s", progress + 1, seekBar.getMax() + 1));
                 }
             }
 
@@ -530,12 +530,16 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         binding.llChapterView.setOnClickListener(v -> {
             if (mChapters != null && mChapters.size() != 0) {
                 Chapter curChapter = mChapters.get(mPageLoader.getChapterPos());
-                String url = curChapter.getUrl();
+                String url = NetworkUtils.getAbsoluteURL(mReadCrawler.getNameSpace(), curChapter.getUrl());
                 if (!"本地书籍".equals(mBook.getType()) && !StringHelper.isEmpty(url)) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    Uri uri = Uri.parse(url);
-                    intent.setData(uri);
-                    startActivity(intent);
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        Uri uri = Uri.parse(url);
+                        intent.setData(uri);
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        ToastUtils.showError(e.getLocalizedMessage());
+                    }
                 }
             }
         });
@@ -664,7 +668,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         mHandler.removeCallbacks(autoPageRunnable);
         /*mHandler.removeCallbacks(sendDownloadNotification);
         notificationUtil.cancelAll();
-        MyApplication.getApplication().shutdownThreadPool();*/
+        App.getApplication().shutdownThreadPool();*/
         if (autoPage) {
             autoPageStop();
         }
@@ -727,12 +731,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     "]\n书签添加成功，书签列表可在目录界面查看！");
             return true;
         } else if (itemId == R.id.action_replace_content) {
-            Intent ruleIntent = new Intent(this, RuleActivity.class);
+            Intent ruleIntent = new Intent(this, ReplaceRuleActivity.class);
             startActivityForResult(ruleIntent, APPCONST.REQUEST_REFRESH_READ_UI);
         } else if (itemId == R.id.action_copy_content) {
             new CopyContentDialog(this, mPageLoader.getContent()).show();
         } else if (itemId == R.id.action_open_link) {
-            Uri uri = Uri.parse(mBook.getChapterUrl());
+            Uri uri = Uri.parse(NetworkUtils.getAbsoluteURL(mReadCrawler.getNameSpace(), mBook.getChapterUrl()));
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
         } else if (itemId == R.id.action_download) {
@@ -756,7 +760,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     Font font = (Font) data.getSerializableExtra(APPCONST.FONT);
                     mSetting.setFont(font);
 //                    init();
-                    MyApplication.runOnUiThread(() -> mPageLoader.setFont(font));
+                    App.runOnUiThread(() -> mPageLoader.setFont(font));
                     break;
                 case APPCONST.REQUEST_CHAPTER_PAGE:
                     int[] chapterAndPage = data.getIntArrayExtra(APPCONST.CHAPTER_PAGE);
@@ -837,7 +841,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 初始化
      */
     private void init() {
-        if (MyApplication.isDestroy(this)) return;
+        if (App.isDestroy(this)) return;
         screenOffTimerStart();
         mPageLoader.init();
         mPageLoader.refreshChapterList();
@@ -851,10 +855,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             Chapter curChapter = mChapters.get(mPageLoader.getChapterPos());
             String url = curChapter.getUrl();
             binding.tvChapterTitleTop.setText(curChapter.getTitle());
-            binding.tvChapterUrl.setText(StringHelper.isEmpty(url) ? curChapter.getId() : url);
+            binding.tvChapterUrl.setText(StringHelper.isEmpty(url) ? curChapter.getId() :
+                    NetworkUtils.getAbsoluteURL(mReadCrawler.getNameSpace(), url));
             binding.readSbChapterProgress.setProgress(mPageLoader.getPagePos());
             binding.readSbChapterProgress.setMax(mPageLoader.getAllPagePos() - 1);
-            binding.readTvPageTip.setText(String.format("%s/%s", binding.readSbChapterProgress.getProgress() + 1, binding.readSbChapterProgress.getMax() + 1));
+            binding.readTvPageTip.setText(String.format("%s/%s",
+                    binding.readSbChapterProgress.getProgress() + 1, binding.readSbChapterProgress.getMax() + 1));
         }
     }
     /************************书籍相关******************************/
@@ -918,7 +924,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         book.setHistoryChapterId("未开始阅读");
         book.setNewestChapterTitle("未拆分章节");
         book.setAuthor(getString(R.string.local_book));
-        book.setSource(BookSource.local.toString());
+        book.setSource(LocalBookSource.local.toString());
         book.setDesc("无");
         book.setIsCloseUpdate(true);
         //判断书籍是否已经添加
@@ -1053,7 +1059,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 mBookService.matchHistoryChapterPos(mBook, mChapters);
             }
             mHandler.sendMessage(mHandler.obtainMessage(1));
-            initMenu();
+            mHandler.sendMessage(mHandler.obtainMessage(4));
         }
     }
 
@@ -1397,7 +1403,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private void changeNightAndDaySetting(boolean isNight) {
         mSetting.setDayStyle(!isNight);
         SysManager.saveSetting(mSetting);
-        MyApplication.getApplication().setNightTheme(isNight);
+        App.getApplication().setNightTheme(isNight);
         //mPageLoader.setPageStyle(!isCurDayStyle);
     }
 
@@ -1501,7 +1507,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             ToastUtils.showWarring("无网络连接！");
             return;
         }
-        MyApplication.runOnUiThread(() -> {
+        App.runOnUiThread(() -> {
             MyAlertDialog.build(this)
                     .setTitle("缓存书籍")
                     .setSingleChoiceItems(getResources().getStringArray(R.array.download), selectedIndex,
@@ -1556,7 +1562,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             mHandler.sendEmptyMessage(9);
             mHandler.postDelayed(sendDownloadNotification, 2 * downloadInterval);
         }
-        MyApplication.getApplication().newThread(() -> {
+        App.getApplication().newThread(() -> {
             for (Chapter chapter : needDownloadChapters) {
                 if (StringHelper.isEmpty(chapter.getBookId())) {
                     chapter.setId(mBook.getId());
@@ -1600,7 +1606,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             Notification notification = notificationUtil.build(APPCONST.channelIdDownload)
                     .setSmallIcon(R.drawable.ic_download)
                     //通知栏大图标
-                    .setLargeIcon(BitmapFactory.decodeResource(MyApplication.getApplication().getResources(), R.mipmap.ic_launcher))
+                    .setLargeIcon(BitmapFactory.decodeResource(App.getApplication().getResources(), R.mipmap.ic_launcher))
                     .setOngoing(true)
                     //点击通知后自动清除
                     .setAutoCancel(true)
@@ -1662,7 +1668,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 下一页
      */
     private void nextPage() {
-        MyApplication.runOnUiThread(() -> {
+        App.runOnUiThread(() -> {
             screenOffTimerStart();
             autoPage();
         });

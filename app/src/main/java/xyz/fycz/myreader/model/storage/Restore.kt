@@ -7,7 +7,7 @@ import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import xyz.fycz.myreader.application.MyApplication
+import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.application.SysManager
 import xyz.fycz.myreader.base.observer.MySingleObserver
 import xyz.fycz.myreader.entity.ReadStyle
@@ -114,7 +114,7 @@ object Restore {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            Preferences.getSharedPreferences(MyApplication.getmContext(), path, "config")?.all?.map {
+            Preferences.getSharedPreferences(App.getmContext(), path, "config")?.all?.map {
                 val edit = SharedPreUtils.getInstance()
                 when (val value = it.value) {
                     is Int -> edit.putInt(it.key, value)
@@ -124,14 +124,14 @@ object Restore {
                     is String -> edit.putString(it.key, value)
                     else -> Unit
                 }
-                edit.putInt("versionCode", MyApplication.getVersionCode())
+                edit.putInt("versionCode", App.getVersionCode())
             }
             e.onSuccess(true)
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : MySingleObserver<Boolean>() {
                     override fun onSuccess(t: Boolean) {
-                        MyApplication.getApplication().initNightTheme()
+                        App.getApplication().initNightTheme()
                         callBack?.restoreSuccess()
                     }
 

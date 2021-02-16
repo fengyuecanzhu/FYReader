@@ -22,6 +22,7 @@ import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.util.CodeUtil;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.ProgressUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 
@@ -201,7 +202,7 @@ public class RegisterActivity extends BaseActivity {
             }else if(!binding.cbAgreement.isChecked()){
                 DialogCreator.createTipDialog(this, "请勾选同意《用户服务协议》");
             }else {
-                ProgressDialog dialog = DialogCreator.createProgressDialog(this, null, "正在注册...");
+                ProgressUtils.show(this, "正在注册...");
                 Map<String, String> userRegisterInfo = new HashMap<>();
                 userRegisterInfo.put("username", username);
                 userRegisterInfo.put("password", password);
@@ -217,12 +218,12 @@ public class RegisterActivity extends BaseActivity {
                         }else {
                             ToastUtils.showWarring(info[1]);
                         }
-                        dialog.dismiss();
+                        ProgressUtils.dismiss();
                     }
                     @Override
                     public void onError(Exception e) {
                         ToastUtils.showError("注册失败：\n" + e.getLocalizedMessage());
-                        dialog.dismiss();
+                        ProgressUtils.dismiss();
                     }
                 });
             }
@@ -250,4 +251,9 @@ public class RegisterActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ProgressUtils.dismiss();
+    }
 }

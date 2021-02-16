@@ -1,7 +1,5 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
-import android.text.Html;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,11 +9,10 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
@@ -93,7 +90,7 @@ public class Du1DuReadCrawler implements ReadCrawler, BookInfoCrawler {
             Chapter chapter = new Chapter();
             chapter.setNumber(i++);
             chapter.setTitle(title);
-            chapter.setUrl(NAME_SPACE + url);
+            chapter.setUrl(url);
             chapters.add(chapter);
         }
         return chapters;
@@ -116,13 +113,13 @@ public class Du1DuReadCrawler implements ReadCrawler, BookInfoCrawler {
             Book book = new Book();
             Elements info = li.getElementsByTag("div");
             book.setName(info.get(1).text());
-            book.setInfoUrl(NAME_SPACE + info.get(1).getElementsByTag("a").attr("href"));
+            book.setInfoUrl(info.get(1).getElementsByTag("a").attr("href"));
             book.setChapterUrl(book.getInfoUrl() + "mulu.htm");
             book.setAuthor(info.get(3).text());
             book.setNewestChapterTitle(info.get(2).text());
             book.setType(info.get(0).text() + "小说");
             book.setUpdateDate(info.get(4).text());
-            book.setSource(BookSource.du1du.toString());
+            book.setSource(LocalBookSource.du1du.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

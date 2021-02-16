@@ -1,7 +1,7 @@
 package xyz.fycz.myreader.model.backup;
 
 import io.reactivex.annotations.NonNull;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.model.storage.Restore;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
@@ -27,7 +27,7 @@ public class UserService {
      * @return 是否成功登录
      */
     public static void login(final Map<String, String> userLoginInfo, final ResultCallback resultCallback) {
-        MyApplication.getApplication().newThread(() -> {
+        App.getApplication().newThread(() -> {
             HttpURLConnection conn = null;
             try {
                 URL url = new URL(URLCONST.APP_WEB_URL + "login");
@@ -66,7 +66,7 @@ public class UserService {
     }
 
     public static void register(final Map<String, String> userRegisterInfo, final ResultCallback resultCallback) {
-        MyApplication.getApplication().newThread(() -> {
+        App.getApplication().newThread(() -> {
             HttpURLConnection conn = null;
             try {
                 URL url = new URL(URLCONST.APP_WEB_URL + "reg");
@@ -111,7 +111,7 @@ public class UserService {
     public static boolean writeConfig(Map<String,String> userLoginInfo){
         FileOutputStream fos = null;
         try {
-            fos = MyApplication.getApplication().openFileOutput("userConfig.fy", MyApplication.getApplication().MODE_PRIVATE);
+            fos = App.getApplication().openFileOutput("userConfig.fy", App.getApplication().MODE_PRIVATE);
             String userInfo = "username='" + userLoginInfo.get("loginName") + "',\npassword='" + userLoginInfo.get("loginPwd") + "'";
             byte[] bs = userInfo.getBytes();
             fos.write(bs);
@@ -131,7 +131,7 @@ public class UserService {
      * @return
      */
     public static Map<String,String> readConfig(){
-        File file = MyApplication.getApplication().getFileStreamPath("userConfig.fy");
+        File file = App.getApplication().getFileStreamPath("userConfig.fy");
         if (!file.exists()){
             return null;
         }
@@ -198,10 +198,10 @@ public class UserService {
         if (userInfo == null){
             rc.onFinish(false, 0);
         }
-        Backup.INSTANCE.backup(MyApplication.getmContext(), APPCONST.FILE_DIR + "webBackup/", new Backup.CallBack() {
+        Backup.INSTANCE.backup(App.getmContext(), APPCONST.FILE_DIR + "webBackup/", new Backup.CallBack() {
             @Override
             public void backupSuccess() {
-                MyApplication.getApplication().newThread(() ->{
+                App.getApplication().newThread(() ->{
                     File inputFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup");
                     if (!inputFile.exists()) {
                         rc.onFinish(false, 0);
@@ -318,8 +318,8 @@ public class UserService {
 
 
     private static String makeSignalParam(){
-        return "&signal=" + AppInfoUtils.getSingInfo(MyApplication.getmContext(),
-                MyApplication.getApplication().getPackageName(), AppInfoUtils.SHA1);
+        return "&signal=" + AppInfoUtils.getSingInfo(App.getmContext(),
+                App.getApplication().getPackageName(), AppInfoUtils.SHA1);
     }
 
     /**
@@ -327,7 +327,7 @@ public class UserService {
      * @return
      */
     public static boolean isLogin(){
-        File file = MyApplication.getApplication().getFileStreamPath("userConfig.fy");
+        File file = App.getApplication().getFileStreamPath("userConfig.fy");
         return file.exists();
     }
 }

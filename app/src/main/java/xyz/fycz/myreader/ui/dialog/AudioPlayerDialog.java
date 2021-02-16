@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.databinding.DialogAudioPlayerBinding;
 import xyz.fycz.myreader.model.audio.ReadAloudService;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
@@ -262,7 +262,7 @@ public class AudioPlayerDialog extends Dialog{
 
         private void updateAloudState(ReadAloudService.Status status) {
             aloudStatus = status;
-            if (!MyApplication.isDestroy(mReadActivity)) {
+            if (!App.isDestroy(mReadActivity)) {
                 mReadActivity.autoPageStop();
             }
             switch (status) {

@@ -5,13 +5,12 @@ import android.text.Html;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -106,7 +105,7 @@ public class PiaoTianReadCrawler implements ReadCrawler, BookInfoCrawler {
             Book book = new Book();
             book.setChapterUrl(readUrl);
             getBookInfo(html, book);
-            book.setSource(BookSource.paiotian.toString());
+            book.setSource(LocalBookSource.paiotian.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         } else {
@@ -123,7 +122,7 @@ public class PiaoTianReadCrawler implements ReadCrawler, BookInfoCrawler {
                 book.setNewestChapterTitle(info.get(1).text());
                 book.setUpdateDate(info.get(4).text());
                 book.setDesc("");
-                book.setSource(BookSource.paiotian.toString());
+                book.setSource(LocalBookSource.paiotian.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }

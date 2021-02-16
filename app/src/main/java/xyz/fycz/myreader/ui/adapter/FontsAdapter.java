@@ -27,7 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
@@ -226,7 +226,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
     }
 
     private void downloadFont(final String url, final Font font, final ViewHolder viewHolder) {
-        MyApplication.getApplication().newThread(() -> {
+        App.getApplication().newThread(() -> {
             HttpURLConnection con = null;
             InputStream is = null;
             FileOutputStream fos = null;

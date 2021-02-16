@@ -2,7 +2,7 @@ package xyz.fycz.myreader.util;
 
 
 
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +42,7 @@ public class CacheHelper {
         FileInputStream fis = null;
         ObjectInputStream ois = null;
         try{
-            fis = MyApplication.getApplication().openFileInput(file);
+            fis = App.getApplication().openFileInput(file);
             ois = new ObjectInputStream(fis);
             return (Serializable)ois.readObject();
         }catch(FileNotFoundException e){
@@ -52,7 +52,7 @@ public class CacheHelper {
             e.printStackTrace();
             //反序列化失败 - 删除缓存文件
             if(e instanceof InvalidClassException){
-                File data = MyApplication.getApplication().getFileStreamPath(file);
+                File data = App.getApplication().getFileStreamPath(file);
                 data.delete();
             }
             //   return null;
@@ -79,7 +79,7 @@ public class CacheHelper {
             }
         }
         WRITING_OR_READING_FILE_NAME = file;
-        boolean flag = MyApplication.getApplication().deleteFile(file);
+        boolean flag = App.getApplication().deleteFile(file);
         WRITING_OR_READING_FILE_NAME = "";
         return flag;
     }
@@ -102,7 +102,7 @@ public class CacheHelper {
         FileOutputStream fos = null;
         ObjectOutputStream oos = null;
         try{
-            fos = MyApplication.getApplication().openFileOutput(file, MyApplication.getApplication().MODE_PRIVATE);
+            fos = App.getApplication().openFileOutput(file, App.getApplication().MODE_PRIVATE);
             oos = new ObjectOutputStream(fos);
             oos.writeObject(ser);
             oos.flush();
@@ -132,7 +132,7 @@ public class CacheHelper {
      */
     private static boolean isExistDataCache(String cachefile){
         boolean exist = false;
-        File data = MyApplication.getApplication().getFileStreamPath(cachefile);
+        File data = App.getApplication().getFileStreamPath(cachefile);
         if(data.exists())
             exist = true;
         return exist;

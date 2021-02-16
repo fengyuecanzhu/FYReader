@@ -14,10 +14,6 @@ import xyz.fycz.myreader.greendao.entity.SearchHistory;
 
 import java.util.ArrayList;
 
-/**
- * Created by zhao on 2017/7/26.
- */
-
 public class SearchHistoryAdapter extends ArrayAdapter<SearchHistory> {
 
     private int mResourceId;

@@ -1,21 +1,14 @@
 package xyz.fycz.myreader.ui.adapter.holder;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
+
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
-import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
+import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.widget.CoverImageView;
 
@@ -65,12 +58,12 @@ public class BookStoreBookHolder extends ViewHolderImpl<Book> {
         tvBookTime.setText(data.getUpdateDate());
         if (hasImg){
             tvBookImg.setVisibility(View.VISIBLE);
-            if (!MyApplication.isDestroy(mActivity)) {
+            if (!App.isDestroy(mActivity)) {
                 tvBookImg.load(data.getImgUrl(), data.getName(), data.getAuthor());
             }
         }
         if (data.getSource() != null) {
-            tvBookSource.setText(String.format("书源：%s", BookSource.fromString(data.getSource()).text));
+            tvBookSource.setText(String.format("书源：%s", BookSourceManager.getSourceNameByStr(data.getSource())));
         }else {
             tvBookSource.setText(data.getNewestChapterId());
         }

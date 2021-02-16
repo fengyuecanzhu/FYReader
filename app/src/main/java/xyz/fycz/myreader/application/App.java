@@ -13,7 +13,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -45,6 +44,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.dialog.APPDownloadTip;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
@@ -58,11 +58,11 @@ import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 
 
-public class MyApplication extends Application {
+public class App extends Application {
 
-    public static final String TAG = MyApplication.class.getSimpleName();
-    private static Handler handler = new Handler();
-    private static MyApplication application;
+    public static final String TAG = App.class.getSimpleName();
+    private static final Handler handler = new Handler();
+    private static App application;
     private ExecutorService mFixedThreadPool;
 
 
@@ -70,6 +70,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         application = this;
+        firstInit();
         HttpUtil.trustAllHosts();//信任所有证书
         RxJavaPlugins.setErrorHandler(Functions.emptyConsumer());
 //        handleSSLHandshake();
@@ -79,6 +80,14 @@ public class MyApplication extends Application {
         mFixedThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());//初始化线程池
         initNightTheme();
 //        LLog.init(APPCONST.LOG_DIR);
+    }
+
+    private void firstInit() {
+        SharedPreUtils sru = SharedPreUtils.getInstance();
+        if (!sru.getBoolean("firstInit")){
+            BookSourceManager.initDefaultSources();
+            sru.putBoolean("firstInit", true);
+        }
     }
 
     public void initNightTheme() {
@@ -110,7 +119,7 @@ public class MyApplication extends Application {
         Setting setting = SysManager.getSetting();
         setting.setDayStyle(!isNightMode);
         SysManager.saveSetting(setting);
-        MyApplication.getApplication().initNightTheme();
+        App.getApplication().initNightTheme();
     }
 
     @SuppressLint("TrulyRandom")
@@ -194,7 +203,7 @@ public class MyApplication extends Application {
         return handler;
     }
 
-    public static MyApplication getApplication() {
+    public static App getApplication() {
         return application;
     }
 
@@ -259,7 +268,7 @@ public class MyApplication extends Application {
      */
     public static void checkVersionByServer(final AppCompatActivity activity, final boolean isManualCheck,
                                             final BookcaseFragment mBookcaseFragment) {
-        MyApplication.getApplication().newThread(() -> {
+        App.getApplication().newThread(() -> {
             try {
                 String url = "https://shimo.im/docs/cqkgjPRRydYYhQKt/read";
                 if (isApkInDebug(getmContext())) {
@@ -313,7 +322,7 @@ public class MyApplication extends Application {
                 }
                 Log.i("检查更新，最新版本", newestVersion + "");
                 if (newestVersion > versionCode) {
-                    MyApplication m = new MyApplication();
+                    App m = new App();
                     Setting setting = SysManager.getSetting();
                     if (isManualCheck || setting.getNewestVersionCode() < newestVersion || isForceUpdate) {
                         setting.setNewestVersionCode(newestVersion);
@@ -326,7 +335,7 @@ public class MyApplication extends Application {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.e("检查更新失败！", e.getLocalizedMessage());
+                Log.e("检查更新失败！", "" + e.getLocalizedMessage());
                 if (isManualCheck || NetworkUtils.isNetWorkAvailable()) {
                     ToastUtils.showError("检查更新失败！");
                 }

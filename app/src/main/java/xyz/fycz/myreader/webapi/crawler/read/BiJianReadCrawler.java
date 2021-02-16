@@ -10,11 +10,10 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
@@ -118,7 +117,7 @@ public class BiJianReadCrawler implements ReadCrawler {
             book.setChapterUrl(as.get(2).attr("href"));
             book.setDesc(ps.get(1).text());
             book.setNewestChapterTitle("");
-            book.setSource(BookSource.bijian.toString());
+            book.setSource(LocalBookSource.bijian.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

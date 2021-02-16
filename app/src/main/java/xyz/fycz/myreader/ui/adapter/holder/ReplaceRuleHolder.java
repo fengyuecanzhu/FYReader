@@ -1,9 +1,5 @@
 package xyz.fycz.myreader.ui.adapter.holder;
 
-import android.app.Activity;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -42,15 +38,16 @@ import xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout;
 public class ReplaceRuleHolder extends ViewHolderImpl<ReplaceRuleBean> {
     private RelativeLayout rlContent;
     private TextView tvRuleSummary;
+    private Button btTop;
     private Button btBan;
     private Button btShare;
     private Button btDelete;
     private AppCompatActivity activity;
-    private ReplaceRuleAdapter.OnDeleteListener onDeleteListener;
+    private ReplaceRuleAdapter.OnSwipeListener onSwipeListener;
 
-    public ReplaceRuleHolder(AppCompatActivity activity, ReplaceRuleAdapter.OnDeleteListener onDeleteListener) {
+    public ReplaceRuleHolder(AppCompatActivity activity, ReplaceRuleAdapter.OnSwipeListener onSwipeListener) {
         this.activity = activity;
-        this.onDeleteListener = onDeleteListener;
+        this.onSwipeListener = onSwipeListener;
     }
 
 
@@ -63,6 +60,7 @@ public class ReplaceRuleHolder extends ViewHolderImpl<ReplaceRuleBean> {
     public void initView() {
         rlContent = findById(R.id.rl_content);
         tvRuleSummary = findById(R.id.tv_rule_summary);
+        btTop = findById(R.id.bt_top);
         btBan = findById(R.id.bt_ban);
         btShare = findById(R.id.bt_share);
         btDelete = findById(R.id.btnDelete);
@@ -82,6 +80,19 @@ public class ReplaceRuleHolder extends ViewHolderImpl<ReplaceRuleBean> {
             replaceDialog.show(activity.getSupportFragmentManager(), "");
         });
 
+        btTop.setOnClickListener(v -> {
+            ((SwipeMenuLayout) getItemView()).smoothClose();
+            ReplaceRuleManager.toTop(data)
+                    .subscribe(new MySingleObserver<Boolean>() {
+                        @Override
+                        public void onSuccess(@NonNull Boolean aBoolean) {
+                            if (aBoolean){
+                                onSwipeListener.onTop(pos, data);
+                            }
+                        }
+                    });
+        });
+
         btBan.setOnClickListener(v -> {
             ((SwipeMenuLayout) getItemView()).smoothClose();
             data.setEnable(!data.getEnable());
@@ -96,6 +107,7 @@ public class ReplaceRuleHolder extends ViewHolderImpl<ReplaceRuleBean> {
                         }
                     });
         });
+
         btShare.setOnClickListener(v -> {
             ((SwipeMenuLayout) getItemView()).smoothClose();
             List<ReplaceRuleBean> shareRuleBean = new ArrayList<>();
@@ -112,7 +124,7 @@ public class ReplaceRuleHolder extends ViewHolderImpl<ReplaceRuleBean> {
                     .subscribe(new MyObserver<Boolean>() {
                         @Override
                         public void onNext(Boolean aBoolean) {
-                            onDeleteListener.success(pos);
+                            onSwipeListener.onDel(pos, data);
                             refreshUI();
                         }
 

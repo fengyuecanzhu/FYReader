@@ -33,6 +33,10 @@ public class APPCONST {
     public static long exitTime;
     public static final int exitConfirmTime = 2000;
 
+    public static final String MATCHER = "Matcher";
+    public static final String XPATH = "Xpath";
+    public static final String JSON_PATH = "JsonPath";
+
     public static final String BOOK = "book";
     public static final String TITLE = "title";
     public static final String FIND_CRAWLER = "findCrawler";
@@ -41,12 +45,12 @@ public class APPCONST {
     public static final String SEARCH_BOOK_BEAN = "SearchBookBean";
     public static final String SOURCE_INDEX = "sourceIndex";
     public static final String FONT = "font";
+    public static final String BOOK_SOURCE = "bookSource";
     public static final String RESULT_NEED_REFRESH = "result_need_refresh";
     public static final String RESULT_IS_COLLECTED = "result_is_collected";
     public static final String RESULT_LAST_READ_POSITION = "result_last_read_position";
     public static final String RESULT_HISTORY_CHAPTER = "result_history_chapter";
-    public static final String RESULT_UP_MENU = "result_up_meu";
-    public static final String RESULT_REPLACE_RULE = "result_up_meu";
+    public static final String RESULT_UP_MENU = "result_up_menu";
 
 
     public static final String[] READ_STYLE_NIGHT = {"#94928c", "#393431"};//黑夜
@@ -71,6 +75,9 @@ public class APPCONST {
     public static final int REQUEST_IMPORT_LAYOUT = 1006;
     public static final int REQUEST_QR_SCAN = 1007;
     public static final int REQUEST_IMPORT_REPLACE_RULE = 1008;
+    public static final int REQUEST_IMPORT_BOOK_SOURCE = 1009;
+    public static final int REQUEST_EDIT_BOOK_SOURCE = 1010;
+    public static final int REQUEST_BOOK_SOURCE = 1011;
 
     public static final int REQUEST_READ = 1;
 
@@ -83,7 +90,7 @@ public class APPCONST {
     //设置版本号
     public static final int SETTING_VERSION = 11;
 
-    public static final int SOURCE_VERSION = 6;
+    public static final int SOURCE_VERSION = 7;
 
     public static final String FORMAT_FILE_DATE = "yyyy-MM-dd";
 

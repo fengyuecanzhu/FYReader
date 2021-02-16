@@ -9,41 +9,30 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.PopupMenu;
-import androidx.appcompat.app.AlertDialog;
+
 import androidx.core.app.ActivityCompat;
 
 import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.google.android.material.textfield.TextInputLayout;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
@@ -54,7 +43,6 @@ import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.widget.custom.DragSortGridView;
 import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.enums.BookcaseStyle;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -69,7 +57,7 @@ import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 
-import static xyz.fycz.myreader.application.MyApplication.checkVersionByServer;
+import static xyz.fycz.myreader.application.App.checkVersionByServer;
 
 
 public class BookcasePresenter implements BasePresenter {
@@ -123,8 +111,8 @@ public class BookcasePresenter implements BasePresenter {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    if (!MyApplication.isDestroy(mMainActivity)) {
-                        MyApplication.runOnUiThread(() -> mBookcaseAdapter.notifyDataSetChanged());
+                    if (!App.isDestroy(mMainActivity)) {
+                        App.runOnUiThread(() -> mBookcaseAdapter.notifyDataSetChanged());
                         finishLoadBookCount++;
                         mBookcaseFragment.getSrlContent().finishRefresh();
                     }
@@ -137,7 +125,7 @@ public class BookcasePresenter implements BasePresenter {
                     break;
                 case 4:
                     showErrorLoadingBooks();
-                    if (MyApplication.isApkInDebug(mMainActivity)) {
+                    if (App.isApkInDebug(mMainActivity)) {
                         if (isFirstRefresh) {
                             initBook();
                             isFirstRefresh = false;
@@ -435,7 +423,7 @@ public class BookcasePresenter implements BasePresenter {
             });
             es.submit(update);
         }
-        MyApplication.getApplication().newThread(() -> {
+        App.getApplication().newThread(() -> {
             while (true) {
                 if (finishLoadBookCount == mBooks.size()) {
                     mHandler.sendMessage(mHandler.obtainMessage(4));
@@ -553,7 +541,7 @@ public class BookcasePresenter implements BasePresenter {
      */
     private void editBookcase(boolean isEdit) {
         if (isEdit) {
-            if (mBooks.size() > 0) {
+            if (canEditBookcase()) {
                 mBookcaseFragment.getSrlContent().setEnableRefresh(false);
                 mBookcaseAdapter.setmEditState(true);
                 if (mSetting.getSortStyle() == 0) {
@@ -580,6 +568,10 @@ public class BookcasePresenter implements BasePresenter {
             mBookcaseFragment.getRlBookEdit().startAnimation(mMainActivity.getmBottomOutAnim());
             mBookcaseAdapter.notifyDataSetChanged();
         }
+    }
+
+    public boolean canEditBookcase(){
+        return mBooks.size() > 0;
     }
 
     /**
@@ -657,10 +649,10 @@ public class BookcasePresenter implements BasePresenter {
                 ToastUtils.showWarring("当前书架没有任何书籍，无法一键缓存！");
             return;
         }
-        MyApplication.getApplication().newThread(() -> {
+        App.getApplication().newThread(() -> {
             ArrayList<Book> needDownloadBooks = new ArrayList<>();
             for (Book book : mBooks) {
-                //if (!BookSource.pinshu.toString().equals(book.getSource()) && !"本地书籍".equals(book.getType())
+                //if (!LocalBookSource.pinshu.toString().equals(book.getSource()) && !"本地书籍".equals(book.getType())
                 if (!"本地书籍".equals(book.getType())
                         && book.getIsDownLoadAll()) {
                     needDownloadBooks.add(book);
@@ -707,7 +699,7 @@ public class BookcasePresenter implements BasePresenter {
                 Notification notification = notificationUtil.build(APPCONST.channelIdDownload)
                         .setSmallIcon(R.drawable.ic_download)
                         //通知栏大图标
-                        .setLargeIcon(BitmapFactory.decodeResource(MyApplication.getApplication().getResources(), R.mipmap.ic_launcher))
+                        .setLargeIcon(BitmapFactory.decodeResource(App.getApplication().getResources(), R.mipmap.ic_launcher))
                         .setOngoing(false)
                         //点击通知后自动清除
                         .setAutoCancel(true)
@@ -840,7 +832,7 @@ public class BookcasePresenter implements BasePresenter {
             Notification notification = notificationUtil.build(APPCONST.channelIdDownload)
                     .setSmallIcon(R.drawable.ic_download)
                     //通知栏大图标
-                    .setLargeIcon(BitmapFactory.decodeResource(MyApplication.getApplication().getResources(), R.mipmap.ic_launcher))
+                    .setLargeIcon(BitmapFactory.decodeResource(App.getApplication().getResources(), R.mipmap.ic_launcher))
                     .setOngoing(true)
                     //点击通知后自动清除
                     .setAutoCancel(true)

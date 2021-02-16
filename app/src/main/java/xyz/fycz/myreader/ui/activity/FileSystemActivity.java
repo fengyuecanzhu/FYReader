@@ -13,7 +13,7 @@ import java.util.List;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseTabActivity;
 import xyz.fycz.myreader.databinding.ActivityFileSystemBinding;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
@@ -65,12 +65,12 @@ public class FileSystemActivity extends BaseTabActivity {
     protected List<Fragment> createTabFragments() {
         mLocalFragment = new LocalBookFragment();
         mCategoryFragment = new FileCategoryFragment();
-        return Arrays.asList(mLocalFragment,mCategoryFragment);
+        return Arrays.asList(mLocalFragment, mCategoryFragment);
     }
 
     @Override
     protected List<String> createTabTitles() {
-        return Arrays.asList("智能导入","手机目录");
+        return Arrays.asList("智能导入", "手机目录");
     }
 
     @Override
@@ -101,10 +101,9 @@ public class FileSystemActivity extends BaseTabActivity {
 
             @Override
             public void onPageSelected(int position) {
-                if (position == 0){
+                if (position == 0) {
                     mCurFragment = mLocalFragment;
-                }
-                else {
+                } else {
                     mCurFragment = mCategoryFragment;
                 }
                 //改变菜单状态
@@ -169,7 +168,7 @@ public class FileSystemActivity extends BaseTabActivity {
 
     @Override
     public void onBackPressed() {
-        if (mCurFragment == mCategoryFragment){
+        if (mCurFragment == mCategoryFragment) {
             if (mCategoryFragment.backLast()) return;
         }
         super.onBackPressed();
@@ -177,12 +176,13 @@ public class FileSystemActivity extends BaseTabActivity {
 
     /**
      * 将文件转换成CollBook
+     *
      * @param files:需要加载的文件列表
      * @return
      */
-    private List<Book> convertBook(List<File> files){
+    private List<Book> convertBook(List<File> files) {
         List<Book> books = new ArrayList<>(files.size());
-        for(File file : files){
+        for (File file : files) {
             //判断文件是否存在
             if (!file.exists()) continue;
 
@@ -193,7 +193,7 @@ public class FileSystemActivity extends BaseTabActivity {
             book.setHistoryChapterId("未开始阅读");
             book.setNewestChapterTitle("未拆分章节");
             book.setAuthor("本地书籍");
-            book.setSource(BookSource.local.toString());
+            book.setSource(LocalBookSource.local.toString());
             book.setDesc("无");
             book.setIsCloseUpdate(true);
             books.add(book);
@@ -204,50 +204,48 @@ public class FileSystemActivity extends BaseTabActivity {
     /**
      * 改变底部选择栏的状态
      */
-    private void changeMenuStatus(){
+    private void changeMenuStatus() {
 
         //点击、删除状态的设置
-        if (mCurFragment.getCheckedCount() == 0){
+        if (mCurFragment.getCheckedCount() == 0) {
             binding.fileSystemBtnAddBook.setText(getString(R.string.file_add_shelf));
             //设置某些按钮的是否可点击
             setMenuClickable(false);
 
-            if (binding.fileSystemCbSelectedAll.isChecked()){
+            if (binding.fileSystemCbSelectedAll.isChecked()) {
                 mCurFragment.setChecked(false);
                 binding.fileSystemCbSelectedAll.setChecked(mCurFragment.isCheckedAll());
             }
 
-        }
-        else {
+        } else {
             binding.fileSystemBtnAddBook.setText(getString(R.string.file_add_shelves, mCurFragment.getCheckedCount()));
             setMenuClickable(true);
 
             //全选状态的设置
 
             //如果选中的全部的数据，则判断为全选
-            if (mCurFragment.getCheckedCount() == mCurFragment.getCheckableCount()){
+            if (mCurFragment.getCheckedCount() == mCurFragment.getCheckableCount()) {
                 //设置为全选
                 mCurFragment.setChecked(true);
                 binding.fileSystemCbSelectedAll.setChecked(mCurFragment.isCheckedAll());
             }
             //如果曾今是全选则替换
-            else if (mCurFragment.isCheckedAll()){
+            else if (mCurFragment.isCheckedAll()) {
                 mCurFragment.setChecked(false);
                 binding.fileSystemCbSelectedAll.setChecked(mCurFragment.isCheckedAll());
             }
         }
 
         //重置全选的文字
-        if (mCurFragment.isCheckedAll()){
+        if (mCurFragment.isCheckedAll()) {
             binding.fileSystemCbSelectedAll.setText("取消");
-        }
-        else {
+        } else {
             binding.fileSystemCbSelectedAll.setText("全选");
         }
 
     }
 
-    private void setMenuClickable(boolean isClickable){
+    private void setMenuClickable(boolean isClickable) {
 
         //设置是否可删除
         binding.fileSystemBtnDelete.setEnabled(isClickable);
@@ -261,16 +259,15 @@ public class FileSystemActivity extends BaseTabActivity {
     /**
      * 改变全选按钮的状态
      */
-    private void changeCheckedAllStatus(){
+    private void changeCheckedAllStatus() {
         //获取可选择的文件数量
         int count = mCurFragment.getCheckableCount();
 
         //设置是否能够全选
-        if (count > 0){
+        if (count > 0) {
             binding.fileSystemCbSelectedAll.setClickable(true);
             binding.fileSystemCbSelectedAll.setEnabled(true);
-        }
-        else {
+        } else {
             binding.fileSystemCbSelectedAll.setClickable(false);
             binding.fileSystemCbSelectedAll.setEnabled(false);
         }

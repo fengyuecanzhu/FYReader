@@ -1,12 +1,10 @@
 package xyz.fycz.myreader.greendao.service;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.greendao.GreenDaoManager;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.gen.BookGroupDao;
-import xyz.fycz.myreader.greendao.gen.BookMarkDao;
-import xyz.fycz.myreader.ui.activity.SplashActivity;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 
@@ -93,7 +91,7 @@ public class BookGroupService extends BaseService{
      * @return
      */
     public boolean curGroupIsPrivate(){
-        String curBookGroupId = SharedPreUtils.getInstance().getString(MyApplication.getmContext().getString(R.string.curBookGroupId), "");
+        String curBookGroupId = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.curBookGroupId), "");
         String privateGroupId = SharedPreUtils.getInstance().getString("privateGroupId");
         return !StringHelper.isEmpty(curBookGroupId) && curBookGroupId.equals(privateGroupId);
     }

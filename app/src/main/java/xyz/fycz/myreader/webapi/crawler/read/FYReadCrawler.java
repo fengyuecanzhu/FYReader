@@ -3,7 +3,7 @@ package xyz.fycz.myreader.webapi.crawler.read;
 import android.text.Html;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.Book;
 
@@ -115,7 +115,7 @@ public class FYReadCrawler implements ReadCrawler {
             book.setChapterUrl(chapterUrl.attr("href"));
             book.setDesc(div.getElementsByTag("p").get(1).text());
             book.setUpdateDate(div.getElementsByTag("span").get(1).text().replace("|", ""));
-            book.setSource(BookSource.fynovel.toString());
+            book.setSource(LocalBookSource.fynovel.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

@@ -17,7 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActiityBookstoreBinding;
@@ -212,7 +212,7 @@ public class BookstoreActivity extends BaseActivity {
                 ((QiDianMobileRank) findCrawler).initCookie(this, new ResultCallback() {
                     @Override
                     public void onFinish(Object o, int code) {
-                        if (MyApplication.isDestroy(BookstoreActivity.this)) return;
+                        if (App.isDestroy(BookstoreActivity.this)) return;
                         spu.putString(getString(R.string.qdCookie), (String) o);
                         mBookTypes = findCrawler.getBookTypes();
                         initBooks();
@@ -220,7 +220,7 @@ public class BookstoreActivity extends BaseActivity {
 
                     @Override
                     public void onError(Exception e) {
-                        if (MyApplication.isDestroy(BookstoreActivity.this)) return;
+                        if (App.isDestroy(BookstoreActivity.this)) return;
                         binding.refreshLayout.showError();
                         e.printStackTrace();
                     }
@@ -235,14 +235,14 @@ public class BookstoreActivity extends BaseActivity {
             BookStoreApi.getBookTypeList(findCrawler, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
-                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
+                    if (App.isDestroy(BookstoreActivity.this)) return;
                     mBookTypes = (ArrayList<BookType>) o;
                     initBooks();
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
+                    if (App.isDestroy(BookstoreActivity.this)) return;
                     e.printStackTrace();
                     mHandler.sendEmptyMessage(5);
                 }
@@ -271,7 +271,7 @@ public class BookstoreActivity extends BaseActivity {
             ((QiDianMobileRank) findCrawler).getRankBooks(curType, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
-                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
+                    if (App.isDestroy(BookstoreActivity.this)) return;
                     List<Book> books = new ArrayList<>();
                     for (QDBook rb : (List<QDBook>) o) {
                         Book book = new Book();
@@ -297,7 +297,7 @@ public class BookstoreActivity extends BaseActivity {
 
                 @Override
                 public void onError(Exception e) {
-                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
+                    if (App.isDestroy(BookstoreActivity.this)) return;
                     mHandler.sendMessage(mHandler.obtainMessage(4));
                     ToastUtils.showError("数据加载失败！\n" + e.getMessage());
                     e.printStackTrace();
@@ -307,13 +307,13 @@ public class BookstoreActivity extends BaseActivity {
             BookStoreApi.getBookRankList(curType, findCrawler, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
-                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
+                    if (App.isDestroy(BookstoreActivity.this)) return;
                     mHandler.sendMessage(mHandler.obtainMessage(2, o));
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    if (MyApplication.isDestroy(BookstoreActivity.this)) return;
+                    if (App.isDestroy(BookstoreActivity.this)) return;
                     mHandler.sendMessage(mHandler.obtainMessage(4));
                     ToastUtils.showError("数据加载失败！\n" + e.getMessage());
                     e.printStackTrace();

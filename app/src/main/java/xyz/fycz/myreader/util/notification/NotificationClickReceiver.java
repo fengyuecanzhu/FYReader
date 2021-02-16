@@ -3,7 +3,7 @@ package xyz.fycz.myreader.util.notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 
 /**
  * @author fengyue
@@ -17,7 +17,7 @@ public class NotificationClickReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         //todo 跳转之前要处理的逻辑
         if (CANCEL_ACTION.equals(intent.getAction())){
-            MyApplication.getApplication().shutdownThreadPool();
+            App.getApplication().shutdownThreadPool();
         }
     }
 }

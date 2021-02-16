@@ -17,23 +17,28 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentMineBinding;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.model.storage.Restore;
 import xyz.fycz.myreader.ui.activity.AboutActivity;
+import xyz.fycz.myreader.ui.activity.BookSourceActivity;
 import xyz.fycz.myreader.ui.activity.FeedbackActivity;
 import xyz.fycz.myreader.ui.activity.LoginActivity;
 import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
+import xyz.fycz.myreader.ui.activity.SourceEditActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
@@ -91,15 +96,15 @@ public class MineFragment extends BaseFragment {
         isLogin = UserService.isLogin();
         mSetting = SysManager.getSetting();
         webSynMenu = new String[]{
-                MyApplication.getmContext().getString(R.string.menu_backup_webBackup),
-                MyApplication.getmContext().getString(R.string.menu_backup_webRestore),
-                MyApplication.getmContext().getString(R.string.menu_backup_autoSyn)
+                App.getmContext().getString(R.string.menu_backup_webBackup),
+                App.getmContext().getString(R.string.menu_backup_webRestore),
+                App.getmContext().getString(R.string.menu_backup_autoSyn)
         };
         backupMenu = new String[]{
-                MyApplication.getmContext().getResources().getString(R.string.menu_backup_backup),
-                MyApplication.getmContext().getResources().getString(R.string.menu_backup_restore),
+                App.getmContext().getResources().getString(R.string.menu_backup_backup),
+                App.getmContext().getResources().getString(R.string.menu_backup_restore),
         };
-        themeMode = MyApplication.getApplication().isNightFS() ? 0 : mSetting.isDayStyle() ? 1 : 2;
+        themeMode = App.getApplication().isNightFS() ? 0 : mSetting.isDayStyle() ? 1 : 2;
         themeModeArr = getResources().getStringArray(R.array.theme_mode_arr);
     }
 
@@ -119,7 +124,7 @@ public class MineFragment extends BaseFragment {
             if (isLogin) {
                 DialogCreator.createCommonDialog(getActivity(), "退出登录", "确定要退出登录吗？"
                         , true, (dialog, which) -> {
-                            File file = MyApplication.getApplication().getFileStreamPath("userConfig.fy");
+                            File file = App.getApplication().getFileStreamPath("userConfig.fy");
                             if (file.delete()) {
                                 ToastUtils.showSuccess("退出成功");
                                 isLogin = false;
@@ -135,6 +140,11 @@ public class MineFragment extends BaseFragment {
                 getActivity().startActivityForResult(intent, APPCONST.REQUEST_LOGIN);
             }
         });
+
+        binding.mineRlBookSource.setOnClickListener(v -> {
+            startActivity(new Intent(getContext(), BookSourceActivity.class));
+        });
+
         binding.mineRlBackup.setOnClickListener(v -> {
             AlertDialog bookDialog = MyAlertDialog.build(getContext())
                     .setTitle(getContext().getResources().getString(R.string.menu_bookcase_backup))
@@ -161,9 +171,9 @@ public class MineFragment extends BaseFragment {
                 return;
             }
             if (mSetting.isAutoSyn()) {
-                webSynMenu[2] = MyApplication.getmContext().getString(R.string.menu_backup_autoSyn) + "已开启";
+                webSynMenu[2] = App.getmContext().getString(R.string.menu_backup_autoSyn) + "已开启";
             } else {
-                webSynMenu[2] = MyApplication.getmContext().getString(R.string.menu_backup_autoSyn) + "已关闭";
+                webSynMenu[2] = App.getmContext().getString(R.string.menu_backup_autoSyn) + "已关闭";
             }
             MyAlertDialog.build(getContext())
                     .setTitle(getActivity().getString(R.string.menu_bookcase_syn))
@@ -228,7 +238,7 @@ public class MineFragment extends BaseFragment {
                                 }
                                 dialog.dismiss();
                                 binding.tvThemeModeSelect.setText(themeModeArr[themeMode]);
-                                MyApplication.getApplication().initNightTheme();
+                                App.getApplication().initNightTheme();
                             })
                     .setNegativeButton("取消", null)
                     .create();
@@ -269,7 +279,7 @@ public class MineFragment extends BaseFragment {
                     } else {
                         DialogCreator.createTipDialog(getContext(), "未给予储存权限，备份失败！");
                     }*/
-                    Backup.INSTANCE.backup(MyApplication.getmContext(), APPCONST.BACKUP_FILE_DIR, new Backup.CallBack() {
+                    Backup.INSTANCE.backup(App.getmContext(), APPCONST.BACKUP_FILE_DIR, new Backup.CallBack() {
                         @Override
                         public void backupSuccess() {
                             DialogCreator.createTipDialog(getContext(), "备份成功，备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
@@ -376,7 +386,7 @@ public class MineFragment extends BaseFragment {
         DialogCreator.createCommonDialog(getContext(), "确认同步吗?", "将书架从网络同步至本地会覆盖原有书架！", true,
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
-                    MyApplication.getApplication().newThread(() -> {
+                    App.getApplication().newThread(() -> {
                         /*if (UserService.webRestore()) {
                             mHandler.sendMessage(mHandler.obtainMessage(7));
 //                                    DialogCreator.createTipDialog(mMainActivity,

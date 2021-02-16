@@ -19,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
@@ -38,9 +37,8 @@ import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
-import xyz.fycz.myreader.BuildConfig;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
@@ -48,10 +46,11 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityBookDetailBinding;
 import xyz.fycz.myreader.entity.SharedBook;
-import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.ui.adapter.DetailCatalogAdapter;
 import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
@@ -148,6 +147,7 @@ public class BookDetailedActivity extends BaseActivity {
             mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
         }
         mBookGroupDia = new BookGroupDialog(this);
+        mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
     }
 
     @Override
@@ -251,6 +251,7 @@ public class BookDetailedActivity extends BaseActivity {
                 mBookService.updateBook(mBook, bookTem);
             }
             mBook = bookTem;
+            mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
             mHandler.sendMessage(mHandler.obtainMessage(1));
             if (isCollected) {
                 String tip = null;
@@ -311,24 +312,22 @@ public class BookDetailedActivity extends BaseActivity {
         if (StringHelper.isEmpty(mBook.getImgUrl())) {
             mBook.setImgUrl("");
         }
-        assert mBook.getNewestChapterTitle() != null;
         binding.ic.bookDetailTvDesc.setText("");
         if (mBook.getType() != null) {
             binding.ih.bookDetailTvType.setText(mBook.getType());
         } else {
             binding.ih.bookDetailTvType.setText("");
         }
-        if (!"null".equals(mBook.getSource())) {
-            binding.ih.bookDetailSource.setText("书源：" + BookSource.fromString(mBook.getSource()).text);
-        }
-        ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
+        BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
+        binding.ih.bookDetailSource.setText(String.format("书源：%s", source.getSourceName()));
+        ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(source);
         if (rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) {
             binding.pbLoading.setVisibility(View.VISIBLE);
             BookInfoCrawler bic = (BookInfoCrawler) rc;
             CommonApi.getBookInfo(mBook, bic, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
-                    if (!MyApplication.isDestroy(BookDetailedActivity.this)) {
+                    if (!App.isDestroy(BookDetailedActivity.this)) {
                         mHandler.sendMessage(mHandler.obtainMessage(4));
                     }
                 }
@@ -349,7 +348,7 @@ public class BookDetailedActivity extends BaseActivity {
     private void initOtherInfo() {
         binding.ic.bookDetailTvDesc.setText("\t\t\t\t" + mBook.getDesc());
         binding.ih.bookDetailTvType.setText(mBook.getType());
-        if (!MyApplication.isDestroy(this)) {
+        if (!App.isDestroy(this)) {
             binding.ih.bookDetailIvCover.load(mBook.getImgUrl(), mBook.getName(), mBook.getAuthor());
             /*Glide.with(this)
                     .load(mBook.getImgUrl())
@@ -379,9 +378,9 @@ public class BookDetailedActivity extends BaseActivity {
         CharSequence[] sources = new CharSequence[aBooks.size()];
         int checkedItem = 0;
         for (int i = 0; i < sources.length; i++) {
-            sources[i] = BookSource.fromString(aBooks.get(i).getSource()).text
+            sources[i] = LocalBookSource.fromString(aBooks.get(i).getSource()).text
                     + "\n" + aBooks.get(i).getNewestChapterTitle();
-            if (sources[i].equals(BookSource.fromString(mBook.getSource()).text
+            if (sources[i].equals(LocalBookSource.fromString(mBook.getSource()).text
                     + "\n" + aBooks.get(i).getNewestChapterTitle())) {
                 checkedItem = i;
             }
@@ -427,7 +426,6 @@ public class BookDetailedActivity extends BaseActivity {
      */
     private void initChapters(boolean isChangeSource) {
         if (mChapters.size() == 0 && !"本地书籍".equals(mBook.getType())) {
-            mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
             if (isCollected) {
                 mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
             }
@@ -454,7 +452,7 @@ public class BookDetailedActivity extends BaseActivity {
                     for (int i = mChapters.size() - 1; i >= end; i--) {
                         mNewestChapters.add(mChapters.get(i));
                     }
-                    MyApplication.runOnUiThread(() -> mCatalogAdapter.refreshItems(mNewestChapters));
+                    App.runOnUiThread(() -> mCatalogAdapter.refreshItems(mNewestChapters));
                 }
 
                 @Override
@@ -567,7 +565,7 @@ public class BookDetailedActivity extends BaseActivity {
                 mBookService.updateEntity(mBook);
                 break;
             case R.id.action_open_link:  //打开链接
-                Uri uri = Uri.parse(mBook.getChapterUrl());
+                Uri uri = Uri.parse(NetworkUtils.getAbsoluteURL(mReadCrawler.getNameSpace(), mBook.getChapterUrl()));
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
                 break;
@@ -643,7 +641,7 @@ public class BookDetailedActivity extends BaseActivity {
     private void shareBook() {
         if ("本地书籍".equals(mBook.getType())) {
             File file = new File(mBook.getChapterUrl());
-            if (!file.exists()){
+            if (!file.exists()) {
                 ToastUtils.showWarring("书籍源文件不存在，无法分享！");
                 return;
             }
@@ -734,7 +732,7 @@ public class BookDetailedActivity extends BaseActivity {
             textPaint.setColor(Color.BLACK);
             cv.drawText(mBook.getType() == null ? "" : mBook.getType(), margin + marginTop + img.getWidth(), margin + marginTop * 8, textPaint);
             assert mBook.getSource() != null;
-            cv.drawText("书源：" + BookSource.fromString(mBook.getSource()).text, margin + marginTop + img.getWidth(), margin + marginTop * 10, textPaint);
+            cv.drawText("书源：" + BookSourceManager.getSourceNameByStr(mBook.getSource()), margin + marginTop + img.getWidth(), margin + marginTop * 10, textPaint);
 
             int textSize = 35;
             int textInterval = textSize / 2;

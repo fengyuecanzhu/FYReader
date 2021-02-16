@@ -1,7 +1,6 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
 import android.text.Html;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,7 +13,6 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -83,12 +81,12 @@ public class LiuLangCatReadCrawler implements ReadCrawler {
             Element author = li.getElementsByClass("author").first();
             Element desc = li.getElementsByClass("item_bottom").first();
             book.setName(bookName.text());
-            book.setChapterUrl(NAME_SPACE + bookName.attr("href"));
+            book.setChapterUrl(bookName.attr("href"));
             book.setAuthor(author.text().replace("[", "").replace("]", ""));
             book.setDesc(desc.text());
             book.setNewestChapterTitle("");
             book.setIsCloseUpdate(true);
-            book.setSource(BookSource.liulangcat.toString());
+            book.setSource(LocalBookSource.liulangcat.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }
@@ -116,11 +114,11 @@ public class LiuLangCatReadCrawler implements ReadCrawler {
                 book.setAuthor(jsonBook.getString("author"));
                 book.setDesc(jsonBook.getString("descrption"));
                 //http://m.liulangcat.com/wgwx/31072.html
-                book.setChapterUrl(NAME_SPACE + "/" + jsonBook.getString("pycode") + "/" +
+                book.setChapterUrl("/" + jsonBook.getString("pycode") + "/" +
                         jsonBook.getString("no") + ".html");
                 book.setNewestChapterTitle("");
                 book.setIsCloseUpdate(true);
-                //book.setSource(BookSource.liulangcat.toString());
+                //book.setSource(LocalBookSource.liulangcat.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }
@@ -143,7 +141,7 @@ public class LiuLangCatReadCrawler implements ReadCrawler {
             Chapter chapter = new Chapter();
             chapter.setNumber(i++);
             chapter.setTitle(title);
-            chapter.setUrl(NAME_SPACE + url);
+            chapter.setUrl(url);
             chapters.add(chapter);
         }
         return chapters;

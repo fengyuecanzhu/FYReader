@@ -1,7 +1,7 @@
 package xyz.fycz.myreader.greendao;
 
 
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.greendao.gen.DaoMaster;
 import xyz.fycz.myreader.greendao.gen.DaoSession;
 import xyz.fycz.myreader.greendao.util.MySQLiteOpenHelper;
@@ -23,7 +23,7 @@ public class GreenDaoManager {
     }
 
     public GreenDaoManager(){
-        mySQLiteOpenHelper = new MySQLiteOpenHelper(MyApplication.getmContext(), "read" , null);
+        mySQLiteOpenHelper = new MySQLiteOpenHelper(App.getmContext(), "read" , null);
         daoMaster = new DaoMaster(mySQLiteOpenHelper.getWritableDatabase());
         mDaoSession = daoMaster.newSession();
     }

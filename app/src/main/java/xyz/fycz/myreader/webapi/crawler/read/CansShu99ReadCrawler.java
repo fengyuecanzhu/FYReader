@@ -8,7 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -85,7 +85,7 @@ public class CansShu99ReadCrawler implements ReadCrawler {
                 Chapter chapter = new Chapter();
                 chapter.setNumber(i++);
                 chapter.setTitle(title);
-                String url = NAME_SPACE + a.attr("href");
+                String url = a.attr("href");
                 chapter.setUrl(url);
                 chapters.add(chapter);
             }
@@ -121,9 +121,9 @@ public class CansShu99ReadCrawler implements ReadCrawler {
             String imgUrl = element.getElementsByTag("img").first().attr("src");
             book.setImgUrl("http:" + imgUrl);
             String chapterUrl = element.getElementsByTag("h2").first().getElementsByTag("a").first().attr("href");
-            book.setChapterUrl(NAME_SPACE + chapterUrl);
+            book.setChapterUrl(chapterUrl);
             book.setNewestChapterTitle("");
-            book.setSource(BookSource.cangshu99.toString());
+            book.setSource(LocalBookSource.cangshu99.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

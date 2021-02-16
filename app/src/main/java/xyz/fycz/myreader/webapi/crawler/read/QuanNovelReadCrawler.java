@@ -1,7 +1,5 @@
 package xyz.fycz.myreader.webapi.crawler.read;
 
-import android.text.Html;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,7 +7,7 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -86,7 +84,7 @@ public class QuanNovelReadCrawler implements ReadCrawler, BookInfoCrawler {
         for (Element div : elementsByClass) {
             Element a = div.getElementsByTag("a").first();
             String title = a.text();
-            String url = NAME_SPACE + a.attr("href");
+            String url = a.attr("href");
             Chapter chapter = new Chapter();
             chapter.setNumber(i++);
             chapter.setTitle(title);
@@ -114,10 +112,10 @@ public class QuanNovelReadCrawler implements ReadCrawler, BookInfoCrawler {
                 Book book = new Book();
                 Element info = element.getElementsByClass("cc2").first();
                 book.setName(info.getElementsByTag("a").first().text());
-                book.setChapterUrl(NAME_SPACE + info.getElementsByTag("a").first().attr("href"));
+                book.setChapterUrl(info.getElementsByTag("a").first().attr("href"));
                 book.setAuthor(element.getElementsByClass("cc4").first().getElementsByTag("a").first().text());
                 book.setNewestChapterTitle(element.getElementsByClass("cc3").first().getElementsByTag("a").first().text());
-                book.setSource(BookSource.quannovel.toString());
+                book.setSource(LocalBookSource.quannovel.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }

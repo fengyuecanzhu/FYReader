@@ -9,7 +9,7 @@ import org.jsoup.select.Elements;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.bookstore.BookType;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -23,9 +23,9 @@ import java.util.List;
 
 
 public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfoCrawler {
-    private static final String NAME_SPACE = "https://www.qb5.tw";
-    private static final String NOVEL_SEARCH = "https://www.qb5.tw/modules/article/search.php?searchkey={key}&submit=%CB%D1%CB%F7";
-    public static final String FIND_URL = "https://www.qb5.tw";
+    private static final String NAME_SPACE = "https://www.qb50.com";
+    private static final String NOVEL_SEARCH = "https://www.qb50.com/modules/article/search.php?searchkey={key}&submit=%CB%D1%CB%F7";
+    public static final String FIND_URL = "https://www.qb50.com";
     public static final String FIND_NAME = "书城[全本小说]";
     private static final String CHARSET = "GBK";
     public static final String SEARCH_CHARSET = "GBK";
@@ -128,7 +128,7 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
                     book.setName(a.attr("title"));
                     book.setChapterUrl(a.attr("href"));
                     book.setAuthor(scanS5.html());
-                    book.setSource(BookSource.biquge.toString());
+                    book.setSource(LocalBookSource.biquge.toString());
                     books.add(book);
                 }
             }
@@ -161,7 +161,7 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
                 book.setNewestChapterTitle(divZz.text());
                 book.setAuthor(divAuthor.text());
                 book.setUpdateDate(divSj.text());
-                book.setSource(BookSource.qb5.toString());
+                book.setSource(LocalBookSource.qb5.toString());
                 books.add(book);
             }
         }
@@ -234,7 +234,7 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
                 book.setChapterUrl(info.get(0).getElementsByTag("a").attr("href"));
                 book.setNewestChapterTitle(info.get(1).text());
                 book.setAuthor(info.get(2).text());
-                book.setSource(BookSource.qb5.toString());
+                book.setSource(LocalBookSource.qb5.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }
@@ -250,7 +250,7 @@ public class QB5ReadCrawler extends FindCrawler implements ReadCrawler, BookInfo
      */
     public Book getBookInfo(String html, Book book) {
         //小说源
-        book.setSource(BookSource.qb5.toString());
+        book.setSource(LocalBookSource.qb5.toString());
         Document doc = Jsoup.parse(html);
         //书名
         String name = doc.select("meta[property=og:title]").attr("content");

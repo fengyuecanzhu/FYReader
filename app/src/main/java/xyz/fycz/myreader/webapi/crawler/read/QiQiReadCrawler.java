@@ -7,11 +7,9 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 import java.util.ArrayList;
@@ -87,7 +85,7 @@ public class QiQiReadCrawler implements ReadCrawler {
         for (Element div : elementsByClass) {
             Element a = div.getElementsByTag("a").first();
             String title = a.text();
-            String url = NAME_SPACE + a.attr("href");
+            String url = a.attr("href");
             Chapter chapter = new Chapter();
             chapter.setNumber(i++);
             chapter.setTitle(title);
@@ -114,7 +112,7 @@ public class QiQiReadCrawler implements ReadCrawler {
                 Book book = new Book();
                 Element info = element.getElementsByTag("h3").first();
                 book.setName(info.getElementsByTag("a").first().text());
-                book.setChapterUrl(NAME_SPACE + info.getElementsByTag("a").first().attr("href"));
+                book.setChapterUrl(info.getElementsByTag("a").first().attr("href"));
                 book.setAuthor(element.getElementsByTag("span").get(1).text());
                 book.setType(element.getElementsByTag("span").get(3).text());
                 book.setNewestChapterTitle(element.getElementsByTag("p").get(4).getElementsByTag("a").first().text());

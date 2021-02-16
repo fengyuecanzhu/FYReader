@@ -99,6 +99,7 @@ android {
     }
     productFlavors {
     }
+
 }
 
 
@@ -136,7 +137,10 @@ dependencies {
     implementation 'org.greenrobot:greendao:3.3.0'
     implementation 'com.github.yuweiguocn:GreenDaoUpgradeHelper:v2.2.1'
 
+    //JSoup
     implementation 'org.jsoup:jsoup:1.11.3'
+    implementation 'cn.wanghaomiao:JsoupXpath:2.4.3'
+    implementation 'com.jayway.jsonpath:json-path:2.5.0'
 
     //SmartRefreshLayout
     implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.2'
@@ -184,24 +188,10 @@ dependencies {
     //编码识别
     implementation 'com.github.albfernandez:juniversalchardet:2.4.0'
 
-
-    /*//email
-    implementation 'com.sun.mail:android-mail:1.6.2'
-    implementation 'com.sun.mail:android-activation:1.6.2'*/
-
-    //Material Dialogs
-    /*def dialog_version = '3.3.0'
-    implementation "com.afollestad.material-dialogs:core:$dialog_version"
-    implementation "com.afollestad.material-dialogs:input:$dialog_version"
-    implementation "com.afollestad.material-dialogs:files:$dialog_version"
-    implementation "com.afollestad.material-dialogs:bottomsheets:$dialog_version"*/
-
-    //kongzueDialog
-    //implementation 'com.kongzue.dialog_v3:dialog:3.2.5'
 }
 
 greendao {
-    schemaVersion 18
+    schemaVersion 23
     daoPackage 'xyz.fycz.myreader.greendao.gen'
 //    targetGenDir 'src/main/java'
 }

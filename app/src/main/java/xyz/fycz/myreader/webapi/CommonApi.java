@@ -13,6 +13,7 @@ import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -36,6 +37,7 @@ public class CommonApi extends BaseApi {
      */
     public static void getBookChapters(String url, final ReadCrawler rc, boolean isRefresh, final ResultCallback callback) {
         String charset = rc.getCharset();
+        url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url);
         getCommonReturnHtmlStringApi(url, null, charset, isRefresh, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
@@ -57,10 +59,11 @@ public class CommonApi extends BaseApi {
      */
     public static Observable<List<Chapter>> getBookChapters(String url, final ReadCrawler rc) {
         String charset = rc.getCharset();
-
+        url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url);
+        String finalUrl = url;
         return Observable.create(emitter -> {
             try {
-                emitter.onNext(rc.getChaptersFromHtml(OkHttpUtils.getHtml(url, charset)));
+                emitter.onNext(rc.getChaptersFromHtml(OkHttpUtils.getHtml(finalUrl, charset)));
             } catch (Exception e) {
                 e.printStackTrace();
                 emitter.onError(e);
@@ -90,6 +93,7 @@ public class CommonApi extends BaseApi {
                 url = URLCONST.nameSpace_FY + url;
             }
         }
+        url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url);
         getCommonReturnHtmlStringApi(url, null, charset, true, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
@@ -111,9 +115,11 @@ public class CommonApi extends BaseApi {
 
     public static Observable<String> getChapterContent(String url, final ReadCrawler rc) {
         String charset = rc.getCharset();
+        url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url);
+        String finalUrl = url;
         return Observable.create(emitter -> {
             try {
-                emitter.onNext(rc.getContentFormHtml(OkHttpUtils.getHtml(url, charset)));
+                emitter.onNext(rc.getContentFormHtml(OkHttpUtils.getHtml(finalUrl, charset)));
             } catch (Exception e) {
                 e.printStackTrace();
                 emitter.onError(e);
@@ -200,9 +206,11 @@ public class CommonApi extends BaseApi {
         } else {
             url = book.getInfoUrl();
         }
+        url = NetworkUtils.getAbsoluteURL(bic.getNameSpace(), url);
+        String finalUrl = url;
         return Observable.create(emitter -> {
             try {
-                emitter.onNext(bic.getBookInfo(OkHttpUtils.getHtml(url, bic.getCharset()), book));
+                emitter.onNext(bic.getBookInfo(OkHttpUtils.getHtml(finalUrl, bic.getCharset()), book));
             } catch (Exception e) {
                 e.printStackTrace();
                 emitter.onError(e);
@@ -222,6 +230,7 @@ public class CommonApi extends BaseApi {
         if (StringHelper.isEmpty(url)) {
             url = book.getChapterUrl();
         }
+        url = NetworkUtils.getAbsoluteURL(bic.getNameSpace(), url);
         getCommonReturnHtmlStringApi(url, null, bic.getCharset(), false, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {

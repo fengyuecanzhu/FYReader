@@ -8,7 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -20,9 +20,9 @@ import java.util.ArrayList;
 
 
 public class BiQuGe44ReadCrawler implements ReadCrawler, BookInfoCrawler {
-    public static final String NAME_SPACE = "http://www.wqge.net";
-//    public static final String NAME_SPACE = "https://www.wqge.cc";
-    public static final String NOVEL_SEARCH = "http://www.wqge.net/modules/article/search.php?searchkey={key}";
+//    public static final String NAME_SPACE = "http://www.wqge.net";
+    public static final String NAME_SPACE = "https://www.wqge.cc";
+    public static final String NOVEL_SEARCH = "https://www.wqge.cc/modules/article/search.php?searchkey={key}";
     public static final String CHARSET = "GBK";
     public static final String SEARCH_CHARSET = "utf-8";
 
@@ -119,10 +119,10 @@ public class BiQuGe44ReadCrawler implements ReadCrawler, BookInfoCrawler {
             Book book = new Book();
             Elements info = element.getElementsByTag("td");
             book.setName(info.get(0).text());
-            book.setChapterUrl(NAME_SPACE + info.get(0).getElementsByTag("a").attr("href"));
+            book.setChapterUrl(info.get(0).getElementsByTag("a").attr("href"));
             book.setAuthor(info.get(2).text());
             book.setNewestChapterTitle(info.get(1).text());
-            book.setSource(BookSource.biquge44.toString());
+            book.setSource(LocalBookSource.biquge44.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

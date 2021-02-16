@@ -1,34 +1,17 @@
 package xyz.fycz.myreader.ui.dialog;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.*;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
-import xyz.fycz.myreader.application.SysManager;
-import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.enums.BookSource;
-import xyz.fycz.myreader.enums.Language;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.enums.ReadStyle;
-import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.util.BrightUtil;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.StringHelper;
 
@@ -61,7 +44,7 @@ public class DialogCreator {
         normalDialog.setNegativeButton("取消", negativeListener);
         // 显示
         final AlertDialog alertDialog = normalDialog.create();
-        MyApplication.runOnUiThread(() -> {
+        App.runOnUiThread(() -> {
             try {
                 alertDialog.show();
             } catch (Exception e) {
@@ -101,7 +84,7 @@ public class DialogCreator {
             normalDialog.setNegativeButton(key2, key2Listener);
             // 显示
 //        final MyAlertDialog alertDialog = normalDialog.create();
-            MyApplication.runOnUiThread(() -> {
+            App.runOnUiThread(() -> {
                 try {
 //                    final MyAlertDialog alertDialog = normalDialog.create();
                     normalDialog.show();
@@ -139,7 +122,7 @@ public class DialogCreator {
 
             // 显示
 //        final MyAlertDialog alertDialog = normalDialog.create();
-            MyApplication.runOnUiThread(new Runnable() {
+            App.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -182,7 +165,7 @@ public class DialogCreator {
       /*  progressDialog.setPositiveButton("确定",positiveListener);
         progressDialog.setNegativeButton("取消",negativeListener);*/
         // 显示
-        MyApplication.runOnUiThread(() -> {
+        App.runOnUiThread(() -> {
             try {
                 progressDialog.show();
             } catch (Exception e) {
@@ -226,7 +209,7 @@ public class DialogCreator {
             //  第三个按钮
             dialog.setPositiveButton(btnText3, positiveListener);
 
-            MyApplication.runOnUiThread(new Runnable() {
+            App.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     try {

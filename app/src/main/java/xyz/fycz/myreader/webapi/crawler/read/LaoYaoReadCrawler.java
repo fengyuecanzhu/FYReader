@@ -9,12 +9,9 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -158,8 +155,8 @@ public class LaoYaoReadCrawler implements ReadCrawler {
                 book.setUpdateDate(li.getElementsByClass("right").first().getElementsByTag("span").text());
                 String imgUrl = li.getElementsByTag("img").attr("data-original");
                 book.setImgUrl(!imgUrl.contains("http") ? "https:" + imgUrl : imgUrl);
-                book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("info", "list").replace(".html", "/"));
-                book.setSource(BookSource.laoyao.toString());
+                book.setChapterUrl(as.get(1).attr("href").replace("info", "list").replace(".html", "/"));
+                book.setSource(LocalBookSource.laoyao.toString());
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }
@@ -172,7 +169,7 @@ public class LaoYaoReadCrawler implements ReadCrawler {
 
     public Book getBookInfo(Document doc, Book book) {
         //小说源
-        book.setSource(BookSource.laoyao.toString());
+        book.setSource(LocalBookSource.laoyao.toString());
         //图片url
         String imgUrl = doc.select("meta[property=og:image]").attr("content");
         book.setImgUrl(!imgUrl.contains("http") ? "https:" + imgUrl : imgUrl);

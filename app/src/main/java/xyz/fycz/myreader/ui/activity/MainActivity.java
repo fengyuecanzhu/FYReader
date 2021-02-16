@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
@@ -290,10 +290,12 @@ public class MainActivity extends BaseActivity {
         } else if (itemId == R.id.action_refresh) {
             mBookcaseFragment.getmBookcasePresenter().initNoReadNum();
         } else if (itemId == R.id.action_edit) {
-            invalidateOptionsMenu();
-            initMenuAnim();
-            binding.bottomNavigationView.setVisibility(View.GONE);
-            binding.bottomNavigationView.startAnimation(mBottomOutAnim);
+            if (mBookcaseFragment.getmBookcasePresenter().canEditBookcase()) {
+                invalidateOptionsMenu();
+                initMenuAnim();
+                binding.bottomNavigationView.setVisibility(View.GONE);
+                binding.bottomNavigationView.startAnimation(mBottomOutAnim);
+            }
         } else if (itemId == R.id.action_qr_scan) {
             Intent intent = new Intent(this, QRCodeScanActivity.class);
             startActivityForResult(intent, APPCONST.REQUEST_QR_SCAN);
@@ -328,7 +330,7 @@ public class MainActivity extends BaseActivity {
         if (binding.viewPagerMain.getCurrentItem() == 0) {
             getSupportActionBar().setSubtitle(groupName);
         }
-//        MyApplication.checkVersionByServer(this);
+//        App.checkVersionByServer(this);
     }
 
 
@@ -399,7 +401,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        MyApplication.getApplication().shutdownThreadPool();
+        App.getApplication().shutdownThreadPool();
         super.onDestroy();
     }
 

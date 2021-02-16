@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.enums.BookSource;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
@@ -139,8 +139,8 @@ public class HongChenReadCrawler implements ReadCrawler {
             String imgUrl = dl.getElementsByTag("img").attr("data-original");
             book.setImgUrl(imgUrl);
             //https://www.zuxs.net/zu/1140.html -> https://www.zuxs.net/zu/1/1140/
-            book.setChapterUrl(NAME_SPACE + as.get(1).attr("href").replace("zu/", "zu/1/").replace(".html", "/"));
-            book.setSource(BookSource.hongchen.toString());
+            book.setChapterUrl(as.get(1).attr("href").replace("zu/", "zu/1/").replace(".html", "/"));
+            book.setSource(LocalBookSource.hongchen.toString());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             books.add(sbb, book);
         }

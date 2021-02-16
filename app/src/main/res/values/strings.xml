@@ -344,6 +344,113 @@
     <string name="refresh_books">更新目录</string>
     <string name="finish">完成</string>
     <string name="hot_search">热搜</string>
+    <string name="webdav_tip">1、 正确填写WebDAV 服务器地址、WebDAV 账号、WebDAV 密码；
+        （要获得这三项的信息，需要注册一个坚果云账号，如果直接在手机上注册，坚果云会让你下载app，
+        过程比较麻烦，为了一步到位，最好是在电脑上打开这个注册链接：
+        <a href="https://www.jianguoyun.com/d/signup">https://www.jianguoyun.com/d/signup</a>；
+        注册后，进入坚果云；点击右上角账户名处选择 “账户信息”，然后选择“安全选项”；
+        在“安全选项” 中找到“第三方应用管理”，并选择“添加应用”，输入名称如“风月读书”后，会生成密码，
+        选择完成；其中<a href="https://dav.jianguoyun.com/dav/">https://dav.jianguoyun.com/dav/</a>就是填入“WebDAV 服务器地址”的内容，“使用情况”后面的邮箱地址就是你的“WebDAV 账号”，点击显示密码后得到的密码就是你的“WebDAV 密码”。）
+        \n\n2、 无需操作，APP默认每天自动云备份一次。</string>
+    <string name="source_tab_base">基本</string>
+    <string name="source_tab_search">搜索</string>
+    <string name="source_tab_find">发现</string>
+    <string name="source_tab_info">详情</string>
+    <string name="source_tab_toc">目录</string>
+    <string name="source_tab_content">正文</string>
+
+
+    <!-- source start-->
+    <string name="source_name">书源名称</string>
+    <string name="source_url">书源URL</string>
+    <string name="source_group">书源分组</string>
+    <string name="source_charset">书源字符编码</string>
+    <string name="diy_source_group">自定义源分组</string>
+    <string name="diy_edit_source_group">输入自定义源分组名称</string>
+    <string name="diy_edit_source_group_title">【%s】</string>
+    <string name="sort_url">分类Url</string>
+    <string name="login_url">登录URL</string>
+    <string name="comment">书源说明</string>
+    <string name="r_search_url">搜索地址</string>
+    <string name="r_search_charset">搜索字符编码</string>
+    <string name="r_find_url">发现地址规则</string>
+    <string name="r_book_list">书籍列表规则</string>
+    <string name="r_book_name">书名规则</string>
+    <string name="r_info_url">详情页URL规则</string>
+    <string name="r_search_related_with_info">关联书籍详情</string>
+    <string name="r_author">作者规则</string>
+    <string name="rule_book_type">分类规则</string>
+    <string name="rule_book_desc">简介规则</string>
+    <string name="rule_img_url">封面规则</string>
+    <string name="rule_last_chapter">最新章节规则</string>
+    <string name="rule_word_count">字数规则</string>
+    <string name="rule_status">连载状态规则</string>
+    <string name="book_url_pattern">书籍URL正则</string>
+    <string name="rule_book_info_init">预处理规则</string>
+    <string name="rule_toc_url">目录URL规则</string>
+    <string name="rule_toc_internal">目录列表区间</string>
+    <string name="rule_next_toc_url">目录下一页规则</string>
+    <string name="rule_chapter_list">目录列表规则</string>
+    <string name="rule_chapter_base_url">章节BaseURL规则</string>
+    <string name="rule_chapter_name">章节名称(和URL)规则</string>
+    <string name="rule_chapter_url">章节URL规则</string>
+    <string name="rule_is_vip">VIP标识</string>
+    <string name="rule_update_time">更新时间规则</string>
+    <string name="rule_book_content">正文规则</string>
+    <string name="rule_base_url_content">正文BaseURL规则</string>
+    <string name="rule_next_content">正文下一页URL规则</string>
+    <string name="rule_web_js">webJs</string>
+    <string name="rule_image_style">图片样式</string>
+    <string name="rule_replace_regex">替换规则</string>
+    <string name="rule_font_js">字体处理js</string>
+    <string name="rule_source_regex">资源正则</string>
+    <!-- source end-->
+
+    <string name="source_icon">图标</string>
+    <string name="r_articles">列表规则</string>
+    <string name="r_next">列表下一页规则</string>
+    <string name="r_title">标题规则</string>
+    <string name="r_guid">guid规则</string>
+    <string name="r_date">时间规则</string>
+    <string name="r_categories">类别规则</string>
+    <string name="r_description">描述规则</string>
+    <string name="r_image">图片url规则</string>
+    <string name="r_content">内容规则</string>
+    <string name="r_style">样式</string>
+    <string name="r_link">链接规则</string>
+    <string name="book_source_man">书源管理</string>
+    <string name="select_all">全选</string>
+    <string name="enable_selected">启用所选</string>
+    <string name="disable_selected">禁用所选</string>
+    <string name="check_selected">校验所选</string>
+    <string name="check">校验</string>
+    <string name="new_source">新建书源</string>
+    <string name="import_source">导入书源</string>
+    <string name="source_tip">书源说明</string>
+    <string name="cancle_select_all">取消全选</string>
+    <string name="delete_ban_source">删除禁用书源</string>
+    <string name="reverse_source">反转书源可用性</string>
+    <string name="edit_mode">编辑模式</string>
+    <string name="export_selected">导出选中</string>
+    <string name="share_selected">分享选中</string>
+    <string name="reverse_enable_selected">反转选中可用性</string>
+    <string name="finish_edit">完成编辑</string>
+    <string name="delete_selected">删除选中</string>
+    <string name="reverse_selected">反选</string>
+    <string name="share_all">分享所有</string>
+    <string name="parse_result">解析结果</string>
+    <string name="source_code">网页源码</string>
+    <string name="re_request">重新请求</string>
+    <string name="debug_search">测试搜索配置</string>
+    <string name="debug_info">测试书籍详情</string>
+    <string name="debug_toc">测试目录列表</string>
+    <string name="debug_content">测试章节内容</string>
+    <string name="debug">测试</string>
+    <string name="debug_desc">书源名称：%s\n书源URL：%s\n测试URL：%s</string>
+    <string name="enable_source">启用书源</string>
+    <string name="parser">解析器</string>
+    <string name="all_source">所有书源</string>
+    <string name="local_source">内置书源</string>
 
     <string-array name="reset_screen_time">
         <item>常亮</item>
@@ -418,5 +525,12 @@
     <string-array name="import_rule">
         <item>从剪切板导入</item>
         <item>从文件导入</item>
+        <item>从网络导入</item>
+    </string-array>
+
+    <string-array name="source_type">
+        <item>Matcher</item>
+        <item>Xpath</item>
+        <item>JsonPath</item>
     </string-array>
 </resources>

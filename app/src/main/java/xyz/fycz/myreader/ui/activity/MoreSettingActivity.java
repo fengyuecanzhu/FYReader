@@ -19,20 +19,22 @@ import androidx.fragment.app.FragmentTransaction;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.MyApplication;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.BaseFragment;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityMoreSettingBinding;
 import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.enums.BookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -41,7 +43,6 @@ import xyz.fycz.myreader.ui.fragment.WebDavFragment;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
-import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 
 import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
 
@@ -127,7 +128,7 @@ public class MoreSettingActivity extends BaseActivity {
         } else if (curFragment == mWebDavFragment) {
             getSupportActionBar().setTitle(getString(R.string.webdav_setting));
             invalidateOptionsMenu();
-        }else if (curFragment == mPrivateBooksFragment){
+        } else if (curFragment == mPrivateBooksFragment) {
             getSupportActionBar().setTitle(getString(R.string.private_bookcase));
             invalidateOptionsMenu();
         }
@@ -170,8 +171,8 @@ public class MoreSettingActivity extends BaseActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_tip) {
             if (curFragment == mWebDavFragment) {
-                DialogCreator.createAssetTipDialog(this, "如何使用WebDav进行云备份？", "webdavhelp.fy");
-            }else if(curFragment == mPrivateBooksFragment){
+                MyAlertDialog.showTipDialogWithLink(this, "如何使用WebDav进行云备份？", R.string.webdav_tip);
+            } else if (curFragment == mPrivateBooksFragment) {
                 DialogCreator.createTipDialog(this, "关于私密书架", getString(R.string.private_bookcase_tip));
             }
         }
@@ -256,7 +257,7 @@ public class MoreSettingActivity extends BaseActivity {
                     SysManager.saveSetting(mSetting);
                 }
         );
-        binding.rlContentReplace.setOnClickListener(v -> startActivity(new Intent(this, RuleActivity.class)));
+        binding.rlContentReplace.setOnClickListener(v -> startActivity(new Intent(this, ReplaceRuleActivity.class)));
         binding.rlReadAloudVolumeTurnPage.setOnClickListener(
                 (v) -> {
                     if (readAloudVolumeTurnPage) {
@@ -325,7 +326,7 @@ public class MoreSettingActivity extends BaseActivity {
         );
 
         binding.llCloseRefresh.setOnClickListener(v -> {
-            MyApplication.runOnUiThread(() -> {
+            App.runOnUiThread(() -> {
                 if (mCloseRefreshDia != null) {
                     mCloseRefreshDia.show();
                     return;
@@ -369,52 +370,6 @@ public class MoreSettingActivity extends BaseActivity {
             });
         });
 
-        binding.llDisableSource.setOnClickListener(v -> {
-            if (mDisableSourceDia != null) {
-                mDisableSourceDia.show();
-                return;
-            }
-
-            HashMap<CharSequence, Boolean> mSources = ReadCrawlerUtil.getDisableSources();
-            CharSequence[] mSourcesName = new CharSequence[mSources.keySet().size()];
-            boolean[] isDisables = new boolean[mSources.keySet().size()];
-            int dSourceCount = 0;
-            int i = 0;
-            for (CharSequence sourceName : mSources.keySet()) {
-                mSourcesName[i] = sourceName;
-                Boolean isDisable = mSources.get(sourceName);
-                if (isDisable == null) isDisable = false;
-                if (isDisable) dSourceCount++;
-                isDisables[i++] = isDisable;
-            }
-
-            mDisableSourceDia = new MultiChoiceDialog().create(this, "选择禁用的书源",
-                    mSourcesName, isDisables, dSourceCount, (dialog, which) -> {
-                        SharedPreUtils spu = SharedPreUtils.getInstance();
-                        StringBuilder sb = new StringBuilder();
-                        for (CharSequence sourceName : mSources.keySet()) {
-                            if (!mSources.get(sourceName)) {
-                                sb.append(BookSource.getFromName(String.valueOf(sourceName)));
-                                sb.append(",");
-                            }
-                        }
-                        if (sb.lastIndexOf(",") >= 0) sb.deleteCharAt(sb.lastIndexOf(","));
-                        spu.putString(getString(R.string.searchSource), sb.toString());
-                    }, null, new DialogCreator.OnMultiDialogListener() {
-                        @Override
-                        public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
-                            mSources.put(mSourcesName[which], isChecked);
-                        }
-
-                        @Override
-                        public void onSelectAll(boolean isSelectAll) {
-                            for (CharSequence sourceName : mSources.keySet()) {
-                                mSources.put(sourceName, isSelectAll);
-                            }
-                        }
-                    });
-        });
-
         binding.llThreadNum.setOnClickListener(v -> {
             View view = LayoutInflater.from(this).inflate(R.layout.dialog_number_picker, null);
             NumberPicker threadPick = view.findViewById(R.id.number_picker);
@@ -452,7 +407,7 @@ public class MoreSettingActivity extends BaseActivity {
 
 
         binding.llDownloadAll.setOnClickListener(v -> {
-            MyApplication.runOnUiThread(() -> {
+            App.runOnUiThread(() -> {
                 if (mDownloadAllDia != null) {
                     mDownloadAllDia.show();
                     return;
@@ -505,7 +460,7 @@ public class MoreSettingActivity extends BaseActivity {
         binding.rlCatheGap.setOnClickListener(v -> binding.scCatheGap.performClick());
 
         binding.rlDeleteCathe.setOnClickListener(v -> {
-            MyApplication.runOnUiThread(() -> {
+            App.runOnUiThread(() -> {
                 File catheFile = getCacheDir();
                 String catheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(catheFile));
 
@@ -693,7 +648,7 @@ public class MoreSettingActivity extends BaseActivity {
         }
     }
 
-    private void showPrivateBooksFragment(){
+    private void showPrivateBooksFragment() {
         binding.svContent.setVisibility(View.GONE);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if (mPrivateBooksFragment == null) {
