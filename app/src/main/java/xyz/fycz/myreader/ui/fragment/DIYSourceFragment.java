@@ -2,6 +2,7 @@ package xyz.fycz.myreader.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -166,6 +167,12 @@ public class DIYSourceFragment extends BaseFragment {
 
                         }
                     }).show();
+        });
+
+        binding.tvSourceTip.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://blog.csdn.net/fengyuecanzhu/article/details/113826962"));
+            startActivity(intent);
         });
 
         binding.ivGroup.setOnClickListener(this::showSourceGroupMenu);

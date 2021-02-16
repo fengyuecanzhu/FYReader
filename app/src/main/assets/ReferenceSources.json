@@ -1,0 +1,237 @@
+[
+  {
+    "contentRule": {
+      "content": "<div id=\"content\"><html></div>##@r(<p>因某些原因.*回家的路！,);@r(<p>喜欢.*最快。,)"
+    },
+    "enable": true,
+    "infoRule": {
+      "updateTime": ""
+    },
+    "orderNum": 1,
+    "searchRule": {
+      "author": "作者：<span><text></span>",
+      "desc": "<dd class=\"book_des\"><text></dd>",
+      "imgUrl": "<img src=\"<text>\"",
+      "lastChapter": "最新章节：<a href=\"(*)\"><text></a>",
+      "list": "<div id=\"sitembox\"><text><div class=\"update_title\">",
+      "name": "<h3><a href=\"(*)\"><text></a>",
+      "relatedWithInfo": false,
+      "searchUrl": "/search.html,searchtype=all&searchkey={key}",
+      "status": "状态：<span><text></span>",
+      "tocUrl": "<dt><a href=\"<text>\">",
+      "type": "分类：<span><text></span>",
+      "updateTime": "更新时间：<span><text></span>",
+      "wordCount": "字数：<span><text></span>"
+    },
+    "sourceCharset": "utf-8",
+    "sourceComment": "",
+    "sourceGroup": "Matcher; 参考书源",
+    "sourceName": "笔下文学",
+    "sourceType": "Matcher",
+    "sourceUrl": "https://www.bxwxorg.com",
+    "tocRule": {
+      "chapterList": "<div id=\"list\"><text></div>",
+      "chapterName": "<dd><a href=\"<link>\"><title></a></dd>##!12"
+    },
+    "weight": 0
+  },
+  {
+    "contentRule": {
+      "content": "<dd id=\"contents\"><html></dd>##@r(，最快(*)最新章节！,)"
+    },
+    "enable": true,
+    "infoRule": {
+      "author": "小说作者：<a href=\"(*)\"><text></a>",
+      "desc": "<div class=\"intro_info\"><html></div>##@r(简介：,)",
+      "imgUrl": "<img src=\"<text>\"",
+      "lastChapter": "最新：<a href=\"(*)\"><text></a>",
+      "name": "<h3 id=\"_55_h1\"><text> 520小说吧</h3>",
+      "tocUrl": "<p><a href=\"<text>\"><h2>##@r(info-,read/);@a(<text>+index.html)",
+      "type": "小说分类：<a href=\"(*)\"><text></a>"
+    },
+    "orderNum": 2,
+    "searchRule": {
+      "author": "<a href=\"/author/(*)\"><text></a>",
+      "charset": "",
+      "infoUrl": "</a><a href=\"<text>\" class=\"blue\">",
+      "list": "<div class=\"cover\"><text></div>",
+      "name": "<a href=\"(*)\" class=\"blue\"><text></a>",
+      "relatedWithInfo": true,
+      "searchUrl": "/modules/article/waps.php,searchtype=articlename&searchkey={key}&submit=",
+      "tocUrl": "</a><a href=\"<text>\" class=\"blue\">##@r(info-,read/);@a(<text>+index.html)",
+      "type": "<a href=\"/sort-(*)/\"><text></a>##@r((\\[|\\]),)"
+    },
+    "sourceCharset": "gbk",
+    "sourceGroup": "💗 女频; Matcher; 参考书源",
+    "sourceName": "💗 520小说",
+    "sourceType": "Matcher",
+    "sourceUrl": "http://www.520xsb.com",
+    "tocRule": {
+      "chapterBaseUrl": "<h1><a href=\"<text>\">##@r(index.html,)",
+      "chapterList": "<table cellspacing=\"1\" cellpadding=\"0\" bgcolor=\"#E4E4E4\" id=\"at\"><text></ul></table>",
+      "chapterName": "<td class=\"L\"><a href=\"<link>\"><title></a></td>"
+    },
+    "weight": 0
+  },
+  {
+    "contentRule": {
+      "content": "<div id=\"content\"><html></div>"
+    },
+    "enable": true,
+    "infoRule": {
+      "author": "<meta name=\"og:novel:author\" content=\"<text>\" />",
+      "desc": "<div id=\"intro\"><html></div>",
+      "imgUrl": "<meta property=\"og:image\" content=\"<text>\" />",
+      "lastChapter": "<meta name=\"og:novel:latest_chapter_name\" content=\"<text>\" />",
+      "name": "<meta property=\"og:title\" content=\"<text>\" />",
+      "status": "<meta name=\"og:novel:status\" content=\"<text>\" />",
+      "tocUrl": "<meta name=\"og:novel:read_url\" content=\"<text>\" />",
+      "type": "<meta name=\"og:novel:category\" content=\"<text>\" />",
+      "updateTime": "<meta name=\"og:novel:update_time\" content=\"<text>\" />"
+    },
+    "orderNum": 3,
+    "searchRule": {
+      "author": "<td class=\"odd\"><text></td>##@nc(<a)",
+      "charset": "",
+      "lastChapter": "<a href=\"(*)\" target=\"_blank\"><text></a>",
+      "list": "<table class=\"grid\" width=\"100%\" align=\"center\"><text></table>",
+      "name": "<td class=\"odd\"><a href=\"(*)\"><text></a></td>",
+      "relatedWithInfo": true,
+      "searchUrl": "/modules/article/search.php?searchkey={key}",
+      "status": "<td class=\"even\" align=\"center\"><text></td>",
+      "tocUrl": "<td class=\"odd\"><a href=\"<text>\">",
+      "updateTime": "<td class=\"odd\" align=\"center\"><text></td>",
+      "wordCount": "<td class=\"even\"><text></td>##@nc(<a)"
+    },
+    "sourceCharset": "gbk",
+    "sourceComment": "",
+    "sourceGroup": "Matcher; 参考书源",
+    "sourceName": "顶点小说",
+    "sourceType": "Matcher",
+    "sourceUrl": "https://www.23wx.cc",
+    "tocRule": {
+      "chapterBaseUrl": "<meta name=\"og:novel:read_url\" content=\"<text>\" />",
+      "chapterList": "<div id=\"list\"><text></div>",
+      "chapterName": "<dd><a href=\"<link>\"><title></a></dd>"
+    },
+    "weight": 0
+  },
+  {
+    "contentRule": {
+      "content": "//*[@class=\"content\"]/html()##@r(您可以(*)最新章节！,);@r(<p>(*)</p>,)"
+    },
+    "enable": true,
+    "infoRule": {
+      "desc": "//*[@id=\"intro\"]/text()",
+      "imgUrl": "//meta[@property=\"og:image\"]/@content",
+      "status": ""
+    },
+    "orderNum": 4,
+    "searchRule": {
+      "author": "/span[4]/text()",
+      "lastChapter": "/span[3]/a/text()",
+      "list": "//*[@id=\"main\"]/div[1]/ul/li",
+      "name": "/span[2]/a/text()",
+      "relatedWithInfo": true,
+      "searchUrl": "/search.html,searchkey={key}",
+      "status": "/span[6]/text()",
+      "tocUrl": "/span[2]/a/@href",
+      "type": "/span[1]/a/text()",
+      "updateTime": "/span[5]/text()"
+    },
+    "sourceGroup": "Xpath; 参考书源",
+    "sourceName": "搜书网",
+    "sourceType": "Xpath",
+    "sourceUrl": "https://www.soshuw.com",
+    "tocRule": {
+      "chapterList": "//*[@class=\"novel_list\"][2]//dd/a",
+      "chapterName": "/text()",
+      "chapterUrl": "/@href"
+    },
+    "weight": 0
+  },
+  {
+    "contentRule": {
+      "content": "//*[@id=\"content\"]/html()##@r(你是天才，一秒记住：红甘泉小说网:,);@r(www.hgq26.com,)"
+    },
+    "enable": true,
+    "infoRule": {
+      "author": "//*[@id=\"author\"]/a/text()",
+      "desc": "//*[@id=\"bookintro\"]/p/text()[1]",
+      "imgUrl": "//*[@id=\"bookimg\"]/img/@src",
+      "lastChapter": "//*[@id=\"newlist\"]/ul/li[1]/a/text()",
+      "name": "//*[@id=\"bookinfo\"]/div[2]/h1/text()",
+      "status": "//*[@id=\"count\"]/span[6]/text()",
+      "tocUrl": "//*[@id=\"newlist\"]/div/strong/a/@href",
+      "type": "//*[@id=\"count\"]/span[1]/text()",
+      "updateTime": "//*[@id=\"bookinfo\"]/div[2]/div[5]/span[1]/text()##@r(最后更新：,)",
+      "wordCount": "//*[@id=\"count\"]/span[5]/text()"
+    },
+    "orderNum": 5,
+    "searchRule": {
+      "author": "/td[3]/text()",
+      "infoUrl": "/td[1]/a/@href",
+      "lastChapter": "/td[2]/a/text()",
+      "list": "//*[@id=\"nr\"]",
+      "name": "/td[1]/a/text()",
+      "relatedWithInfo": true,
+      "searchUrl": "/modules/article/search.php,searchkey={key}",
+      "status": "/td[6]/text()",
+      "tocUrl": "/td[1]/a/@href##@r(book,0);@r(.html,/)",
+      "type": "",
+      "updateTime": "/td[5]/text()",
+      "wordCount": "/td[4]/text()"
+    },
+    "sourceCharset": "gbk",
+    "sourceGroup": "Xpath; 参考书源",
+    "sourceName": "红甘泉",
+    "sourceType": "Xpath",
+    "sourceUrl": "https://www.hgq26.com",
+    "tocRule": {
+      "chapterBaseUrl": "",
+      "chapterList": "//*[@id=\"readerlist\"]/ul/li/a",
+      "chapterName": "/text()",
+      "chapterUrl": "/@href"
+    },
+    "weight": 0
+  },
+  {
+    "contentRule": {
+      "content": "//*[@id=\"content\"]/html()##@r(本章未完.*继续阅读--.*$,)",
+      "contentBaseUrl": "//a[@id=\"backToDirButton\"]/@href",
+      "contentUrlNext": "//a[@id=\"nextChapterButton\" and @title=\"下一页\"]/@href"
+    },
+    "enable": true,
+    "infoRule": {
+      "imgUrl": "//meta[@property=\"og:image\"]/@content",
+      "lastChapter": "//*[@id=\"info\"]/p[4]/a/text()",
+      "type": "//div[@class=\"con_top\"]/a[2]/text()"
+    },
+    "orderNum": 6,
+    "searchRule": {
+      "author": "/td[3]/a/text()",
+      "desc": "/td[2]/text()",
+      "list": "//*[@id=\"nr\"]",
+      "name": "/td[1]/a/text()",
+      "relatedWithInfo": true,
+      "searchUrl": "http://www.kandashuw.com/plus/search.php?q={key}&searchtype=articlename",
+      "status": "/td[6]/text()",
+      "tocUrl": "/td[1]/a/@href",
+      "type": "",
+      "updateTime": "/td[5]/text()",
+      "wordCount": "/td[4]/text()"
+    },
+    "sourceCharset": "gbk",
+    "sourceGroup": "Xpath; 参考书源",
+    "sourceName": "看大书网",
+    "sourceType": "Xpath",
+    "sourceUrl": "http://www.kandashuw.com",
+    "tocRule": {
+      "chapterBaseUrl": "//div[@class=\"con_top\"]/a[3]/@href",
+      "chapterList": "//*[@id=\"list\"]/dl/dd/a",
+      "chapterName": "/text()",
+      "chapterUrl": "/@href"
+    },
+    "weight": 0
+  }
+]
