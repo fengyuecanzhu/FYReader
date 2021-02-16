@@ -2,6 +2,8 @@
 
 ## 风月读书DIY书源说明
 
+[参考书源](./app/src/main/assets/ReferenceSources.json)
+
 ### 一、解析器
 
 #### 1、Matcher

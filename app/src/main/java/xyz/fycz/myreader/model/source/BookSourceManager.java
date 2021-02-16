@@ -15,14 +15,17 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
+import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.GreenDaoManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.gen.BookSourceDao;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.GsonUtils;
 import xyz.fycz.myreader.util.utils.MeUtils;
@@ -271,7 +274,8 @@ public class BookSourceManager {
             String group = cursor.getString(0);
             if (TextUtils.isEmpty(group) || TextUtils.isEmpty(group.trim())) continue;
             for (String item : group.split("\\s*[,;，；]\\s*")) {
-                if (TextUtils.isEmpty(item) || groupList.contains(item)|| item.equals("内置书源")) continue;
+                if (TextUtils.isEmpty(item) || groupList.contains(item) || item.equals("内置书源"))
+                    continue;
                 groupList.add(item);
             }
         } while (cursor.moveToNext());
@@ -288,7 +292,8 @@ public class BookSourceManager {
             String group = cursor.getString(0);
             if (TextUtils.isEmpty(group) || TextUtils.isEmpty(group.trim())) continue;
             for (String item : group.split("\\s*[,;，；]\\s*")) {
-                if (TextUtils.isEmpty(item) || groupList.contains(item) || item.equals("内置书源")) continue;
+                if (TextUtils.isEmpty(item) || groupList.contains(item) || item.equals("内置书源"))
+                    continue;
                 groupList.add(item);
             }
         } while (cursor.moveToNext());
@@ -330,7 +335,7 @@ public class BookSourceManager {
                                     .where(BookSourceDao.Properties.SourceUrl.eq(bookSource.getSourceUrl()))
                                     .buildDelete().executeDeleteWithoutDetachingEntities();
                         } else {
-                            if (addBookSource(bookSource)){
+                            if (addBookSource(bookSource)) {
                                 successImportSources.add(bookSource);
                             }
                         }
@@ -373,7 +378,14 @@ public class BookSourceManager {
             source1.setOrderNum(0);
             GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplace(source1);
         }
-        BookSourceManager.importBookSourceFromJson(FileUtils.readAssertFile(App.getmContext(),
-                "ReferenceSources.json"));
+        String referenceSources = FileUtils.readAssertFile(App.getmContext(),
+                "ReferenceSources.json");
+        Observable<List<BookSource>> observable = BookSourceManager.importBookSourceFromJson(referenceSources);
+        observable.subscribe(new MyObserver<List<BookSource>>() {
+            @Override
+            public void onNext(@NonNull List<BookSource> sources) {
+
+            }
+        });
     }
 }

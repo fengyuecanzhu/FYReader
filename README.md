@@ -2,7 +2,7 @@
 
 风月读书，一款开源、无广告的小说阅读软件。
 
-成品下载(v1.8.2)：[https://fycz.lanzous.com/iEy9kldwrpi](https://fycz.lanzous.com/iEy9kldwrpi)
+成品下载(v1.9.0-beta 支持自定义书源)：[https://fycz.lanzous.com/ixI19lqnscf](https://fycz.lanzous.com/ixI19lqnscf)
 
 [更新日志](./app/src/main/assets/updatelog.fy)
 

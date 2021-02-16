@@ -336,7 +336,7 @@ public class SearchBookActivity extends BaseActivity {
      */
     public void initSourceGroupMenu() {
         if (menu == null) return;
-        String searchGroup = SharedPreUtils.getInstance().getString("");
+        String searchGroup = SharedPreUtils.getInstance().getString("searchGroup");
         menu.removeGroup(R.id.source_group);
         MenuItem item = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.all_source);
         MenuItem localItem = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.local_source);
