@@ -159,13 +159,14 @@
         }
         ```
 
-    * 第二步：注册书源信息。
-
-      * 在app/src/main/resources/crawler.properties配置文件中添加书源类信息，例如：
-
-        * ```java
-          // biquge44书源的命名，与BookSource中的命名一致，xyz.fycz.myreader.webapi.crawler.read.BiQuGe44ReadCrawler是书源类的完整路径
-          biquge44=xyz.fycz.myreader.webapi.crawler.read.BiQuGe44ReadCrawler
-          ```
-
-    * 第三步：添加书源到数据库。
+    * 第二步：添加书源到数据库。
+      ```java
+        BookSource source = new BookSource();
+        source.setSourceEName("ename");//这是内置书源标识，必填
+        source.setSourceName(source.text);//设置书源名称
+        source.setSourceGroup("内置书源");//设置书源分组
+        source.setEnable(true);//设置书源可用性
+        source.setSourceUrl("xyz.fycz.myreader.webapi.crawler.read.BiQuGe44ReadCrawler");//这是书源完整类路径，必填
+        source.setOrderNum(0);//内置书源一般设置排序为0
+        GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplace(source);//添加书源进数据库
+      ```
