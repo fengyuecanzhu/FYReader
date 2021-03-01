@@ -15,6 +15,7 @@ import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.ChapterService;
+import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
@@ -225,7 +226,9 @@ public class NetPageLoader extends PageLoader {
             @Override
             public void onFinish(final Object o, int code) {
                 loadingChapters.remove(chapter);
-                mChapterService.saveOrUpdateChapter(chapter, (String) o);
+                String content = (String) o;
+                if (StringHelper.isEmpty(content)) content = "章节内容为空";
+                mChapterService.saveOrUpdateChapter(chapter, content);
                 if (isClose()) return;
                 if (getPageStatus() == PageLoader.STATUS_LOADING && mCurChapterPos == chapter.getNumber()) {
                     App.runOnUiThread(() -> {

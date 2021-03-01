@@ -104,6 +104,7 @@ public class MatcherAnalyzer extends BaseAnalyzer{
                 rules[1] = rules[1].replace("(*)", ".*");
                 rMatcher = Pattern.compile(rules[1]).matcher(html);
                 while ((lIndex = html.indexOf(rules[0], lIndex)) != -1) {
+                    lIndex += rules[0].length();
                     while (rIndex < lIndex && rMatcher.find()) {
                         rIndex = rMatcher.start();
                     }

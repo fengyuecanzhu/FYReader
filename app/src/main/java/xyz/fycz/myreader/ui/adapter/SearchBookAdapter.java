@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.ui.adapter;
 
+import android.app.Activity;
 import android.text.TextUtils;
 
 import xyz.fycz.myreader.application.App;
@@ -14,6 +15,7 @@ import xyz.fycz.myreader.ui.adapter.holder.SearchBookHolder;
 import xyz.fycz.myreader.util.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,11 +23,13 @@ import java.util.List;
  * @date 2020/10/2 10:08
  */
 public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
+    private Activity activity;
     private ConcurrentMultiValueMap<SearchBookBean, Book> mBooks;
     private SearchEngine searchEngine;
     private String keyWord;
 
-    public SearchBookAdapter(ConcurrentMultiValueMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord) {
+    public SearchBookAdapter(Activity activity, ConcurrentMultiValueMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord) {
+        this.activity = activity;
         this.mBooks = mBooks;
         this.searchEngine = searchEngine;
         this.keyWord = keyWord;
@@ -33,7 +37,7 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
 
     @Override
     protected IViewHolder<SearchBookBean> createViewHolder(int viewType) {
-        return new SearchBookHolder(mBooks, searchEngine, keyWord);
+        return new SearchBookHolder(activity, mBooks, searchEngine, keyWord);
     }
 
     public void addAll(List<SearchBookBean> newDataS, String keyWord) {
@@ -63,7 +67,7 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
                 break;
         }
 
-        if (filterDataS != null && filterDataS.size() > 0) {
+        if (filterDataS.size() > 0) {
             List<SearchBookBean> searchBookBeansAdd = new ArrayList<>();
             if (copyDataS.size() == 0) {
                 copyDataS.addAll(filterDataS);
@@ -79,7 +83,6 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
                             break;
                         }
                     }
-
                     if (!hasSame) {
                         searchBookBeansAdd.add(temp);
                     }
@@ -107,6 +110,7 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
                     }
                 }
             }
+
             synchronized (this) {
                 App.runOnUiThread(() -> {
                     mList = copyDataS;
@@ -114,5 +118,48 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
                 });
             }
         }
+    }
+
+    private void sort(List<SearchBookBean> bookBeans) {
+        //排序，基于最符合关键字的搜书结果应该是最短的
+        //TODO ;这里只做了简单的比较排序，还需要继续完善
+        Collections.sort(bookBeans, (o1, o2) -> {
+            if (o1.getName().equals(keyWord))
+                return -1;
+            if (o2.getName().equals(keyWord))
+                return 1;
+            if (o1.getAuthor() != null && o1.getAuthor().equals(keyWord))
+                return -1;
+            if (o2.getAuthor() != null && o2.getAuthor().equals(keyWord))
+                return 1;
+            return Integer.compare(o1.getName().length(), o2.getName().length());
+        });
+    }
+
+    private int getAddIndex(List<SearchBookBean> beans, SearchBookBean bean) {
+        int maxWeight = 0;
+        int index = -1;
+        if (TextUtils.equals(keyWord, bean.getName())) {
+            maxWeight = 5;
+        }else if (TextUtils.equals(keyWord, bean.getAuthor())) {
+            maxWeight = 3;
+        }
+        for (int i = 0; i < beans.size(); i++) {
+            SearchBookBean searchBook = beans.get(i);
+            int weight = 0;
+            if (TextUtils.equals(bean.getName(), searchBook.getName())) {
+                weight = 4;
+            } else if (TextUtils.equals(bean.getAuthor(), searchBook.getAuthor())) {
+                weight = 2;
+            } else if (bean.getName().length() <= searchBook.getName().length()) {
+                weight = 1;
+            }
+            if (weight > maxWeight) {
+                index = i;
+                maxWeight = weight;
+            }
+        }
+        if (maxWeight == 5 || maxWeight == 3) index = 0;
+        return index;
     }
 }

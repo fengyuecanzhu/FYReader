@@ -35,34 +35,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/cover"
-            android:layout_marginLeft="14dp"
+            android:layout_marginStart="14dp"
             android:layout_marginTop="30dp"
-            android:layout_toRightOf="@+id/cover"
+            android:layout_toEndOf="@+id/cover"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/origin"
             tools:text=" 茶叶蛋" />
 
-    <TextView
-            android:id="@+id/book_detail_tv_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/book_detail_tv_author"
-            android:layout_alignLeft="@id/book_detail_tv_author"
-            android:layout_marginTop="6dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/textSecondaryInverted"
-            tools:text="仙侠" />
 
+
+    <com.zhy.view.flowlayout.TagFlowLayout
+        android:id="@+id/tfl_book_tag"
+        android:layout_below="@+id/book_detail_tv_author"
+        android:layout_alignStart="@id/book_detail_tv_author"
+        android:layout_marginTop="2dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:max_select="0"
+        app:tag_gravity="left" />
 
     <TextView
         android:id="@+id/book_detail_source"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/book_detail_tv_type"
-        android:layout_alignLeft="@id/book_detail_tv_type"
-        android:layout_marginTop="6dp"
+        android:layout_below="@id/tfl_book_tag"
+        android:layout_alignStart="@id/tfl_book_tag"
+        android:layout_marginTop="2dp"
         android:textColor="@color/textSecondaryInverted"
         tools:text="书源" />
 

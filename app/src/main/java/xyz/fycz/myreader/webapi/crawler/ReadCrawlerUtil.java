@@ -52,7 +52,7 @@ public class ReadCrawlerUtil {
             sb.deleteCharAt(sb.lastIndexOf(","));
             searchSource = sb.toString();
             spu.putString(App.getmContext().getString(R.string.searchSource), searchSource);
-        } else if (!"".equals(searchSource)){
+        } else if (!"".equals(searchSource)) {
             String[] sources = searchSource.split(",");
             for (String source : sources) {
                 readCrawlers.add(getReadCrawler(source));
@@ -61,7 +61,7 @@ public class ReadCrawlerUtil {
         return readCrawlers;
     }
 
-    public static List<String> getAllSources(){
+    public static List<String> getAllSources() {
         List<String> sources = new ArrayList<>();
         for (LocalBookSource bookSource : LocalBookSource.values()) {
             if (bookSource.equals(LocalBookSource.fynovel))
@@ -77,14 +77,16 @@ public class ReadCrawlerUtil {
         HashMap<CharSequence, Boolean> mSources = new LinkedHashMap<>();
         if (searchSource == null) {
             for (LocalBookSource bookSource : LocalBookSource.values()) {
-                if (bookSource.equals(LocalBookSource.fynovel) || bookSource.equals(LocalBookSource.local)) continue;
+                if (bookSource.equals(LocalBookSource.fynovel) || bookSource.equals(LocalBookSource.local))
+                    continue;
                 mSources.put(bookSource.text, false);
             }
         } else {
             String[] ableSources = searchSource.split(",");
             bookSourceFor:
             for (LocalBookSource bookSource : LocalBookSource.values()) {
-                if (bookSource.equals(LocalBookSource.fynovel) || bookSource.equals(LocalBookSource.local)) continue;
+                if (bookSource.equals(LocalBookSource.fynovel) || bookSource.equals(LocalBookSource.local))
+                    continue;
                 for (String ableSource : ableSources) {
                     if (ableSource.equals(bookSource.toString())) {
                         mSources.put(bookSource.text, false);
@@ -97,7 +99,7 @@ public class ReadCrawlerUtil {
         return mSources;
     }
 
-    public static void resetReadCrawlers(){
+    public static void resetReadCrawlers() {
         StringBuilder sb = new StringBuilder();
         for (LocalBookSource bookSource : LocalBookSource.values()) {
             if (bookSource.equals(LocalBookSource.fynovel) || bookSource.equals(LocalBookSource.local))
@@ -109,22 +111,22 @@ public class ReadCrawlerUtil {
         SharedPreUtils.getInstance().putString(App.getmContext().getString(R.string.searchSource), sb.toString());
     }
 
-    public synchronized static void addReadCrawler(LocalBookSource... bookSources){
+    public synchronized static void addReadCrawler(LocalBookSource... bookSources) {
         SharedPreUtils spu = SharedPreUtils.getInstance();
         String searchSource = spu.getString(App.getmContext().getString(R.string.searchSource));
-        if ("".equals(searchSource)){
+        if ("".equals(searchSource)) {
             resetReadCrawlers();
             return;
         }
         StringBuilder sb = new StringBuilder(searchSource);
-        for (LocalBookSource bookSource : bookSources){
+        for (LocalBookSource bookSource : bookSources) {
             sb.append(",");
             sb.append(bookSource.toString());
         }
         SharedPreUtils.getInstance().putString(App.getmContext().getString(R.string.searchSource), sb.toString());
     }
 
-    public synchronized static void removeReadCrawler(String... bookSources){
+    public synchronized static void removeReadCrawler(String... bookSources) {
         SharedPreUtils spu = SharedPreUtils.getInstance();
         String searchSource = spu.getString(App.getmContext().getString(R.string.searchSource), null);
         if (searchSource == null) {
@@ -141,7 +143,7 @@ public class ReadCrawlerUtil {
             }
         }
         StringBuilder sb = new StringBuilder();
-        for (String ableSource : ableSources){
+        for (String ableSource : ableSources) {
             if ("".equals(ableSource)) continue;
             sb.append(ableSource);
             sb.append(",");
@@ -172,46 +174,48 @@ public class ReadCrawlerUtil {
     }
 
     public static ReadCrawler getReadCrawler(BookSource source) {
-        if (StringHelper.isEmpty(source.getSourceEName())) {
-            BaseSourceCrawler crawler;
-            if (source.getSourceType() == null) source.setSourceType(MATCHER);
-            switch (source.getSourceType()){
-                case MATCHER: default:
-                    crawler = new MatcherCrawler(source);
-                    break;
-                case XPATH:
-                    crawler = new XpathCrawler(source);
-                    break;
-                case JSON_PATH:
-                    crawler = new JsonPathCrawler(source);
-                    break;
-            }
-            if (source.getSearchRule().isRelatedWithInfo()) {
-                return crawler;
+        try {
+            if (StringHelper.isEmpty(source.getSourceEName())) {
+                BaseSourceCrawler crawler;
+                if (source.getSourceType() == null) source.setSourceType(MATCHER);
+                switch (source.getSourceType()) {
+                    case MATCHER:
+                    default:
+                        crawler = new MatcherCrawler(source);
+                        break;
+                    case XPATH:
+                        crawler = new XpathCrawler(source);
+                        break;
+                    case JSON_PATH:
+                        crawler = new JsonPathCrawler(source);
+                        break;
+                }
+                if (source.getSearchRule().isRelatedWithInfo()) {
+                    return crawler;
+                } else {
+                    return new BaseSourceCrawlerNoInfo(crawler);
+                }
             } else {
-                return new BaseSourceCrawlerNoInfo(crawler);
-            }
-        }else {
-            try {
+
                 Class clz = Class.forName(source.getSourceUrl());
                 return (ReadCrawler) clz.newInstance();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return new FYReadCrawler();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new FYReadCrawler();
         }
     }
 
-    public static List<ReadCrawler> getEnableReadCrawlers(){
+    public static List<ReadCrawler> getEnableReadCrawlers() {
         return getEnableReadCrawlers("");
     }
 
-    public static List<ReadCrawler> getEnableReadCrawlers(String group){
+    public static List<ReadCrawler> getEnableReadCrawlers(String group) {
         List<ReadCrawler> crawlers = new ArrayList<>();
         List<BookSource> sources = TextUtils.isEmpty(group) ?
                 BookSourceManager.getEnabledBookSource() :
                 BookSourceManager.getEnableSourceByGroup(group);
-        for (BookSource source : sources){
+        for (BookSource source : sources) {
             crawlers.add(getReadCrawler(source));
         }
         return crawlers;

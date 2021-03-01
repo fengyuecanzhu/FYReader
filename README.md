@@ -2,7 +2,7 @@
 
 风月读书，一款开源、无广告的小说阅读软件。
 
-成品下载(v1.9.0-beta 支持自定义书源)：[https://fycz.lanzous.com/ixI19lqnscf](https://fycz.lanzous.com/ixI19lqnscf)
+成品下载(v1.9.1 支持自定义书源)：[https://fycz.lanzous.com/ijJsnmcfwja](https://fycz.lanzous.com/ijJsnmcfwja)
 
 [更新日志](./app/src/main/assets/updatelog.fy)
 
@@ -39,7 +39,7 @@
 
 ## LICENSE
 ```
-    Copyright 2020 fengyuecanzhu
+    Copyright 2020~2021 fengyuecanzhu
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

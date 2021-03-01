@@ -2,48 +2,66 @@ package xyz.fycz.myreader.ui.adapter.holder;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.os.Handler;
+import android.content.Intent;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+
+import com.zhy.view.flowlayout.FlowLayout;
+import com.zhy.view.flowlayout.TagAdapter;
+import com.zhy.view.flowlayout.TagFlowLayout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
-import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.source.BookSourceManager;
-import xyz.fycz.myreader.model.SearchEngine;
+import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
+import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.source.BookSourceManager;
+import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
+import xyz.fycz.myreader.ui.adapter.BookTagAdapter;
 import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.KeyWordUtils;
+import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.widget.CoverImageView;
-
-import java.util.List;
 
 /**
  * @author fengyue
  * @date 2020/10/2 10:10
  */
 public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
+    private Activity activity;
     private ConcurrentMultiValueMap<SearchBookBean, Book> mBooks;
     private SearchEngine searchEngine;
     private String keyWord;
+    private List<String> tagList = new ArrayList<>();
 
-    public SearchBookHolder(ConcurrentMultiValueMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord) {
+    public SearchBookHolder(Activity activity, ConcurrentMultiValueMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord) {
+        this.activity = activity;
         this.mBooks = mBooks;
         this.searchEngine = searchEngine;
         this.keyWord = keyWord;
     }
 
+
     private CoverImageView ivBookImg;
     private TextView tvBookName;
+    private TagFlowLayout tflBookTag;
     private TextView tvDesc;
     private TextView tvAuthor;
-    private TextView tvType;
     private TextView tvSource;
     private TextView tvNewestChapter;
 
@@ -56,9 +74,9 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
     public void initView() {
         ivBookImg = findById(R.id.iv_book_img);
         tvBookName = findById(R.id.tv_book_name);
+        tflBookTag = findById(R.id.tfl_book_tag);
         tvAuthor = findById(R.id.tv_book_author);
         tvDesc = findById(R.id.tv_book_desc);
-        tvType = findById(R.id.tv_book_type);
         tvSource = findById(R.id.tv_book_source);
         tvNewestChapter = findById(R.id.tv_book_newest_chapter);
     }
@@ -70,64 +88,153 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
         List<Book> aBooks = mBooks.getValues(data);
         int bookCount = aBooks.size();
         Book book = aBooks.get(0);
-        if (StringHelper.isEmpty(book.getImgUrl())) {
-            book.setImgUrl("");
-        }
-        if (!StringHelper.isEmpty(book.getDesc())) {
-            tvDesc.setText("简介:" + book.getDesc());
-        }
-        if (!StringHelper.isEmpty(book.getType())) {
-            tvType.setText(book.getType());
-        }
-        if (!StringHelper.isEmpty(book.getNewestChapterTitle())) {
-            tvNewestChapter.setText(getContext().getString(R.string.newest_chapter, book.getNewestChapterTitle()));
-        }
-        if (!StringHelper.isEmpty(book.getAuthor())) {
-            KeyWordUtils.setKeyWord(tvAuthor, book.getAuthor(), keyWord);
-        }
-        KeyWordUtils.setKeyWord(tvBookName, book.getName(), keyWord);
         BookSource source = BookSourceManager.getBookSourceByStr(book.getSource());
-        tvSource.setText(getContext().getString(R.string.source_title_num, source.getSourceName(), bookCount));
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(source);
-        if (rc instanceof BookInfoCrawler) {
-            if (tvBookName.getTag() == null || !(Boolean) tvBookName.getTag()) {
-                tvBookName.setTag(true);
-            } else {
-                initOtherInfo(book);
-                return;
+        books2SearchBookBean(data, aBooks);
+        if (!StringHelper.isEmpty(data.getImgUrl())) {
+            if (!App.isDestroy((Activity) getContext())) {
+                ivBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), data.getImgUrl()), data.getName(), data.getAuthor());
             }
-            Log.i(book.getName(), "initOtherInfo");
-            BookInfoCrawler bic = (BookInfoCrawler) rc;
-            searchEngine.getBookInfo(book, bic, isSuccess -> {
-                if (isSuccess)
-                    App.runOnUiThread(() -> initOtherInfo(book));
-                else
-                    tvBookName.setTag(false);
-            });
-        } else {
-            initOtherInfo(book);
         }
+        KeyWordUtils.setKeyWord(tvBookName, data.getName(), keyWord);
+        if (!StringHelper.isEmpty(data.getAuthor())) {
+            KeyWordUtils.setKeyWord(tvAuthor, data.getAuthor(), keyWord);
+        }
+        initTagList(data);
+        if (!StringHelper.isEmpty(data.getLastChapter())) {
+            tvNewestChapter.setText(getContext().getString(R.string.newest_chapter, data.getLastChapter()));
+        }
+        if (!StringHelper.isEmpty(data.getDesc())) {
+            tvDesc.setText(String.format("简介:%s", data.getDesc()));
+        }
+        tvSource.setText(getContext().getString(R.string.source_title_num, source.getSourceName(), bookCount));
+        App.getHandler().postDelayed(() -> {
+            if (needGetInfo(data) && rc instanceof BookInfoCrawler) {
+                if (tvBookName.getTag() == null || !(Boolean) tvBookName.getTag()) {
+                    tvBookName.setTag(true);
+                } else {
+                    initOtherInfo(data, rc);
+                    return;
+                }
+                Log.i(book.getName(), "initOtherInfo");
+                BookInfoCrawler bic = (BookInfoCrawler) rc;
+                searchEngine.getBookInfo(book, bic, isSuccess -> {
+                    if (isSuccess) {
+                        List<Book> books = new ArrayList<>();
+                        books.add(book);
+                        books2SearchBookBean(data, books);
+                        initOtherInfo(data, rc);
+                    } else {
+                        tvBookName.setTag(false);
+                    }
+                });
+            }
+        }, 1000);
     }
 
-    private void initOtherInfo(Book book) {
+    private void initOtherInfo(SearchBookBean book, ReadCrawler rc) {
         //简介
         if (StringHelper.isEmpty(tvDesc.getText().toString())) {
             tvDesc.setText(String.format("简介:%s", book.getDesc()));
         }
-        if (StringHelper.isEmpty(tvType.getText().toString())) {
-            tvType.setText(book.getType());
-        }
         if (StringHelper.isEmpty(tvNewestChapter.getText().toString())) {
-            tvNewestChapter.setText(getContext().getString(R.string.newest_chapter, book.getNewestChapterTitle()));
+            tvNewestChapter.setText(getContext().getString(R.string.newest_chapter, book.getLastChapter()));
         }
         if (StringHelper.isEmpty(tvAuthor.getText().toString())) {
             KeyWordUtils.setKeyWord(tvAuthor, book.getAuthor(), keyWord);
         }
         //图片
         if (!App.isDestroy((Activity) getContext())) {
-            ivBookImg.load(book.getImgUrl(), book.getName(), book.getAuthor());
+            ivBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), book.getImgUrl()), book.getName(), book.getAuthor());
         }
-
     }
 
+    private void initTagList(SearchBookBean data) {
+        tagList.clear();
+        String type = data.getType();
+        if (!StringHelper.isEmpty(type))
+            tagList.add("0:" + type);
+        String wordCount = data.getWordCount();
+        if (!StringHelper.isEmpty(wordCount))
+            tagList.add("1:" + wordCount);
+        String status = data.getStatus();
+        if (!StringHelper.isEmpty(status))
+            tagList.add("2:" + status);
+        tflBookTag.setAdapter(new BookTagAdapter(activity, tagList, 11));
+    }
+
+    private void books2SearchBookBean(SearchBookBean bookBean, List<Book> books) {
+        for (Book book : books) {
+            if (!StringHelper.isEmpty(bookBean.getAuthor())) break;
+            String author = book.getAuthor();
+            if (!StringHelper.isEmpty(author)) {
+                bookBean.setAuthor(author);
+                break;
+            }
+        }
+        for (Book book : books) {
+            if (!StringHelper.isEmpty(bookBean.getType())) break;
+            String type = book.getType();
+            if (!StringHelper.isEmpty(type)) {
+                bookBean.setType(type);
+                break;
+            }
+        }
+        for (Book book : books) {
+            if (!StringHelper.isEmpty(bookBean.getDesc())) break;
+            String desc = book.getDesc();
+            if (!StringHelper.isEmpty(desc)) {
+                bookBean.setDesc(desc);
+                break;
+            }
+        }
+        for (Book book : books) {
+            if (!StringHelper.isEmpty(bookBean.getStatus())) break;
+            String status = book.getStatus();
+            if (!StringHelper.isEmpty(status)) {
+                bookBean.setStatus(status);
+                break;
+            }
+        }
+        for (Book book : books) {
+            if (!StringHelper.isEmpty(bookBean.getWordCount())) break;
+            String wordCount = book.getWordCount();
+            if (!StringHelper.isEmpty(wordCount)) {
+                bookBean.setWordCount(wordCount);
+                break;
+            }
+        }
+        for (Book book : books) {
+            if (!StringHelper.isEmpty(bookBean.getLastChapter())) break;
+            String lastChapter = book.getNewestChapterTitle();
+            if (!StringHelper.isEmpty(lastChapter)) {
+                bookBean.setLastChapter(lastChapter);
+                break;
+            }
+        }
+        for (Book book : books) {
+            if (!StringHelper.isEmpty(bookBean.getUpdateTime())) break;
+            String updateTime = book.getUpdateDate();
+            if (!StringHelper.isEmpty(updateTime)) {
+                bookBean.setUpdateTime(updateTime);
+                break;
+            }
+        }
+        for (Book book : books) {
+            if (!StringHelper.isEmpty(bookBean.getImgUrl())) break;
+            String imgUrl = book.getImgUrl();
+            if (!StringHelper.isEmpty(imgUrl)) {
+                bookBean.setImgUrl(imgUrl);
+                break;
+            }
+        }
+    }
+
+    private boolean needGetInfo(SearchBookBean bookBean) {
+        if (StringHelper.isEmpty(bookBean.getAuthor())) return true;
+        if (StringHelper.isEmpty(bookBean.getType())) return true;
+        if (StringHelper.isEmpty(bookBean.getDesc())) return true;
+        if (StringHelper.isEmpty(bookBean.getLastChapter())) return true;
+        return StringHelper.isEmpty(bookBean.getImgUrl());
+    }
 }

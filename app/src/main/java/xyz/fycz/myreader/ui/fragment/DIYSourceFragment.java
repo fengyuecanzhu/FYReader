@@ -392,7 +392,7 @@ public class DIYSourceFragment extends BaseFragment {
         for (BookSource source : mBookSources) {
             source.setEnable(!source.getEnable());
         }
-        BookSourceManager.saveDatas(mBookSources);
+        GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(mBookSources);
         mAdapter.notifyDataSetChanged();
     }
 

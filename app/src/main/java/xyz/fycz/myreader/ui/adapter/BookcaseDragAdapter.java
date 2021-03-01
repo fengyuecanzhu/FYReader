@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
+import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -22,6 +24,9 @@ import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
 import xyz.fycz.myreader.ui.presenter.BookcasePresenter;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
 public class BookcaseDragAdapter extends BookcaseAdapter {
@@ -63,7 +68,8 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
             book.setImgUrl("");
         }
 
-        viewHolder.ivBookImg.load(book.getImgUrl(), book.getName(),book.getAuthor());
+        ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(book.getSource());
+        viewHolder.ivBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), book.getImgUrl()), book.getName(),book.getAuthor());
 
         viewHolder.tvBookName.setText(book.getName());
 

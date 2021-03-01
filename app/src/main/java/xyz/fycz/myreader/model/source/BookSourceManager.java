@@ -109,12 +109,13 @@ public class BookSourceManager {
      */
     @Nullable
     public static BookSource getBookSourceByEName(String ename) {
-        if (ename == null) return getDefaultSource();
         if ("local".equals(ename)) return getLocalSource();
-        return GreenDaoManager.getDaoSession().getBookSourceDao().
+        BookSource source = GreenDaoManager.getDaoSession().getBookSourceDao().
                 queryBuilder()
                 .where(BookSourceDao.Properties.SourceEName.eq(ename))
                 .unique();
+        if (source == null) return getDefaultSource();
+        return source;
     }
 
     /**

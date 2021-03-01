@@ -46,19 +46,6 @@ public class Test {
         System.out.println(sb.toString());
     }
 
-    @org.junit.Test
-    public void testRegex() throws UnsupportedEncodingException {
-        String str = new String(FileUtils.getBytes(new File("D:\\Java\\Project\\FYReader-master\\app\\src\\test\\resources\\html.html")), "GBK");
-        MatcherAnalyzer analyzer = new MatcherAnalyzer();
-        String ruleList = "<div id=\"content\"><text><div class=\"footer\">";
-        String list = analyzer.getInnerText(ruleList, str);
-        String rule = "(*)<td class=\"odd\"><a href=\".*\"><text></a></td>";
-
-        List<String> listStr = analyzer.matcherInnerText(rule, list);
-        for (String s : listStr) {
-            System.out.println(s);
-        }
-    }
 
     @org.junit.Test
     public void testUrl() {
@@ -72,5 +59,31 @@ public class Test {
         String str = new String(FileUtils.getBytes(new File("D:\\Java\\Project\\FYReader-master\\app\\src\\test\\resources\\html.html")), "GBK");
         JXDocument jxDoc = JXDocument.create(str);
         System.out.println(jxDoc.selNOne("//*[@id=\"intro\"]/p[1]/text()"));
+    }
+
+    @org.junit.Test
+    public void testBean() {
+        String[] strings = "type;desc;status;wordCount;lastChapter;updateTime;imgUrl".split(";");
+        String[] strings1 = new String[strings.length];
+        for (int i = 0, stringsLength = strings.length; i < stringsLength; i++) {
+            String s = strings[i];
+            strings1[i] = s.substring(0, 1).toUpperCase() + s.substring(1);
+        }
+        for (int i = 0; i < strings.length; i++) {
+            String s = strings[i];
+            /*String str =
+                    "        for (Book book : books){\n" +
+                    "            String "+ s + " = book.get" + strings1[i] + "();\n" +
+                    "            if (!StringHelper.isEmpty(bookBean.get" + strings1[i] + "())) break;\n" +
+                    "            if (!StringHelper.isEmpty("+ s + ")){\n" +
+                    "                bookBean.set" + strings1[i] + "("+ s + ");\n" +
+                    "                break;\n" +
+                    "            }\n" +
+                    "        }";*/
+            String str =
+                    "            if (StringHelper.isEmpty(book.get" + strings1[i] + "()) && !StringHelper.isEmpty(bean.get" + strings1[i] + "()))\n" +
+                    "            book.set" + strings1[i] + "(bean.get" + strings1[i] + "());";
+            System.out.println(str);
+        }
     }
 }
