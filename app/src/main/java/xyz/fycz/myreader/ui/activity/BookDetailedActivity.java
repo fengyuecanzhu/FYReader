@@ -45,6 +45,7 @@ import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityBookDetailBinding;
+import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.SharedBook;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -52,6 +53,7 @@ import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.greendao.service.ChapterService;
+import xyz.fycz.myreader.ui.adapter.BookTagAdapter;
 import xyz.fycz.myreader.ui.adapter.DetailCatalogAdapter;
 import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
@@ -94,6 +96,7 @@ public class BookDetailedActivity extends BaseActivity {
     private SourceExchangeDialog mSourceDialog;
     private int sourceIndex;
     private BookGroupDialog mBookGroupDia;
+    private List<String> tagList = new ArrayList<>();
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -146,8 +149,30 @@ public class BookDetailedActivity extends BaseActivity {
         if (isCollected) {
             mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
         }
+        //Dialog
+        mSourceDialog = new SourceExchangeDialog(this, mBook);
+        if (isBookSourceNotExist()){
+            DialogCreator.createCommonDialog(this, "未知书源",
+                    "当前书籍的书源不存在，是否搜索以切换书源？", false, (dialog, which) -> {
+                        mSourceDialog.show();
+                    }, null);
+        }
         mBookGroupDia = new BookGroupDialog(this);
         mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
+    }
+
+    private void initTagList() {
+        tagList.clear();
+        String type = mBook.getType();
+        if (!StringHelper.isEmpty(type))
+            tagList.add("0:" + type);
+        String wordCount = mBook.getWordCount();
+        if (!StringHelper.isEmpty(wordCount))
+            tagList.add("1:" + wordCount);
+        String status = mBook.getStatus();
+        if (!StringHelper.isEmpty(status))
+            tagList.add("2:" + status);
+        binding.ih.tflBookTag.setAdapter(new BookTagAdapter(this, tagList, 13));
     }
 
     @Override
@@ -182,8 +207,6 @@ public class BookDetailedActivity extends BaseActivity {
             binding.ib.bookDetailTvOpen.setText("继续阅读");
         }
 
-        //Dialog
-        mSourceDialog = new SourceExchangeDialog(this, mBook);
         if (aBooks != null && aBooks.size() > 0) {
             if (isCollected) {
                 for (int i = 0; i < aBooks.size(); i++) {
@@ -304,6 +327,11 @@ public class BookDetailedActivity extends BaseActivity {
         }
     }
 
+    private boolean isBookSourceNotExist(){
+        BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
+        return source.getSourceEName() != null && "fynovel".equals(source.getSourceEName());
+    }
+
     /**
      * 初始化书籍信息
      */
@@ -312,12 +340,8 @@ public class BookDetailedActivity extends BaseActivity {
         if (StringHelper.isEmpty(mBook.getImgUrl())) {
             mBook.setImgUrl("");
         }
+        initTagList();
         binding.ic.bookDetailTvDesc.setText("");
-        if (mBook.getType() != null) {
-            binding.ih.bookDetailTvType.setText(mBook.getType());
-        } else {
-            binding.ih.bookDetailTvType.setText("");
-        }
         BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
         binding.ih.bookDetailSource.setText(String.format("书源：%s", source.getSourceName()));
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(source);
@@ -346,17 +370,10 @@ public class BookDetailedActivity extends BaseActivity {
      * 初始化其他书籍信息
      */
     private void initOtherInfo() {
-        binding.ic.bookDetailTvDesc.setText("\t\t\t\t" + mBook.getDesc());
-        binding.ih.bookDetailTvType.setText(mBook.getType());
+        binding.ic.bookDetailTvDesc.setText(String.format("\t\t\t\t%s", mBook.getDesc()));
+        initTagList();
         if (!App.isDestroy(this)) {
-            binding.ih.bookDetailIvCover.load(mBook.getImgUrl(), mBook.getName(), mBook.getAuthor());
-            /*Glide.with(this)
-                    .load(mBook.getImgUrl())
-                    .transition(DrawableTransitionOptions.withCrossFade(1500))
-                    .thumbnail(defaultCover())
-                    .centerCrop()
-                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(this, 25)))
-                    .into(mIvBlurCover);*/
+            binding.ih.bookDetailIvCover.load(NetworkUtils.getAbsoluteURL(mReadCrawler.getNameSpace(), mBook.getImgUrl()), mBook.getName(), mBook.getAuthor());
         }
     }
 

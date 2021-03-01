@@ -90,6 +90,8 @@ public class SearchBookActivity extends BaseActivity {
 
     private Menu menu;
 
+    private AlertDialog mDisableSourceDia;
+
 
     private static String[] suggestion = {"第一序列", "大道朝天", "伏天氏", "终极斗罗", "我师兄实在太稳健了", "烂柯棋缘", "诡秘之主"};
     private static String[] suggestion2 = {"不朽凡人", "圣墟", "我是至尊", "龙王传说", "太古神王", "一念永恒", "雪鹰领主", "大主宰"};
@@ -295,7 +297,10 @@ public class SearchBookActivity extends BaseActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (!showHot) menu.findItem(R.id.action_hot).setVisible(true);
+        if (!showHot) {
+            menu.findItem(R.id.action_hot).setVisible(true);
+            menu.findItem(R.id.action_disable_source).setVisible(true);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -304,7 +309,9 @@ public class SearchBookActivity extends BaseActivity {
         if (item.getItemId() == R.id.action_hot) {
             showHot = !showHot;
             initSuggestionList();
-        } else if (item.getItemId() == R.id.action_source_man) {
+        }else if (item.getItemId() == R.id.action_disable_source) {
+            showDisableSourceDia();
+        }else if (item.getItemId() == R.id.action_source_man) {
             startActivityForResult(new Intent(this, BookSourceActivity.class),
                     APPCONST.REQUEST_BOOK_SOURCE);
         } else {
@@ -342,7 +349,7 @@ public class SearchBookActivity extends BaseActivity {
         MenuItem localItem = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.local_source);
         if ("".equals(searchGroup)) {
             item.setChecked(true);
-        }else if (getString(R.string.local_source).equals(searchGroup)){
+        } else if (getString(R.string.local_source).equals(searchGroup)) {
             localItem.setChecked(true);
         }
         List<String> groupList = BookSourceManager.getEnableNoLocalGroupList();
@@ -353,7 +360,7 @@ public class SearchBookActivity extends BaseActivity {
         menu.setGroupCheckable(R.id.source_group, true, true);
     }
 
-    /*private void showDisableSourceDia() {
+    private void showDisableSourceDia() {
         if (mDisableSourceDia != null) {
             mDisableSourceDia.show();
             return;
@@ -394,7 +401,7 @@ public class SearchBookActivity extends BaseActivity {
                         }
                     }
                 });
-    }*/
+    }
 
     /**
      * 初始化建议书目
@@ -517,28 +524,32 @@ public class SearchBookActivity extends BaseActivity {
      */
     private void search() {
         binding.rpb.setIsAutoLoading(true);
-        binding.fabSearchStop.setVisibility(View.VISIBLE);
         if (StringHelper.isEmpty(searchKey)) {
             stopSearch();
             binding.rpb.setIsAutoLoading(false);
             binding.rvSearchBooksList.setVisibility(View.GONE);
             binding.llSuggestBooksView.setVisibility(View.VISIBLE);
+            binding.fabSearchStop.setVisibility(View.GONE);
             initHistoryList();
             binding.rvSearchBooksList.setAdapter(null);
             binding.srlSearchBookList.setEnableRefresh(false);
         } else {
-            mSearchBookAdapter = new SearchBookAdapter(mBooks, searchEngine, searchKey);
+            mSearchBookAdapter = new SearchBookAdapter(this, mBooks, searchEngine, searchKey);
             binding.rvSearchBooksList.setAdapter(mSearchBookAdapter);
             //进入书籍详情页
             mSearchBookAdapter.setOnItemClickListener((view, pos) -> {
+                SearchBookBean data = mSearchBookAdapter.getItem(pos);
+                ArrayList<Book> books = (ArrayList<Book>) mBooks.getValues(data);
+                searchBookBean2Book(data, books.get(0));
                 Intent intent = new Intent(this, BookDetailedActivity.class);
-                intent.putExtra(APPCONST.SEARCH_BOOK_BEAN, new ArrayList<>(mBooks.getValues(mSearchBookAdapter.getItem(pos))));
+                intent.putExtra(APPCONST.SEARCH_BOOK_BEAN, books);
                 startActivity(intent);
             });
             binding.srlSearchBookList.setEnableRefresh(true);
             binding.rvSearchBooksList.setVisibility(View.VISIBLE);
             binding.llSuggestBooksView.setVisibility(View.GONE);
             binding.llHistoryView.setVisibility(View.GONE);
+            binding.fabSearchStop.setVisibility(View.VISIBLE);
             getData();
             mSearchHistoryService.addOrUpadteHistory(searchKey);
             //收起软键盘
@@ -569,5 +580,24 @@ public class SearchBookActivity extends BaseActivity {
             mHandler.removeMessages(i + 1);
         }
         super.onDestroy();
+    }
+
+    private void searchBookBean2Book(SearchBookBean bean, Book book) {
+        if (StringHelper.isEmpty(book.getType()) && !StringHelper.isEmpty(bean.getType()))
+            book.setType(bean.getType());
+        if (StringHelper.isEmpty(book.getType()) && !StringHelper.isEmpty(bean.getType()))
+            book.setType(bean.getType());
+        if (StringHelper.isEmpty(book.getDesc()) && !StringHelper.isEmpty(bean.getDesc()))
+            book.setDesc(bean.getDesc());
+        if (StringHelper.isEmpty(book.getStatus()) && !StringHelper.isEmpty(bean.getStatus()))
+            book.setStatus(bean.getStatus());
+        if (StringHelper.isEmpty(book.getWordCount()) && !StringHelper.isEmpty(bean.getWordCount()))
+            book.setWordCount(bean.getWordCount());
+        if (StringHelper.isEmpty(book.getNewestChapterTitle()) && !StringHelper.isEmpty(bean.getLastChapter()))
+            book.setNewestChapterTitle(bean.getLastChapter());
+        if (StringHelper.isEmpty(book.getUpdateDate()) && !StringHelper.isEmpty(bean.getUpdateTime()))
+            book.setUpdateDate(bean.getUpdateTime());
+        if (StringHelper.isEmpty(book.getImgUrl()) && !StringHelper.isEmpty(bean.getImgUrl()))
+            book.setImgUrl(bean.getImgUrl());
     }
 }

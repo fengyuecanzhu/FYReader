@@ -1,30 +1,23 @@
 package xyz.fycz.myreader.webapi;
 
-import android.util.Log;
+import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.annotations.NonNull;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.SearchBookBean;
+import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
-import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.FYReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.TianLaiReadCrawler;
-import xyz.fycz.myreader.webapi.crawler.read.YanQingLouReadCrawler;
-
-import java.io.IOException;
-import java.util.List;
 
 
 public class CommonApi extends BaseApi {

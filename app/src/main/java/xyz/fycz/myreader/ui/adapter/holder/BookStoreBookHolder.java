@@ -8,8 +8,12 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.widget.CoverImageView;
 
 /**
@@ -56,14 +60,16 @@ public class BookStoreBookHolder extends ViewHolderImpl<Book> {
         tvBookNewestChapter.setText(StringHelper.isEmpty(data.getNewestChapterTitle()) ?
                 data.getDesc() : data.getNewestChapterTitle());
         tvBookTime.setText(data.getUpdateDate());
+        BookSource source = BookSourceManager.getBookSourceByStr(data.getSource());
+        ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(source);
         if (hasImg){
             tvBookImg.setVisibility(View.VISIBLE);
             if (!App.isDestroy(mActivity)) {
-                tvBookImg.load(data.getImgUrl(), data.getName(), data.getAuthor());
+                tvBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), data.getImgUrl()), data.getName(), data.getAuthor());
             }
         }
         if (data.getSource() != null) {
-            tvBookSource.setText(String.format("书源：%s", BookSourceManager.getSourceNameByStr(data.getSource())));
+            tvBookSource.setText(String.format("书源：%s", source.getSourceName()));
         }else {
             tvBookSource.setText(data.getNewestChapterId());
         }

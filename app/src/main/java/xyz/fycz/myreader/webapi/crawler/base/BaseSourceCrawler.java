@@ -97,7 +97,6 @@ public abstract class BaseSourceCrawler implements ReadCrawler, BookInfoCrawler 
             List<String> imgs = analyzer.getStringList(searchRule.getImgUrl(), obj);
             List<String> chapterUrls = analyzer.getStringList(searchRule.getTocUrl(), obj);
             List<String> infoUrls = analyzer.getStringList(searchRule.getInfoUrl(), obj);
-            String baseUrl = getNameSpace();
             for (int i = 0; i < names.size(); i++) {
                 Book book = new Book();
                 book.setName(names.get(i));
@@ -110,11 +109,11 @@ public abstract class BaseSourceCrawler implements ReadCrawler, BookInfoCrawler 
                 if (lastChapters.size() > i) book.setNewestChapterTitle(lastChapters.get(i));
                 if (updateTimes.size() > i) book.setUpdateDate(updateTimes.get(i));
                 if (imgs.size() > i)
-                    book.setImgUrl(NetworkUtils.getAbsoluteURL(baseUrl, imgs.get(i)));
+                    book.setImgUrl(imgs.get(i));
                 if (chapterUrls.size() > i)
-                    book.setChapterUrl(NetworkUtils.getAbsoluteURL(baseUrl, chapterUrls.get(i)));
+                    book.setChapterUrl(chapterUrls.get(i));
                 if (infoUrls.size() > i)
-                    book.setInfoUrl(NetworkUtils.getAbsoluteURL(baseUrl, infoUrls.get(i)));
+                    book.setInfoUrl(infoUrls.get(i));
                 SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
                 books.add(sbb, book);
             }
@@ -161,7 +160,7 @@ public abstract class BaseSourceCrawler implements ReadCrawler, BookInfoCrawler 
                 book.setStatus(status);
                 book.setNewestChapterTitle(lastChapter);
                 book.setUpdateDate(updateTime);
-                book.setImgUrl(NetworkUtils.getAbsoluteURL(getNameSpace(), imgUrl));
+                book.setImgUrl(imgUrl);
                 book.setChapterUrl(tocUrl);
                 book.setInfoUrl(infoUrl);
                 book.setSource(source.getSourceUrl());
@@ -170,6 +169,8 @@ public abstract class BaseSourceCrawler implements ReadCrawler, BookInfoCrawler 
             }
         }
     }
+
+
 
     /**
      * 获取章节列表
@@ -332,7 +333,7 @@ public abstract class BaseSourceCrawler implements ReadCrawler, BookInfoCrawler 
         if (StringHelper.isEmpty(book.getUpdateDate()))
             book.setUpdateDate(analyzer.getString(infoRule.getUpdateTime(), obj));
         if (StringHelper.isEmpty(book.getImgUrl()))
-            book.setImgUrl(NetworkUtils.getAbsoluteURL(getNameSpace(), analyzer.getString(infoRule.getImgUrl(), obj)));
+            book.setImgUrl(analyzer.getString(infoRule.getImgUrl(), obj));
         if (StringHelper.isEmpty(book.getChapterUrl()))
             book.setChapterUrl(analyzer.getString(infoRule.getTocUrl(), obj));
         return book;

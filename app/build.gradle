@@ -44,7 +44,7 @@ def getVersionName(){
     def hun = (version / 100).toInteger()
     def ten = (version / 10).toInteger() % 10
     def one = version % 10
-    return hun + "." + ten + "." + one + "-beta"
+    return hun + "." + ten + "." + one
 }
 
 def versionN = getVersionName()
@@ -188,6 +188,8 @@ dependencies {
     //编码识别
     implementation 'com.github.albfernandez:juniversalchardet:2.4.0'
 
+    // 标签 https://github.com/hongyangAndroid/FlowLayout
+    implementation 'com.hyman:flowlayout-lib:1.1.2'
 }
 
 greendao {
