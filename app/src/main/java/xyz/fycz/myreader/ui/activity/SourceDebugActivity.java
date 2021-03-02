@@ -82,7 +82,7 @@ public class SourceDebugActivity extends BaseActivity {
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         debugEntity = getIntent().getParcelableExtra("debugEntity");
-        rc = ReadCrawlerUtil.getReadCrawler(debugEntity.getBookSource());
+        rc = ReadCrawlerUtil.getReadCrawler(debugEntity.getBookSource(), true);
     }
 
     @Override
