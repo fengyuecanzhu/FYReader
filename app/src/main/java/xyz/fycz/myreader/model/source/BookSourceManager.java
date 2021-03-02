@@ -109,6 +109,7 @@ public class BookSourceManager {
      */
     @Nullable
     public static BookSource getBookSourceByEName(String ename) {
+        if (ename == null) return getDefaultSource();
         if ("local".equals(ename)) return getLocalSource();
         BookSource source = GreenDaoManager.getDaoSession().getBookSourceDao().
                 queryBuilder()

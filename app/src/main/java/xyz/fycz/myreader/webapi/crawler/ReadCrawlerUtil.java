@@ -174,6 +174,9 @@ public class ReadCrawlerUtil {
     }
 
     public static ReadCrawler getReadCrawler(BookSource source) {
+        return getReadCrawler(source, false);
+    }
+    public static ReadCrawler getReadCrawler(BookSource source, boolean isInfo) {
         try {
             if (StringHelper.isEmpty(source.getSourceEName())) {
                 BaseSourceCrawler crawler;
@@ -190,7 +193,7 @@ public class ReadCrawlerUtil {
                         crawler = new JsonPathCrawler(source);
                         break;
                 }
-                if (source.getSearchRule().isRelatedWithInfo()) {
+                if (source.getSearchRule().isRelatedWithInfo() || isInfo) {
                     return crawler;
                 } else {
                     return new BaseSourceCrawlerNoInfo(crawler);
