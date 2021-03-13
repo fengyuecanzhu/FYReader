@@ -161,7 +161,7 @@ public class SplashActivity extends BaseActivity {
                     }
                     fos.flush();
                     Log.d("SplashActivity", "downLoadImage success!");
-                } catch (IOException e) {
+                } catch (Exception e) {
                     File data = getFileStreamPath(APPCONST.FILE_NAME_SPLASH_IMAGE);
                     if (data != null && data.exists()){
                         data.delete();

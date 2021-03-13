@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +20,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseFragment;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentMineBinding;
 import xyz.fycz.myreader.entity.Setting;
@@ -32,7 +38,9 @@ import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.model.storage.Backup;
+import xyz.fycz.myreader.model.storage.BackupRestoreUi;
 import xyz.fycz.myreader.model.storage.Restore;
+import xyz.fycz.myreader.model.storage.WebDavHelp;
 import xyz.fycz.myreader.ui.activity.AboutActivity;
 import xyz.fycz.myreader.ui.activity.BookSourceActivity;
 import xyz.fycz.myreader.ui.activity.FeedbackActivity;
@@ -56,7 +64,7 @@ public class MineFragment extends BaseFragment {
 
     private FragmentMineBinding binding;
 
-    private boolean isLogin;
+    //private boolean isLogin;
     private Setting mSetting;
     private String[] webSynMenu;
     private String[] backupMenu;
@@ -69,7 +77,7 @@ public class MineFragment extends BaseFragment {
         public void handleMessage(@NonNull Message msg) {
             switch (msg.what) {
                 case 1:
-                    binding.tvUser.setText("登录/注册");
+                    //binding.tvUser.setText("登录/注册");
                     break;
                 case 2:
                     backup();
@@ -93,7 +101,7 @@ public class MineFragment extends BaseFragment {
     @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
-        isLogin = UserService.isLogin();
+        //isLogin = UserService.isLogin();
         mSetting = SysManager.getSetting();
         webSynMenu = new String[]{
                 App.getmContext().getString(R.string.menu_backup_webBackup),
@@ -111,16 +119,16 @@ public class MineFragment extends BaseFragment {
     @Override
     protected void initWidget(Bundle savedInstanceState) {
         super.initWidget(savedInstanceState);
-        if (isLogin) {
+        /*if (isLogin) {
             binding.tvUser.setText(UserService.readUsername());
-        }
+        }*/
         binding.tvThemeModeSelect.setText(themeModeArr[themeMode]);
     }
 
     @Override
     protected void initClick() {
         super.initClick();
-        binding.mineRlUser.setOnClickListener(v -> {
+        /*binding.mineRlUser.setOnClickListener(v -> {
             if (isLogin) {
                 DialogCreator.createCommonDialog(getActivity(), "退出登录", "确定要退出登录吗？"
                         , true, (dialog, which) -> {
@@ -139,8 +147,36 @@ public class MineFragment extends BaseFragment {
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 getActivity().startActivityForResult(intent, APPCONST.REQUEST_LOGIN);
             }
+        });*/
+
+        binding.mineRlWebdav.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), MoreSettingActivity.class);
+            intent.putExtra(APPCONST.WEB_DAV, true);
+            startActivity(intent);
         });
 
+        binding.mineRlSyn.setOnClickListener(v -> {
+            String account = SharedPreUtils.getInstance().getString("webdavAccount");
+            String password = SharedPreUtils.getInstance().getString("webdavPassword");
+            if (TextUtils.isEmpty(account) || TextUtils.isEmpty(password)){
+                ToastUtils.showWarring("请先配置WebDav账户");
+                binding.mineRlWebdav.performClick();
+                return;
+            }
+            Single.create((SingleOnSubscribe<ArrayList<String>>) emitter -> {
+                ToastUtils.showInfo("正在连接WebDav服务器...");
+                emitter.onSuccess(WebDavHelp.INSTANCE.getWebDavFileNames());
+            }).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new MySingleObserver<ArrayList<String>>() {
+                        @Override
+                        public void onSuccess(ArrayList<String> strings) {
+                            if (!WebDavHelp.INSTANCE.showRestoreDialog(getContext(), strings, BackupRestoreUi.INSTANCE)) {
+                                ToastUtils.showWarring("WebDav服务端没有备份或WebDav配置错误");
+                            }
+                        }
+                    });
+        });
         binding.mineRlBookSource.setOnClickListener(v -> {
             startActivity(new Intent(getContext(), BookSourceActivity.class));
         });
@@ -163,7 +199,7 @@ public class MineFragment extends BaseFragment {
                     .create();
             bookDialog.show();
         });
-        binding.mineRlSyn.setOnClickListener(v -> {
+        /*binding.mineRlSyn.setOnClickListener(v -> {
             if (!UserService.isLogin()) {
                 ToastUtils.showWarring("请先登录！");
                 Intent loginIntent = new Intent(getActivity(), LoginActivity.class);
@@ -202,7 +238,7 @@ public class MineFragment extends BaseFragment {
                     .setNegativeButton(null, null)
                     .setPositiveButton(null, null)
                     .show();
-        });
+        });*/
         binding.mineRlSetting.setOnClickListener(v -> {
             Intent settingIntent = new Intent(getActivity(), MoreSettingActivity.class);
             startActivity(settingIntent);
@@ -423,13 +459,13 @@ public class MineFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case APPCONST.REQUEST_LOGIN:
+                /*case APPCONST.REQUEST_LOGIN:
                     assert data != null;
                     isLogin = data.getBooleanExtra("isLogin", false);
                     if (isLogin) {
                         binding.tvUser.setText(UserService.readUsername());
                     }
-                    break;
+                    break;*/
             }
         }
     }

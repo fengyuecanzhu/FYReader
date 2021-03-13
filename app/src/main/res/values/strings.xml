@@ -180,6 +180,7 @@
     <string name="webdav_password">WebDav 密码</string>
     <string name="webdav_restore_tip">从WebDav恢复</string>
     <string name="webdav_setting">WebDav设置</string>
+    <string name="webdav">WebDav</string>
     <string name="webdav_setting_tip">WebDav备份与恢复</string>
     <string name="menu_add_bookmark">添加书签</string>
     <string name="menu_copy_content">拷贝内容</string>

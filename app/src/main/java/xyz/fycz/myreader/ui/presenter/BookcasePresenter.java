@@ -185,9 +185,9 @@ public class BookcasePresenter implements BasePresenter {
 
         getData();
 
-        if (mSetting.isAutoSyn() && UserService.isLogin()) {
+        /*if (mSetting.isAutoSyn() && UserService.isLogin()) {
             synBookcaseToWeb(true);
-        }
+        }*/
 
         //是否启用下拉刷新（默认启用）
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {

@@ -17,6 +17,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.databinding.FragmentLocalSourceBinding;
+import xyz.fycz.myreader.greendao.GreenDaoManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.BookSourceActivity;
@@ -104,13 +105,14 @@ public class LocalSourceFragment extends BaseFragment {
             for (BookSource source : sources) {
                 source.setEnable(isEnable);
             }
-            BookSourceManager.saveDatas(sources)
+            Single.create((SingleOnSubscribe<Boolean>) emitter -> {
+                GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(sources);
+                emitter.onSuccess(true);
+            }).compose(RxUtils::toSimpleSingle)
                     .subscribe(new MySingleObserver<Boolean>() {
                         @Override
-                        public void onSuccess(@androidx.annotation.NonNull Boolean aBoolean) {
-                            if (aBoolean) {
-                                mAdapter.notifyDataSetChanged();
-                            }
+                        public void onSuccess(@NonNull Boolean aBoolean) {
+                            mAdapter.notifyDataSetChanged();
                         }
                     });
         }

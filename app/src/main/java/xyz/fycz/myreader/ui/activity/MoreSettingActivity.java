@@ -88,6 +88,8 @@ public class MoreSettingActivity extends BaseActivity {
     private PrivateBooksFragment mPrivateBooksFragment;
 
     private BaseFragment curFragment;
+    // 是否前往webdav设置
+    private boolean isWebDav;
 
     @Override
     protected void bindView() {
@@ -113,6 +115,7 @@ public class MoreSettingActivity extends BaseActivity {
         noMenuTitle = mSetting.isNoMenuChTitle();
         readAloudVolumeTurnPage = mSetting.isReadAloudVolumeTurnPage();
         threadNum = SharedPreUtils.getInstance().getInt(getString(R.string.threadNum), 8);
+        isWebDav = getIntent().getBooleanExtra(APPCONST.WEB_DAV, false);
     }
 
     @Override
@@ -149,6 +152,13 @@ public class MoreSettingActivity extends BaseActivity {
             binding.rlMatchChapterSuitability.setVisibility(View.GONE);
         }
         binding.tvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
+    }
+
+    @Override
+    protected void processLogic() {
+        if(isWebDav){
+            binding.llWebdav.performClick();
+        }
     }
 
     @Override
@@ -503,7 +513,7 @@ public class MoreSettingActivity extends BaseActivity {
 
     @Override
     public void finish() {
-        if (curFragment == null) {
+        if (curFragment == null || isWebDav) {
             Intent result = new Intent();
             result.putExtra(APPCONST.RESULT_NEED_REFRESH, needRefresh);
             result.putExtra(APPCONST.RESULT_UP_MENU, upMenu);

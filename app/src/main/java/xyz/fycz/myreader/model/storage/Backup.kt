@@ -40,6 +40,7 @@ object Backup {
                 "setting.json",
                 "readStyles.json",
                 "replaceRule.json",
+                "bookSource.json",
                 "config.xml"
         )
     }
@@ -94,7 +95,13 @@ object Backup {
                             .writeText(json)
                 }
             }
-
+            GreenDaoManager.getInstance().session.bookSourceDao.queryBuilder().list().let {
+                if (it.isNotEmpty()) {
+                    val json = GSON.toJson(it)
+                    FileUtils.getFile(backupPath + File.separator + "bookSource.json")
+                            .writeText(json)
+                }
+            }
             try {
                 val setting = SysManager.getNewSetting()
                 val readStyles = setting.readStyles
