@@ -14,6 +14,7 @@ import xyz.fycz.myreader.entity.ReadStyle
 import xyz.fycz.myreader.entity.Setting
 import xyz.fycz.myreader.greendao.GreenDaoManager
 import xyz.fycz.myreader.greendao.entity.*
+import xyz.fycz.myreader.greendao.entity.rule.BookSource
 import xyz.fycz.myreader.util.SharedPreUtils
 import xyz.fycz.myreader.util.utils.*
 import java.io.File
@@ -96,6 +97,15 @@ object Restore {
                 val json = file.readText()
                 GSON.fromJsonArray<ReplaceRuleBean>(json)?.let {
                     GreenDaoManager.getInstance().session.replaceRuleBeanDao.insertOrReplaceInTx(it)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            try {
+                val file = FileUtils.getFile(path + File.separator + "bookSource.json")
+                val json = file.readText()
+                GSON.fromJsonArray<BookSource>(json)?.let {
+                    GreenDaoManager.getInstance().session.bookSourceDao.insertOrReplaceInTx(it)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

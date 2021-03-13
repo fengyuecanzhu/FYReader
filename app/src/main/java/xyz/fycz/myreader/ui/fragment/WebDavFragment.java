@@ -114,7 +114,7 @@ public class WebDavFragment extends BaseFragment {
                         @Override
                         public void onSuccess(ArrayList<String> strings) {
                             if (!WebDavHelp.INSTANCE.showRestoreDialog(getContext(), strings, BackupRestoreUi.INSTANCE)) {
-                                ToastUtils.showWarring("没有备份");
+                                ToastUtils.showWarring("WebDav服务端没有备份或WebDav配置错误");
                             }
                         }
                     });

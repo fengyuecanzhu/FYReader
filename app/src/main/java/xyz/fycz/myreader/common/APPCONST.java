@@ -46,6 +46,7 @@ public class APPCONST {
     public static final String SOURCE_INDEX = "sourceIndex";
     public static final String FONT = "font";
     public static final String BOOK_SOURCE = "bookSource";
+    public static final String WEB_DAV = "WebDav";
     public static final String RESULT_NEED_REFRESH = "result_need_refresh";
     public static final String RESULT_IS_COLLECTED = "result_is_collected";
     public static final String RESULT_LAST_READ_POSITION = "result_last_read_position";

@@ -1534,12 +1534,14 @@ public abstract class PageLoader {
 
                     @Override
                     public void onSuccess(TxtChapter txtChapter) {
-                        mPreChapter = txtChapter;
+                        if (txtChapter.getPosition() == mCurChapterPos - 1)
+                            mPreChapter = txtChapter;
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         //无视错误
+                        mPreChapter = null;
                     }
                 });
     }
@@ -1569,12 +1571,14 @@ public abstract class PageLoader {
 
                     @Override
                     public void onSuccess(TxtChapter txtChapter) {
-                        mNextChapter = txtChapter;
+                        if (txtChapter.getPosition() == mCurChapterPos + 1)
+                            mNextChapter = txtChapter;
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         //无视错误
+                        mNextChapter = null;
                     }
                 });
     }

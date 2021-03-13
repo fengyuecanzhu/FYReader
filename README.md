@@ -2,7 +2,7 @@
 
 风月读书，一款开源、无广告的小说阅读软件。
 
-成品下载(v1.9.2 支持自定义书源)：[https://fycz.lanzous.com/iMpIkmcv9dc](https://fycz.lanzous.com/iMpIkmcv9dc)
+成品下载(v1.9.3 支持自定义书源)：[https://fycz.lanzous.com/ivyijmwfdqd](https://fycz.lanzous.com/ivyijmwfdqd)
 
 [更新日志](./app/src/main/assets/updatelog.fy)
 
@@ -27,15 +27,16 @@
 
 #### 二、关于发现界面
 
-* 软件内置的两个发现源：
-  * 某点的排行榜、分类，全本小说网
+* 软件内置的4个发现源：
+  * 某点的排行榜、分类，全本小说网、100本·实体、妙笔阁
   * 制作发现源方法与书源类似，在此不再赘述
 
 ![Image](./img/1.png)![Image](./img/2.png)
 ![Image](./img/3.png)![Image](./img/4.png)
-![Image](./img/10.png)![Image](./img/5.png)
-![Image](./img/6.png)![Image](./img/7.png)
-![Image](./img/8.png)![Image](./img/9.png)
+![Image](./img/5.png)![Image](./img/6.png)
+![Image](./img/7.png)![Image](./img/8.png)
+![Image](./img/9.png)![Image](./img/10.png)
+![Image](./img/11.png)![Image](./img/12.png)
 
 ## LICENSE
 ```
