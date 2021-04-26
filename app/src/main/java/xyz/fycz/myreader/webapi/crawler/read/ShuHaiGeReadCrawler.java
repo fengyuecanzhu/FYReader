@@ -22,8 +22,8 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
 public class ShuHaiGeReadCrawler implements ReadCrawler, BookInfoCrawler {
-    public static final String NAME_SPACE = "https://www.xinshuhaige.net";
-    public static final String NOVEL_SEARCH = "https://www.xinshuhaige.net/search.html,searchkey={key}&searchtype=all";
+    public static final String NAME_SPACE = "https://www.xinshuhaige.org";
+    public static final String NOVEL_SEARCH = "https://www.xinshuhaige.org/search.html,searchkey={key}&searchtype=all";
     public static final String CHARSET = "utf-8";
     public static final String SEARCH_CHARSET = "utf-8";
 

@@ -227,5 +227,11 @@
     <color name="toast_yellow">#FFFFE284</color>
     <color name="toast_red">#FFE75B76</color>
 
-
+    <!--  updateDialog  -->
+    <color name="gray_cfcfcf">#cfcfcf</color>
+    <color name="orange_ffc032">#ffc032</color>
+    <color name="black_3A3D4E">#3a3d4e</color>
+    <color name="black_475B80">#475b80</color>
+    <color name="end_fffb8435">#fffb8435</color>
+    <color name="start_fffe795f">#fffe795f</color>
 </resources>

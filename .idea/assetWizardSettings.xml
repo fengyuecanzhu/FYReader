@@ -3,11 +3,6 @@
   <component name="WizardSettings">
     <option name="children">
       <map>
-        <entry key="imageWizard">
-          <value>
-            <PersistentState />
-          </value>
-        </entry>
         <entry key="vectorWizard">
           <value>
             <PersistentState>
@@ -19,8 +14,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_yun" />
-                            <entry key="sourceFile" value="F:\SVG图标\云.svg" />
+                            <entry key="outputName" value="ic_edit" />
+                            <entry key="sourceFile" value="F:\SVG图标\编辑.svg" />
                           </map>
                         </option>
                       </PersistentState>

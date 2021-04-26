@@ -58,13 +58,11 @@ public class JsonPathAnalyzer extends BaseAnalyzer {
      */
     public List<ReadContext> getReadContextList(String rule, ReadContext rc) {
         List<ReadContext> list = new ArrayList<>();
-        int skip = 0;
-        if (rule.contains("##!")) {
-            try {
-                skip = Integer.parseInt(rule.substring(rule.indexOf("##!") + 3));
-            } catch (Exception ignored) {
-            }
-            rule = rule.split("##")[0];
+        boolean hasFunction = rule.contains("##");
+        String funs = "";
+        if (hasFunction) {
+            funs = rule.substring(rule.indexOf("##") + 2);
+            rule = rule.substring(0, rule.indexOf("##"));
         }
         if (StringHelper.isEmpty(rule)) return list;
         JsonArray temp = rc.read(rule);
@@ -73,7 +71,7 @@ public class JsonPathAnalyzer extends BaseAnalyzer {
             if (str.startsWith("\"")) str = str.substring(1, str.length() - 1);
             list.add(getReadContext(str));
         }
-        return list.subList(skip, list.size());
+        return !hasFunction ? list : evalListFunction(funs, list);
     }
 
     public ReadContext getReadContext(Object obj) {

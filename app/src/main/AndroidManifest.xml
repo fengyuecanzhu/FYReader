@@ -1,118 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools" package="xyz.fycz.myreader">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="xyz.fycz.myreader">
+
+    <!--  删除权限  -->
+    <uses-permission
+        android:name="android.permission.READ_PHONE_STATE"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.GET_TASKS"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        tools:node="remove" />
 
     <!-- ********************************permission************************************ -->
     <!-- 读取手机状态和身份 -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <!--    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>-->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-    <uses-permission android:name="com.example.broadcast.permission"/>
+    <uses-permission android:name="com.example.broadcast.permission" />
     <!-- 拥有完全的网络访问权限 -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- 查看网络连接 -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- 查看WLAN连接 -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- 修改或删除您的USB存储设备中的内容 -->
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEM"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEM" />
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- 读取您的USB存储设备中的内容 -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!-- 开机启动 -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.Manifest.permission.INTERNAL_SYSTEM_WINDOW"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.Manifest.permission.INTERNAL_SYSTEM_WINDOW" />
     <!-- 停用屏幕锁定 -->
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <!-- 防止手机休眠 -->
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- 检索正在运行的应用 -->
     <!-- <uses-permission android:name="android.permission.GET_TASKS" /> -->
     <!-- 连接WLAN网络和断开连接 -->
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
     <!-- 安装应用的权限  -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
     <application
-            android:name=".application.App"
-            android:allowBackup="true"
-            android:alwaysRetainTaskState="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher"
-            android:supportsRtl="true"
-            android:theme="@style/MAppTheme"
-            android:requestLegacyExternalStorage="true"
-            android:networkSecurityConfig="@xml/network_security_config">
+        android:name=".application.App"
+        android:allowBackup="true"
+        android:alwaysRetainTaskState="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:requestLegacyExternalStorage="true"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/MAppTheme">
 
         <activity android:name=".ui.activity.SplashActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <meta-data
-                    android:name="android.app.shortcuts"
-                    android:resource="@xml/shortcuts" />
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
 
 
         <provider
-                android:name="androidx.core.content.FileProvider"
-                android:authorities="xyz.fycz.myreader.fileprovider"
-                android:exported="false"
-                android:grantUriPermissions="true">
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="xyz.fycz.myreader.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
-                    android:name="android.support.FILE_PROVIDER_PATHS"
-                    android:resource="@xml/file_paths"/>
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".ui.activity.MainActivity"
-                  android:launchMode="singleTask"
-                  android:alwaysRetainTaskState="true"/>
         <activity
-                android:name=".ui.activity.SearchBookActivity"
-                android:windowSoftInputMode="stateVisible"/>
-        <activity android:name=".ui.activity.BookDetailedActivity"/>
+            android:name=".ui.activity.MainActivity"
+            android:alwaysRetainTaskState="true"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.activity.SearchBookActivity"
+            android:windowSoftInputMode="stateVisible" />
+        <activity android:name=".ui.activity.BookDetailedActivity" />
 
         <activity
-                android:name=".ui.activity.ReadActivity"
-                android:launchMode="singleTask"
-                android:windowSoftInputMode="stateAlwaysHidden">
+            android:name=".ui.activity.ReadActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.FontsActivity"/>
+        <activity android:name=".ui.activity.FontsActivity" />
 
-        <activity android:name=".ui.activity.LoginActivity"/>
+        <activity android:name=".ui.activity.LoginActivity" />
 
-        <activity android:name=".ui.activity.RegisterActivity"/>
+        <activity android:name=".ui.activity.RegisterActivity" />
 
-        <activity android:name=".ui.activity.CatalogActivity"/>
-        <activity android:name=".ui.activity.AboutActivity"/>
+        <activity android:name=".ui.activity.CatalogActivity" />
+        <activity android:name=".ui.activity.AboutActivity" />
 
 
-        <activity android:name=".ui.activity.FileSystemActivity"/>
+        <activity android:name=".ui.activity.FileSystemActivity" />
 
-        <activity android:name=".ui.activity.FeedbackActivity"/>
-        <activity android:name=".ui.activity.ReplaceRuleActivity"/>
+        <activity android:name=".ui.activity.FeedbackActivity" />
+        <activity android:name=".ui.activity.ReplaceRuleActivity" />
 
-        <activity android:name=".ui.activity.MoreSettingActivity"/>
-        <activity android:name=".ui.activity.BookstoreActivity"/>
-        <activity android:name=".ui.activity.QRCodeScanActivity"/>
-        <activity android:name=".ui.activity.BookSourceActivity"/>
-        <activity android:name=".ui.activity.SourceEditActivity"/>
-        <activity android:name=".ui.activity.SourceDebugActivity"/>
+        <activity android:name=".ui.activity.MoreSettingActivity" />
+        <activity android:name=".ui.activity.BookstoreActivity" />
+        <activity android:name=".ui.activity.QRCodeScanActivity" />
+        <activity android:name=".ui.activity.BookSourceActivity" />
+        <activity android:name=".ui.activity.SourceEditActivity" />
+        <activity android:name=".ui.activity.SourceDebugActivity" />
+        <activity android:name=".ui.activity.AdSettingActivity" />
+        <activity android:name=".ui.activity.DonateActivity" />
+        <activity android:name=".ui.activity.BookInfoEditActivity" />
 
-        <receiver android:name=".util.notification.NotificationClickReceiver"/>
-        <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver"/>
-        <service android:name=".model.audio.ReadAloudService"/>
+        <receiver android:name=".util.notification.NotificationClickReceiver" />
+        <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver" />
+
+        <service android:name=".model.audio.ReadAloudService" />
     </application>
 
 </manifest>

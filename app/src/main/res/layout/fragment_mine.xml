@@ -295,6 +295,36 @@
                 android:textColor="@color/textSecondary"
                 android:textSize="@dimen/text_normal_size" />
         </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/mine_rl_ad_setting"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/selector_common_bg"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <ImageView
+                android:id="@+id/iv_ad_setting"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="3dp"
+                android:src="@drawable/ic_ad"
+                app:tint="@color/textPrimary" />
+
+            <TextView
+                android:id="@+id/tv_ad_setting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="16dp"
+                android:layout_toEndOf="@id/iv_ad_setting"
+                android:text="@string/ad_setting"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
+
+        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -342,7 +372,35 @@
                 android:textSize="@dimen/text_normal_size" />
 
         </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/mine_rl_donate"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/selector_common_bg"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
 
+            <ImageView
+                android:id="@+id/iv_donate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_support"
+                app:tint="@color/textPrimary" />
+
+            <TextView
+                android:id="@+id/tv_donate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/iv_donate"
+                android:text="@string/support_author"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
+
+        </RelativeLayout>
         <RelativeLayout
             android:id="@+id/mine_rl_about"
             android:layout_width="match_parent"
@@ -372,6 +430,7 @@
                 android:textSize="@dimen/text_normal_size" />
 
         </RelativeLayout>
+
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

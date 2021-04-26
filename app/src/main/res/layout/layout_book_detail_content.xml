@@ -28,7 +28,12 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="10dp"
+        android:layout_height="5dp"
+        android:background="@color/colorDivider"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
         android:background="@color/colorDivider"/>
 
     <!--书籍目录-->

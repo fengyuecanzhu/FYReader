@@ -6,21 +6,27 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.signature.ObjectKey;
 import com.gyf.immersionbar.ImmersionBar;
+import com.weaction.ddsdk.ad.DdSdkSplashAd;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySplashBinding;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
@@ -30,6 +36,7 @@ import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.PermissionsChecker;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.util.utils.MD5Utils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
@@ -37,7 +44,8 @@ import xyz.fycz.myreader.util.utils.SystemBarUtils;
 
 public class SplashActivity extends BaseActivity {
     /*************Constant**********/
-    private static int WAIT_INTERVAL = 1000;
+    public static final String TAG = SplashActivity.class.getSimpleName();
+    public static int WAIT_INTERVAL = 0;
     private static final int PERMISSIONS_REQUEST_STORAGE = 1;
 
     static final String[] PERMISSIONS = {
@@ -46,6 +54,9 @@ public class SplashActivity extends BaseActivity {
     };
 
     private ActivitySplashBinding binding;
+    private SharedPreUtils spu;
+    private int todayAdCount;
+    private int adTimes;
 
     private PermissionsChecker mPermissionsChecker;
     private Thread myThread = new Thread() {//创建子线程
@@ -59,6 +70,23 @@ public class SplashActivity extends BaseActivity {
                 finish();//关闭当前活动
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+    };
+
+    private Thread countTime = new Thread(){
+        @Override
+        public void run() {
+            for (int i = 0; i < 8; i++) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (!App.isDestroy(SplashActivity.this)){
+                WAIT_INTERVAL = 0;
+                startNormal();
             }
         }
     };
@@ -82,18 +110,82 @@ public class SplashActivity extends BaseActivity {
                 .fullScreen(true)
                 .init();
         SystemBarUtils.hideStableStatusBar(this);
-        loadImage();
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M){
+        //loadImage();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             mPermissionsChecker = new PermissionsChecker(this);
             requestPermission();
-        }else {
+        } else {
             start();
         }
     }
 
-    private void start(){
+    @Override
+    protected boolean initSwipeBackEnable() {
+        return false;
+    }
+
+    @Override
+    protected void initData(Bundle savedInstanceState) {
+        spu = SharedPreUtils.getInstance();
+        String splashAdCount = spu.getString("splashAdCount");
+        adTimes = spu.getInt("curAdTimes", 3);
+        String[] splashAdCounts = splashAdCount.split(":");
+        String today = DateHelper.getYearMonthDay1();
+        if (today.equals(splashAdCounts[0])){
+            todayAdCount = Integer.parseInt(splashAdCounts[1]);
+        }else {
+            todayAdCount = 0;
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void start() {
+        if (adTimes >= 0 && todayAdCount >= adTimes){
+            startNoAd();
+        } else {
+            AdUtils.checkHasAd()
+                    .subscribe(new MySingleObserver<Boolean>() {
+                        @Override
+                        public void onSuccess(@NonNull Boolean aBoolean) {
+                            if (aBoolean) {
+                                AdUtils.initAd();
+                                startWithAd();
+                                binding.ivSplash.setVisibility(View.GONE);
+                                binding.llAd.setVisibility(View.VISIBLE);
+                            } else {
+                                startNoAd();
+                            }
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            startNoAd();
+                        }
+                    });
+        }
+    }
+
+    private void startNoAd(){
+        Animation inAni = AnimationUtils.loadAnimation(SplashActivity.this, R.anim.fade_in);
+        binding.ivSplash.setVisibility(View.VISIBLE);
+        binding.ivSplash.startAnimation(inAni);
+        binding.llAd.setVisibility(View.GONE);
+        WAIT_INTERVAL = 1500;
+        loadImage();
+        startNormal();
+    }
+
+    private void startNormal() {
         if (BookGroupService.getInstance().curGroupIsPrivate()) {
-            App.runOnUiThread(() ->{
+            App.runOnUiThread(() -> {
                 MyAlertDialog.showPrivateVerifyDia(SplashActivity.this, needGoTo -> {
                     myThread.start();
                 }, () -> {
@@ -102,17 +194,64 @@ public class SplashActivity extends BaseActivity {
                     myThread.start();
                 });
             });
-        }else {
+        } else {
             myThread.start();
         }
     }
+
+    private void startWithAd() {
+        try {
+            new DdSdkSplashAd().show(binding.flAd, this, new DdSdkSplashAd.CountdownCallback() {
+                // 展示成功
+                @Override
+                public void show() {
+                    Log.d(TAG, "广告展示成功");
+                    AdUtils.adRecord("splash","adShow");
+                    countTodayAd();
+                    countTime.start();
+                }
+
+                // 广告被点击
+                @Override
+                public void click() {
+                    Log.d(TAG, "广告被点击");
+                    AdUtils.adRecord("splash","adClick");
+                }
+
+                // 展示出错时可读取 msg 中的错误信息
+                @Override
+                public void error(String msg) {
+                    WAIT_INTERVAL = 1500;
+                    if (!App.isDestroy(SplashActivity.this))
+                        startNormal();
+                    Log.e(TAG, msg);
+                    //ToastUtils.showError(msg);
+                }
+
+                // 倒计时结束或用户主动点击跳过按钮后调用
+                @Override
+                public void finishCountdown() {
+                    Log.d(TAG, "倒计时结束或用户主动点击跳过按钮");
+                    AdUtils.adRecord("splash","adFinishCount");
+                    if (!App.isDestroy(SplashActivity.this))
+                        startNormal();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            WAIT_INTERVAL = 1500;
+            if (!App.isDestroy(SplashActivity.this))
+                startNormal();
+        }
+    }
+
 
     private void loadImage() {
         File imgFile = getFileStreamPath(APPCONST.FILE_NAME_SPLASH_IMAGE);
         SharedPreUtils preUtils = SharedPreUtils.getInstance();
         String splashImageMD5 = preUtils.getString("splashImageMD5");
         if (!imgFile.exists() || preUtils.getBoolean("needUdSI") ||
-                !splashImageMD5.equals(MD5Utils.getFileMD5s(imgFile, 16))){
+                !splashImageMD5.equals(MD5Utils.getFileMD5s(imgFile, 16))) {
             if ("".equals(splashImageMD5)) return;
             downLoadImage();
             return;
@@ -129,18 +268,22 @@ public class SplashActivity extends BaseActivity {
             startTime = DateHelper.strDateToLong(splashLoadDates[0] + " 00:00:00");
             endTime = DateHelper.strDateToLong(splashLoadDates[1] + " 00:00:00");
         }
-        if (startTime == 0){
+        if (startTime == 0) {
             startTime = DateHelper.strDateToLong(splashLoadDate + " 00:00:00");
         }
-        if (endTime == 0){
+        if (endTime == 0) {
             endTime = startTime + 24 * 60 * 60 * 1000;
         }
-        if (curTime >= startTime && curTime <= endTime){
+        if (curTime >= startTime && curTime <= endTime) {
             WAIT_INTERVAL = 1500;
+            RequestOptions options = new RequestOptions()
+                    .error(R.drawable.start)
+                    .signature(new ObjectKey(splashLoadDate));
             ImageLoader.INSTANCE
                     .load(this, imgFile)
-                    .error(R.drawable.start)
-                    .signature(new ObjectKey(splashLoadDate))
+                    /*.error(R.drawable.start)
+                    .signature(new ObjectKey(splashLoadDate))*/
+                    .apply(options)
                     .into(binding.ivSplash);
         }
     }
@@ -156,27 +299,27 @@ public class SplashActivity extends BaseActivity {
                     fos = openFileOutput(APPCONST.FILE_NAME_SPLASH_IMAGE, MODE_PRIVATE);
                     byte[] bytes = new byte[1024];
                     int len;
-                    while ((len = is.read(bytes)) != -1){
+                    while ((len = is.read(bytes)) != -1) {
                         fos.write(bytes, 0, len);
                     }
                     fos.flush();
                     Log.d("SplashActivity", "downLoadImage success!");
                 } catch (Exception e) {
                     File data = getFileStreamPath(APPCONST.FILE_NAME_SPLASH_IMAGE);
-                    if (data != null && data.exists()){
+                    if (data != null && data.exists()) {
                         data.delete();
                     }
                     e.printStackTrace();
-                }finally {
+                } finally {
                     IOUtils.close(is, fos);
                 }
             }
         });
     }
 
-    private void requestPermission(){
+    private void requestPermission() {
         //获取读取和写入SD卡的权限
-        if (mPermissionsChecker.lacksPermissions(PERMISSIONS)){
+        if (mPermissionsChecker.lacksPermissions(PERMISSIONS)) {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONS_REQUEST_STORAGE);
         } else {
             start();
@@ -201,5 +344,11 @@ public class SplashActivity extends BaseActivity {
                 return;
             }
         }
+    }
+
+    private void countTodayAd() {
+        String today = DateHelper.getYearMonthDay1();
+        todayAdCount++;
+        spu.putString("splashAdCount", today + ":" + todayAdCount);
     }
 }

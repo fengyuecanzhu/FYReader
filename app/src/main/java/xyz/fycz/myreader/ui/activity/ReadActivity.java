@@ -277,6 +277,11 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     }
 
     @Override
+    protected boolean initSwipeBackEnable() {
+        return false;
+    }
+
+    @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         mBookService = BookService.getInstance();
@@ -1481,7 +1486,11 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 重置黑屏时间
      */
     private void screenOffTimerStart() {
-        if (screenTimeOut <= 0) {
+        if (screenTimeOut < 0) {
+            keepScreenOn(false);
+            return;
+        }
+        if (screenTimeOut == 0) {
             keepScreenOn(true);
             return;
         }
@@ -1678,7 +1687,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private View vProtectEye;
 
     private void initEyeView() {
-        ViewGroup content = findViewById(android.R.id.content);
+        ViewGroup content = (ViewGroup) findViewById(android.R.id.content);
         vProtectEye = new FrameLayout(this);
         vProtectEye.setBackgroundColor(mSetting.isProtectEye() ? getFilterColor(mSetting.getBlueFilterPercent()) : Color.TRANSPARENT);          //设置透明
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();

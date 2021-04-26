@@ -66,6 +66,11 @@ public class SourceEditActivity extends BaseActivity {
     }
 
     @Override
+    protected boolean initSwipeBackEnable() {
+        return false;
+    }
+
+    @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         source = getIntent().getParcelableExtra(APPCONST.BOOK_SOURCE);

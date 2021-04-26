@@ -89,6 +89,22 @@ public class FileUtils {
         }
     }
 
+    //获取File文件夹
+    public static String getFilePath(){
+        return getFileDir().getAbsolutePath();
+    }
+
+    public static File getFileDir(){
+        if (isSdCardExist()){
+            return App.getmContext()
+                    .getExternalFilesDir(null);
+        }
+        else{
+            return App.getmContext()
+                    .getFilesDir();
+        }
+    }
+
     public static long getDirSize(File file){
         //判断文件是否存在
         if (file.exists()) {

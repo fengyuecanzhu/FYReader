@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
@@ -30,7 +31,7 @@ import xyz.fycz.myreader.util.StatusBarUtil;
  * @author fengyue
  * @date 2020/8/12 20:02
  */
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends SwipeBackActivity {
     private static final int INVALID_VAL = -1;
 
     protected CompositeDisposable mDisposable;
@@ -43,9 +44,10 @@ public abstract class BaseActivity extends AppCompatActivity {
      * 绑定视图
      */
     protected abstract void bindView();
+
     /************************init area************************************/
-    protected void addDisposable(Disposable d){
-        if (mDisposable == null){
+    protected void addDisposable(Disposable d) {
+        if (mDisposable == null) {
             mDisposable = new CompositeDisposable();
         }
         mDisposable.add(d);
@@ -54,29 +56,44 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 配置Toolbar
+     *
      * @param toolbar
      */
-    protected void setUpToolbar(Toolbar toolbar){
+    protected void setUpToolbar(Toolbar toolbar) {
     }
 
-    protected void initData(Bundle savedInstanceState){
+    /**
+     * 是否开启左滑手势
+     *
+     * @return
+     */
+    protected boolean initSwipeBackEnable() {
+        return true;
     }
+
+    protected void initData(Bundle savedInstanceState) {
+    }
+
     /**
      * 初始化零件
      */
     protected void initWidget() {
 
     }
+
     /**
      * 初始化点击事件
      */
-    protected void initClick(){
+    protected void initClick() {
     }
+
     /**
      * 逻辑使用区
      */
-    protected void processLogic(){
+    protected void processLogic() {
     }
+
+
     /**
      * @return 是否夜间模式
      */
@@ -86,6 +103,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 设置夜间模式
+     *
      * @param isNightMode
      */
     protected void setNightTheme(boolean isNightMode) {
@@ -93,8 +111,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         setting.setDayStyle(!isNightMode);
         App.getApplication().initNightTheme();
     }
-
-
 
 
     /*************************lifecycle area*****************************************************/
@@ -105,6 +121,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         initTheme();
         ActivityManage.addActivity(this);
         bindView();
+        setSwipeBackEnable(initSwipeBackEnable());
         initData(savedInstanceState);
         initToolbar();
         initWidget();
@@ -112,10 +129,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         processLogic();
     }
 
-    private void initToolbar(){
+    private void initToolbar() {
         //更严谨是通过反射判断是否存在Toolbar
-        mToolbar = findViewById(R.id.toolbar);
-        if (mToolbar != null){
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (mToolbar != null) {
             supportActionBar(mToolbar);
             setUpToolbar(mToolbar);
         }
@@ -124,7 +141,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (isThemeChange()){
+        if (isThemeChange()) {
             recreate();
         }
     }
@@ -133,16 +150,17 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ActivityManage.removeActivity(this);
-        if (mDisposable != null){
+        if (mDisposable != null) {
             mDisposable.dispose();
         }
     }
+
     /**
      * 初始化主题
      */
     public void initTheme() {
         //if (isNightTheme()) {
-            //setTheme(R.style.AppNightTheme);
+        //setTheme(R.style.AppNightTheme);
         curNightMode = AppCompatDelegate.getDefaultNightMode();
         /*} else {
             //curNightMode = false;
@@ -150,20 +168,21 @@ public abstract class BaseActivity extends AppCompatActivity {
         }*/
     }
 
-    protected boolean isThemeChange(){
+    protected boolean isThemeChange() {
         return curNightMode != AppCompatDelegate.getDefaultNightMode();
     }
+
     /**************************used method area*******************************************/
 
-    protected void startActivity(Class<? extends AppCompatActivity> activity){
+    protected void startActivity(Class<? extends AppCompatActivity> activity) {
         Intent intent = new Intent(this, activity);
         startActivity(intent);
     }
 
-    protected ActionBar supportActionBar(Toolbar toolbar){
+    protected ActionBar supportActionBar(Toolbar toolbar) {
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null){
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
@@ -173,7 +192,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         return actionBar;
     }
 
-    protected void setStatusBarColor(int statusColor, boolean dark){
+    protected void setStatusBarColor(int statusColor, boolean dark) {
         //沉浸式代码配置
         //当FitsSystemWindows设置 true 时，会在屏幕最上方预留出状态栏高度的 padding
         StatusBarUtil.setRootViewFitsSystemWindows(this, true);
@@ -190,7 +209,9 @@ public abstract class BaseActivity extends AppCompatActivity {
                 StatusBarUtil.setStatusBarColor(this, 0x55000000);
             }
         }
-    } /**
+    }
+
+    /**
      * 设置MENU图标颜色
      */
     @Override

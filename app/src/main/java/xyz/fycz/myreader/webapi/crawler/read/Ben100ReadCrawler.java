@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-
+@Deprecated
 public class Ben100ReadCrawler extends FindCrawler implements ReadCrawler, BookInfoCrawler {
     public static final String NAME_SPACE = "https://www.100ben.net";
     public static final String NOVEL_SEARCH = "https://www.100ben.net/plus/search.php?keyword={key}";

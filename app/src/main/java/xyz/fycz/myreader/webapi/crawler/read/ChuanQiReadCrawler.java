@@ -17,7 +17,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
-
+@Deprecated
 public class ChuanQiReadCrawler implements ReadCrawler {
     public static final String NAME_SPACE = "https://www.xs86.com";
     public static final String NOVEL_SEARCH = "https://www.xs86.com/search.php?key={key}";

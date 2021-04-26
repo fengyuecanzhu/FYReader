@@ -4,6 +4,7 @@ import android.util.Log;
 import okhttp3.*;
 import xyz.fycz.myreader.application.TrustAllCerts;
 import xyz.fycz.myreader.util.HttpUtil;
+import xyz.fycz.myreader.util.StringHelper;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -27,13 +28,20 @@ public class OkHttpUtils {
     }
 
     public static String getHtml(String url, RequestBody requestBody, String encodeType) throws IOException {
+        return getHtml(url, requestBody, encodeType, null);
+    }
+
+    public static String getHtml(String url, RequestBody requestBody, String encodeType, String cookie) throws IOException {
 
         Request.Builder builder = new Request.Builder()
                 .addHeader("Accept", "*/*")
                 .addHeader("Connection", "Keep-Alive")
                 //.addHeader("Charsert", "utf-8")
                 .addHeader("Cache-Control", "no-cache")
-                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36");
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36");
+        if (cookie != null){
+            builder.addHeader("Cookie", cookie);
+        }
         if (requestBody != null) {
             builder.post(requestBody);
             Log.d("HttpPost URl", url);

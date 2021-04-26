@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "xyz.fycz.myreader",
+  "variantName": "processDebugResources",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "versionCode": 193,
+      "versionName": "1.9.3",
+      "outputFile": "风月读书v1.9.3.apk"
+    }
+  ]
+}

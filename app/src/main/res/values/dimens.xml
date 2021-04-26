@@ -46,5 +46,6 @@
 
     <dimen name="tab_home_text_size">16sp</dimen>
 
-
+    <dimen name="_10dp">10dp</dimen>
+    <dimen name="_15dp">15dp</dimen>
 </resources>

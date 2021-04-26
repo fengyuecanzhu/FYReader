@@ -26,6 +26,7 @@ import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.weaction.ddsdk.ad.DdSdkFlowAd;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,6 +39,7 @@ import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.ai.BookWordCountPre;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
@@ -63,6 +65,7 @@ import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.BitmapUtil;
 import xyz.fycz.myreader.util.utils.BlurTransformation;
 import xyz.fycz.myreader.util.utils.FileUtils;
@@ -83,6 +86,7 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 public class BookDetailedActivity extends BaseActivity {
 
     private ActivityBookDetailBinding binding;
+    private static final String TAG = BookDetailedActivity.class.getSimpleName();
 
     private Book mBook;
     private ArrayList<Book> aBooks;
@@ -223,6 +227,45 @@ public class BookDetailedActivity extends BaseActivity {
         }
         mSourceDialog.setABooks(aBooks);
         mSourceDialog.setSourceIndex(sourceIndex);
+
+        initAd();
+    }
+    /**
+     * type   信息流类型，只能填 1、4、6、3 (样式请看下表)
+     * count  请求返回的信息流广告条目数，最小为 1，最大为 5，通常情况下建议一次返回一条
+     */
+    private void initAd() {
+        if (SharedPreUtils.getInstance().getBoolean("bookDetailAd", false)) {
+            AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
+                @Override
+                public void onSuccess(@NonNull Boolean aBoolean) {
+                    if (aBoolean){
+                        AdUtils.initAd();
+                        new DdSdkFlowAd().getFlowViews(BookDetailedActivity.this, 6, 1, new DdSdkFlowAd.FlowCallback() {
+                            // 信息流广告拉取完毕后返回的 views
+                            @Override
+                            public void getFlowViews(List<View> views) {
+                                Log.i(TAG, "信息流广告拉取完毕后返回了" + views.size() + "个view");
+                                binding.ic.getRoot().addView(views.get(0), 2);
+                            }
+
+                            // 信息流广告展示后调用
+                            @Override
+                            public void show() {
+                                AdUtils.adRecord("flow","adShow");
+                                Log.i(TAG, "信息流广告展示成功");
+                            }
+
+                            // 广告拉取失败调用
+                            @Override
+                            public void error(String msg) {
+                                Log.i(TAG, "广告拉取失败\n" + msg);
+                            }
+                        });
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -253,6 +296,7 @@ public class BookDetailedActivity extends BaseActivity {
                 binding.ib.bookDetailTvAdd.setText("加入书架");
                 binding.ib.bookDetailTvOpen.setText("开始阅读");
             }
+            invalidateOptionsMenu();
         });
         binding.ib.flOpenBook.setOnClickListener(view -> goReadActivity());
 
@@ -363,6 +407,7 @@ public class BookDetailedActivity extends BaseActivity {
             });
         } else {
             initOtherInfo();
+            //predictBookCount();
         }
     }
 
@@ -521,17 +566,22 @@ public class BookDetailedActivity extends BaseActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         if ("本地书籍".equals(mBook.getType())) {
             MenuItem groupSetting = menu.findItem(R.id.action_group_setting);
+            MenuItem edit = menu.findItem(R.id.action_edit);
             groupSetting.setVisible(isCollected);
+            edit.setVisible(isCollected);
         } else {
             MenuItem isUpdate = menu.findItem(R.id.action_is_update);
             MenuItem groupSetting = menu.findItem(R.id.action_group_setting);
+            MenuItem edit = menu.findItem(R.id.action_edit);
             if (isCollected) {
                 isUpdate.setVisible(true);
                 groupSetting.setVisible(true);
+                edit.setVisible(true);
                 isUpdate.setChecked(!mBook.getIsCloseUpdate());
             } else {
                 isUpdate.setVisible(false);
                 groupSetting.setVisible(false);
+                edit.setVisible(false);
             }
         }
         return super.onPrepareOptionsMenu(menu);
@@ -573,6 +623,11 @@ public class BookDetailedActivity extends BaseActivity {
                 break;
             case R.id.action_share:
                 shareBook();
+                break;
+            case R.id.action_edit:
+                Intent editIntent = new Intent(this, BookInfoEditActivity.class);
+                editIntent.putExtra(APPCONST.BOOK, mBook);
+                startActivityForResult(editIntent, APPCONST.REQUEST_EDIT_BOOK);
                 break;
             case R.id.action_reload:  //重新加载
                 mHandler.sendEmptyMessage(1);
@@ -646,6 +701,10 @@ public class BookDetailedActivity extends BaseActivity {
                     mBook.setHisttoryChapterNum(chapterAndPage[0]);
                     mBook.setLastReadPosition(chapterAndPage[1]);
                     goReadActivity();
+                    break;
+                case APPCONST.REQUEST_EDIT_BOOK:
+                    mBook = BookService.getInstance().getBookById(mBook.getId());
+                    initBookInfo();
                     break;
             }
         }
@@ -835,5 +894,19 @@ public class BookDetailedActivity extends BaseActivity {
             i++;
         }
         return lines;
+    }
+
+
+    private void predictBookCount(){
+        if (isCollected) {
+            BookWordCountPre bwcp = new BookWordCountPre(mBook);
+            App.getApplication().newThread(() ->{
+                if (bwcp.train()){
+                    int count = bwcp.predict();
+                    mBook.setWordCount(String.valueOf(count));
+                    App.runOnUiThread(this::initTagList);
+                }
+            });
+        }
     }
 }

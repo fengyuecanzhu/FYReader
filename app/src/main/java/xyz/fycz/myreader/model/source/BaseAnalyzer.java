@@ -2,6 +2,8 @@ package xyz.fycz.myreader.model.source;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import xyz.fycz.myreader.util.StringHelper;
@@ -236,6 +238,78 @@ public abstract class BaseAnalyzer {
             e.printStackTrace();
         }
         return content;
+    }
+
+    /**
+     * 执行列表(特殊)函数
+     * 1、!n：跳过列表前n个
+     * 2、%n：以n为分组长度进行分组，并对各组进行反转
+     * @param funs
+     * @param list
+     * @return
+     */
+    protected List evalListFunction(String funs, List list) {
+        if (funs.endsWith(";")) funs = funs.substring(0, funs.length() - 1);
+        String[] funArr = funs.split(";");
+        for (String fun : funArr) {
+            if (fun.contains("!")) {
+                list = evalListSkip(fun, list);
+            } else if (fun.contains("%")) {
+                list = evalListGroupReverse(fun, list);
+            }
+        }
+        return new ArrayList(list);
+    }
+
+    /**
+     * 执行列表跳过函数
+     * @param rule
+     * @param list
+     * @return
+     */
+    protected List evalListSkip(String rule, List list) {
+        int skip = 0;
+        if (rule.matches("!([0-9]+)")) {
+            rule = rule.substring(1);
+        }
+        try {
+            skip = Integer.parseInt(rule);
+            Log.d("evalListSkip", "执行成功");
+        } catch (Exception ignored) {
+        }
+        if (skip > list.size()) skip = 0;
+        return list.subList(skip, list.size());
+    }
+
+    /**
+     * 执行列表分组反转函数
+     * @param rule
+     * @param list
+     * @return
+     */
+    protected List evalListGroupReverse(String rule, List list){
+        int groupSize = 0;
+        if (rule.matches("%([0-9]+)")) {
+            rule = rule.substring(1);
+        }
+        try {
+            groupSize = Integer.parseInt(rule);
+            Log.d("evalListGroupReverse", "执行成功");
+        } catch (Exception ignored) {
+        }
+        if (groupSize < 2) return list;
+        List reverseList = new ArrayList();
+        int groupNum = list.size() / groupSize;
+        if (list.size() % groupSize != 0) groupNum++;
+        for (int i = 0; i < groupNum; i++) {
+            int start = i * groupSize;
+            int end = (i + 1) * groupSize;
+            if (end > list.size()) end = list.size();
+            List subList = list.subList(start, end);
+            Collections.reverse(subList);
+            reverseList.addAll(subList);
+        }
+        return reverseList;
     }
 
     public static String getCharset(String charset) {

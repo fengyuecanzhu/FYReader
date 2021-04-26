@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.util.utils.ImageLoader
@@ -126,9 +127,15 @@ class CoverImageView : androidx.appcompat.widget.AppCompatImageView {
 
     fun load(path: String?, name: String?, author: String?) {
         setText(name, author)
-        ImageLoader.load(context, path)//Glide自动识别http://和file://
+        val options = RequestOptions ()
                 .placeholder(R.mipmap.default_cover)
                 .error(R.mipmap.default_cover)
+                .centerCrop()
+        ImageLoader.load(context, path)//Glide自动识别http://和file://
+                /*.placeholder(R.mipmap.default_cover)
+                .error(R.mipmap.default_cover)
+                .centerCrop()*/
+                .apply(options)
                 .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
                             e: GlideException?,
@@ -152,7 +159,6 @@ class CoverImageView : androidx.appcompat.widget.AppCompatImageView {
                     }
 
                 })
-                .centerCrop()
                 .into(this)
     }
 }

@@ -99,6 +99,11 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    protected boolean initSwipeBackEnable() {
+        return false;
+    }
+
+    @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         groupName = SharedPreUtils.getInstance().getString(getString(R.string.curBookGroupName), "");

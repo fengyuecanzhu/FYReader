@@ -317,7 +317,7 @@ public class UserService {
     }
 
 
-    private static String makeSignalParam(){
+    public static String makeSignalParam(){
         return "&signal=" + AppInfoUtils.getSingInfo(App.getmContext(),
                 App.getApplication().getPackageName(), AppInfoUtils.SHA1);
     }

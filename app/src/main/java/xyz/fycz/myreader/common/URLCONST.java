@@ -14,7 +14,7 @@ public class URLCONST {
     //字体下载
     public static final String FONT_DOWNLOAD_URL = "https://novel.fycz.xyz/app/fonts/";
 
-    public static final String APP_WEB_URL = "http://fyreader.fycz.xyz:8080/FYReader/";
+    public static final String APP_WEB_URL = "https://fyreader.fycz.xyz/";
 
     public static final String BAI_DU_SEARCH = "https://m.baidu.com/s?word={key}";
 
@@ -22,5 +22,14 @@ public class URLCONST {
 
     public static final String YOU_DAO_SEARCH = "http://m.youdao.com/dict?le=eng&q={key}";
 
+    public static final String FY_READER_URL = "https://fyreader.fycz.tk";
+
+    public static final String AD_URL = FY_READER_URL + "/ad";
+
+    public static final String DONATE = "https://gitee.com/fengyuecanzhu/Donate/raw/master";
+
+    public static final String WX_ZSM = DONATE + "/wx_zsm.png";
+    public static final String ZFB_SKM = DONATE + "/zfb_skm.jpg";
+    public static final String QQ_SKM = DONATE + "/qq_skm.png";
 }
 

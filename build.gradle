@@ -5,9 +5,9 @@ ext {
 buildscript {
     ext.kotlin_version = '1.4.20'
     repositories {
+        google()
         jcenter()
         mavenCentral()
-        google()
         maven { url 'https://s3.amazonaws.com/fabric-artifacts/public' }
         maven { url 'https://plugins.gradle.org/m2/' }
         maven { url "https://maven.java.net/content/groups/public/" }
@@ -24,9 +24,9 @@ buildscript {
 
 allprojects {
     repositories {
+        google()
         jcenter()
         maven { url "https://jitpack.io" }
-        google()
     }
     /*gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {
