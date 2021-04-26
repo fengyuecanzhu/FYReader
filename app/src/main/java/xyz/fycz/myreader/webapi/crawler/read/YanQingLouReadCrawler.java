@@ -23,7 +23,7 @@ import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
-
+@Deprecated
 public class YanQingLouReadCrawler implements ReadCrawler {
     public static final String NAME_SPACE = "http://www.yanqinglou.com";
     public static final String NOVEL_SEARCH = "http://www.yanqinglou.com/Home/Search,action=search&q={key}";

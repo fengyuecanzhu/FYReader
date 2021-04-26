@@ -122,6 +122,7 @@ public class HongChenReadCrawler implements ReadCrawler {
 			</dd>
 		</dl>
      */
+    @Deprecated
     public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
         ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
         Document doc = Jsoup.parse(html);

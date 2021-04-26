@@ -42,7 +42,9 @@ import xyz.fycz.myreader.model.storage.BackupRestoreUi;
 import xyz.fycz.myreader.model.storage.Restore;
 import xyz.fycz.myreader.model.storage.WebDavHelp;
 import xyz.fycz.myreader.ui.activity.AboutActivity;
+import xyz.fycz.myreader.ui.activity.AdSettingActivity;
 import xyz.fycz.myreader.ui.activity.BookSourceActivity;
+import xyz.fycz.myreader.ui.activity.DonateActivity;
 import xyz.fycz.myreader.ui.activity.FeedbackActivity;
 import xyz.fycz.myreader.ui.activity.LoginActivity;
 import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
@@ -282,6 +284,8 @@ public class MineFragment extends BaseFragment {
 
         });
 
+        binding.mineRlAdSetting.setOnClickListener(v -> startActivity(new Intent(getActivity(), AdSettingActivity.class)));
+
         binding.mineRlAbout.setOnClickListener(v -> {
             Intent aboutIntent = new Intent(getActivity(), AboutActivity.class);
             startActivity(aboutIntent);
@@ -291,6 +295,8 @@ public class MineFragment extends BaseFragment {
             Intent intent = new Intent(getContext(), FeedbackActivity.class);
             getActivity().startActivity(intent);
         });
+
+        binding.mineRlDonate.setOnClickListener(v -> startActivity(new Intent(getActivity(), DonateActivity.class)));
     }
 
     @Override

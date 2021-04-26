@@ -156,7 +156,7 @@ public class MoreSettingActivity extends BaseActivity {
 
     @Override
     protected void processLogic() {
-        if(isWebDav){
+        if (isWebDav) {
             binding.llWebdav.performClick();
         }
     }
@@ -470,38 +470,35 @@ public class MoreSettingActivity extends BaseActivity {
         binding.rlCatheGap.setOnClickListener(v -> binding.scCatheGap.performClick());
 
         binding.rlDeleteCathe.setOnClickListener(v -> {
-            App.runOnUiThread(() -> {
-                File catheFile = getCacheDir();
-                String catheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(catheFile));
+            File catheFile = getCacheDir();
+            String catheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(catheFile));
 
-                File eCatheFile = new File(BOOK_CACHE_PATH);
-                String eCatheFileSize;
-                if (eCatheFile.exists() && eCatheFile.isDirectory()) {
-                    eCatheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(eCatheFile));
-                } else {
-                    eCatheFileSize = "0";
-                }
-                CharSequence[] cathes = {"章节缓存：" + eCatheFileSize, "图片缓存：" + catheFileSize};
-                boolean[] catheCheck = {true, true};
-                new MultiChoiceDialog().create(this, "清除缓存", cathes, catheCheck, 2,
-                        (dialog, which) -> {
-                            String tip = "";
-                            if (catheCheck[0]) {
-                                BookService.getInstance().deleteAllBookCathe();
-                                tip += "章节缓存 ";
-                            }
-                            if (catheCheck[1]) {
-                                FileUtils.deleteFile(catheFile.getAbsolutePath());
-                                tip += "图片缓存 ";
-                            }
-                            if (tip.length() > 0) {
-                                tip += "清除成功";
-                                ToastUtils.showSuccess(tip);
-                            }
-                        }, null, null);
-            });
+            File eCatheFile = new File(BOOK_CACHE_PATH);
+            String eCatheFileSize;
+            if (eCatheFile.exists() && eCatheFile.isDirectory()) {
+                eCatheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(eCatheFile));
+            } else {
+                eCatheFileSize = "0";
+            }
+            CharSequence[] cathes = {"章节缓存：" + eCatheFileSize, "图片缓存：" + catheFileSize};
+            boolean[] catheCheck = {true, true};
+            new MultiChoiceDialog().create(this, "清除缓存", cathes, catheCheck, 2,
+                    (dialog, which) -> {
+                        String tip = "";
+                        if (catheCheck[0]) {
+                            BookService.getInstance().deleteAllBookCathe();
+                            tip += "章节缓存 ";
+                        }
+                        if (catheCheck[1]) {
+                            FileUtils.deleteFile(catheFile.getAbsolutePath());
+                            tip += "图片缓存 ";
+                        }
+                        if (tip.length() > 0) {
+                            tip += "清除成功";
+                            ToastUtils.showSuccess(tip);
+                        }
+                    }, null, null);
         });
-
     }
 
 
@@ -539,17 +536,20 @@ public class MoreSettingActivity extends BaseActivity {
 
         int resetScreenSelection = 0;
         switch (resetScreenTime) {
-            case 0:
+            case -1:
                 resetScreenSelection = 0;
                 break;
-            case 1:
+            case 0:
                 resetScreenSelection = 1;
                 break;
-            case 3:
+            case 1:
                 resetScreenSelection = 2;
                 break;
-            case 5:
+            case 3:
                 resetScreenSelection = 3;
+                break;
+            case 5:
+                resetScreenSelection = 4;
                 break;
         }
         binding.scResetScreen.setSelection(resetScreenSelection);
@@ -558,15 +558,18 @@ public class MoreSettingActivity extends BaseActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 0:
-                        resetScreenTime = 0;
+                        resetScreenTime = -1;
                         break;
                     case 1:
-                        resetScreenTime = 1;
+                        resetScreenTime = 0;
                         break;
                     case 2:
-                        resetScreenTime = 3;
+                        resetScreenTime = 1;
                         break;
                     case 3:
+                        resetScreenTime = 3;
+                        break;
+                    case 4:
                         resetScreenTime = 5;
                         break;
                 }

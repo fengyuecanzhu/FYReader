@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 public class JiuTaoReadCrawler implements ReadCrawler {
     public static final String NAME_SPACE = "https://www.9txs.com";
-    public static final String NOVEL_SEARCH = "https://www.9txs.com/search.html,searchkey={key}";
+    public static final String NOVEL_SEARCH = "https://so.9txs.org/www/,searchkey={key}";
     public static final String CHARSET = "UTF-8";
     public static final String SEARCH_CHARSET = "UTF-8";
 

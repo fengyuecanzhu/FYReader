@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/app/src/main/java/xyz/fycz/myreader/model/backup/UserService.java" dialect="GenericSQL" />
-    <file url="PROJECT" dialect="MySQL" />
-  </component>
-</project>

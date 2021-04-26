@@ -111,12 +111,12 @@
 
                     <androidx.appcompat.widget.AppCompatSpinner
                         android:id="@+id/sc_reset_screen"
-                        android:layout_width="115dp"
+                        android:layout_width="130dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:clickable="false"
-                        android:dropDownWidth="75dp"
+                        android:dropDownWidth="90dp"
                         android:gravity="center"
                         android:longClickable="false" />
                 </RelativeLayout>

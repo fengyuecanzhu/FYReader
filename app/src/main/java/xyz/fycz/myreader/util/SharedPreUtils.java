@@ -84,7 +84,7 @@ public class SharedPreUtils {
     }
 
     public boolean getBoolean(String key,boolean def){
-        return sharedReadable.getBoolean(key, false);
+        return sharedReadable.getBoolean(key, def);
     }
 
     public float getFloat(String key){

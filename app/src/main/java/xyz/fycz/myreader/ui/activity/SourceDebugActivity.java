@@ -29,10 +29,10 @@ import xyz.fycz.myreader.entity.sourcedebug.DebugEntity;
 import xyz.fycz.myreader.entity.sourcedebug.ListResult;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
+import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
-import xyz.fycz.myreader.util.utils.ProgressUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
@@ -49,6 +49,7 @@ public class SourceDebugActivity extends BaseActivity {
     private DebugEntity debugEntity;
     private ReadCrawler rc;
     private Disposable disposable;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void bindView() {
@@ -83,6 +84,11 @@ public class SourceDebugActivity extends BaseActivity {
         super.initData(savedInstanceState);
         debugEntity = getIntent().getParcelableExtra("debugEntity");
         rc = ReadCrawlerUtil.getReadCrawler(debugEntity.getBookSource(), true);
+        loadingDialog = new LoadingDialog(this, "正在请求", () -> {
+            if (disposable != null && !disposable.isDisposed()) {
+                disposable.dispose();
+            }
+        });
     }
 
     @Override
@@ -119,17 +125,10 @@ public class SourceDebugActivity extends BaseActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        if (ProgressUtils.isShowing()) {
-            ProgressUtils.dismiss();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
     protected void onDestroy() {
-        ProgressUtils.dismiss();
+        if (loadingDialog != null) {
+            loadingDialog.dismiss();
+        }
         super.onDestroy();
     }
 
@@ -149,11 +148,7 @@ public class SourceDebugActivity extends BaseActivity {
     }
 
     private void initDebugEntity() {
-        ProgressUtils.show(this, "正在请求...", "取消", (dialog, which) -> {
-            if (disposable != null) {
-                disposable.dispose();
-            }
-        });
+        loadingDialog.show();
         Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             try {
                 String url = debugEntity.getUrl();
@@ -209,7 +204,7 @@ public class SourceDebugActivity extends BaseActivity {
             public void onNext(@NonNull Boolean flag) {
                 binding.rvParseResult.setCode(debugEntity.getParseResult()).apply();
                 binding.rvSourceCode.setCode(debugEntity.getHtml()).apply();
-                ProgressUtils.dismiss();
+                loadingDialog.dismiss();
             }
 
             @Override
@@ -217,7 +212,7 @@ public class SourceDebugActivity extends BaseActivity {
                 binding.rvParseResult.setCode(String.format("{\n\b\b\b\b\"result\": \"error\", \n\b\b\b\b\"msg\": \"%s\"\n}"
                         , e.getLocalizedMessage().replace("\"", "\\\""))).apply();
                 binding.rvSourceCode.setCode(debugEntity.getHtml()).apply();
-                ProgressUtils.dismiss();
+                loadingDialog.dismiss();
             }
 
         });

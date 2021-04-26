@@ -84,33 +84,28 @@ public class XpathAnalyzer extends BaseAnalyzer {
 
     public List<JXNode> getJXNodeList(String rule, JXDocument JXDoc) {
         List<JXNode> list = new ArrayList<>();
-        int skip = 0;
-        if (rule.contains("##!")) {
-            try {
-                skip = Integer.parseInt(rule.substring(rule.indexOf("##!") + 3));
-            } catch (Exception ignored) {
-            }
-            rule = rule.split("##")[0];
+        boolean hasFunction = rule.contains("##");
+        String funs = "";
+        if (hasFunction) {
+            funs = rule.substring(rule.indexOf("##") + 2);
+            rule = rule.substring(0, rule.indexOf("##"));
         }
         if (StringHelper.isEmpty(rule)) return list;
-        List<JXNode> selN = JXDoc.selN(rule);
-        list = selN.subList(skip, selN.size());
-        return list;
+        list = JXDoc.selN(rule);
+        return !hasFunction ? list : evalListFunction(funs, list);
     }
 
     public List<JXNode> getJXNodeList(String rule, JXNode jxNode) {
         List<JXNode> list = new ArrayList<>();
-        if (StringHelper.isEmpty(rule)) return list;
-        int skip = 0;
-        if (rule.contains("##!")) {
-            try {
-                skip = Integer.parseInt(rule.substring(rule.indexOf("##!") + 3));
-            } catch (Exception ignored) {
-            }
-            rule = rule.split("##")[0];
+        boolean hasFunction = rule.contains("##");
+        String funs = "";
+        if (hasFunction) {
+            funs = rule.substring(rule.indexOf("##") + 2);
+            rule = rule.substring(0, rule.indexOf("##"));
         }
-        List<JXNode> selN = jxNode.sel(rule);
-        list = selN.subList(skip, selN.size());
+        if (StringHelper.isEmpty(rule)) return list;
+        list = jxNode.sel(rule);
+        if (hasFunction) list = evalListFunction(funs, list);
         return list;
     }
 

@@ -91,13 +91,15 @@ public class LanZousApi {
     }
 
     private static String getKey(String html) {
-        SharedPreUtils spu = SharedPreUtils.getInstance();
+        //SharedPreUtils spu = SharedPreUtils.getInstance();
         String lanzousKeyStart = "var pposturl = '";
-        try {
-            lanzousKeyStart = spu.getString(App.getmContext().getString(R.string.lanzousKeyStart));
-        }catch (Exception e){
-            e.printStackTrace();
+        String keyName = StringHelper.getSubString(html, "'sign':", ",");
+        if (keyName.endsWith("'")){
+            lanzousKeyStart = "'sign':'";
+        }else {
+            lanzousKeyStart = "var " + keyName + " = '";
         }
+        //lanzousKeyStart = spu.getString(App.getmContext().getString(R.string.lanzousKeyStart));
         return StringHelper.getSubString(html, lanzousKeyStart, "'");
     }
 

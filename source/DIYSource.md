@@ -42,7 +42,7 @@
 
 #### 1、概要
 
-* 书源规则支持四个普通函数和一个列表函数，分别为@r/@replace，@a/@append，@c/contains，@nc/notContains，!
+* 书源规则支持四个普通函数和一个列表函数，分别为@r/@replace，@a/@append，@c/contains，@nc/notContains，!，%
 * 如何使用：在书源规则后添加 ***##+函数*** ，多个函数以半角分号 **;** 分隔，若函数内部出现 **;** 请使用 **\;** 转义
 
 #### 2、@r/@replace替换函数
@@ -123,8 +123,33 @@
 
 #### 6、!跳过列表前几个函数
 
-* 语法：!+数字
+* 语法：!n
+* n为跳过数量
 * 此函数仅支持书籍列表(Xpath、JsonPath)，章节列表(Matcher、Xpath、JsonPath)
+
+#### 7、!列表分组反转函数
+
+* 语法：%n
+* 以n为分组长度进行分组，并对各组进行反转
+* 此函数仅支持书籍列表(Xpath、JsonPath)，章节列表(Matcher、Xpath、JsonPath)
+* 例如：
+    * ```html
+        <a href="3.html">第三章</a>
+        <a href="2.html">第二章</a>
+        <a href="1.html">第一章</a>
+      
+        <a href="6.html">第六章</a>
+        <a href="5.html">第五章</a>
+        <a href="4.html">第四章</a>
+      
+        <a href="9.html">第九章</a>
+        <a href="8.html">第八章</a>
+        <a href="7.html">第七章</a>
+      
+        <a href="10.html">第十章</a>
+      ```
+    
+    * 以上列表每三个为一组顺序倒置了，故可用此函数：%3 即可的到正确排序的列表
 
 
 

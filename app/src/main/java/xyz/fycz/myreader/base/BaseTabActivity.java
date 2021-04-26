@@ -32,8 +32,8 @@ public abstract class BaseTabActivity extends BaseActivity {
 
     @Override
     protected void bindView() {
-        mTlIndicator = findViewById(R.id.tab_tl_indicator);
-        mVp = findViewById(R.id.tab_vp);
+        mTlIndicator = (TabLayout) findViewById(R.id.tab_tl_indicator);
+        mVp = (ViewPager) findViewById(R.id.tab_vp);
     }
 
     /*****************rewrite method***************************/

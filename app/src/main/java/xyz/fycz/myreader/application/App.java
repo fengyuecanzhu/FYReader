@@ -4,6 +4,7 @@ package xyz.fycz.myreader.application;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -18,10 +19,19 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+import android.webkit.WebView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.liulishuo.filedownloader.FileDownloader;
+import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
+import com.weaction.ddsdk.base.DdSdkHelper;
+import com.weaction.ddsdk.util.GsonUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -38,24 +48,37 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.internal.functions.Functions;
 import io.reactivex.plugins.RxJavaPlugins;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.MainActivity;
+import xyz.fycz.myreader.ui.activity.SplashActivity;
 import xyz.fycz.myreader.ui.dialog.APPDownloadTip;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
+import xyz.fycz.myreader.util.DateHelper;
 import xyz.fycz.myreader.util.HttpUtil;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.ui.dialog.UpdateDialog;
+import xyz.fycz.myreader.util.utils.RxUtils;
 
 
 public class App extends Application {
@@ -65,7 +88,6 @@ public class App extends Application {
     private static App application;
     private ExecutorService mFixedThreadPool;
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -73,6 +95,16 @@ public class App extends Application {
         firstInit();
         HttpUtil.trustAllHosts();//信任所有证书
         RxJavaPlugins.setErrorHandler(Functions.emptyConsumer());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            webviewSetPath(this);
+        }
+        FileDownloader.setupOnApplicationOnCreate(this)
+                .connectionCreator(new FileDownloadUrlConnection
+                        .Creator(new FileDownloadUrlConnection.Configuration()
+                        .connectTimeout(15_000) // set connection timeout.
+                        .readTimeout(15_000) // set read timeout.
+                ))
+                .commit();
 //        handleSSLHandshake();
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
@@ -84,16 +116,16 @@ public class App extends Application {
 
     private void firstInit() {
         SharedPreUtils sru = SharedPreUtils.getInstance();
-        if (!sru.getBoolean("firstInit")){
+        if (!sru.getBoolean("firstInit")) {
             BookSourceManager.initDefaultSources();
             sru.putBoolean("firstInit", true);
         }
     }
 
     public void initNightTheme() {
-        if (isNightFS()){
+        if (isNightFS()) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-        }else {
+        } else {
             if (isNightTheme()) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             } else {
@@ -112,6 +144,7 @@ public class App extends Application {
 
     /**
      * 设置夜间模式
+     *
      * @param isNightMode
      */
     public void setNightTheme(boolean isNightMode) {
@@ -199,7 +232,7 @@ public class App extends Application {
         handler.post(runnable);
     }
 
-    public static Handler getHandler(){
+    public static Handler getHandler() {
         return handler;
     }
 
@@ -249,6 +282,7 @@ public class App extends Application {
 
     /**
      * 获取apk包的信息：版本号，名称，图标等
+     *
      * @param absPath apk包的绝对路径
      */
     public static int apkInfo(String absPath) {
@@ -266,8 +300,7 @@ public class App extends Application {
     /**
      * 检查更新
      */
-    public static void checkVersionByServer(final AppCompatActivity activity, final boolean isManualCheck,
-                                            final BookcaseFragment mBookcaseFragment) {
+    public static void checkVersionByServer(final AppCompatActivity activity, final boolean isManualCheck) {
         App.getApplication().newThread(() -> {
             try {
                 String url = "https://shimo.im/docs/cqkgjPRRydYYhQKt/read";
@@ -318,17 +351,16 @@ public class App extends Application {
                 String[] updateContents = updateContent.split("/");
                 for (String string : updateContents) {
                     s.append(string);
-                    s.append("\n");
+                    s.append("<br>");
                 }
                 Log.i("检查更新，最新版本", newestVersion + "");
                 if (newestVersion > versionCode) {
-                    App m = new App();
                     Setting setting = SysManager.getSetting();
                     if (isManualCheck || setting.getNewestVersionCode() < newestVersion || isForceUpdate) {
                         setting.setNewestVersionCode(newestVersion);
                         SysManager.saveSetting(setting);
-                        m.updateApp(activity, downloadLink, newestVersion, s.toString(), isForceUpdate,
-                                mBookcaseFragment);
+                        getApplication().updateApp2(activity, downloadLink, newestVersion, s.toString(), isForceUpdate
+                        );
                     }
                 } else if (isManualCheck) {
                     ToastUtils.showSuccess("已经是最新版本！");
@@ -370,11 +402,11 @@ public class App extends Application {
                         activity.finish();
                     }
                 }, (dialog, which) -> {
-                    if (activity instanceof MainActivity){
+                    if (activity instanceof MainActivity) {
                         MainActivity mainActivity = (MainActivity) activity;
                         mainActivity.getViewPagerMain().setCurrentItem(0);
                         String filePath = APPCONST.UPDATE_APK_FILE_DIR + "FYReader.apk";
-                        if (apkInfo(filePath) == versionCode){
+                        if (apkInfo(filePath) == versionCode) {
                             mainActivity.installApk(FileUtils.getFile(filePath), isForceUpdate);
                             return;
                         }
@@ -398,6 +430,25 @@ public class App extends Application {
                         activity.finish();
                     }
                 });
+    }
+
+    public void updateApp2(final AppCompatActivity activity, final String url, final int versionCode, String message,
+                           final boolean isForceUpdate) {
+        //String version = (versionCode / 100 % 10) + "." + (versionCode / 10 % 10) + "." + (versionCode % 10);
+        int hun = versionCode / 100;
+        int ten = versionCode / 10 % 10;
+        int one = versionCode % 10;
+        String versionName = "v" + hun + "." + ten + "." + one;
+        UpdateDialog updateDialog = new UpdateDialog.Builder()
+                .setVersion(versionName)
+                .setContent(message)
+                .setCancelable(!isForceUpdate)
+                .setDownloadUrl(url)
+                .setContentHtml(true)
+                .setDebug(true)
+                .build();
+
+        updateDialog.showUpdateDialog(activity);
     }
 
     private void goDownload(Activity activity, String url) {
@@ -425,6 +476,7 @@ public class App extends Application {
 
     /**
      * 判断Activity是否Destroy
+     *
      * @param mActivity
      * @return
      */
@@ -452,5 +504,27 @@ public class App extends Application {
             // 未安装手Q或安装的版本不支持
             return false;
         }
+    }
+
+    @RequiresApi(api = 28)
+    public void webviewSetPath(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            String processName = getProcessName(context);
+
+            if (!getApplicationContext().getPackageName().equals(processName)) {//判断不等于默认进程名称
+                WebView.setDataDirectorySuffix(processName);
+            }
+        }
+    }
+
+    public String getProcessName(Context context) {
+        if (context == null) return null;
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses()) {
+            if (processInfo.pid == android.os.Process.myPid()) {
+                return processInfo.processName;
+            }
+        }
+        return null;
     }
 }

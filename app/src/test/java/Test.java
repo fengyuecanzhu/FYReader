@@ -2,8 +2,12 @@ import org.seimicrawler.xpath.JXDocument;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import xyz.fycz.myreader.ai.MatrixUtil;
+import xyz.fycz.myreader.model.source.BaseAnalyzer;
 import xyz.fycz.myreader.model.source.MatcherAnalyzer;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -82,8 +86,41 @@ public class Test {
                     "        }";*/
             String str =
                     "            if (StringHelper.isEmpty(book.get" + strings1[i] + "()) && !StringHelper.isEmpty(bean.get" + strings1[i] + "()))\n" +
-                    "            book.set" + strings1[i] + "(bean.get" + strings1[i] + "());";
+                            "            book.set" + strings1[i] + "(bean.get" + strings1[i] + "());";
             System.out.println(str);
         }
+    }
+
+    @org.junit.Test
+    public void testReverse() {
+        List<String> list = new ArrayList<>();
+        list.add("3");
+        list.add("2");
+        list.add("1");
+        list.add("6");
+        list.add("5");
+        list.add("4");
+        list.add("9");
+        list.add("8");
+        list.add("7");
+        list.add("11");
+        list.add("10");
+        BaseAnalyzer analyzer = new BaseAnalyzer() {
+            @Override
+            public List<String> getStringList(String rule, Object obj, boolean first) {
+                return null;
+            }
+        };
+        //List<String> newList = analyzer.evalListFunction("%3;", list);
+        //for (String s : newList) {
+        //    System.out.println(s);
+        //}
+    }
+
+    @org.junit.Test
+    public void testMatrix() {
+        double[][] m = MatrixUtil.ones(4,5);
+
+        System.out.println(Arrays.deepToString(m));
     }
 }

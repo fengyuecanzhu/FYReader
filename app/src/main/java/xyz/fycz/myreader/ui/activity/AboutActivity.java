@@ -59,7 +59,7 @@ public class AboutActivity extends BaseActivity {
         });
         binding.il.vwShare.setOnClickListener(v -> ShareUtils.share(this, getString(R.string.share_text) +
                 SharedPreUtils.getInstance().getString(getString(R.string.downloadLink), URLCONST.LAN_ZOUS_URL)));
-        binding.il.vwUpdate.setOnClickListener(v -> App.checkVersionByServer(this, true, null));
+        binding.il.vwUpdate.setOnClickListener(v -> App.checkVersionByServer(this, true));
         binding.il.vwUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));
         binding.il.vwQq.setOnClickListener(v -> {
             if (!App.joinQQGroup(this,"8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")){

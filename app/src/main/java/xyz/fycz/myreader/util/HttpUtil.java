@@ -94,8 +94,8 @@ public class HttpUtil {
         if (mClient == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
             builder.connectTimeout(5, TimeUnit.SECONDS)
-                    .readTimeout(15, TimeUnit.SECONDS)
-                    .writeTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(10, TimeUnit.SECONDS)
+                    .writeTimeout(10, TimeUnit.SECONDS)
                     .sslSocketFactory(createSSLSocketFactory(), createTrustAllManager())
                     .hostnameVerifier((hostname, session) -> true)
                     .protocols(Collections.singletonList(Protocol.HTTP_1_1))

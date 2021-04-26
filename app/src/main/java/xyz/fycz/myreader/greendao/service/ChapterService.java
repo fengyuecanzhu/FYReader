@@ -286,6 +286,27 @@ public class ChapterService extends BaseService {
         return file.exists();
     }
 
+    public static int countChar(String folderName, String fileName) {//统计字符数
+        int charnum = 0;//字符数
+        File file = new File(APPCONST.BOOK_CACHE_PATH + folderName
+                + File.separator + fileName + FileUtils.SUFFIX_FY);
+        int x;
+        FileReader fReader = null;
+        try {
+            fReader = new FileReader(file);
+            while ((x = fReader.read()) != -1) {//按字符读文件，判断，符合则字符加一
+                char a = (char) x;
+                if (a != '\n' && a != '\r') {
+                    charnum++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            IOUtils.close(fReader);
+        }
+        return charnum;//返回结果
+    }
 
     private void deleteAllChapterCacheFile(String bookId) {
         FileUtils.deleteFile(APPCONST.BOOK_CACHE_PATH + bookId);

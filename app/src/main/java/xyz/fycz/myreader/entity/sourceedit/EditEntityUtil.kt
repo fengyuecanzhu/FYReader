@@ -28,8 +28,8 @@ object EditEntityUtil {
                     "搜索关键词以{key}进行占位;post请求以“,”分隔url,“,”前是搜索地址,“,”后是请求体"))
             add(EditEntity("charset", searchRule?.charset, R.string.r_search_charset, "默认使用书源字符编码"))
             add(EditEntity("list", searchRule?.list, R.string.r_book_list,
-                    "对于Matcher解析器：此处填写书籍列表所在区间，支持普通函数；" +
-                            "\n对于Xpath/JsonPath解析器：此处填写书籍列表规则，不支持普通函数，规则后接##!加数字可以跳过列表前几个"))
+                    "对于Matcher解析器：此处填写书籍列表所在区间，仅支持普通函数；" +
+                            "\n对于Xpath/JsonPath解析器：此处填写书籍列表规则，仅支持列表函数"))
             add(EditEntity("name", searchRule?.name, R.string.r_book_name))
             add(EditEntity("author", searchRule?.author, R.string.r_author))
             add(EditEntity("type", searchRule?.type, R.string.rule_book_type))
@@ -70,11 +70,11 @@ object EditEntityUtil {
             add(EditEntity("chapterBaseUrl", tocRule?.chapterBaseUrl, R.string.rule_chapter_base_url,
                     "如果章节URL(一般为相对路径)无法定位章节，可填写此规则获取，默认为书源URL"))
             add(EditEntity("chapterList", tocRule?.chapterList, R.string.rule_chapter_list,
-                     "对于Mathcer解析器：此处填写书籍列表所在区间，支持普通函数；" +
-                             "\n对于Xpath/JsonPath解析器：此处填写书籍列表规则，不支持普通函数，规则后接##!加数字可以跳过列表前几个"))
+                     "对于Mathcer解析器：此处填写书籍列表所在区间，仅支持普通函数；" +
+                             "\n对于Xpath/JsonPath解析器：此处填写书籍列表规则，仅支持列表函数"))
             add(EditEntity("chapterName", tocRule?.chapterName, R.string.rule_chapter_name,
-            "对于Mathcer解析器：此处填写章节名称和URL规则，其中章节名称以<title>占位，章节URL以<link>占位，不支持普通函数，规则后接##!加数字可以跳过列表前几个\n" +
-                    "对于Xpath/JsonPath解析器：此处填写章节名称，支持普通函数"))
+            "对于Mathcer解析器：此处填写章节名称和URL规则，其中章节名称以<title>占位，章节URL以<link>占位，仅支持列表函数\n" +
+                    "对于Xpath/JsonPath解析器：此处填写章节名称，仅支持普通函数"))
             add(EditEntity("chapterUrl", tocRule?.chapterUrl, R.string.rule_chapter_url,
             "对于Mathcer解析器：此处不用填写\n" +
                     "对于Xpath/JsonPath解析器：此处填写章节URL规则"))

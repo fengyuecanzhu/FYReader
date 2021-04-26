@@ -17,7 +17,7 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 import java.util.ArrayList;
 
-
+@Deprecated
 public class MiQuReadCrawler implements ReadCrawler, BookInfoCrawler {
     public static final String NAME_SPACE = "https://www.meegoq.com";
     public static final String NOVEL_SEARCH = "https://www.meegoq.com/search.htm?keyword={key}";

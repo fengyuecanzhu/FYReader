@@ -53,6 +53,7 @@ public class NetworkUtils {
     public static String getAbsoluteURL(String baseURL, String relativePath) {
         if (StringHelper.isEmpty(relativePath)) return "";
         if (StringHelper.isEmpty(baseURL)) return relativePath;
+        if (relativePath.contains("storage")) return relativePath;
         String header = null;
         if (StringUtils.startWithIgnoreCase(relativePath, "@header:")) {
             header = relativePath.substring(0, relativePath.indexOf("}") + 1);

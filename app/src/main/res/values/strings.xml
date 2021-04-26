@@ -452,8 +452,34 @@
     <string name="parser">解析器</string>
     <string name="all_source">所有书源</string>
     <string name="local_source">内置书源</string>
+    <string name="ad_setting">广告设置</string>
+    <string name="splash_ad">开屏广告</string>
+    <string name="splash_ad_times">每日广告显示次数</string>
+    <string name="splash_cur_ad_times">当前次数:%s，今日已显示次数:%s</string>
+    <string name="ad">广告总开关</string>
+    <string name="book_detail_ad">详情页广告</string>
+    <string name="book_detail_ad_sc">详情页广告开关</string>
+    <string name="support_author">支持作者</string>
+    <string name="donate_author">捐赠作者</string>
+    <string name="wx_zsm">微信赞赏码</string>
+    <string name="donate_tip">点击打开</string>
+    <string name="zfb_skm">支付宝收款码</string>
+    <string name="qq_skm">QQ收款码</string>
+    <string name="ad_support">广告支持作者</string>
+    <string name="ad_support_tip">点击下列广告即可支持作者，建议在WIFI环境下点击</string>
+    <string name="flow_ad_tip">信息流广告(下载的文件可在广告设置中清除)</string>
+    <string name="rewarded_video">激励视频</string>
+    <string name="ad_file">广告下载/缓存</string>
+    <string name="delete_ad_file">清除广告文件</string>
+    <string name="cover_path">封面地址</string>
+    <string name="book_desc">书籍简介</string>
+    <string name="author">作者</string>
+    <string name="book_name">书名</string>
+    <string name="select_local_pic">选择本地图片</string>
+    <string name="menu_edit">编辑书籍</string>
 
     <string-array name="reset_screen_time">
+        <item>跟随系统</item>
         <item>常亮</item>
         <item>1分钟</item>
         <item>3分钟</item>

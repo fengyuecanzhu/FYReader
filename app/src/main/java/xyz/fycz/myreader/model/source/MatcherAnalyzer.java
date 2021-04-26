@@ -130,17 +130,15 @@ public class MatcherAnalyzer extends BaseAnalyzer{
      */
     public ArrayList<Chapter> matchChapters(String rule, String html, String baseUrl) {
         ArrayList<Chapter> chapters = new ArrayList<>();
+        boolean hasFunction = rule.contains("##");
+        String funs = "";
+        if (hasFunction) {
+            funs = rule.substring(rule.indexOf("##") + 2);
+            rule = rule.substring(0, rule.indexOf("##"));
+        }
         if (StringHelper.isEmpty(rule)) return chapters;
         if (!rule.contains("<link>") || !rule.contains("<title>")) return chapters;
         rule = rule.replace("(*)", ".*");
-        int skip = 0;
-        if (rule.contains("##!")) {
-            try {
-                skip = Integer.parseInt(rule.substring(rule.indexOf("##!") + 3));
-            } catch (Exception ignored) {
-            }
-            rule = rule.split("##")[0];
-        }
         int linkI = 1;
         int titleI = 2;
         if (rule.indexOf("<link>") > rule.indexOf("<title>")) {
@@ -152,10 +150,8 @@ public class MatcherAnalyzer extends BaseAnalyzer{
         rule = rule.replace("<title>", "(.*?)");
         Matcher matcher = Pattern.compile(rule).matcher(html);
         String lastTile = null;
-        int i = 0;
         int j = 0;
         while (matcher.find()) {
-            if (i++ < skip) continue;
             String title = matcher.group(titleI);
             if (!StringHelper.isEmpty(lastTile) && lastTile.equals(title)) continue;
             Chapter chapter = new Chapter();
@@ -165,7 +161,7 @@ public class MatcherAnalyzer extends BaseAnalyzer{
             chapters.add(chapter);
             lastTile = title;
         }
-        return chapters;
+        return !hasFunction ? chapters : (ArrayList<Chapter>) evalListFunction(funs, chapters);
     }
 
     /**

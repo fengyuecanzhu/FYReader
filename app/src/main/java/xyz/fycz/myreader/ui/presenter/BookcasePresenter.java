@@ -175,7 +175,7 @@ public class BookcasePresenter implements BasePresenter {
     //启动
     @Override
     public void start() {
-        checkVersionByServer(mMainActivity, false, mBookcaseFragment);
+        checkVersionByServer(mMainActivity, false);
         if (mSetting.getBookcaseStyle() == null) {
             mSetting.setBookcaseStyle(BookcaseStyle.listMode);
         }

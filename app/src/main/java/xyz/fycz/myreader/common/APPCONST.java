@@ -79,6 +79,8 @@ public class APPCONST {
     public static final int REQUEST_IMPORT_BOOK_SOURCE = 1009;
     public static final int REQUEST_EDIT_BOOK_SOURCE = 1010;
     public static final int REQUEST_BOOK_SOURCE = 1011;
+    public static final int REQUEST_SELECT_COVER = 1012;
+    public static final int REQUEST_EDIT_BOOK = 1013;
 
     public static final int REQUEST_READ = 1;
 

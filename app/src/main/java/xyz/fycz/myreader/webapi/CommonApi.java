@@ -3,6 +3,7 @@ package xyz.fycz.myreader.webapi;
 import java.util.List;
 
 import io.reactivex.Observable;
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import xyz.fycz.myreader.common.URLCONST;
@@ -168,10 +169,26 @@ public class CommonApi extends BaseApi {
                     String url = rc.getSearchLink();
                     String[] urlInfo = url.split(",");
                     url = urlInfo[0];
+                    /*String[] bodies = makeSearchUrl(urlInfo[1], key).split("&");
+                    FormBody.Builder formBody = new FormBody.Builder();
+                    for (String body : bodies) {
+                        String[] kv = body.split("=");
+                        formBody.add(kv[0], kv[1]);
+                    }
+                    RequestBody requestBody = formBody.build();*/
                     String body = makeSearchUrl(urlInfo[1], key);
                     MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                     RequestBody requestBody = RequestBody.create(mediaType, body);
-                    emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset)));
+                    if (rc.getNameSpace().contains("soxs.cc") ||
+                            rc.getNameSpace().contains("xinshuhaige.org") ||
+                            rc.getNameSpace().contains("bxwxorg.com") ||
+                            rc.getNameSpace().contains("soshuw.com")) {
+                        String cookie = "Hm_lvt_46329db612a10d9ae3a668a40c152e0e=1612793811,1612795781,1613200980,1613218588; "
+                                + "__cfduid=d0ebd0275436b7b0c3ccf4c9eb7394abd1619231977 ";
+                        emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset, cookie)));
+                    } else {
+                        emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset)));
+                    }
                 } else {
                     emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(makeSearchUrl(rc.getSearchLink(), key), finalCharset)));
                 }
