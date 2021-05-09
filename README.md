@@ -4,6 +4,7 @@
 
 风月读书，一款开源、免费的小说阅读软件。
 
+* 官网：[https://reader.fycz.tk](https://reader.fycz.tk)
 * 反馈交流群:
   * QQ群：[1085028304](https://jq.qq.com/?_wv=1027&k=6pcq8YBk)
   * Telegram：[https://t.me/FYReader](https://t.me/FYReader)
