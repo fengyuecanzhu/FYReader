@@ -19,6 +19,7 @@ import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityDonateBinding;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.AdUtils;
 
 /**
  * @author fengyue

@@ -64,6 +64,7 @@ import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.BitmapUtil;
 import xyz.fycz.myreader.util.utils.BlurTransformation;
 import xyz.fycz.myreader.util.utils.FileUtils;
