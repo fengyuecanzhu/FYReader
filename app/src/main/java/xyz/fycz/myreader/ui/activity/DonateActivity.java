@@ -7,7 +7,6 @@ import android.view.View;
 
 import androidx.appcompat.widget.Toolbar;
 
-import com.sigmob.sdk.common.models.sigdsp.pb.Ad;
 import com.weaction.ddsdk.ad.DdSdkFlowAd;
 import com.weaction.ddsdk.ad.DdSdkRewardAd;
 
@@ -19,9 +18,7 @@ import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityDonateBinding;
-import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.AdUtils;
 
 /**
  * @author fengyue
