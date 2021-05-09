@@ -1,44 +1,85 @@
-# FYReader-master
+# 风月读书-FYReader
 
-风月读书，一款开源、无广告的小说阅读软件。
+## 一、概要
 
-成品下载(v1.9.3 支持自定义书源)：[https://fycz.lanzous.com/ivyijmwfdqd](https://fycz.lanzous.com/ivyijmwfdqd)
+风月读书，一款开源、免费的小说阅读软件。
 
-[更新日志](./app/src/main/assets/updatelog.fy)
+* 反馈交流群:
+  * QQ群：[1085028304](https://jq.qq.com/?_wv=1027&k=6pcq8YBk)
+  * Telegram：[https://t.me/FYReader](https://t.me/FYReader)
+* [更新日志](./app/src/main/assets/updatelog.fy)
+* [免责声明](./app/src/main/assets/disclaimer.fy)
 
-#### 一、关于书源
+## 二、关于书源
 
-* 软件内置了~~36~~(33)个书源如下：
+* 软件内置了~~36~~(33)个书源如下:
 
-  * ~~32~~(29)个网络小说书源：天籁小说、笔趣阁44、~~品书网~~、笔趣阁、
-        全本小说、米趣小说、九桃小说、云中书库、
-        搜小说网、全小说网、~~奇奇小说~~、妙笔阁、
-        丹书铁券、小说旗、读一读网、飘天文学、
-        老幺小说、星星小说、时光小说、峡谷文学、
-        红尘小说、~~热血小说~~、传奇小说、笔尖小说、
-        言情楼、卧龙小说、E文学、书海阁、落秋中文、
-        三七中文、新笔趣阁、斋书苑
+  * ~~32~~(29)个网络小说书源:
+
+    天籁小说、笔趣阁44、~~品书网~~、笔趣阁、
+    全本小说、米趣小说、九桃小说、云中书库、
+    搜小说网、全小说网、~~奇奇小说~~、妙笔阁、
+    丹书铁券、小说旗、读一读网、飘天文学、
+    老幺小说、星星小说、时光小说、峡谷文学、
+    红尘小说、~~热血小说~~、传奇小说、笔尖小说、
+    言情楼、卧龙小说、E文学、书海阁、落秋中文、
+    三七中文、新笔趣阁、斋书苑
+
+
   * 4个实体书书源：超星图书·实体、作品集·实体、99藏书·实体、100本·实体
+
 
 * 软件中有两种书源，内置书源和DIY书源
   * 内置书源为java类，需要编译
   * DIY书源为用户自定义书源，可在软件内以特定规则书写的书源
   * [内置书源说明](./source/LocalSource.md)  [DIY书源说明](./source/DIYSource.md)
 
-#### 二、关于发现界面
+## 三、关于发现界面
 
 * 软件内置的4个发现源：
   * 某点的排行榜、分类，全本小说网、100本·实体、妙笔阁
   * 制作发现源方法与书源类似，在此不再赘述
 
-![Image](./img/1.png)![Image](./img/2.png)
-![Image](./img/3.png)![Image](./img/4.png)
-![Image](./img/5.png)![Image](./img/6.png)
-![Image](./img/7.png)![Image](./img/8.png)
-![Image](./img/9.png)![Image](./img/10.png)
-![Image](./img/11.png)![Image](./img/12.png)
+## 四、支持作者
 
-## LICENSE
+<table>
+    <tr>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/Donate/raw/master/wx_zsm.png" width=300></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/Donate/raw/master/zfb_skm.jpg" width=300> </center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/Donate/raw/master/qq_skm.png" width=300></center></td>
+    </tr>
+</table>
+
+
+
+## 五、APP图片
+
+<table>
+    <tr>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/1.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/2.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/3.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/4.png" ></center></td>
+    </tr>
+    <tr>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/5.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/6.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/7.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/8.png" ></center></td>
+    </tr>
+    <tr>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/9.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/10.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/11.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/12.png" ></center></td>
+    </tr>
+</table>
+
+
+
+
+## 六、LICENSE
+
 ```
     Copyright 2020~2021 fengyuecanzhu
 
