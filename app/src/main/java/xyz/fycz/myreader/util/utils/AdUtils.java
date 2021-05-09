@@ -2,6 +2,7 @@ package xyz.fycz.myreader.util.utils;
 
 import android.util.Log;
 
+
 import com.weaction.ddsdk.base.DdSdkHelper;
 
 import org.json.JSONArray;
@@ -58,7 +59,7 @@ public class AdUtils {
     public static void adRecord(String type, String name) {
         Single.create((SingleOnSubscribe<Boolean>) emitter -> {
             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-            String body = "adType=" + type +  "&type=" + name + UserService.makeSignalParam();
+            String body = "adType=" + type + "&type=" + name + UserService.makeSignalParam();
             RequestBody requestBody = RequestBody.create(mediaType, body);
             OkHttpUtils.getHtml(URLCONST.AD_URL, requestBody, "UTF-8");
             emitter.onSuccess(true);
@@ -121,8 +122,8 @@ public class AdUtils {
         return adTimes < 0 || todayAdCount < adTimes || bookDetailAd;
     }
 
-    public static void initAd(){
-        if (!hasInitAd){
+    public static void initAd() {
+        if (!hasInitAd) {
             hasInitAd = true;
             DdSdkHelper.init("1234", "216", "51716a16fbdf50905704b6575b1b3b60",
                     "142364", "35ce0efe5f3cc960b116db227498e238",

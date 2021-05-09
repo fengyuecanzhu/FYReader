@@ -311,10 +311,13 @@ public class App extends Application {
                 Document doc = Jsoup.parse(html);
                 String content = doc.getElementsByClass("ql-editor").text();
                 if (StringHelper.isEmpty(content)) {
-                    if (isManualCheck || NetworkUtils.isNetWorkAvailable()) {
-                        ToastUtils.showError("检查更新失败！");
+                    content = OkHttpUtils.getUpdateInfo();
+                    if (StringHelper.isEmpty(content)) {
+                        if (isManualCheck || NetworkUtils.isNetWorkAvailable()) {
+                            ToastUtils.showError("检查更新失败！");
+                        }
+                        return;
                     }
-                    return;
                 }
                 String[] contents = content.split(";");
                 int newestVersion = 0;

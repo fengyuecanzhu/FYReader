@@ -59,11 +59,12 @@ public class SplashActivity extends BaseActivity {
     private int adTimes;
 
     private PermissionsChecker mPermissionsChecker;
-    private Thread myThread = new Thread() {//创建子线程
+    //创建子线程
+    private Thread start = new Thread() {
         @Override
         public void run() {
             try {
-                sleep(WAIT_INTERVAL);//使程序休眠
+                Thread.sleep(WAIT_INTERVAL);//使程序休眠
                 Intent it = new Intent(SplashActivity.this, MainActivity.class);//启动MainActivity
                 it.putExtra("startFromSplash", true);
                 startActivity(it);
@@ -74,23 +75,22 @@ public class SplashActivity extends BaseActivity {
         }
     };
 
-    private Thread countTime = new Thread(){
+    private Thread countTime = new Thread() {
         @Override
         public void run() {
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < 5; i++) {
+                int time = 5 - i;
+                App.runOnUiThread(() -> binding.tvSkip.setText(getString(R.string.skip_ad, time)));
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            if (!App.isDestroy(SplashActivity.this)){
-                WAIT_INTERVAL = 0;
-                startNormal();
-            }
+            WAIT_INTERVAL = 0;
+            startNormal();
         }
     };
-
 
     @Override
     protected void bindView() {
@@ -131,11 +131,19 @@ public class SplashActivity extends BaseActivity {
         adTimes = spu.getInt("curAdTimes", 3);
         String[] splashAdCounts = splashAdCount.split(":");
         String today = DateHelper.getYearMonthDay1();
-        if (today.equals(splashAdCounts[0])){
+        if (today.equals(splashAdCounts[0])) {
             todayAdCount = Integer.parseInt(splashAdCounts[1]);
-        }else {
+        } else {
             todayAdCount = 0;
         }
+    }
+
+    @Override
+    protected void initClick() {
+        binding.tvSkip.setOnClickListener(v -> {
+            WAIT_INTERVAL = 0;
+            startNormal();
+        });
     }
 
     @Override
@@ -147,7 +155,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void start() {
-        if (adTimes >= 0 && todayAdCount >= adTimes){
+        if (adTimes >= 0 && todayAdCount >= adTimes) {
             startNoAd();
         } else {
             AdUtils.checkHasAd()
@@ -173,7 +181,7 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
-    private void startNoAd(){
+    private void startNoAd() {
         Animation inAni = AnimationUtils.loadAnimation(SplashActivity.this, R.anim.fade_in);
         binding.ivSplash.setVisibility(View.VISIBLE);
         binding.ivSplash.startAnimation(inAni);
@@ -184,18 +192,26 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void startNormal() {
-        if (BookGroupService.getInstance().curGroupIsPrivate()) {
-            App.runOnUiThread(() -> {
-                MyAlertDialog.showPrivateVerifyDia(SplashActivity.this, needGoTo -> {
-                    myThread.start();
-                }, () -> {
-                    SharedPreUtils.getInstance().putString(SplashActivity.this.getString(R.string.curBookGroupId), "");
-                    SharedPreUtils.getInstance().putString(SplashActivity.this.getString(R.string.curBookGroupName), "");
-                    myThread.start();
+        if (!App.isDestroy(this)) {
+            if (BookGroupService.getInstance().curGroupIsPrivate()) {
+                App.runOnUiThread(() -> {
+                    MyAlertDialog.showPrivateVerifyDia(SplashActivity.this, needGoTo -> {
+                        if (!start.isAlive()) {
+                            start.start();
+                        }
+                    }, () -> {
+                        SharedPreUtils.getInstance().putString(SplashActivity.this.getString(R.string.curBookGroupId), "");
+                        SharedPreUtils.getInstance().putString(SplashActivity.this.getString(R.string.curBookGroupName), "");
+                        if (!start.isAlive()) {
+                            start.start();
+                        }
+                    });
                 });
-            });
-        } else {
-            myThread.start();
+            } else {
+                if (!start.isAlive()) {
+                    start.start();
+                }
+            }
         }
     }
 
@@ -206,7 +222,7 @@ public class SplashActivity extends BaseActivity {
                 @Override
                 public void show() {
                     Log.d(TAG, "广告展示成功");
-                    AdUtils.adRecord("splash","adShow");
+                    AdUtils.adRecord("splash", "adShow");
                     countTodayAd();
                     countTime.start();
                 }
@@ -215,15 +231,14 @@ public class SplashActivity extends BaseActivity {
                 @Override
                 public void click() {
                     Log.d(TAG, "广告被点击");
-                    AdUtils.adRecord("splash","adClick");
+                    AdUtils.adRecord("splash", "adClick");
                 }
 
                 // 展示出错时可读取 msg 中的错误信息
                 @Override
                 public void error(String msg) {
                     WAIT_INTERVAL = 1500;
-                    if (!App.isDestroy(SplashActivity.this))
-                        startNormal();
+                    startNormal();
                     Log.e(TAG, msg);
                     //ToastUtils.showError(msg);
                 }
@@ -232,16 +247,15 @@ public class SplashActivity extends BaseActivity {
                 @Override
                 public void finishCountdown() {
                     Log.d(TAG, "倒计时结束或用户主动点击跳过按钮");
-                    AdUtils.adRecord("splash","adFinishCount");
-                    if (!App.isDestroy(SplashActivity.this))
-                        startNormal();
+                    WAIT_INTERVAL = 0;
+                    AdUtils.adRecord("splash", "adFinishCount");
+                    startNormal();
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
             WAIT_INTERVAL = 1500;
-            if (!App.isDestroy(SplashActivity.this))
-                startNormal();
+            startNormal();
         }
     }
 

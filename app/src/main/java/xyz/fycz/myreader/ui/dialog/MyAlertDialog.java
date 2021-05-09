@@ -153,7 +153,8 @@ public class MyAlertDialog {
                         onCancel.cancel();
                     }
                 });
-                fd.show(activity.getSupportFragmentManager(), "fingerprint");
+                if (!App.isDestroy(activity))
+                    fd.show(activity.getSupportFragmentManager(), "fingerprint");
             } else {
                 showPrivatePwdInputDia(activity, onVerify, onCancel);
             }
