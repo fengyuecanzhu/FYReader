@@ -27,11 +27,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
-import com.weaction.ddsdk.base.DdSdkHelper;
-import com.weaction.ddsdk.util.GsonUtil;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -48,37 +44,25 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
-import io.reactivex.SingleOnSubscribe;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.internal.functions.Functions;
 import io.reactivex.plugins.RxJavaPlugins;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.MainActivity;
-import xyz.fycz.myreader.ui.activity.SplashActivity;
 import xyz.fycz.myreader.ui.dialog.APPDownloadTip;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
-import xyz.fycz.myreader.util.DateHelper;
 import xyz.fycz.myreader.util.HttpUtil;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.ui.dialog.UpdateDialog;
-import xyz.fycz.myreader.util.utils.RxUtils;
 
 
 public class App extends Application {
