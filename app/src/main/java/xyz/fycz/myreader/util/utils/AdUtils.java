@@ -125,10 +125,7 @@ public class AdUtils {
     public static void initAd() {
         if (!hasInitAd) {
             hasInitAd = true;
-            DdSdkHelper.init("", "", "",
-                    "", "",
-                    "", "",
-                    App.getApplication(), true);
+
         }
     }
 }
