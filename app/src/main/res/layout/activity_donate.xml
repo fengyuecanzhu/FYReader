@@ -150,7 +150,30 @@
                     android:text="@string/flow_ad_tip"
                     android:textColor="@color/textSecondary" />
             </RelativeLayout>
+            <LinearLayout
+                android:id="@+id/ll_inter_ad"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/selector_common_bg"
+                android:orientation="vertical"
+                android:paddingLeft="20dp"
+                android:paddingTop="8dp"
+                android:paddingRight="20dp">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/inter_ad"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_normal_size" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="@string/donate_tip"
+                    android:textColor="@color/textAssist" />
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/ll_rewarded_video"
                 android:layout_width="match_parent"
@@ -175,6 +198,7 @@
                     android:text="@string/donate_tip"
                     android:textColor="@color/textAssist" />
             </LinearLayout>
+
         </LinearLayout>
 
 

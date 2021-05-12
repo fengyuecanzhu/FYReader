@@ -1673,7 +1673,7 @@ public abstract class PageLoader {
                 }
                 // 重置段落
                 if (!showTitle) {
-                    paragraph = paragraph.replaceAll("\\s", "").trim();
+                    paragraph = paragraph.replaceAll("[ |　]", " ").trim();
                     // 如果只有换行符，那么就不执行
                     if (paragraph.equals("")) continue;
                     paragraph = indent + paragraph + "\n";

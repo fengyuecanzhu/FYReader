@@ -478,6 +478,8 @@
     <string name="select_local_pic">选择本地图片</string>
     <string name="menu_edit">编辑书籍</string>
     <string name="skip_ad">跳过 | %ds</string>
+    <string name="inter_ad">插屏广告</string>
+    <string name="inter_video">插屏视频</string>
 
     <string-array name="reset_screen_time">
         <item>跟随系统</item>

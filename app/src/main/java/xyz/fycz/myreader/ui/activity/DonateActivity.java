@@ -8,6 +8,8 @@ import android.view.View;
 import androidx.appcompat.widget.Toolbar;
 
 import com.weaction.ddsdk.ad.DdSdkFlowAd;
+import com.weaction.ddsdk.ad.DdSdkInterAd;
+import com.weaction.ddsdk.ad.DdSdkInterVideoAd;
 import com.weaction.ddsdk.ad.DdSdkRewardAd;
 
 import java.util.List;
@@ -114,6 +116,36 @@ public class DonateActivity extends BaseActivity {
                 public void finishCountdown() {
                     Log.i(TAG, "激励视频计时完成");
                     AdUtils.adRecord("rewardVideo","adFinishCount");
+                }
+            });
+        });
+
+        binding.llInterAd.setOnClickListener(v -> {
+            /*
+             * 参数 1  activity
+             * 参数 2  marginDp (float)，插屏默认 margin 全屏幕的 24dp，此处允许开发者手动调节 margin 大小，单位为 dp，允许范围为 0dp (全屏) ~ 48dp，请开发者按需填写
+             */
+            DdSdkInterAd.show(this, 48f, new DdSdkInterAd.Callback() {
+                @Override
+                public void show() {
+                    Log.i(TAG, "插屏广告展示成功");
+                    AdUtils.adRecord("inter","adShow");
+                }
+
+                @Override
+                public void click() {
+                    Log.i(TAG, "插屏广告");
+                    AdUtils.adRecord("inter","adClick");
+                }
+
+                @Override
+                public void error(String msg) {
+                }
+
+                @Override
+                public void close() {
+                    Log.i(TAG, "插屏广告被关闭");
+                    AdUtils.adRecord("inter","adClose");
                 }
             });
         });
