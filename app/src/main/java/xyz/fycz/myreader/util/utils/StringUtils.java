@@ -579,4 +579,60 @@ public class StringUtils {
             return null;
         }
     }
+
+    public static String base64Decode(String str) {
+        byte[] bytes = Base64.decode(str, Base64.DEFAULT);
+        try {
+            return new String(bytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return new String(bytes);
+        }
+    }
+
+    public static String escape(String src) {
+        int i;
+        char j;
+        StringBuilder tmp = new StringBuilder();
+        tmp.ensureCapacity(src.length() * 6);
+        for (i = 0; i < src.length(); i++) {
+            j = src.charAt(i);
+            if (Character.isDigit(j) || Character.isLowerCase(j)
+                    || Character.isUpperCase(j))
+                tmp.append(j);
+            else if (j < 256) {
+                tmp.append("%");
+                if (j < 16)
+                    tmp.append("0");
+                tmp.append(Integer.toString(j, 16));
+            } else {
+                tmp.append("%u");
+                tmp.append(Integer.toString(j, 16));
+            }
+        }
+        return tmp.toString();
+    }
+
+    public static String getBaseUrl(String url) {
+        if (url == null || !url.startsWith("http")) return null;
+        int index = url.indexOf("/", 9);
+        if (index == -1) {
+            return url;
+        }
+        return url.substring(0, index);
+    }
+
+    // 移除字符串首尾空字符的高效方法(利用ASCII值判断,包括全角空格)
+    public static String trim(String s) {
+        if (isEmpty(s)) return "";
+        int start = 0, len = s.length();
+        int end = len - 1;
+        while ((start < end) && ((s.charAt(start) <= 0x20) || (s.charAt(start) == '　'))) {
+            ++start;
+        }
+        while ((start < end) && ((s.charAt(end) <= 0x20) || (s.charAt(end) == '　'))) {
+            --end;
+        }
+        if (end < len) ++end;
+        return ((start > 0) || (end < len)) ? s.substring(start, end) : s;
+    }
 }

@@ -1,6 +1,5 @@
 package xyz.fycz.myreader.util.utils;
 
-import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -10,18 +9,12 @@ import org.jsoup.nodes.Document;
 
 import okhttp3.*;
 import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.application.TrustAllCerts;
 import xyz.fycz.myreader.util.HttpUtil;
-import xyz.fycz.myreader.util.StringHelper;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
+import java.util.Map;
 
 public class OkHttpUtils {
 
@@ -42,7 +35,7 @@ public class OkHttpUtils {
         return getHtml(url, requestBody, encodeType, null);
     }
 
-    public static String getHtml(String url, RequestBody requestBody, String encodeType, String cookie) throws IOException {
+    public static String getHtml(String url, RequestBody requestBody, String encodeType, Map<String, String> headers) throws IOException {
 
         Request.Builder builder = new Request.Builder()
                 .addHeader("Accept", "*/*")
@@ -50,8 +43,10 @@ public class OkHttpUtils {
                 //.addHeader("Charsert", "utf-8")
                 .addHeader("Cache-Control", "no-cache")
                 .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36");
-        if (cookie != null) {
-            builder.addHeader("Cookie", cookie);
+        if (headers != null) {
+            for (String name : headers.keySet()){
+                builder.addHeader(name, headers.get(name));
+            }
         }
         if (requestBody != null) {
             builder.post(requestBody);
@@ -75,18 +70,6 @@ public class OkHttpUtils {
         }
     }
 
-    private static SSLSocketFactory createSSLSocketFactory() {
-        SSLSocketFactory ssfFactory = null;
-        try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, new TrustManager[]{new TrustAllCerts()}, new SecureRandom());
-            ssfFactory = sc.getSocketFactory();
-        } catch (Exception e) {
-        }
-
-        return ssfFactory;
-    }
-
     public static InputStream getInputStream(String url) throws IOException {
         Request.Builder builder = new Request.Builder()
                 .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36");
@@ -104,7 +87,7 @@ public class OkHttpUtils {
 
     public static String getUpdateInfo() throws IOException, JSONException {
         String key = "ryvwiq";
-        if (App.isApkInDebug(App.getmContext())) {
+        if (App.isDebug()) {
             key = "sgak2h";
         }
         String url = "https://www.yuque.com/api/docs/" + key + "?book_id=19981967&include_contributors=true&include_hits=true&include_like=true&include_pager=true&include_suggests=true";

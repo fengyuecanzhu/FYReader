@@ -71,11 +71,13 @@ public class App extends Application {
     private static final Handler handler = new Handler();
     private static App application;
     private ExecutorService mFixedThreadPool;
+    private static boolean debug;
 
     @Override
     public void onCreate() {
         super.onCreate();
         application = this;
+        debug = isApkInDebug(this);
         firstInit();
         HttpUtil.trustAllHosts();//信任所有证书
         RxJavaPlugins.setErrorHandler(Functions.emptyConsumer());
@@ -159,12 +161,7 @@ public class App extends Application {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            });
+            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
         } catch (Exception ignored) {
         }
     }
@@ -288,7 +285,7 @@ public class App extends Application {
         App.getApplication().newThread(() -> {
             try {
                 String url = "https://shimo.im/docs/cqkgjPRRydYYhQKt/read";
-                if (isApkInDebug(getmContext())) {
+                if (getApplication().debug) {
                     url = "https://shimo.im/docs/zfzpda7MUGskOC9v/read";
                 }
                 String html = OkHttpUtils.getHtml(url);
@@ -513,5 +510,9 @@ public class App extends Application {
             }
         }
         return null;
+    }
+
+    public static boolean isDebug() {
+        return debug;
     }
 }

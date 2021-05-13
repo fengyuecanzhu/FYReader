@@ -3,9 +3,14 @@ package xyz.fycz.myreader.ui.presenter;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
+
+import org.jetbrains.annotations.NotNull;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BasePresenter;
+import xyz.fycz.myreader.base.observer.MyObserver;
+import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.CatalogActivity;
@@ -20,6 +25,7 @@ import xyz.fycz.myreader.webapi.CommonApi;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author fengyue
@@ -29,8 +35,8 @@ public class CatalogPresenter implements BasePresenter {
     private static final String TAG = CatalogPresenter.class.getSimpleName();
     private CatalogFragment mCatalogFragment;
     private ChapterService mChapterService;
-    private ArrayList<Chapter> mChapters = new ArrayList<>();
-    private ArrayList<Chapter> mConvertChapters = new ArrayList<>();
+    private List<Chapter> mChapters = new ArrayList<>();
+    private List<Chapter> mConvertChapters = new ArrayList<>();
     private int curSortflag = 0; //0正序  1倒序
     private ChapterTitleAdapter mChapterTitleAdapter;
     private Book mBook;
@@ -62,26 +68,23 @@ public class CatalogPresenter implements BasePresenter {
                 return;
             }
             mCatalogFragment.getPbLoading().setVisibility(View.VISIBLE);
-            CommonApi.getBookChapters(mBook.getChapterUrl(), ReadCrawlerUtil.getReadCrawler(mBook.getSource()),false,
-                    new ResultCallback() {
-                        @Override
-                        public void onFinish(Object o, int code) {
-                            mChapters = (ArrayList<Chapter>) o;
+            CommonApi.getBookChapters(mBook.getChapterUrl(), ReadCrawlerUtil.getReadCrawler(mBook.getSource()))
+                    .compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<List<Chapter>>() {
+                @Override
+                public void onNext(@NotNull List<Chapter> chapters) {
+                    mChapters = chapters;
+                    mCatalogFragment.getPbLoading().setVisibility(View.GONE);
+                    initChapterTitleList();
+                }
 
-                            App.runOnUiThread(() -> {
-                                mCatalogFragment.getPbLoading().setVisibility(View.GONE);
-                                initChapterTitleList();
-                            });
-
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            e.printStackTrace();
-                            ToastUtils.showError("章节目录加载失败！\n" + e.getLocalizedMessage());
-                            App.runOnUiThread(() -> mCatalogFragment.getPbLoading().setVisibility(View.GONE));
-                        }
-                    });
+                @Override
+                public void onError(Throwable e) {
+                    e.printStackTrace();
+                    ToastUtils.showError("章节目录加载失败！\n" + e.getLocalizedMessage());
+                    mCatalogFragment.getPbLoading().setVisibility(View.GONE);
+                    if (App.isDebug()) e.printStackTrace();
+                }
+            });
         }
         mCatalogFragment.getLvChapterList().setOnItemClickListener((adapterView, view, i, l) -> {
             Chapter chapter = mChapterTitleAdapter.getItem(i);

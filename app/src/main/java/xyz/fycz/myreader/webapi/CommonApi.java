@@ -1,6 +1,8 @@
 package xyz.fycz.myreader.webapi;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import okhttp3.FormBody;
@@ -21,29 +23,7 @@ import xyz.fycz.myreader.webapi.crawler.read.FYReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.TianLaiReadCrawler;
 
 
-public class CommonApi extends BaseApi {
-
-    /**
-     * 获取章节列表
-     *
-     * @param url
-     * @param callback
-     */
-    public static void getBookChapters(String url, final ReadCrawler rc, boolean isRefresh, final ResultCallback callback) {
-        String charset = rc.getCharset();
-        url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url);
-        getCommonReturnHtmlStringApi(url, null, charset, isRefresh, new ResultCallback() {
-            @Override
-            public void onFinish(Object o, int code) {
-                callback.onFinish(rc.getChaptersFromHtml((String) o), 0);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
-            }
-        });
-    }
+public class CommonApi {
 
 
     /**
@@ -56,48 +36,8 @@ public class CommonApi extends BaseApi {
         url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url);
         String finalUrl = url;
         return Observable.create(emitter -> {
-            try {
-                emitter.onNext(rc.getChaptersFromHtml(OkHttpUtils.getHtml(finalUrl, charset)));
-            } catch (Exception e) {
-                e.printStackTrace();
-                emitter.onError(e);
-            }
+            emitter.onNext(rc.getChaptersFromHtml(OkHttpUtils.getHtml(finalUrl, charset)));
             emitter.onComplete();
-        });
-    }
-
-    /**
-     * 获取章节正文
-     *
-     * @param url
-     * @param callback
-     */
-
-    public static void getChapterContent(String url, final ReadCrawler rc, final ResultCallback callback) {
-        int tem = url.indexOf("\"");
-        if (tem != -1) {
-            url = url.substring(0, tem);
-        }
-        String charset = rc.getCharset();
-        if (rc instanceof FYReadCrawler) {
-            if (url.contains("47.105.152.62")) {
-                url.replace("47.105.152.62", "novel.fycz.xyz");
-            }
-            if (!url.contains("novel.fycz.xyz")) {
-                url = URLCONST.nameSpace_FY + url;
-            }
-        }
-        url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url);
-        getCommonReturnHtmlStringApi(url, null, charset, true, new ResultCallback() {
-            @Override
-            public void onFinish(Object o, int code) {
-                callback.onFinish(rc.getContentFormHtml((String) o), 0);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
-            }
         });
     }
 
@@ -122,32 +62,6 @@ public class CommonApi extends BaseApi {
         });
     }
 
-    /**
-     * 搜索小说
-     *
-     * @param key
-     * @param callback
-     */
-
-    public static void search(String key, final ReadCrawler rc, final ResultCallback callback) {
-        String charset = "utf-8";
-        if (rc instanceof TianLaiReadCrawler) {
-            charset = "utf-8";
-        } else {
-            charset = rc.getCharset();
-        }
-        getCommonReturnHtmlStringApi(makeSearchUrl(rc.getSearchLink(), key), null, charset, false, new ResultCallback() {
-            @Override
-            public void onFinish(Object o, int code) {
-                callback.onFinish(rc.getBooksFromSearchHtml((String) o), code);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
-            }
-        });
-    }
 
     /**
      * 搜索小说
@@ -185,7 +99,9 @@ public class CommonApi extends BaseApi {
                             rc.getNameSpace().contains("soshuw.com")) {
                         String cookie = "Hm_lvt_46329db612a10d9ae3a668a40c152e0e=1612793811,1612795781,1613200980,1613218588; "
                                 + "__cfduid=d0ebd0275436b7b0c3ccf4c9eb7394abd1619231977 ";
-                        emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset, cookie)));
+                        Map<String, String> headers = new HashMap<>();
+                        headers.put("Cookie", cookie);
+                        emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset, headers)));
                     } else {
                         emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset)));
                     }
@@ -228,32 +144,6 @@ public class CommonApi extends BaseApi {
             emitter.onComplete();
         });
     }
-
-    /**
-     * 获取小说详细信息
-     *
-     * @param book
-     * @param callback
-     */
-    public static void getBookInfo(final Book book, final BookInfoCrawler bic, final ResultCallback callback) {
-        String url = book.getInfoUrl();
-        if (StringHelper.isEmpty(url)) {
-            url = book.getChapterUrl();
-        }
-        url = NetworkUtils.getAbsoluteURL(bic.getNameSpace(), url);
-        getCommonReturnHtmlStringApi(url, null, bic.getCharset(), false, new ResultCallback() {
-            @Override
-            public void onFinish(Object o, int code) {
-                callback.onFinish(bic.getBookInfo((String) o, book), 0);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
-            }
-        });
-    }
-
 
     /**
      * 通过api获取蓝奏云可下载直链

@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class NetworkUtils {
+    public static final Pattern headerPattern = Pattern.compile("@Header:\\{.+?\\}", Pattern.CASE_INSENSITIVE);
+
     public static final int SUCCESS = 10000;
     public static final int ERROR_CODE_NONET = 10001;
     public static final int ERROR_CODE_OUTTIME = 10002;

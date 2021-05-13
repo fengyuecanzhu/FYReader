@@ -200,6 +200,10 @@ dependencies {
 
     //SwipeBackLayout
     implementation 'me.imid.swipebacklayout.lib:library:1.1.0'
+
+    //JS
+    //noinspection GradleDependency
+    implementation 'com.github.gedoor:rhino-android:1.3'
 }
 
 greendao {

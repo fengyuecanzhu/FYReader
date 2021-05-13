@@ -39,16 +39,25 @@ import androidx.core.content.ContextCompat;
 import com.gyf.immersionbar.ImmersionBar;
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
+import io.reactivex.functions.Function;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityReadBinding;
@@ -87,6 +96,7 @@ import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
 import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.ColorUtil;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.ScreenUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.util.utils.SystemBarUtils;
@@ -1001,20 +1011,25 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 });
             } else {
                 mPageLoader.setmStatus(PageLoader.STATUS_LOADING_CHAPTER);
-                CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler, false, new ResultCallback() {
+                CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
+                    updateAllOldChapterData(chapters);
+                    initChapters();
+                    emitter.onComplete();
+                })).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Object>() {
                     @Override
-                    public void onFinish(Object o, int code) {
+                    public void onComplete() {
                         mPageLoader.setmStatus(PageLoader.STATUS_LOADING);
-                        ArrayList<Chapter> chapters = (ArrayList<Chapter>) o;
-                        updateAllOldChapterData(chapters);
-                        initChapters();
                     }
 
                     @Override
-                    public void onError(Exception e) {
-//                settingChange = true;
-                        initChapters();
+                    public void onNext(@NotNull Object o) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
                         mHandler.sendMessage(mHandler.obtainMessage(1));
+                        if (App.isDebug()) e.printStackTrace();
                     }
                 });
             }
@@ -1028,7 +1043,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      *
      * @param newChapters
      */
-    private void updateAllOldChapterData(ArrayList<Chapter> newChapters) {
+    private void updateAllOldChapterData(List<Chapter> newChapters) {
         for (Chapter newChapter : newChapters) {
             newChapter.setId(StringHelper.getStringRandom(25));
             newChapter.setBookId(mBook.getId());
@@ -1576,19 +1591,21 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 if (StringHelper.isEmpty(chapter.getBookId())) {
                     chapter.setId(mBook.getId());
                 }
-                CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler, new ResultCallback() {
-                    @Override
-                    public void onFinish(Object o, int code) {
-                        downloadingChapter = chapter.getTitle();
-                        mChapterService.saveOrUpdateChapter(chapter, (String) o);
-                        curCacheChapterNum++;
-                    }
+                CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler)
+                        .subscribe(new MyObserver<String>() {
+                            @Override
+                            public void onNext(@NotNull String s) {
+                                downloadingChapter = chapter.getTitle();
+                                mChapterService.saveOrUpdateChapter(chapter, s);
+                                curCacheChapterNum++;
+                            }
 
-                    @Override
-                    public void onError(Exception e) {
-                        curCacheChapterNum++;
-                    }
-                });
+                            @Override
+                            public void onError(Throwable e) {
+                                curCacheChapterNum++;
+                                if (App.isDebug()) e.printStackTrace();
+                            }
+                        });
                 try {
                     Thread.sleep(downloadInterval);
                 } catch (InterruptedException e) {

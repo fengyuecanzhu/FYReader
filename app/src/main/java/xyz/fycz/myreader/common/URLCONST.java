@@ -9,7 +9,7 @@ public class URLCONST {
 
     public static String APP_DIR_UR = "https://www.lanzous.com/b00ngso7e";
 
-    public static String LAN_ZOUS_URL = "https://fycz.lanzous.com";
+    public static String LAN_ZOUS_URL = "https://fycz.lanzoui.com";
 
     //字体下载
     public static final String FONT_DOWNLOAD_URL = "https://novel.fycz.xyz/app/fonts/";

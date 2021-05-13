@@ -1,20 +1,25 @@
 package xyz.fycz.myreader.webapi;
 
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
-import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 
-import static xyz.fycz.myreader.webapi.BaseApi.*;
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
+import xyz.fycz.myreader.common.URLCONST;
+import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
+import xyz.fycz.myreader.webapi.callback.ResultCallback;
 
 /**
  * @author fengyue
@@ -29,17 +34,20 @@ public class LanZousApi {
      * @param callback
      */
     public static void getUrl1(String lanZouUrl, final ResultCallback callback) {
-        getCommonReturnHtmlStringApi(lanZouUrl, null, "utf-8", true, new ResultCallback() {
+        Single.create((SingleOnSubscribe<String>) emitter -> {
+            emitter.onSuccess(getUrl1(OkHttpUtils.getHtml(lanZouUrl)));
+        }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<String>() {
             @Override
-            public void onFinish(Object o, int code) {
-                callback.onFinish(getUrl1((String) o), code);
+            public void onSuccess(@NotNull String s) {
+                callback.onFinish(s, 0);
             }
 
             @Override
-            public void onError(Exception e) {
-                callback.onError(e);
+            public void onError(Throwable e) {
+                callback.onError((Exception) e);
             }
         });
+
     }
 
     /**
@@ -49,15 +57,17 @@ public class LanZousApi {
      * @param callback
      */
     public static void getKey(String url, final ResultCallback callback) {
-        getCommonReturnHtmlStringApi(url, null, "utf-8", true, new ResultCallback() {
+        Single.create((SingleOnSubscribe<String>) emitter -> {
+            emitter.onSuccess(getKey(OkHttpUtils.getHtml(url)));
+        }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<String>() {
             @Override
-            public void onFinish(Object o, int code) {
-                callback.onFinish(getKey((String) o), code);
+            public void onSuccess(@NotNull String s) {
+                callback.onFinish(s, 0);
             }
 
             @Override
-            public void onError(Exception e) {
-                callback.onError(e);
+            public void onError(Throwable e) {
+                callback.onError((Exception) e);
             }
         });
     }
@@ -72,17 +82,28 @@ public class LanZousApi {
         params.put("action", "downprocess");
         params.put("sign", key);
         params.put("ves", 1);
-        postLanzousApi(URLCONST.LAN_ZOUS_URL + "/ajaxm.php", params, new ResultCallback() {
+        Single.create((SingleOnSubscribe<String>) emitter -> {
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            String body = "action=downprocess&sign=" + key + "&ves=1";
+            RequestBody requestBody = RequestBody.create(mediaType, body);
+
+            HashMap<String, String> headers = new HashMap<>();
+            headers.put("Referer", referer);
+
+            String html = OkHttpUtils.getHtml(URLCONST.LAN_ZOUS_URL + "/ajaxm.php", requestBody,
+                    "UTF-8", headers);
+            emitter.onSuccess(getUrl2(html));
+        }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<String>() {
             @Override
-            public void onFinish(Object o, int code) {
-                callback.onFinish(getUrl2((String) o), code);
+            public void onSuccess(@NotNull String s) {
+                callback.onFinish(s, 1);
             }
 
             @Override
-            public void onError(Exception e) {
-                callback.onError(e);
+            public void onError(Throwable e) {
+                callback.onError((Exception) e);
             }
-        }, referer);
+        });
     }
 
     private static String getUrl1(String html) {
@@ -94,9 +115,9 @@ public class LanZousApi {
         //SharedPreUtils spu = SharedPreUtils.getInstance();
         String lanzousKeyStart = "var pposturl = '";
         String keyName = StringHelper.getSubString(html, "'sign':", ",");
-        if (keyName.endsWith("'")){
+        if (keyName.endsWith("'")) {
             lanzousKeyStart = "'sign':'";
-        }else {
+        } else {
             lanzousKeyStart = "var " + keyName + " = '";
         }
         //lanzousKeyStart = spu.getString(App.getmContext().getString(R.string.lanzousKeyStart));
@@ -120,7 +141,6 @@ public class LanZousApi {
      * 获取重定向地址
      *
      * @param path
-     *
      */
     public static void getRedirectUrl(final String path, final ResultCallback callback) {
         App.getApplication().newThread(() -> {
@@ -140,7 +160,7 @@ public class LanZousApi {
                 callback.onFinish(redirectUrl, 1);
             } catch (IOException e) {
                 callback.onError(e);
-            }finally {
+            } finally {
                 if (conn != null) {
                     conn.disconnect();
                 }
