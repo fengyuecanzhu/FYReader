@@ -9,31 +9,31 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import me.gujun.android.taggroup.TagGroup;
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
@@ -46,10 +46,10 @@ import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.SearchHistory;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.greendao.service.SearchHistoryService;
 import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.SearchBookAdapter;
 import xyz.fycz.myreader.ui.adapter.SearchHistoryAdapter;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
@@ -57,9 +57,8 @@ import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.webapi.BaseApi;
-import xyz.fycz.myreader.webapi.CommonApi;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
@@ -138,7 +137,7 @@ public class SearchBookActivity extends BaseActivity {
         super.initData(savedInstanceState);
         mSetting = SysManager.getSetting();
         mSearchHistoryService = SearchHistoryService.getInstance();
-        showHot = !App.isApkInDebug(this);
+        showHot = !App.isDebug();
         searchEngine = new SearchEngine();
         searchEngine.setOnSearchListener(new SearchEngine.OnSearchListener() {
             @Override
@@ -309,9 +308,9 @@ public class SearchBookActivity extends BaseActivity {
         if (item.getItemId() == R.id.action_hot) {
             showHot = !showHot;
             initSuggestionList();
-        }else if (item.getItemId() == R.id.action_disable_source) {
+        } else if (item.getItemId() == R.id.action_disable_source) {
             showDisableSourceDia();
-        }else if (item.getItemId() == R.id.action_source_man) {
+        } else if (item.getItemId() == R.id.action_source_man) {
             startActivityForResult(new Intent(this, BookSourceActivity.class),
                     APPCONST.REQUEST_BOOK_SOURCE);
         } else {
@@ -383,7 +382,7 @@ public class SearchBookActivity extends BaseActivity {
                             .subscribe(new MySingleObserver<Boolean>() {
                                 @Override
                                 public void onSuccess(@NonNull Boolean aBoolean) {
-                                    if (aBoolean){
+                                    if (aBoolean) {
                                         ToastUtils.showSuccess("保存成功");
                                     }
                                 }
@@ -411,27 +410,31 @@ public class SearchBookActivity extends BaseActivity {
             binding.tgSuggestBook.setTags(suggestion);
         } else {
             SharedPreUtils spu = SharedPreUtils.getInstance();
-            String cookie = spu.getString(getString(R.string.qdCookie), "");
-            String url = "https://m.qidian.com/majax/search/auto?kw=&";
-            if (cookie.equals("")) {
-                url += "_csrfToken=eXRDlZxmRDLvFAmdgzqvwWAASrxxp2WkVlH4ZM7e";
-            } else {
+            Single.create((SingleOnSubscribe<String>) emitter -> {
+                String cookie = spu.getString(getString(R.string.qdCookie), "");
+                String url = "https://m.qidian.com/majax/search/auto?kw=&";
+                if (cookie.equals("")) {
+                    cookie = "_csrfToken=eXRDlZxmRDLvFAmdgzqvwWAASrxxp2WkVlH4ZM7e; newstatisticUUID=1595991935_2026387981";
+                }
                 url += cookie.split(";")[0];
-            }
-            BaseApi.getCommonReturnHtmlStringApi(url, null, "utf-8", true, new ResultCallback() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Cookie", cookie);
+                emitter.onSuccess(OkHttpUtils.getHtml(url, null,
+                        "utf-8", headers));
+            }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<String>() {
                 @Override
-                public void onFinish(Object o, int code) {
-                    parseSuggestionList((String) o);
+                public void onSuccess(@NotNull String s) {
+                    parseSuggestionList(s);
                     if (mSuggestions.size() > 0) {
-                        App.runOnUiThread(() -> binding.tgSuggestBook.setTags(mSuggestions.subList(0, 5)));
+                        binding.tgSuggestBook.setTags(mSuggestions.subList(0, 5));
                     } else {
-                        App.runOnUiThread(() -> binding.llSuggestBooksView.setVisibility(View.GONE));
+                        binding.llSuggestBooksView.setVisibility(View.GONE);
                     }
                 }
 
                 @Override
-                public void onError(Exception e) {
-                    App.runOnUiThread(() -> binding.llSuggestBooksView.setVisibility(View.GONE));
+                public void onError(Throwable e) {
+                    binding.llSuggestBooksView.setVisibility(View.GONE);
                 }
             });
         }

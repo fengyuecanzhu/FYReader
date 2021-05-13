@@ -326,7 +326,7 @@ public class BookService extends BaseService {
         return false;
     }*/
 
-    public boolean matchHistoryChapterPos(Book book, ArrayList<Chapter> mChapters) {
+    public boolean matchHistoryChapterPos(Book book, List<Chapter> mChapters) {
         float matchSui = SysManager.getSetting().getMatchChapterSuitability();
         int index = getDurChapter(book.getHisttoryChapterNum(), book.getChapterTotalNum(), book.getHistoryChapterId(), mChapters);
         if (book.getHistoryChapterId() == null) return false;

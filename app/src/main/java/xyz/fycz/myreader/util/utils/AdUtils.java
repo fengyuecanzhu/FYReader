@@ -2,7 +2,6 @@ package xyz.fycz.myreader.util.utils;
 
 import android.util.Log;
 
-
 import com.weaction.ddsdk.base.DdSdkHelper;
 
 import org.json.JSONArray;
@@ -10,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
 import okhttp3.MediaType;
@@ -125,9 +123,9 @@ public class AdUtils {
     public static void initAd() {
         if (!hasInitAd) {
             hasInitAd = true;
-            DdSdkHelper.init("", "", "",
-                    "", "",
-                    "", "",
+            DdSdkHelper.init("1234", "216", "51716a16fbdf50905704b6575b1b3b60",
+                    "142364", "35ce0efe5f3cc960b116db227498e238",
+                    "8167", "85bd159309c3da1b",
                     App.getApplication(), true);
         }
     }

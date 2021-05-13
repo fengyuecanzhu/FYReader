@@ -32,7 +32,7 @@ public class ChapterTitleAdapter extends ArrayAdapter<Chapter> {
     private List<Chapter> mList;
     private Book mBook;
 
-    public ChapterTitleAdapter(Context context, int resourceId, ArrayList<Chapter> datas, Book book) {
+    public ChapterTitleAdapter(Context context, int resourceId, List<Chapter> datas, Book book) {
         super(context, resourceId, new ArrayList<>(datas));
         mResourceId = resourceId;
         setting = SysManager.getSetting();

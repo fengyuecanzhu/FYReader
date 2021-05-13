@@ -28,21 +28,28 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.weaction.ddsdk.ad.DdSdkFlowAd;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.ai.BookWordCountPre;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
@@ -52,8 +59,8 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookService;
-import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.greendao.service.ChapterService;
+import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.BookTagAdapter;
 import xyz.fycz.myreader.ui.adapter.DetailCatalogAdapter;
 import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
@@ -93,13 +100,14 @@ public class BookDetailedActivity extends BaseActivity {
     private ChapterService mChapterService;
     private ReadCrawler mReadCrawler;
     private DetailCatalogAdapter mCatalogAdapter;
-    private ArrayList<Chapter> mChapters = new ArrayList<>();
-    private ArrayList<Chapter> mNewestChapters = new ArrayList<>();
+    private List<Chapter> mChapters = new ArrayList<>();
+    private List<Chapter> mNewestChapters = new ArrayList<>();
     private boolean isCollected;
     private SourceExchangeDialog mSourceDialog;
     private int sourceIndex;
     private BookGroupDialog mBookGroupDia;
     private List<String> tagList = new ArrayList<>();
+    private Disposable chaptersDis;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -137,6 +145,12 @@ public class BookDetailedActivity extends BaseActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        if (chaptersDis != null) chaptersDis.dispose();
+        super.onDestroy();
+    }
+
+    @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         mBookService = BookService.getInstance();
@@ -154,7 +168,7 @@ public class BookDetailedActivity extends BaseActivity {
         }
         //Dialog
         mSourceDialog = new SourceExchangeDialog(this, mBook);
-        if (isBookSourceNotExist()){
+        if (isBookSourceNotExist()) {
             DialogCreator.createCommonDialog(this, "未知书源",
                     "当前书籍的书源不存在，是否搜索以切换书源？", false, (dialog, which) -> {
                         mSourceDialog.show();
@@ -229,6 +243,7 @@ public class BookDetailedActivity extends BaseActivity {
 
         initAd();
     }
+
     /**
      * type   信息流类型，只能填 1、4、6、3 (样式请看下表)
      * count  请求返回的信息流广告条目数，最小为 1，最大为 5，通常情况下建议一次返回一条
@@ -238,7 +253,7 @@ public class BookDetailedActivity extends BaseActivity {
             AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
                 @Override
                 public void onSuccess(@NonNull Boolean aBoolean) {
-                    if (aBoolean){
+                    if (aBoolean) {
                         AdUtils.initAd();
                         new DdSdkFlowAd().getFlowViews(BookDetailedActivity.this, 6, 1, new DdSdkFlowAd.FlowCallback() {
                             // 信息流广告拉取完毕后返回的 views
@@ -251,7 +266,7 @@ public class BookDetailedActivity extends BaseActivity {
                             // 信息流广告展示后调用
                             @Override
                             public void show() {
-                                AdUtils.adRecord("flow","adShow");
+                                AdUtils.adRecord("flow", "adShow");
                                 Log.i(TAG, "信息流广告展示成功");
                             }
 
@@ -370,7 +385,7 @@ public class BookDetailedActivity extends BaseActivity {
         }
     }
 
-    private boolean isBookSourceNotExist(){
+    private boolean isBookSourceNotExist() {
         BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
         return source.getSourceEName() != null && "fynovel".equals(source.getSourceEName());
     }
@@ -391,19 +406,21 @@ public class BookDetailedActivity extends BaseActivity {
         if (rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) {
             binding.pbLoading.setVisibility(View.VISIBLE);
             BookInfoCrawler bic = (BookInfoCrawler) rc;
-            CommonApi.getBookInfo(mBook, bic, new ResultCallback() {
+            CommonApi.getBookInfo(mBook, bic).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Book>() {
                 @Override
-                public void onFinish(Object o, int code) {
+                public void onNext(@NotNull Book book) {
                     if (!App.isDestroy(BookDetailedActivity.this)) {
                         mHandler.sendMessage(mHandler.obtainMessage(4));
                     }
                 }
 
                 @Override
-                public void onError(Exception e) {
+                public void onError(Throwable e) {
                     ToastUtils.showError("书籍详情加载失败！");
+                    e.printStackTrace();
                 }
             });
+
         } else {
             initOtherInfo();
             //predictBookCount();
@@ -435,51 +452,6 @@ public class BookDetailedActivity extends BaseActivity {
             mHandler.sendMessage(mHandler.obtainMessage(3));
             return;
         }
-        /*pbLoading.setVisibility(View.GONE);
-        CharSequence[] sources = new CharSequence[aBooks.size()];
-        int checkedItem = 0;
-        for (int i = 0; i < sources.length; i++) {
-            sources[i] = LocalBookSource.fromString(aBooks.get(i).getSource()).text
-                    + "\n" + aBooks.get(i).getNewestChapterTitle();
-            if (sources[i].equals(LocalBookSource.fromString(mBook.getSource()).text
-                    + "\n" + aBooks.get(i).getNewestChapterTitle())) {
-                checkedItem = i;
-            }
-        }
-        final int finalCheckedItem = checkedItem;
-        AlertDialog dialog = MyAlertDialog.build(this)
-                .setTitle("切换书源")
-                .setCancelable(true)
-                .setSingleChoiceItems(sources, checkedItem, (dialog1, which) -> {
-                    if (finalCheckedItem == which) {
-                        dialog1.dismiss();
-                        return;
-                    }
-                    Book book = aBooks.get(which);
-                    Book bookTem = new Book(mBook);
-                    bookTem.setChapterUrl(book.getChapterUrl());
-                    bookTem.setImgUrl(book.getImgUrl());
-                    bookTem.setType(book.getType());
-                    bookTem.setDesc(book.getDesc());
-                    bookTem.setSource(book.getSource());
-                    if (isCollected) {
-                        mBookService.updateBook(mBook, bookTem);
-                    }
-                    mBook = bookTem;
-                    mHandler.sendMessage(mHandler.obtainMessage(1));
-                    if (isCollected) {
-                        String tip = null;
-                        if (SysManager.getSetting().isMatchChapter()) {
-                            tip = getString(R.string.change_source_tip1);
-                        } else {
-                            tip = getString(R.string.change_source_tip2);
-                        }
-                        DialogCreator.createTipDialog(this, tip);
-                    }
-                    dialog1.dismiss();
-                }).create();
-        dialog.show();*/
-
     }
 
     /**
@@ -488,40 +460,27 @@ public class BookDetailedActivity extends BaseActivity {
     private void initChapters(boolean isChangeSource) {
         if (mChapters.size() == 0 && !"本地书籍".equals(mBook.getType())) {
             if (isCollected) {
-                mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
+                mChapters = mChapterService.findBookAllChapterByBookId(mBook.getId());
             }
-            CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler, isChangeSource, new ResultCallback() {
-                @Override
-                public void onFinish(Object o, int code) {
-                    ArrayList<Chapter> chapters = (ArrayList<Chapter>) o;
-                    mBook.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
-                    if (isCollected) {
-                        int noReadNum = chapters.size() - mBook.getChapterTotalNum();
-                        mBook.setNoReadNum(Math.max(noReadNum, 0));
-                        mChapterService.updateAllOldChapterData(mChapters, chapters, mBook.getId());
-                        mBookService.updateEntity(mBook);
-                        if (isChangeSource && SysManager.getSetting().isMatchChapter()) {
-                            if (mBookService.matchHistoryChapterPos(mBook, chapters)) {
-                                ToastUtils.showSuccess("历史阅读章节匹配成功！");
-                            } else {
-                                ToastUtils.showError("历史阅读章节匹配失败！");
-                            }
+            if (chaptersDis != null) chaptersDis.dispose();
+            CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler)
+                    .flatMap((Function<List<Chapter>, ObservableSource<Boolean>>) chapters -> saveChapters(chapters, isChangeSource)).compose(RxUtils::toSimpleSingle)
+                    .subscribe(new MyObserver<Boolean>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            chaptersDis = d;
                         }
-                    }
-                    mChapters = chapters;
-                    int end = Math.max(0, mChapters.size() - 6);
-                    for (int i = mChapters.size() - 1; i >= end; i--) {
-                        mNewestChapters.add(mChapters.get(i));
-                    }
-                    App.runOnUiThread(() -> mCatalogAdapter.refreshItems(mNewestChapters));
-                }
 
-                @Override
-                public void onError(Exception e) {
-                    e.printStackTrace();
-                    ToastUtils.showError("最新章节加载失败！");
-                }
-            });
+                        @Override
+                        public void onNext(@NotNull Boolean aBoolean) {
+                            mCatalogAdapter.refreshItems(mNewestChapters);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            if (App.isDebug()) e.printStackTrace();
+                        }
+                    });
         } else {
             int end = Math.max(0, mChapters.size() - 6);
             for (int i = mChapters.size() - 1; i >= end; i--) {
@@ -529,6 +488,32 @@ public class BookDetailedActivity extends BaseActivity {
                 mCatalogAdapter.refreshItems(mNewestChapters);
             }
         }
+    }
+
+    private Observable<Boolean> saveChapters(List<Chapter> chapters, boolean isChangeSource){
+        return Observable.create(emitter -> {
+            mBook.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
+            if (isCollected) {
+                int noReadNum = chapters.size() - mBook.getChapterTotalNum();
+                mBook.setNoReadNum(Math.max(noReadNum, 0));
+                mChapterService.updateAllOldChapterData(mChapters, chapters, mBook.getId());
+                mBookService.updateEntity(mBook);
+                if (isChangeSource && SysManager.getSetting().isMatchChapter()) {
+                    if (mBookService.matchHistoryChapterPos(mBook, chapters)) {
+                        ToastUtils.showSuccess("历史阅读章节匹配成功！");
+                    } else {
+                        ToastUtils.showError("历史阅读章节匹配失败！");
+                    }
+                }
+            }
+            mChapters = chapters;
+            int end = Math.max(0, mChapters.size() - 6);
+            for (int i = mChapters.size() - 1; i >= end; i--) {
+                mNewestChapters.add(mChapters.get(i));
+            }
+            emitter.onNext(true);
+            emitter.onComplete();
+        });
     }
 
     /**
@@ -600,24 +585,6 @@ public class BookDetailedActivity extends BaseActivity {
                     ToastUtils.showWarring("无网络连接！");
                     return true;
                 }
-                /*pbLoading.setVisibility(View.VISIBLE);
-                if (aBooks == null) {
-                    ChangeSourceDialog csd = new ChangeSourceDialog(this, mBook);
-                    csd.init(new ResultCallback() {
-                        @Override
-                        public void onFinish(Object o, int code) {
-                            aBooks = (ArrayList<Book>) o;
-                            mHandler.sendMessage(mHandler.obtainMessage(2));
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            mHandler.sendMessage(mHandler.obtainMessage(3));
-                        }
-                    });
-                } else {
-                    createChangeSourceDia();
-                }*/
                 mSourceDialog.show();
                 break;
             case R.id.action_share:
@@ -895,17 +862,4 @@ public class BookDetailedActivity extends BaseActivity {
         return lines;
     }
 
-
-    private void predictBookCount(){
-        if (isCollected) {
-            BookWordCountPre bwcp = new BookWordCountPre(mBook);
-            App.getApplication().newThread(() ->{
-                if (bwcp.train()){
-                    int count = bwcp.predict();
-                    mBook.setWordCount(String.valueOf(count));
-                    App.runOnUiThread(this::initTagList);
-                }
-            });
-        }
-    }
 }

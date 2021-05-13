@@ -1,6 +1,8 @@
 package xyz.fycz.myreader.widget.page;
 
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,7 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import io.reactivex.Observable;
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -17,6 +21,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
@@ -222,32 +227,36 @@ public class NetPageLoader extends PageLoader {
      * @param chapter
      */
     public void getChapterContent(Chapter chapter) {
-        CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler, new ResultCallback() {
+        CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler).flatMap(s -> Observable.create(emitter -> {
+            loadingChapters.remove(chapter);
+            String content = StringHelper.isEmpty(s) ? "章节内容为空" : s;
+            mChapterService.saveOrUpdateChapter(chapter, content);
+            emitter.onComplete();
+        })).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Object>() {
             @Override
-            public void onFinish(final Object o, int code) {
-                loadingChapters.remove(chapter);
-                String content = (String) o;
-                if (StringHelper.isEmpty(content)) content = "章节内容为空";
-                mChapterService.saveOrUpdateChapter(chapter, content);
+            public void onNext(@NotNull Object o) {
+
+            }
+
+            @Override
+            public void onComplete() {
                 if (isClose()) return;
                 if (getPageStatus() == PageLoader.STATUS_LOADING && mCurChapterPos == chapter.getNumber()) {
-                    App.runOnUiThread(() -> {
-                        if (isPrev) {
-                            openChapterInLastPage();
-                        } else {
-                            openChapter();
-                        }
-                    });
+                    if (isPrev) {
+                        openChapterInLastPage();
+                    } else {
+                        openChapter();
+                    }
                 }
             }
 
             @Override
-            public void onError(Exception e) {
+            public void onError(Throwable e) {
                 loadingChapters.remove(chapter);
                 if (isClose()) return;
                 if (mCurChapterPos == chapter.getNumber())
-                    App.runOnUiThread(() -> chapterError("请尝试重新加载或换源\n" + e.getLocalizedMessage()));
-                e.printStackTrace();
+                    chapterError("请尝试重新加载或换源\n" + e.getLocalizedMessage());
+                if (App.isDebug()) e.printStackTrace();
             }
         });
     }

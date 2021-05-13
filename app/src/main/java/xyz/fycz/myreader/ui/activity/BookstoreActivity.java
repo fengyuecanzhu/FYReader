@@ -165,24 +165,6 @@ public class BookstoreActivity extends BaseActivity {
                     mSourceDia.dismiss();
                 });
                 mSourceDia.show();
-                /*mHandler.sendMessage(mHandler.obtainMessage(3));
-                ChangeSourceDialog csd = new ChangeSourceDialog(this, book);
-                csd.initOneBook(new ResultCallback() {
-                    @Override
-                    public void onFinish(Object o, int code) {
-                        Book searchBook = (Book) o;
-                        book.setChapterUrl(searchBook.getChapterUrl());
-                        book.setSource(searchBook.getSource());
-                        goToBookDetail(book);
-                        mHandler.sendMessage(mHandler.obtainMessage(4));
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        DialogCreator.createTipDialog(BookstoreActivity.this, "未搜索到该书籍，无法进入书籍详情！");
-                        mHandler.sendMessage(mHandler.obtainMessage(4));
-                    }
-                });*/
             }
         });
     }

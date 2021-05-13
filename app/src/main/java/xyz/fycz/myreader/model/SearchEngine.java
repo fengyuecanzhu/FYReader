@@ -168,6 +168,7 @@ public class SearchEngine {
                         public void onError(Throwable e) {
                             searchFinishNum++;
                             searchOnEngine(keyword);
+                            if (App.isDebug()) e.printStackTrace();
                         }
 
                         @Override
@@ -224,6 +225,7 @@ public class SearchEngine {
                         public void onError(Throwable e) {
                             searchFinishNum++;
                             searchOnEngine(title, author);
+                            if (App.isDebug()) e.printStackTrace();
                         }
 
                         @Override

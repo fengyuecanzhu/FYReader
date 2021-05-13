@@ -17,6 +17,8 @@ import android.widget.PopupMenu;
 
 import androidx.core.app.ActivityCompat;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,11 +28,14 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.reactivex.Observable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BasePresenter;
+import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
+import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -125,7 +130,7 @@ public class BookcasePresenter implements BasePresenter {
                     break;
                 case 4:
                     showErrorLoadingBooks();
-                    if (App.isApkInDebug(mMainActivity)) {
+                    if (App.isDebug()) {
                         if (isFirstRefresh) {
                             initBook();
                             isFirstRefresh = false;
@@ -234,10 +239,10 @@ public class BookcasePresenter implements BasePresenter {
                             init();
                             mBookcaseAdapter.setCheckedAll(false);
                         }, null);
-            }else {
+            } else {
                 DialogCreator.createCommonDialog(mMainActivity, "批量删除/移除书籍",
                         "您是希望是要删除这些书籍及其所有缓存还是从分组中移除(不会删除书籍)呢？", true,
-                        "删除书籍", "从分组中移除" ,(dialog, which) -> {
+                        "删除书籍", "从分组中移除", (dialog, which) -> {
                             for (Book book : mBookcaseAdapter.getSelectBooks()) {
                                 mBookService.deleteBook(book);
                             }
@@ -258,7 +263,7 @@ public class BookcasePresenter implements BasePresenter {
 
         //加入分组监听器
         mBookcaseFragment.getmBtnAddGroup().setOnClickListener(v -> {
-            mBookGroupDia.addGroup(mBookcaseAdapter.getSelectBooks(), new BookGroupDialog.OnGroup(){
+            mBookGroupDia.addGroup(mBookcaseAdapter.getSelectBooks(), new BookGroupDialog.OnGroup() {
                 @Override
                 public void change() {
                     init();
@@ -312,9 +317,9 @@ public class BookcasePresenter implements BasePresenter {
                 mBookcaseFragment.getGvBook().setOnDragSelectListener(new DragSortGridView.OnDragSelectListener() {
                     @Override
                     public void onDragSelect(View mirror) {
-                        if (mSetting.getBookcaseStyle() == BookcaseStyle.listMode){
+                        if (mSetting.getBookcaseStyle() == BookcaseStyle.listMode) {
                             mirror.setBackgroundColor(mMainActivity.getResources().getColor(R.color.colorBackground));
-                        }else {
+                        } else {
                             mirror.setScaleX(1.05f);
                         }
                         mirror.setScaleY(1.05f);
@@ -354,14 +359,14 @@ public class BookcasePresenter implements BasePresenter {
 
         if (mSetting.getSortStyle() == 1) {
             Collections.sort(mBooks, (o1, o2) -> {
-                if (o1.getLastReadTime() < o2.getLastReadTime()){
+                if (o1.getLastReadTime() < o2.getLastReadTime()) {
                     return 1;
-                }else if (o1.getLastReadTime() > o2.getLastReadTime()){
+                } else if (o1.getLastReadTime() > o2.getLastReadTime()) {
                     return -1;
                 }
                 return 0;
             });
-        }else if (mSetting.getSortStyle() == 2){
+        } else if (mSetting.getSortStyle() == 2) {
             Collections.sort(mBooks, (o1, o2) -> {
                 Collator cmp = Collator.getInstance(java.util.Locale.CHINA);
                 return cmp.compare(o1.getName(), o2.getName());
@@ -373,7 +378,7 @@ public class BookcasePresenter implements BasePresenter {
             if (sort != i + 1) {
                 if (!isGroup) {
                     mBooks.get(i).setSortCode(i + 1);
-                }else {
+                } else {
                     mBooks.get(i).setGroupSort(i + 1);
                 }
                 mBookService.updateEntity(mBooks.get(i));
@@ -400,24 +405,31 @@ public class BookcasePresenter implements BasePresenter {
             Thread update = new Thread(() -> {
                 final ArrayList<Chapter> mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
                 final ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(book.getSource());
-                CommonApi.getBookChapters(book.getChapterUrl(), mReadCrawler, true, new ResultCallback() {
+                CommonApi.getBookChapters(book.getChapterUrl(), mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
+                    int noReadNum = chapters.size() - book.getChapterTotalNum();
+                    book.setNoReadNum(Math.max(noReadNum, 0));
+                    book.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
+                    mBookcaseAdapter.getIsLoading().put(book.getId(), false);
+                    mChapterService.updateAllOldChapterData(mChapters, chapters, book.getId());
+                    mBookService.updateEntity(book);
+                    emitter.onComplete();
+                })).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Object>() {
                     @Override
-                    public void onFinish(Object o, int code) {
-                        ArrayList<Chapter> chapters = (ArrayList<Chapter>) o;
-                        int noReadNum = chapters.size() - book.getChapterTotalNum();
-                        book.setNoReadNum(Math.max(noReadNum, 0));
-                        book.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
-                        mBookcaseAdapter.getIsLoading().put(book.getId(), false);
-                        mChapterService.updateAllOldChapterData(mChapters, chapters, book.getId());
-                        mHandler.sendMessage(mHandler.obtainMessage(1));
-                        mBookService.updateEntity(book);
+                    public void onNext(@NotNull Object o) {
+
                     }
 
                     @Override
-                    public void onError(Exception e) {
+                    public void onComplete() {
+                        mHandler.sendMessage(mHandler.obtainMessage(1));
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
                         mBookcaseAdapter.getIsLoading().put(book.getId(), false);
                         errorLoadingBooks.add(book);
                         mHandler.sendMessage(mHandler.obtainMessage(1));
+                        if (App.isDebug()) e.printStackTrace();
                     }
                 });
             });
@@ -509,7 +521,6 @@ public class BookcasePresenter implements BasePresenter {
 
     /**
      * 显示书籍分组菜单
-     *
      */
     public void showBookGroupMenu(View view) {
         mBookGroupDia.initBookGroups(false);
@@ -570,7 +581,7 @@ public class BookcasePresenter implements BasePresenter {
         }
     }
 
-    public boolean canEditBookcase(){
+    public boolean canEditBookcase() {
         return mBooks.size() > 0;
     }
 
@@ -583,55 +594,55 @@ public class BookcasePresenter implements BasePresenter {
                 .setItems(mMainActivity.getResources().getStringArray(R.array.group_man)
                         , (dialog, which) -> {
                             mBookGroupDia.initBookGroups(false);
-                    switch (which){
-                        case 0:
-                            mBookGroupDia.showAddOrRenameGroupDia(false, false, 0, new BookGroupDialog.OnGroup() {
-                                @Override
-                                public void change() {
-                                    ogcl.onChange();
-                                }
+                            switch (which) {
+                                case 0:
+                                    mBookGroupDia.showAddOrRenameGroupDia(false, false, 0, new BookGroupDialog.OnGroup() {
+                                        @Override
+                                        public void change() {
+                                            ogcl.onChange();
+                                        }
 
-                                @Override
-                                public void addGroup() {
-                                    mBookcaseFragment.getmBtnAddGroup().performClick();
-                                }
-                            });
-                            break;
-                        case 1:
-                            mBookGroupDia.showSelectGroupDia((dialog1, which1) -> {
-                                mBookGroupDia.showAddOrRenameGroupDia(true,false, which1, new BookGroupDialog.OnGroup() {
-                                    @Override
-                                    public void change() {
-                                        ogcl.onChange();
-                                    }
+                                        @Override
+                                        public void addGroup() {
+                                            mBookcaseFragment.getmBtnAddGroup().performClick();
+                                        }
+                                    });
+                                    break;
+                                case 1:
+                                    mBookGroupDia.showSelectGroupDia((dialog1, which1) -> {
+                                        mBookGroupDia.showAddOrRenameGroupDia(true, false, which1, new BookGroupDialog.OnGroup() {
+                                            @Override
+                                            public void change() {
+                                                ogcl.onChange();
+                                            }
 
-                                    @Override
-                                    public void addGroup() {
-                                        mBookcaseFragment.getmBtnAddGroup().performClick();
-                                    }
-                                });
-                            });
-                            break;
-                        case 2:
-                            mBookGroupDia.showDeleteGroupDia(new BookGroupDialog.OnGroup() {
-                                @Override
-                                public void change() {
-                                    ogcl.onChange();
-                                    init();
-                                }
-                            });
-                            break;
-                    }
-                }).show();
+                                            @Override
+                                            public void addGroup() {
+                                                mBookcaseFragment.getmBtnAddGroup().performClick();
+                                            }
+                                        });
+                                    });
+                                    break;
+                                case 2:
+                                    mBookGroupDia.showDeleteGroupDia(new BookGroupDialog.OnGroup() {
+                                        @Override
+                                        public void change() {
+                                            ogcl.onChange();
+                                            init();
+                                        }
+                                    });
+                                    break;
+                            }
+                        }).show();
     }
 
     //分组切换监听器
-    public void addOnGroupChangeListener(MainActivity.OnGroupChangeListener ogcl){
+    public void addOnGroupChangeListener(MainActivity.OnGroupChangeListener ogcl) {
         this.ogcl = ogcl;
     }
 
     //是否有分组切换监听器
-    public boolean hasOnGroupChangeListener(){
+    public boolean hasOnGroupChangeListener() {
         return this.ogcl != null;
     }
 
@@ -768,19 +779,26 @@ public class BookcasePresenter implements BasePresenter {
         }
         mHandler.postDelayed(sendDownloadNotification, 2 * downloadInterval);
         for (Chapter chapter : needDownloadChapters) {
-            getChapterContent(book, chapter, new ResultCallback() {
+            if (StringHelper.isEmpty(chapter.getBookId())) {
+                chapter.setBookId(book.getId());
+            }
+            ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(book.getSource());
+            CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler).flatMap(s -> Observable.create(emitter -> {
+                downloadingChapter = chapter.getTitle();
+                mChapterService.saveOrUpdateChapter(chapter, s);
+                successCathe++;
+                curCacheChapterNum++;
+            })).subscribe(new MyObserver<Object>() {
                 @Override
-                public void onFinish(Object o, int code) {
-                    downloadingChapter = chapter.getTitle();
-                    mChapterService.saveOrUpdateChapter(chapter, (String) o);
-                    successCathe++;
-                    curCacheChapterNum++;
+                public void onNext(@NotNull Object o) {
+
                 }
 
                 @Override
-                public void onError(Exception e) {
+                public void onError(Throwable e) {
                     curCacheChapterNum++;
                     errorCathe++;
+                    if (App.isDebug()) e.printStackTrace();
                 }
             });
             try {
@@ -806,19 +824,6 @@ public class BookcasePresenter implements BasePresenter {
     }
 
 
-    /**
-     * 获取章节内容
-     *
-     * @param
-     * @param
-     */
-    private void getChapterContent(Book mBook, final Chapter chapter, final ResultCallback resultCallback) {
-        if (StringHelper.isEmpty(chapter.getBookId())) {
-            chapter.setBookId(mBook.getId());
-        }
-        ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
-        CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler, resultCallback);
-    }
 
     /**
      * 发送通知
@@ -892,28 +897,28 @@ public class BookcasePresenter implements BasePresenter {
         SharedPreUtils spb = SharedPreUtils.getInstance();
         String synTime = spb.getString(mMainActivity.getString(R.string.synTime));
         if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
-                UserService.webBackup(new ResultCallback() {
-                    @Override
-                    public void onFinish(Object o, int code) {
-                        if ((boolean) o){
-                            spb.putString(mMainActivity.getString(R.string.synTime), nowTimeStr);
-                            if (!isAutoSyn) {
-                                DialogCreator.createTipDialog(mMainActivity, "成功将书架同步至网络！");
-                            }
-                        }else {
-                            if (!isAutoSyn) {
-                                DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！");
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
+            UserService.webBackup(new ResultCallback() {
+                @Override
+                public void onFinish(Object o, int code) {
+                    if ((boolean) o) {
+                        spb.putString(mMainActivity.getString(R.string.synTime), nowTimeStr);
                         if (!isAutoSyn) {
-                            DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！\n" + e.getLocalizedMessage());
+                            DialogCreator.createTipDialog(mMainActivity, "成功将书架同步至网络！");
+                        }
+                    } else {
+                        if (!isAutoSyn) {
+                            DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！");
                         }
                     }
-                });
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    if (!isAutoSyn) {
+                        DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！\n" + e.getLocalizedMessage());
+                    }
+                }
+            });
         }
     }
 

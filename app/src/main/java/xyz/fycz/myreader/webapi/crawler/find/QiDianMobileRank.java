@@ -2,11 +2,18 @@ package xyz.fycz.myreader.webapi.crawler.find;
 
 import android.content.Context;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
+import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.entity.bookstore.QDBook;
@@ -157,18 +164,19 @@ public class QiDianMobileRank extends FindCrawler {
     }
 
     public void getRankBooks(BookType bookType, ResultCallback rc) {
-        CommonApi.getCommonReturnHtmlStringApi(bookType.getUrl(), null, "UTF-8", true,
-                new ResultCallback() {
-                    @Override
-                    public void onFinish(Object o, int code) {
-                        rc.onFinish(getBooksFromJson((String) o, bookType), 1);
-                    }
+        Single.create((SingleOnSubscribe<List<QDBook>>) emitter -> {
+            emitter.onSuccess(getBooksFromJson(OkHttpUtils.getHtml(bookType.getUrl()), bookType));
+        }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<List<QDBook>>() {
+            @Override
+            public void onSuccess(@NotNull List<QDBook> books) {
+                rc.onFinish(books, 0);
+            }
 
-                    @Override
-                    public void onError(Exception e) {
-                        rc.onError(e);
-                    }
-                });
+            @Override
+            public void onError(Throwable e) {
+                rc.onError((Exception) e);
+            }
+        });
     }
 
     private List<QDBook> getBooksFromJson(String json, BookType bookType) {

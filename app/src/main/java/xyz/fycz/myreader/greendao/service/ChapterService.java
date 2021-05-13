@@ -241,7 +241,7 @@ public class ChapterService extends BaseService {
      *
      * @param newChapters
      */
-    public void updateAllOldChapterData(ArrayList<Chapter> mChapters, ArrayList<Chapter> newChapters, String bookId) {
+    public void updateAllOldChapterData(List<Chapter> mChapters, List<Chapter> newChapters, String bookId) {
         int i;
         for (i = 0; i < mChapters.size() && i < newChapters.size(); i++) {
             Chapter oldChapter = mChapters.get(i);
