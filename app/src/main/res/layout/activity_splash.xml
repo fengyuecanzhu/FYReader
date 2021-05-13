@@ -63,6 +63,7 @@
                 android:paddingVertical="5dp"
                 android:paddingHorizontal="8dp"
                 android:text="跳过"
+                android:visibility="gone"
                 android:textColor="@color/textSecondary"
                 android:textSize="@dimen/text_normal_size" />
 
