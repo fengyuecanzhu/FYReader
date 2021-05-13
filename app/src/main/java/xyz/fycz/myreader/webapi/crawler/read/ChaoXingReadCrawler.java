@@ -13,12 +13,13 @@ import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 import java.util.ArrayList;
 
 
-public class ChaoXingReadCrawler implements ReadCrawler {
+public class ChaoXingReadCrawler extends BaseLocalCrawler {
     public static final String NAME_SPACE = "http://yz4.chaoxing.com";
     public static final String NOVEL_SEARCH = "http://yz4.chaoxing.com/circlemarket/getsearch,start=0&size=25&sw={key}&channelId=52";
     public static final String CHAPTERS_URL = "https://special.zhexuezj.cn/mobile/mooc/tocourse/";

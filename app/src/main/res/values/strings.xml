@@ -366,6 +366,7 @@
     <string name="source_url">书源URL</string>
     <string name="source_group">书源分组</string>
     <string name="source_charset">书源字符编码</string>
+    <string name="source_headers">书源请求头</string>
     <string name="diy_source_group">自定义源分组</string>
     <string name="diy_edit_source_group">输入自定义源分组名称</string>
     <string name="diy_edit_source_group_title">【%s】</string>

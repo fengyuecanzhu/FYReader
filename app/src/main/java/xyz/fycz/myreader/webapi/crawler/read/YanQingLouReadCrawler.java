@@ -21,10 +21,11 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
+import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 @Deprecated
-public class YanQingLouReadCrawler implements ReadCrawler {
+public class YanQingLouReadCrawler extends BaseLocalCrawler {
     public static final String NAME_SPACE = "http://www.yanqinglou.com";
     public static final String NOVEL_SEARCH = "http://www.yanqinglou.com/Home/Search,action=search&q={key}";
     public static final String AJAX_CONTENT = "http://www.yanqinglou.com/home/index/ajaxchapter";

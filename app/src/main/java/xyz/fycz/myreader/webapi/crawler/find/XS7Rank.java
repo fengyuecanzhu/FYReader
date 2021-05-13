@@ -20,7 +20,7 @@ import xyz.fycz.myreader.webapi.crawler.read.XS7ReadCrawler;
  */
 @Deprecated
 public class XS7Rank extends FindCrawler {
-    private FindCrawler xs7 = new XS7ReadCrawler();
+    private FindCrawler xs7 = new XS7FindCrawler();
     public static final String CHARSET = "GBK";
     public static final String FIND_NAME = "排行榜[小说旗]";
     public static final String FIND_URL = "https://www.xs7.la/top/lastupdate/1.html";
