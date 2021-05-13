@@ -9,8 +9,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import xyz.fycz.myreader.model.analyzeRule.AnalyzeUrl;
-import xyz.fycz.myreader.util.HttpUtil;
+import xyz.fycz.myreader.util.SSLSocketClient;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public interface JsExtensions {
@@ -56,7 +55,7 @@ public interface JsExtensions {
      */
     default Connection.Response get(String urlStr, Map<String, String> headers) throws IOException {
         return Jsoup.connect(urlStr)
-                .sslSocketFactory(HttpUtil.createSSLSocketFactory())
+                .sslSocketFactory(SSLSocketClient.createSSLSocketFactory())
                 .ignoreContentType(true)
                 .followRedirects(false)
                 .headers(headers)
@@ -69,7 +68,7 @@ public interface JsExtensions {
      */
     default Connection.Response post(String urlStr, String body, Map<String, String> headers) throws IOException {
         return Jsoup.connect(urlStr)
-                .sslSocketFactory(HttpUtil.createSSLSocketFactory())
+                .sslSocketFactory(SSLSocketClient.createSSLSocketFactory())
                 .ignoreContentType(true)
                 .followRedirects(false)
                 .requestBody(body)

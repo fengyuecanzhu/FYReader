@@ -4,7 +4,8 @@ import xyz.fycz.myreader.util.webdav.http.Handler
 import xyz.fycz.myreader.util.webdav.http.HttpAuth
 import okhttp3.*
 import org.jsoup.Jsoup
-import xyz.fycz.myreader.util.HttpUtil
+import xyz.fycz.myreader.util.SSLSocketClient
+import xyz.fycz.myreader.util.utils.OkHttpUtils
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -131,7 +132,7 @@ constructor(urlStr: String) {
                 )
             }
             request.header("Depth", if (depth < 0) "infinity" else depth.toString())
-            return HttpUtil.getOkHttpClient().newCall(request.build()).execute()
+            return OkHttpUtils.getOkHttpClient().newCall(request.build()).execute()
         }
         return null
     }
@@ -226,7 +227,7 @@ constructor(urlStr: String) {
                     Credentials.basic(it.user, it.pass)
             )
         }
-        val response = HttpUtil.getOkHttpClient().newCall(requestBuilder.build()).execute()
+        val response = OkHttpUtils.getOkHttpClient().newCall(requestBuilder.build()).execute()
         return response.isSuccessful
     }
 
@@ -237,7 +238,7 @@ constructor(urlStr: String) {
                 request.header("Authorization", Credentials.basic(it.user, it.pass))
             }
             try {
-                return HttpUtil.getOkHttpClient().newCall(request.build()).execute().body()?.byteStream()
+                return OkHttpUtils.getOkHttpClient().newCall(request.build()).execute().body()?.byteStream()
             } catch (e: IOException) {
                 e.printStackTrace()
             } catch (e: IllegalArgumentException) {
