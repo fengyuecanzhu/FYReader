@@ -34,7 +34,7 @@ import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.BookStoreApi;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
 

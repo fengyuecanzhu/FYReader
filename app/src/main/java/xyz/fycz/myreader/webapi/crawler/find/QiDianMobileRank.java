@@ -14,7 +14,7 @@ import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.ResultCallback;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.entity.bookstore.QDBook;
 import xyz.fycz.myreader.entity.bookstore.RankBook;
@@ -23,7 +23,6 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 
 import java.io.BufferedReader;

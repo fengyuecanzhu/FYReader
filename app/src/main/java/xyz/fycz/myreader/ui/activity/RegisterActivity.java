@@ -1,7 +1,6 @@
 package xyz.fycz.myreader.ui.activity;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
@@ -24,7 +23,7 @@ import xyz.fycz.myreader.util.CodeUtil;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.ProgressUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.ResultCallback;
 
 /**
  * @author fengyue

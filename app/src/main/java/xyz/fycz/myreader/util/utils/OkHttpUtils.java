@@ -17,9 +17,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static xyz.fycz.myreader.util.SSLSocketClient.createSSLSocketFactory;
-import static xyz.fycz.myreader.util.SSLSocketClient.createTrustAllManager;
-import static xyz.fycz.myreader.util.SSLSocketClient.getHeaderInterceptor;
+import static xyz.fycz.myreader.util.help.SSLSocketClient.createSSLSocketFactory;
+import static xyz.fycz.myreader.util.help.SSLSocketClient.createTrustAllManager;
+import static xyz.fycz.myreader.util.help.SSLSocketClient.getHeaderInterceptor;
 
 public class OkHttpUtils {
 

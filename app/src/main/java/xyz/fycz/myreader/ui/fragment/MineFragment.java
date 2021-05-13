@@ -14,11 +14,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
@@ -33,9 +31,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentMineBinding;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookService;
-import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.model.storage.BackupRestoreUi;
@@ -46,15 +42,13 @@ import xyz.fycz.myreader.ui.activity.AdSettingActivity;
 import xyz.fycz.myreader.ui.activity.BookSourceActivity;
 import xyz.fycz.myreader.ui.activity.DonateActivity;
 import xyz.fycz.myreader.ui.activity.FeedbackActivity;
-import xyz.fycz.myreader.ui.activity.LoginActivity;
 import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
-import xyz.fycz.myreader.ui.activity.SourceEditActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.ResultCallback;
 
 import static android.app.Activity.RESULT_OK;
 

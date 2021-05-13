@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.util.utils;
+package xyz.fycz.myreader.util.help;
 
 
 import org.jsoup.Connection;
@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import xyz.fycz.myreader.util.SSLSocketClient;
+import xyz.fycz.myreader.util.help.SSLSocketClient;
+import xyz.fycz.myreader.util.utils.StringUtils;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public interface JsExtensions {

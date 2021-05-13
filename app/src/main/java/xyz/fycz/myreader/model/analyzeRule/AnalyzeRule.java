@@ -1,33 +1,8 @@
 package xyz.fycz.myreader.model.analyzeRule;
 
-import android.annotation.SuppressLint;
-
 import androidx.annotation.Keep;
 
-import com.google.gson.Gson;
-
-import org.jsoup.nodes.Entities;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.script.SimpleBindings;
-
-import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.util.utils.JsExtensions;
-import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.util.utils.StringUtils;
-
-import static android.text.TextUtils.isEmpty;
-import static xyz.fycz.myreader.common.APPCONST.EXP_PATTERN;
-import static xyz.fycz.myreader.common.APPCONST.JS_PATTERN;
-import static xyz.fycz.myreader.common.APPCONST.MAP_STRING;
-import static xyz.fycz.myreader.common.APPCONST.SCRIPT_ENGINE;
-import static xyz.fycz.myreader.util.utils.NetworkUtils.headerPattern;
+import xyz.fycz.myreader.util.help.JsExtensions;
 
 
 /**

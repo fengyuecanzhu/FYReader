@@ -10,7 +10,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;

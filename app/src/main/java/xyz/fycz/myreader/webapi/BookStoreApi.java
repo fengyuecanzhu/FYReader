@@ -6,14 +6,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 
 public class BookStoreApi {

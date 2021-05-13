@@ -4,7 +4,7 @@ import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.model.storage.Restore;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.util.*;

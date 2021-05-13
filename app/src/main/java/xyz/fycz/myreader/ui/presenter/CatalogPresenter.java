@@ -11,7 +11,6 @@ import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.util.utils.RxUtils;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.CatalogActivity;
 import xyz.fycz.myreader.util.ToastUtils;
