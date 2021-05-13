@@ -78,6 +78,7 @@ public class SplashActivity extends BaseActivity {
     private Thread countTime = new Thread() {
         @Override
         public void run() {
+            App.runOnUiThread(() -> binding.tvSkip.setVisibility(View.VISIBLE));
             for (int i = 0; i < 5; i++) {
                 int time = 5 - i;
                 App.runOnUiThread(() -> binding.tvSkip.setText(getString(R.string.skip_ad, time)));
@@ -158,6 +159,9 @@ public class SplashActivity extends BaseActivity {
         if (adTimes >= 0 && todayAdCount >= adTimes) {
             startNoAd();
         } else {
+            App.getHandler().postDelayed(() -> {
+                binding.tvSkip.setVisibility(View.VISIBLE);
+            }, 3000);
             AdUtils.checkHasAd()
                     .subscribe(new MySingleObserver<Boolean>() {
                         @Override

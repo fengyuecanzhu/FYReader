@@ -414,7 +414,7 @@ public class BookDetailedActivity extends BaseActivity {
                 @Override
                 public void onError(Throwable e) {
                     ToastUtils.showError("书籍详情加载失败！");
-                    e.printStackTrace();
+                    if (App.isDebug()) e.printStackTrace();
                 }
             });
 
@@ -475,6 +475,8 @@ public class BookDetailedActivity extends BaseActivity {
 
                         @Override
                         public void onError(Throwable e) {
+                            binding.pbLoading.setVisibility(View.GONE);
+                            ToastUtils.showError("最新章节加载失败！");
                             if (App.isDebug()) e.printStackTrace();
                         }
                     });

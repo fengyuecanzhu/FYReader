@@ -48,12 +48,7 @@ public class CommonApi {
         url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url);
         String finalUrl = url;
         return Observable.create(emitter -> {
-            try {
-                emitter.onNext(rc.getContentFormHtml(OkHttpUtils.getHtml(finalUrl, charset)));
-            } catch (Exception e) {
-                e.printStackTrace();
-                emitter.onError(e);
-            }
+            emitter.onNext(rc.getContentFormHtml(OkHttpUtils.getHtml(finalUrl, charset)));
             emitter.onComplete();
         });
     }
@@ -131,12 +126,7 @@ public class CommonApi {
         url = NetworkUtils.getAbsoluteURL(bic.getNameSpace(), url);
         String finalUrl = url;
         return Observable.create(emitter -> {
-            try {
-                emitter.onNext(bic.getBookInfo(OkHttpUtils.getHtml(finalUrl, bic.getCharset()), book));
-            } catch (Exception e) {
-                e.printStackTrace();
-                emitter.onError(e);
-            }
+            emitter.onNext(bic.getBookInfo(OkHttpUtils.getHtml(finalUrl, bic.getCharset()), book));
             emitter.onComplete();
         });
     }
