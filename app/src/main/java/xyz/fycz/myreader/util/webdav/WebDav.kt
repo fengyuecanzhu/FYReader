@@ -4,7 +4,6 @@ import xyz.fycz.myreader.util.webdav.http.Handler
 import xyz.fycz.myreader.util.webdav.http.HttpAuth
 import okhttp3.*
 import org.jsoup.Jsoup
-import xyz.fycz.myreader.util.SSLSocketClient
 import xyz.fycz.myreader.util.utils.OkHttpUtils
 import java.io.File
 import java.io.IOException

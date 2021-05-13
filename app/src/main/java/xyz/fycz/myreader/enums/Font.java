@@ -4,10 +4,10 @@ public enum Font {
 
     默认字体( "默认字体"),
     本地字体( "默认字体"),
-    方正楷体( "https://fycz.lanzous.com/ilLFMe6kefe"),
-    方正行楷( "https://fycz.lanzous.com/imFvne6keji"),
-    经典宋体("https://fycz.lanzous.com/idhI5e6keqf"),
-    方正硬笔行书("https://fycz.lanzous.com/ilVh6ep9xja"),
+    方正楷体( "https://fycz.lanzousi.com/ilLFMe6kefe"),
+    方正行楷( "https://fycz.lanzousi.com/imFvne6keji"),
+    经典宋体("https://fycz.lanzousi.com/idhI5e6keqf"),
+    方正硬笔行书("https://fycz.lanzousi.com/ilVh6ep9xja"),
     包图小白体("https://fycz.lanzoui.com/i5qgAicrirc"),
     仓耳非白W02("https://fycz.lanzoui.com/iHwRnicriuf"),
     仓耳舒圆体W02("https://fycz.lanzoui.com/i3GVPicrj3e"),
@@ -24,8 +24,8 @@ public enum Font {
     演示悠然小楷("https://fycz.lanzoui.com/ikKq7icrmrg"),
     杨任东竹石体("https://fycz.lanzoui.com/iiWdVicrnbg"),
     站酷仓耳渔阳体("https://fycz.lanzoui.com/if5weicrnje"),
-    迷你隶书( "https://fycz.lanzous.com/ihaXVe6kekj"),
-    方正黄草("https://fycz.lanzous.com/iQg67e6keed");
+    迷你隶书( "https://fycz.lanzousi.com/ihaXVe6kekj"),
+    方正黄草("https://fycz.lanzousi.com/iQg67e6keed");
 
     public String downloadPath;
 

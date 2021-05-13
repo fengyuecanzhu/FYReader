@@ -53,7 +53,7 @@ import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.dialog.APPDownloadTip;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
-import xyz.fycz.myreader.util.SSLSocketClient;
+import xyz.fycz.myreader.util.help.SSLSocketClient;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -427,7 +427,7 @@ public class App extends Application {
                 .setCancelable(!isForceUpdate)
                 .setDownloadUrl(url)
                 .setContentHtml(true)
-                .setDebug(true)
+                .setDebug(App.isDebug())
                 .build();
 
         updateDialog.showUpdateDialog(activity);

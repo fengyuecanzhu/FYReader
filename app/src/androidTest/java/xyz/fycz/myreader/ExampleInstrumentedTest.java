@@ -15,16 +15,13 @@ import org.junit.runner.RunWith;
 
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.model.source.MatcherAnalyzer;
 import xyz.fycz.myreader.util.utils.GsonUtils;
-import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.ResultCallback;
 
 import static org.junit.Assert.assertEquals;
 

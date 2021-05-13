@@ -19,7 +19,6 @@ import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
 
 /**
  * @author fengyue

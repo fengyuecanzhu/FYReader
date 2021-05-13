@@ -41,7 +41,7 @@ import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.databinding.FragmentUpdateBinding;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.ResultCallback;
 
 
 public class UpdateDialog extends Fragment {

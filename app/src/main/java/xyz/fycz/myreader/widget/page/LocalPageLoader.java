@@ -3,7 +3,7 @@ package xyz.fycz.myreader.widget.page;
 import android.util.Log;
 import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
-import xyz.fycz.myreader.webapi.callback.ResultCallback;
+import xyz.fycz.myreader.webapi.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;

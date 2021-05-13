@@ -2,10 +2,6 @@ package xyz.fycz.myreader.common;
 
 public class URLCONST {
 
-    // 命名空间
-    public static String nameSpace_FY = "https://novel.fycz.xyz";
-
-    public static boolean isRSA = false;
 
     public static String APP_DIR_UR = "https://www.lanzous.com/b00ngso7e";
 

@@ -1,30 +1,11 @@
-package xyz.fycz.myreader.util;
+package xyz.fycz.myreader.util.help;
 
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
-import android.util.Base64;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import okhttp3.*;
-import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.webapi.callback.HttpCallback;
-import xyz.fycz.myreader.webapi.callback.JsonCallback;
-import xyz.fycz.myreader.webapi.callback.URLConnectionCallback;
-import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.entity.JsonModel;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -32,7 +13,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import static java.lang.String.valueOf;
+import okhttp3.Interceptor;
+import okhttp3.Request;
 
 
 public class SSLSocketClient {

@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.webapi.callback;
+package xyz.fycz.myreader.webapi;
 
 
 public interface ResultCallback {

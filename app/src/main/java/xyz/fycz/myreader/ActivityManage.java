@@ -1,14 +1,8 @@
 package xyz.fycz.myreader;
 
-import android.app.Activity;
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-/**
- * Created by zhao on 2016/4/16.
- */
 public class ActivityManage {
 
     private static ArrayList<AppCompatActivity> activities = new ArrayList<>();
