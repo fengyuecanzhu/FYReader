@@ -158,9 +158,9 @@ public class SourceDebugActivity extends BaseActivity {
                     String body = urlInfo[1];
                     MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                     RequestBody requestBody = RequestBody.create(mediaType, body);
-                    debugEntity.setHtml(OkHttpUtils.getHtml(url, requestBody, rc.getCharset()));
+                    debugEntity.setHtml(OkHttpUtils.getHtml(url, requestBody, rc.getCharset(), rc.getHeaders()));
                 } else {
-                    debugEntity.setHtml(OkHttpUtils.getHtml(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url), rc.getCharset()));
+                    debugEntity.setHtml(OkHttpUtils.getHtml(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url), rc.getCharset(), rc.getHeaders()));
                 }
                 ListResult listResult = new ListResult();
                 switch (debugEntity.getDebugMode()) {

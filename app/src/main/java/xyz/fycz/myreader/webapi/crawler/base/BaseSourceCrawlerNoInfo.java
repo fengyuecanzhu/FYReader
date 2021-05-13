@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.webapi.crawler.base;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -57,5 +58,10 @@ public class BaseSourceCrawlerNoInfo implements ReadCrawler {
     @Override
     public String getContentFormHtml(String html) {
         return crawler.getContentFormHtml(html);
+    }
+
+    @Override
+    public Map<String, String> getHeaders() {
+        return crawler.getHeaders();
     }
 }

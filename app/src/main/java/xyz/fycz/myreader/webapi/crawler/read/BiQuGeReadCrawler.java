@@ -12,6 +12,7 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
@@ -21,7 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class BiQuGeReadCrawler implements ReadCrawler, BookInfoCrawler {
+public class BiQuGeReadCrawler extends BaseLocalCrawler implements BookInfoCrawler {
     private static final String NAME_SPACE = "https://www.52bqg.net";
     private static final String NOVEL_SEARCH = "https://www.52bqg.net/modules/article/search.php?searchkey={key}";
     private static final String CHARSET = "GBK";

@@ -11,13 +11,14 @@ import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 import java.util.ArrayList;
 
 
-public class YunZhongReadCrawler implements ReadCrawler, BookInfoCrawler {
+public class YunZhongReadCrawler extends BaseLocalCrawler implements BookInfoCrawler {
     public static final String NAME_SPACE = "http://www.yunxs.com";
     public static final String NOVEL_SEARCH = "http://www.yunxs.com/plus/search.php?q={key}";
     public static final String CHARSET = "UTF-8";

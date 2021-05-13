@@ -5,19 +5,19 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
-import android.widget.*;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-
-import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.enums.ReadStyle;
-import xyz.fycz.myreader.util.IOUtils;
-import xyz.fycz.myreader.util.StringHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.util.IOUtils;
+import xyz.fycz.myreader.util.StringHelper;
 
 public class DialogCreator {
 
@@ -278,32 +278,6 @@ public class DialogCreator {
 
     public interface OnClickNegativeListener {
         void onClick(Dialog dialog, View view);
-    }
-
-    /**
-     * 白天黑夜切换监听
-     */
-    public interface OnClickNightAndDayListener {
-        void onClick(Dialog dialog, View view, boolean isDayStyle);
-    }
-
-    /**
-     * 阅读style切换监听器
-     */
-    public interface OnReadStyleChangeListener {
-        void onChange(ReadStyle readStyle);
-    }
-
-    public interface OnBrightFollowSystemChangeListener {
-        void onChange(boolean isFollowSystem);
-    }
-
-    public interface OnClickDownloadAllChapterListener {
-        void onClick(Dialog dialog, View view,TextView tvDownloadProgress);
-    }
-
-    public interface OnPageModeChangeListener {
-        void onChange(TextView tvPageMode);
     }
 
     public interface OnSkipChapterListener{

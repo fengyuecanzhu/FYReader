@@ -16,6 +16,7 @@ object EditEntityUtil {
             add(EditEntity("sourceName", source?.sourceName, R.string.source_name, "不能为空"))
             add(EditEntity("sourceGroup", source?.sourceGroup, R.string.source_group, "不同分组以;/,隔开"))
             add(EditEntity("sourceCharset", source?.sourceCharset, R.string.source_charset, "默认UTF-8"))
+            add(EditEntity("sourceHeaders", source?.sourceHeaders, R.string.source_headers, "json格式"))
             add(EditEntity("sourceComment", source?.sourceComment, R.string.comment, "这是您留给使用者的说明"))
         }
         return sourceEntities
@@ -104,6 +105,7 @@ object EditEntityUtil {
                 "sourceName" -> source.sourceName = it.value
                 "sourceGroup" -> source.sourceGroup = it.value
                 "sourceCharset" -> source.sourceCharset = it.value
+                "sourceHeaders" -> source.sourceHeaders = it.value
                 "sourceComment" -> source.sourceComment = it.value
             }
         }

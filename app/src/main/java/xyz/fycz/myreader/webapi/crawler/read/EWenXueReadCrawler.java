@@ -15,11 +15,12 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
-public class EWenXueReadCrawler implements ReadCrawler, BookInfoCrawler {
+public class EWenXueReadCrawler extends BaseLocalCrawler implements BookInfoCrawler {
     public static final String NAME_SPACE = "http://ewenxue.org";
     public static final String NOVEL_SEARCH = "http://ewenxue.org/search.htm?keyword={key}";
     public static final String CHARSET = "GBK";

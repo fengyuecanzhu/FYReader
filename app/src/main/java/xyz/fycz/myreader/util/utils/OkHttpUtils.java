@@ -52,6 +52,10 @@ public class OkHttpUtils {
         return getHtml(url, null, encodeType);
     }
 
+    public static String getHtml(String url, String encodeType, Map<String, String> headers) throws IOException {
+        return getHtml(url, null, encodeType, headers);
+    }
+
     public static String getHtml(String url, RequestBody requestBody, String encodeType) throws IOException {
         return getHtml(url, requestBody, encodeType, null);
     }

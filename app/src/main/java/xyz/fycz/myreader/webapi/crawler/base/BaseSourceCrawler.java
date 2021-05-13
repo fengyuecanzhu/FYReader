@@ -2,9 +2,15 @@ package xyz.fycz.myreader.webapi.crawler.base;
 
 import android.text.TextUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -337,6 +343,26 @@ public abstract class BaseSourceCrawler implements ReadCrawler, BookInfoCrawler 
         if (StringHelper.isEmpty(book.getChapterUrl()))
             book.setChapterUrl(analyzer.getString(infoRule.getTocUrl(), obj));
         return book;
+    }
+
+    @Override
+    public Map<String, String> getHeaders() {
+        if (!StringUtils.isJsonObject(source.getSourceHeaders()))
+            return null;
+        try {
+            JSONObject headersJson = new JSONObject(source.getSourceHeaders());
+            Map<String, String> headers = new HashMap<>();
+            Iterator<String> it = headersJson.keys();
+            while (it.hasNext()){
+                String key = it.next();
+                String value = String.valueOf(headersJson.get(key));
+                headers.put(key, value);
+            }
+            return headers;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

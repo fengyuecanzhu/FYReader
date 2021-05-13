@@ -10,12 +10,10 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentFindBinding;
 import xyz.fycz.myreader.ui.activity.BookstoreActivity;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
+import xyz.fycz.myreader.webapi.crawler.find.Ben100FindCrawler;
+import xyz.fycz.myreader.webapi.crawler.find.MiaoBiFindCrawler;
+import xyz.fycz.myreader.webapi.crawler.find.QB5FindCrawler;
 import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
-import xyz.fycz.myreader.webapi.crawler.find.XS7Rank;
-import xyz.fycz.myreader.webapi.crawler.read.Ben100ReadCrawler;
-import xyz.fycz.myreader.webapi.crawler.read.MiaoBiReadCrawler;
-import xyz.fycz.myreader.webapi.crawler.read.QB5ReadCrawler;
-import xyz.fycz.myreader.webapi.crawler.read.XS7ReadCrawler;
 
 /**
  * @author fengyue
@@ -39,9 +37,9 @@ public class FindFragment extends BaseFragment {
         //binding.findRlXs7Top.setOnClickListener(v -> comeToBookstore(new XS7Rank()));
         binding.findRlQidianSort.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false, true)));
         binding.findRlQidianNsSort.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(true, true)));
-        binding.findRlQb5Store.setOnClickListener(v -> comeToBookstore(new QB5ReadCrawler()));
-        binding.findRlBen100Store.setOnClickListener(v -> comeToBookstore(new Ben100ReadCrawler()));
-        binding.findRlMiaoquStore.setOnClickListener(v -> comeToBookstore(new MiaoBiReadCrawler()));
+        binding.findRlQb5Store.setOnClickListener(v -> comeToBookstore(new QB5FindCrawler()));
+        binding.findRlBen100Store.setOnClickListener(v -> comeToBookstore(new Ben100FindCrawler()));
+        binding.findRlMiaoquStore.setOnClickListener(v -> comeToBookstore(new MiaoBiFindCrawler()));
         //binding.findRlXs7Store.setOnClickListener(v -> comeToBookstore(new XS7ReadCrawler()));
     }
 

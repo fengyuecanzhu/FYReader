@@ -8,7 +8,9 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.LocalBookSource;
@@ -17,11 +19,12 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
-public class ShuHaiGeReadCrawler implements ReadCrawler, BookInfoCrawler {
+public class ShuHaiGeReadCrawler extends BaseLocalCrawler implements BookInfoCrawler {
     public static final String NAME_SPACE = "https://www.xinshuhaige.org";
     public static final String NOVEL_SEARCH = "https://www.xinshuhaige.org/search.html,searchkey={key}&searchtype=all";
     public static final String CHARSET = "utf-8";
@@ -50,6 +53,15 @@ public class ShuHaiGeReadCrawler implements ReadCrawler, BookInfoCrawler {
     @Override
     public String getSearchCharset() {
         return SEARCH_CHARSET;
+    }
+
+    @Override
+    public Map<String, String> getHeaders() {
+        String cookie = "Hm_lvt_46329db612a10d9ae3a668a40c152e0e=1612793811,1612795781,1613200980,1613218588; "
+                + "__cfduid=d0ebd0275436b7b0c3ccf4c9eb7394abd1619231977 ";
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Cookie", cookie);
+        return headers;
     }
 
     /**

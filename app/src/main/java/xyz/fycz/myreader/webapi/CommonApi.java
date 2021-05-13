@@ -32,7 +32,7 @@ public class CommonApi {
         url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url);
         String finalUrl = url;
         return Observable.create(emitter -> {
-            emitter.onNext(rc.getChaptersFromHtml(OkHttpUtils.getHtml(finalUrl, charset)));
+            emitter.onNext(rc.getChaptersFromHtml(OkHttpUtils.getHtml(finalUrl, charset, rc.getHeaders())));
             emitter.onComplete();
         });
     }
@@ -48,7 +48,7 @@ public class CommonApi {
         url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url);
         String finalUrl = url;
         return Observable.create(emitter -> {
-            emitter.onNext(rc.getContentFormHtml(OkHttpUtils.getHtml(finalUrl, charset)));
+            emitter.onNext(rc.getContentFormHtml(OkHttpUtils.getHtml(finalUrl, charset, rc.getHeaders())));
             emitter.onComplete();
         });
     }
@@ -84,20 +84,9 @@ public class CommonApi {
                     String body = makeSearchUrl(urlInfo[1], key);
                     MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                     RequestBody requestBody = RequestBody.create(mediaType, body);
-                    if (rc.getNameSpace().contains("soxs.cc") ||
-                            rc.getNameSpace().contains("xinshuhaige.org") ||
-                            rc.getNameSpace().contains("bxwxorg.com") ||
-                            rc.getNameSpace().contains("soshuw.com")) {
-                        String cookie = "Hm_lvt_46329db612a10d9ae3a668a40c152e0e=1612793811,1612795781,1613200980,1613218588; "
-                                + "__cfduid=d0ebd0275436b7b0c3ccf4c9eb7394abd1619231977 ";
-                        Map<String, String> headers = new HashMap<>();
-                        headers.put("Cookie", cookie);
-                        emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset, headers)));
-                    } else {
-                        emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset)));
-                    }
+                    emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset, rc.getHeaders())));
                 } else {
-                    emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(makeSearchUrl(rc.getSearchLink(), key), finalCharset)));
+                    emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(makeSearchUrl(rc.getSearchLink(), key), finalCharset, rc.getHeaders())));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -126,7 +115,8 @@ public class CommonApi {
         url = NetworkUtils.getAbsoluteURL(bic.getNameSpace(), url);
         String finalUrl = url;
         return Observable.create(emitter -> {
-            emitter.onNext(bic.getBookInfo(OkHttpUtils.getHtml(finalUrl, bic.getCharset()), book));
+            emitter.onNext(bic.getBookInfo(OkHttpUtils.getHtml(finalUrl, bic.getCharset(),
+                    ((ReadCrawler) bic).getHeaders()), book));
             emitter.onComplete();
         });
     }
