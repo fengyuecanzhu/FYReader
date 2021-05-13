@@ -513,4 +513,8 @@ public class App extends Application {
     public static boolean isDebug() {
         return debug;
     }
+
+    public ExecutorService getmFixedThreadPool() {
+        return mFixedThreadPool;
+    }
 }

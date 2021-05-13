@@ -47,6 +47,8 @@ import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.Observable;
+import io.reactivex.internal.schedulers.ExecutorScheduler;
+import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
@@ -1587,6 +1589,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     chapter.setId(mBook.getId());
                 }
                 CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler)
+                        .subscribeOn(Schedulers.from(App.getApplication().getmFixedThreadPool()))
                         .subscribe(new MyObserver<String>() {
                             @Override
                             public void onNext(@NotNull String s) {

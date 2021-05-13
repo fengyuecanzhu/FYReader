@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
@@ -788,7 +789,7 @@ public class BookcasePresenter implements BasePresenter {
                 mChapterService.saveOrUpdateChapter(chapter, s);
                 successCathe++;
                 curCacheChapterNum++;
-            })).subscribe(new MyObserver<Object>() {
+            })).subscribeOn(Schedulers.from(App.getApplication().getmFixedThreadPool())).subscribe(new MyObserver<Object>() {
                 @Override
                 public void onNext(@NotNull Object o) {
 
