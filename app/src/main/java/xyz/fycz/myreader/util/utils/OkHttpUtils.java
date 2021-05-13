@@ -9,16 +9,37 @@ import org.jsoup.nodes.Document;
 
 import okhttp3.*;
 import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.util.HttpUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static xyz.fycz.myreader.util.SSLSocketClient.createSSLSocketFactory;
+import static xyz.fycz.myreader.util.SSLSocketClient.createTrustAllManager;
+import static xyz.fycz.myreader.util.SSLSocketClient.getHeaderInterceptor;
 
 public class OkHttpUtils {
 
-    public static OkHttpClient okHttpClient = HttpUtil.getOkHttpClient();
+    public static OkHttpClient mClient;
+
+    public static synchronized OkHttpClient getOkHttpClient() {
+        if (mClient == null) {
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.connectTimeout(5, TimeUnit.SECONDS)
+                    .readTimeout(10, TimeUnit.SECONDS)
+                    .writeTimeout(10, TimeUnit.SECONDS)
+                    .sslSocketFactory(createSSLSocketFactory(), createTrustAllManager())
+                    .hostnameVerifier((hostname, session) -> true)
+                    .protocols(Collections.singletonList(Protocol.HTTP_1_1))
+                    .addInterceptor(getHeaderInterceptor());
+            mClient = builder
+                    .build();
+        }
+        return mClient;
+    }
 
     /**
      * 同步获取html文件，默认编码utf-8
@@ -44,7 +65,7 @@ public class OkHttpUtils {
                 .addHeader("Cache-Control", "no-cache")
                 .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36");
         if (headers != null) {
-            for (String name : headers.keySet()){
+            for (String name : headers.keySet()) {
                 builder.addHeader(name, headers.get(name));
             }
         }
@@ -57,7 +78,7 @@ public class OkHttpUtils {
         Request request = builder
                 .url(url)
                 .build();
-        Response response = okHttpClient
+        Response response = getOkHttpClient()
                 .newCall(request)
                 .execute();
         ResponseBody body = response.body();
@@ -76,7 +97,7 @@ public class OkHttpUtils {
         Request request = builder
                 .url(url)
                 .build();
-        Response response = okHttpClient
+        Response response = getOkHttpClient()
                 .newCall(request)
                 .execute();
         if (response.body() == null) {
@@ -99,7 +120,7 @@ public class OkHttpUtils {
         Request request = builder
                 .url(url)
                 .build();
-        Response response = okHttpClient
+        Response response = getOkHttpClient()
                 .newCall(request)
                 .execute();
         ResponseBody body = response.body();

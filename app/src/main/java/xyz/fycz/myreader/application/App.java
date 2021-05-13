@@ -37,10 +37,8 @@ import java.security.cert.X509Certificate;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -55,7 +53,7 @@ import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.dialog.APPDownloadTip;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
-import xyz.fycz.myreader.util.HttpUtil;
+import xyz.fycz.myreader.util.SSLSocketClient;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -79,7 +77,7 @@ public class App extends Application {
         application = this;
         debug = isApkInDebug(this);
         firstInit();
-        HttpUtil.trustAllHosts();//信任所有证书
+        SSLSocketClient.trustAllHosts();//信任所有证书
         RxJavaPlugins.setErrorHandler(Functions.emptyConsumer());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             webviewSetPath(this);
