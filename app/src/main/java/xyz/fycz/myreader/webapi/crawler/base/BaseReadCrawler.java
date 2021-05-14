@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 
 /**
  * 因新版书源使用StrResponse，为了兼容旧版本，书源全部继承自此类
@@ -21,7 +20,7 @@ public abstract class BaseReadCrawler implements ReadCrawler {
     }
 
     @Override
-    public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
+    public ConMVMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
         return null;
     }
 

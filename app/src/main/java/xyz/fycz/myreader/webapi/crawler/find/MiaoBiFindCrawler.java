@@ -1,7 +1,5 @@
 package xyz.fycz.myreader.webapi.crawler.find;
 
-import android.text.Html;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,14 +9,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
 public class MiaoBiFindCrawler extends FindCrawler {

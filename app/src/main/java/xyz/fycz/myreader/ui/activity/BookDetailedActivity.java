@@ -210,7 +210,7 @@ public class BookDetailedActivity extends BaseActivity {
         binding.ic.bookDetailRvCatalog.setLayoutManager(new LinearLayoutManager(this));
         binding.ic.bookDetailRvCatalog.setAdapter(mCatalogAdapter);
 
-        if (!thirdSource) initChapters(false);
+        if (!thirdSource || isCollected) initChapters(false);
 
         mCatalogAdapter.setOnItemClickListener((view, pos) -> {
             mBook.setHisttoryChapterNum(mChapters.size() - pos - 1);
@@ -399,11 +399,12 @@ public class BookDetailedActivity extends BaseActivity {
             mBook.setImgUrl("");
         }
         initTagList();
-        binding.ic.bookDetailTvDesc.setText("");
+        if (StringHelper.isEmpty(mBook.getDesc()))
+            binding.ic.bookDetailTvDesc.setText("");
         BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
         binding.ih.bookDetailSource.setText(String.format("书源：%s", source.getSourceName()));
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(source);
-        if ((rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) || thirdSource) {
+        if ((rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) || (thirdSource && !isCollected)) {
             binding.pbLoading.setVisibility(View.VISIBLE);
             BookInfoCrawler bic = (BookInfoCrawler) rc;
             CommonApi.getBookInfo(mBook, bic).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Book>() {
@@ -420,6 +421,9 @@ public class BookDetailedActivity extends BaseActivity {
                 @Override
                 public void onError(Throwable e) {
                     ToastUtils.showError("书籍详情加载失败！");
+                    if (thirdSource){
+                        initChapters(false);
+                    }
                     if (App.isDebug()) e.printStackTrace();
                 }
             });

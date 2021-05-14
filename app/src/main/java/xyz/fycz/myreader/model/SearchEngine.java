@@ -13,15 +13,13 @@ import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -140,14 +138,14 @@ public class SearchEngine {
             CommonApi.search(keyword, crawler)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<ConcurrentMultiValueMap<SearchBookBean, Book>>() {
+                    .subscribe(new Observer<ConMVMap<SearchBookBean, Book>>() {
                         @Override
                         public void onSubscribe(Disposable d) {
                             compositeDisposable.add(d);
                         }
 
                         @Override
-                        public void onNext(ConcurrentMultiValueMap<SearchBookBean, Book> bookSearchBeans) {
+                        public void onNext(ConMVMap<SearchBookBean, Book> bookSearchBeans) {
                             searchFinishNum++;
                             if (bookSearchBeans != null) {
                                 searchSuccessNum++;
@@ -183,17 +181,18 @@ public class SearchEngine {
         searchSiteIndex++;
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
-            CommonApi.search(title, crawler)
+            String searchKey = title;
+            CommonApi.search(searchKey, crawler)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<ConcurrentMultiValueMap<SearchBookBean, Book>>() {
+                    .subscribe(new Observer<ConMVMap<SearchBookBean, Book>>() {
                         @Override
                         public void onSubscribe(Disposable d) {
                             compositeDisposable.add(d);
                         }
 
                         @Override
-                        public void onNext(ConcurrentMultiValueMap<SearchBookBean, Book> bookSearchBeans) {
+                        public void onNext(ConMVMap<SearchBookBean, Book> bookSearchBeans) {
                             searchFinishNum++;
                             if (bookSearchBeans != null) {
                                 List<Book> books = bookSearchBeans.getValues(new SearchBookBean(title, author));
@@ -262,7 +261,7 @@ public class SearchEngine {
 
         void loadMoreFinish(Boolean isAll);
 
-        void loadMoreSearchBook(ConcurrentMultiValueMap<SearchBookBean, Book> items);
+        void loadMoreSearchBook(ConMVMap<SearchBookBean, Book> items);
 
         void loadMoreSearchBook(List<Book> items);
 

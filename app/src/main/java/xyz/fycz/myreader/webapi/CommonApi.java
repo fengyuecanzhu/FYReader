@@ -1,11 +1,8 @@
 package xyz.fycz.myreader.webapi;
 
-import android.text.TextUtils;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 
 import io.reactivex.Observable;
@@ -15,17 +12,15 @@ import io.reactivex.functions.Function;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeUrl;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.model.third.content.BookChapterList;
 import xyz.fycz.myreader.model.third.content.BookContent;
 import xyz.fycz.myreader.model.third.content.BookInfo;
 import xyz.fycz.myreader.model.third.content.BookList;
-import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
@@ -141,7 +136,7 @@ public class CommonApi {
      *
      * @param key
      */
-    public static Observable<ConcurrentMultiValueMap<SearchBookBean, Book>> search(String key, final ReadCrawler rc) {
+    public static Observable<ConMVMap<SearchBookBean, Book>> search(String key, final ReadCrawler rc) {
         if (rc instanceof ThirdCrawler) {
             return searchByTC(key, (ThirdCrawler) rc);
         }
@@ -192,14 +187,14 @@ public class CommonApi {
      * @param rc
      * @return
      */
-    public static Observable<ConcurrentMultiValueMap<SearchBookBean, Book>> searchByTC(String key, final ThirdCrawler rc) {
+    public static Observable<ConMVMap<SearchBookBean, Book>> searchByTC(String key, final ThirdCrawler rc) {
         try {
             BookSource source = rc.getSource();
             AnalyzeUrl analyzeUrl = new AnalyzeUrl(source.getSearchRule().getSearchUrl(),
                     key, 1, null, source.getSourceUrl());
             BookList bookList = new BookList(source.getSourceUrl(), source.getSourceName(), source, false);
             return OkHttpUtils.getStrResponse(analyzeUrl).flatMap(bookList::analyzeSearchBook)
-                    .flatMap((Function<List<Book>, ObservableSource<ConcurrentMultiValueMap<SearchBookBean, Book>>>) books -> Observable.create((ObservableOnSubscribe<ConcurrentMultiValueMap<SearchBookBean, Book>>) emitter -> {
+                    .flatMap((Function<List<Book>, ObservableSource<ConMVMap<SearchBookBean, Book>>>) books -> Observable.create((ObservableOnSubscribe<ConMVMap<SearchBookBean, Book>>) emitter -> {
                         emitter.onNext(rc.getBooks(books));
                         emitter.onComplete();
                     }));

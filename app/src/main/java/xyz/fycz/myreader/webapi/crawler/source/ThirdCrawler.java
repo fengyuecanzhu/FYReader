@@ -6,7 +6,8 @@ import java.util.Map;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
+import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 
@@ -60,9 +61,10 @@ public class ThirdCrawler extends BaseReadCrawler implements BookInfoCrawler {
         return null;
     }
 
-    public ConcurrentMultiValueMap<SearchBookBean, Book> getBooks(List<Book> books) {
-        ConcurrentMultiValueMap<SearchBookBean, Book> newBooks = new ConcurrentMultiValueMap<>();
+    public ConMVMap<SearchBookBean, Book> getBooks(List<Book> books) {
+        ConMVMap<SearchBookBean, Book> newBooks = new ConMVMap<>();
         for (Book book : books){
+            if (book == null || StringHelper.isEmpty(book.getName())) continue;
             book.setSource(source.getSourceUrl());
             SearchBookBean sbb = new SearchBookBean(book.getName(), book.getAuthor());
             newBooks.add(sbb, book);

@@ -19,7 +19,7 @@ import xyz.fycz.myreader.databinding.DialogBookSourceBinding;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.model.SearchEngine;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.ui.adapter.SourceExchangeAdapter;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.widget.RefreshProgressBar;
@@ -140,7 +140,7 @@ public class SourceExchangeDialog extends Dialog {
             }
 
             @Override
-            public void loadMoreSearchBook(ConcurrentMultiValueMap<SearchBookBean, Book> items) {
+            public void loadMoreSearchBook(ConMVMap<SearchBookBean, Book> items) {
 
             }
 

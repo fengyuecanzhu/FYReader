@@ -13,7 +13,7 @@ import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
 
@@ -101,8 +101,8 @@ public class ZaiShuYuanReadCrawler extends BaseReadCrawler {
      * <dd class="book_other">最新章节：<a href="/chapter/3/8855386">第一千五百五十一章 邪神陨落（大结局）</a> 更新时间：<span>2020-2-26 13:26:49</span></dd>
      * </dl>
      */
-    public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
-        ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
+    public ConMVMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
+        ConMVMap<SearchBookBean, Book> books = new ConMVMap<>();
         Document doc = Jsoup.parse(html);
         String urlType = doc.select("meta[property=og:type]").attr("content");
         if ("novel".equals(urlType)) {

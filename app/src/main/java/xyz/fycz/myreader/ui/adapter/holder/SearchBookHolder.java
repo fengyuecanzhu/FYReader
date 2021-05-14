@@ -17,9 +17,10 @@ import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.SearchEngine;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.BookTagAdapter;
+import xyz.fycz.myreader.ui.adapter.SearchBookAdapter;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.KeyWordUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -34,12 +35,12 @@ import xyz.fycz.myreader.widget.CoverImageView;
  */
 public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
     private Activity activity;
-    private ConcurrentMultiValueMap<SearchBookBean, Book> mBooks;
+    private ConMVMap<SearchBookBean, Book> mBooks;
     private SearchEngine searchEngine;
     private String keyWord;
     private List<String> tagList = new ArrayList<>();
 
-    public SearchBookHolder(Activity activity, ConcurrentMultiValueMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord) {
+    public SearchBookHolder(Activity activity, ConMVMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord, SearchBookAdapter adapter) {
         this.activity = activity;
         this.mBooks = mBooks;
         this.searchEngine = searchEngine;
@@ -76,6 +77,9 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
     @Override
     public void onBind(SearchBookBean data, int pos) {
         List<Book> aBooks = mBooks.getValues(data);
+        if (aBooks == null || aBooks.size() == 0){
+            return;
+        }
         int bookCount = aBooks.size();
         Book book = aBooks.get(0);
         BookSource source = BookSourceManager.getBookSourceByStr(book.getSource());

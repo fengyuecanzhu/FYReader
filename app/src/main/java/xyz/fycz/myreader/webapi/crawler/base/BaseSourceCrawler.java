@@ -19,7 +19,7 @@ import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.entity.rule.InfoRule;
 import xyz.fycz.myreader.greendao.entity.rule.SearchRule;
 import xyz.fycz.myreader.greendao.entity.rule.TocRule;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.sourceAnalyzer.BaseAnalyzer;
 import xyz.fycz.myreader.model.sourceAnalyzer.MatcherAnalyzer;
 import xyz.fycz.myreader.util.StringHelper;
@@ -82,7 +82,7 @@ public abstract class BaseSourceCrawler extends BaseReadCrawler implements BookI
      * @param searchRule
      * @param books
      */
-    protected void getBooksNoList(Object obj, SearchRule searchRule, ConcurrentMultiValueMap<SearchBookBean, Book> books) {
+    protected void getBooksNoList(Object obj, SearchRule searchRule, ConMVMap<SearchBookBean, Book> books) {
         List<String> names = analyzer.getStringList(searchRule.getName(), obj);
         //未搜索到书籍，按详情页处理
         if (names.size() == 0) {
@@ -133,7 +133,7 @@ public abstract class BaseSourceCrawler extends BaseReadCrawler implements BookI
      * @param searchRule
      * @param books
      */
-    protected void getBooks(Object obj, SearchRule searchRule, ConcurrentMultiValueMap<SearchBookBean, Book> books) {
+    protected void getBooks(Object obj, SearchRule searchRule, ConMVMap<SearchBookBean, Book> books) {
         List bookList = getList(searchRule.getList(), obj);
         if (bookList.size() == 0) {
             Book book = new Book();
