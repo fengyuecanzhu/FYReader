@@ -6,6 +6,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import okhttp3.Response;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.util.StringHelper;
 
@@ -49,6 +50,15 @@ public class NetworkUtils {
             return false;
         }
     }
+    public static String getUrl(Response response) {
+        okhttp3.Response networkResponse = response.networkResponse();
+        if (networkResponse != null) {
+            return networkResponse.request().url().toString();
+        } else {
+            return response.request().url().toString();
+        }
+    }
+
     /**
      * 获取绝对地址
      */

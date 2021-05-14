@@ -14,11 +14,10 @@ import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
-public class PiaoTianReadCrawler extends BaseLocalCrawler implements BookInfoCrawler {
+public class PiaoTianReadCrawler extends BaseReadCrawler implements BookInfoCrawler {
     public static final String NAME_SPACE = "https://www.piaotian.org";
     public static final String NOVEL_SEARCH = "https://www.piaotian.org/modules/article/search.php?searchkey={key}&submit=%CB%D1%CB%F7";
     public static final String CHARSET = "GBK";

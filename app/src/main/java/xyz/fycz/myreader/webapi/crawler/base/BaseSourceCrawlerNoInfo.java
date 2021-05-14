@@ -13,7 +13,7 @@ import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
  * @author fengyue
  * @date 2021/2/14 18:28
  */
-public class BaseSourceCrawlerNoInfo implements ReadCrawler {
+public class BaseSourceCrawlerNoInfo extends BaseReadCrawler {
     protected final BaseSourceCrawler crawler;
 
     public BaseSourceCrawlerNoInfo(BaseSourceCrawler crawler) {

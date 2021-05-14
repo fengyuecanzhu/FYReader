@@ -1008,19 +1008,16 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 });
             } else {
                 mPageLoader.setmStatus(PageLoader.STATUS_LOADING_CHAPTER);
-                CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
+                CommonApi.getBookChapters(mBook, mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
                     updateAllOldChapterData(chapters);
                     initChapters();
+                    emitter.onNext(chapters);
                     emitter.onComplete();
                 })).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Object>() {
-                    @Override
-                    public void onComplete() {
-                        mPageLoader.setmStatus(PageLoader.STATUS_LOADING);
-                    }
 
                     @Override
                     public void onNext(@NotNull Object o) {
-
+                        mPageLoader.setmStatus(PageLoader.STATUS_LOADING);
                     }
 
                     @Override
@@ -1588,7 +1585,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 if (StringHelper.isEmpty(chapter.getBookId())) {
                     chapter.setId(mBook.getId());
                 }
-                CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler)
+                CommonApi.getChapterContent(chapter, mBook, mReadCrawler)
                         .subscribeOn(Schedulers.from(App.getApplication().getmFixedThreadPool()))
                         .subscribe(new MyObserver<String>() {
                             @Override

@@ -12,13 +12,12 @@ import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
 import java.util.ArrayList;
 
 
-public class JiuTaoReadCrawler extends BaseLocalCrawler {
+public class JiuTaoReadCrawler extends BaseReadCrawler {
     public static final String NAME_SPACE = "https://www.9txs.org";
     public static final String NOVEL_SEARCH = "https://so.9txs.org/www/,searchkey={key}";
     public static final String CHARSET = "UTF-8";

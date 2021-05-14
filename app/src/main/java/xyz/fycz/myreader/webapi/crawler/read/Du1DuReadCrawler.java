@@ -13,14 +13,13 @@ import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 /**
  * 此小说源书籍详情页可添加推荐书籍，暂未开始做
  */
-public class Du1DuReadCrawler extends BaseLocalCrawler implements BookInfoCrawler {
+public class Du1DuReadCrawler extends BaseReadCrawler implements BookInfoCrawler {
     public static final String NAME_SPACE = "http://du1du.org";
     public static final String NOVEL_SEARCH = "http://du1du.org/search.htm?keyword={key}";
     public static final String CHARSET = "GBK";

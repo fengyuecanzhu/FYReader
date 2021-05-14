@@ -226,19 +226,15 @@ public class NetPageLoader extends PageLoader {
      * @param chapter
      */
     public void getChapterContent(Chapter chapter) {
-        CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler).flatMap(s -> Observable.create(emitter -> {
+        CommonApi.getChapterContent(chapter, mCollBook, mReadCrawler).flatMap(s -> Observable.create(emitter -> {
             loadingChapters.remove(chapter);
             String content = StringHelper.isEmpty(s) ? "章节内容为空" : s;
             mChapterService.saveOrUpdateChapter(chapter, content);
+            emitter.onNext(content);
             emitter.onComplete();
         })).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Object>() {
             @Override
             public void onNext(@NotNull Object o) {
-
-            }
-
-            @Override
-            public void onComplete() {
                 if (isClose()) return;
                 if (getPageStatus() == PageLoader.STATUS_LOADING && mCurChapterPos == chapter.getNumber()) {
                     if (isPrev) {

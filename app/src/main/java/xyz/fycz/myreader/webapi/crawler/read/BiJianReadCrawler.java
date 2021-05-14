@@ -14,11 +14,10 @@ import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
 
-public class BiJianReadCrawler extends BaseLocalCrawler {
+public class BiJianReadCrawler extends BaseReadCrawler {
     public static final String NAME_SPACE = "http://www.bjcan.com";
     public static final String NOVEL_SEARCH = "http://www.bjcan.com/home/search/index.html?keyword={key}";
     public static final String CHARSET = "UTF-8";
