@@ -11,7 +11,7 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.entity.rule.SearchRule;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.sourceAnalyzer.JsonPathAnalyzer;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.BaseSourceCrawler;
@@ -30,8 +30,8 @@ public class JsonPathCrawler extends BaseSourceCrawler {
     }
 
     @Override
-    public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String json) {
-        ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
+    public ConMVMap<SearchBookBean, Book> getBooksFromSearchHtml(String json) {
+        ConMVMap<SearchBookBean, Book> books = new ConMVMap<>();
         ReadContext rc = analyzer.getReadContext(json);
         SearchRule searchRule = source.getSearchRule();
         if (StringHelper.isEmpty(searchRule.getList())) {

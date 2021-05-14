@@ -7,7 +7,7 @@ import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.sourceAnalyzer.MatcherAnalyzer;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -27,8 +27,8 @@ public class MatcherCrawler extends BaseSourceCrawler {
     }
 
     @Override
-    public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
-        ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
+    public ConMVMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
+        ConMVMap<SearchBookBean, Book> books = new ConMVMap<>();
         String list = analyzer.getString(source.getSearchRule().getList(), html);
         if (StringHelper.isEmpty(list)) list = html;
         List<String> names = analyzer.getStringList(source.getSearchRule().getName(), list);

@@ -7,17 +7,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author fengyue
  * @date 2020/5/19 7:36
  */
-
-public class ConcurrentMultiValueMap<K, V> implements MultiValueSetMap<K, V> {
+public class ConMVMap<K, V> implements MultiValueSetMap<K, V> {
 
     protected Map<K, LinkedHashSet<V>> mSource = new ConcurrentHashMap<>();
 
-    public ConcurrentMultiValueMap() {
+    public ConMVMap() {
     }
 
     @Override
     public void add(K key, V value) {
         if (key != null) {
+            if (value == null) return;
             // 如果有这个Key就继续添加Value，没有就创建一个List并添加Value
             if (!mSource.containsKey(key))
                 mSource.put(key, new LinkedHashSet<V>(2));

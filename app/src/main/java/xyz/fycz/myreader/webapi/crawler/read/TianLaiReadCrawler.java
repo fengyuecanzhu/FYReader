@@ -11,7 +11,7 @@ import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
@@ -115,8 +115,8 @@ public class TianLaiReadCrawler extends BaseReadCrawler {
      * @param html
      * @return
      */
-    public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
-        ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
+    public ConMVMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
+        ConMVMap<SearchBookBean, Book> books = new ConMVMap<>();
         Document doc = Jsoup.parse(html);
 //        Element node = doc.getElementById("results");
 //        for (Element div : node.children()) {

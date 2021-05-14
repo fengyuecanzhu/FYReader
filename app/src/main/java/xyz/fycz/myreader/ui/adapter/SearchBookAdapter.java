@@ -10,7 +10,7 @@ import xyz.fycz.myreader.base.adapter.IViewHolder;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.model.SearchEngine;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.ui.adapter.holder.SearchBookHolder;
 import xyz.fycz.myreader.util.utils.StringUtils;
 
@@ -24,11 +24,11 @@ import java.util.List;
  */
 public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
     private Activity activity;
-    private ConcurrentMultiValueMap<SearchBookBean, Book> mBooks;
+    private ConMVMap<SearchBookBean, Book> mBooks;
     private SearchEngine searchEngine;
     private String keyWord;
 
-    public SearchBookAdapter(Activity activity, ConcurrentMultiValueMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord) {
+    public SearchBookAdapter(Activity activity, ConMVMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord) {
         this.activity = activity;
         this.mBooks = mBooks;
         this.searchEngine = searchEngine;
@@ -37,7 +37,7 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
 
     @Override
     protected IViewHolder<SearchBookBean> createViewHolder(int viewType) {
-        return new SearchBookHolder(activity, mBooks, searchEngine, keyWord);
+        return new SearchBookHolder(activity, mBooks, searchEngine, keyWord, this);
     }
 
     public void addAll(List<SearchBookBean> newDataS, String keyWord) {
@@ -110,7 +110,6 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
                     }
                 }
             }
-
             synchronized (this) {
                 App.runOnUiThread(() -> {
                     mList = copyDataS;

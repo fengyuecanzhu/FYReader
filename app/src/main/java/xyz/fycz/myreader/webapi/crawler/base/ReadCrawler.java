@@ -1,10 +1,9 @@
 package xyz.fycz.myreader.webapi.crawler.base;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -21,7 +20,7 @@ public interface ReadCrawler {
     String getNameSpace(); // 书源主页地址
     Boolean isPost(); // 是否以post请求搜索
     Map<String, String> getHeaders();// 自定义请求头，可添加cookie等
-    ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html); // 搜索书籍规则
+    ConMVMap<SearchBookBean, Book> getBooksFromSearchHtml(String html); // 搜索书籍规则
     ArrayList<Chapter> getChaptersFromHtml(String html); // 获取书籍章节列表规则
     String getContentFormHtml(String html); // 获取书籍内容规则
 }

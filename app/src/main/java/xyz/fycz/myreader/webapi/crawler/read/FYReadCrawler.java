@@ -11,7 +11,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
 import java.util.ArrayList;
@@ -98,8 +98,8 @@ public class FYReadCrawler extends BaseReadCrawler {
      * @param html
      * @return
      */
-    public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
-        ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
+    public ConMVMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
+        ConMVMap<SearchBookBean, Book> books = new ConMVMap<>();
         Document doc = Jsoup.parse(html);
         Elements nodes = doc.getElementsByClass("secd-rank-list");
         for (Element div : nodes) {

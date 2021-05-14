@@ -6,8 +6,7 @@ import java.util.Map;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 
 /**
  * @author fengyue
@@ -46,7 +45,7 @@ public class BaseSourceCrawlerNoInfo extends BaseReadCrawler {
     }
 
     @Override
-    public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
+    public ConMVMap<SearchBookBean, Book> getBooksFromSearchHtml(String html) {
         return crawler.getBooksFromSearchHtml(html);
     }
 

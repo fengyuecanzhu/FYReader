@@ -48,7 +48,7 @@ import xyz.fycz.myreader.greendao.entity.SearchHistory;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.SearchHistoryService;
 import xyz.fycz.myreader.model.SearchEngine;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.SearchBookAdapter;
 import xyz.fycz.myreader.ui.adapter.SearchHistoryAdapter;
@@ -73,7 +73,7 @@ public class SearchBookActivity extends BaseActivity {
     private SearchBookAdapter mSearchBookAdapter;
     private String searchKey;//搜索关键字
     private ArrayList<SearchBookBean> mBooksBean = new ArrayList<>();
-    private ConcurrentMultiValueMap<SearchBookBean, Book> mBooks = new ConcurrentMultiValueMap<>();
+    private ConMVMap<SearchBookBean, Book> mBooks = new ConMVMap<>();
     private ArrayList<SearchHistory> mSearchHistories = new ArrayList<>();
     private ArrayList<String> mSuggestions = new ArrayList<>();
 
@@ -147,7 +147,7 @@ public class SearchBookActivity extends BaseActivity {
             }
 
             @Override
-            public void loadMoreSearchBook(ConcurrentMultiValueMap<SearchBookBean, Book> items) {
+            public void loadMoreSearchBook(ConMVMap<SearchBookBean, Book> items) {
                 mBooks.addAll(items);
                 mSearchBookAdapter.addAll(new ArrayList<>(items.keySet()), searchKey);
                 mHandler.sendMessage(mHandler.obtainMessage(2));
@@ -543,6 +543,7 @@ public class SearchBookActivity extends BaseActivity {
             mSearchBookAdapter.setOnItemClickListener((view, pos) -> {
                 SearchBookBean data = mSearchBookAdapter.getItem(pos);
                 ArrayList<Book> books = (ArrayList<Book>) mBooks.getValues(data);
+                if (books == null || books.size() == 0) return;
                 searchBookBean2Book(data, books.get(0));
                 Intent intent = new Intent(this, BookDetailedActivity.class);
                 intent.putExtra(APPCONST.SEARCH_BOOK_BEAN, books);

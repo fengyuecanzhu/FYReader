@@ -12,7 +12,7 @@ import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
 import java.util.ArrayList;
@@ -103,8 +103,8 @@ public class ChaoXingReadCrawler extends BaseReadCrawler {
      * @param json
      * @return
      */
-    public ConcurrentMultiValueMap<SearchBookBean, Book> getBooksFromSearchHtml(String json) {
-        ConcurrentMultiValueMap<SearchBookBean, Book> books = new ConcurrentMultiValueMap<>();
+    public ConMVMap<SearchBookBean, Book> getBooksFromSearchHtml(String json) {
+        ConMVMap<SearchBookBean, Book> books = new ConMVMap<>();
         try {
             JSONArray booksArray = new JSONArray(json);
             for (int i = 0; i < booksArray.length(); i++) {
