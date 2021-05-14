@@ -18,6 +18,7 @@ public class DebugEntity implements Parcelable {
     private int debugMode;
     private BookSource bookSource;
     private String url;
+    private String key;
     private String parseResult;
     private String html;
 
@@ -28,6 +29,7 @@ public class DebugEntity implements Parcelable {
         debugMode = in.readInt();
         bookSource = in.readParcelable(BookSource.class.getClassLoader());
         url = in.readString();
+        key = in.readString();
         parseResult = in.readString();
         html = in.readString();
     }
@@ -37,6 +39,7 @@ public class DebugEntity implements Parcelable {
         dest.writeInt(debugMode);
         dest.writeParcelable(bookSource, flags);
         dest.writeString(url);
+        dest.writeString(key);
         dest.writeString(parseResult);
         dest.writeString(html);
     }
@@ -80,6 +83,14 @@ public class DebugEntity implements Parcelable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getParseResult() {

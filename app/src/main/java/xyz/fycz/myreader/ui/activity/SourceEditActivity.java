@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import androidx.appcompat.widget.Toolbar;
@@ -140,12 +142,30 @@ public class SourceEditActivity extends BaseActivity {
 
             }
         });
+        binding.sSourceType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_source_edit, menu);
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem debug = menu.findItem(R.id.action_debug);
+        debug.setVisible(!APPCONST.THIRD_SOURCE.equals(getSource().getSourceType()));
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
