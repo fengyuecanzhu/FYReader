@@ -487,7 +487,7 @@ public class BookDetailedActivity extends BaseActivity {
                         public void onError(Throwable e) {
                             binding.pbLoading.setVisibility(View.GONE);
                             mCatalogAdapter.clear();
-                            ToastUtils.showError("最新章节加载失败，请尝试重新加载！");
+                            ToastUtils.showError("最新章节加载失败！");
                             if (App.isDebug()) e.printStackTrace();
                         }
                     });

@@ -165,9 +165,7 @@ public class DIYSourceFragment extends BaseFragment {
         });
 
         binding.tvSourceTip.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://blog.csdn.net/fengyuecanzhu/article/details/113826962"));
-            startActivity(intent);
+            MyAlertDialog.showTipDialogWithLink(getContext(), "书源说明",R.string.DIY_source_tip);
         });
 
         binding.ivGroup.setOnClickListener(this::showSourceGroupMenu);

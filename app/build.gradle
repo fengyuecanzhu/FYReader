@@ -44,7 +44,7 @@ def getVersionName(){
     def hun = (version / 100).toInteger()
     def ten = (version / 10).toInteger() % 10
     def one = version % 10
-    return hun + "." + ten + "." + one
+    return hun + "." + ten + "." + one + "-beta"
 }
 
 def versionN = getVersionName()

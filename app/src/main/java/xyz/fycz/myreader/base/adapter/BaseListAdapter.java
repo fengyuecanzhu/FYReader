@@ -141,6 +141,7 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
 
     public void clear(){
         mList.clear();
+        notifyDataSetChanged();
     }
 
     /***************************inner class area***********************************/
