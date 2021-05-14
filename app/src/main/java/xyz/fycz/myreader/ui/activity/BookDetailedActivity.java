@@ -106,6 +106,7 @@ public class BookDetailedActivity extends BaseActivity {
     private BookGroupDialog mBookGroupDia;
     private List<String> tagList = new ArrayList<>();
     private Disposable chaptersDis;
+    private boolean thirdSource;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -174,6 +175,7 @@ public class BookDetailedActivity extends BaseActivity {
         }
         mBookGroupDia = new BookGroupDialog(this);
         mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
+        thirdSource = mReadCrawler instanceof ThirdCrawler;
     }
 
     private void initTagList() {
@@ -208,7 +210,7 @@ public class BookDetailedActivity extends BaseActivity {
         binding.ic.bookDetailRvCatalog.setLayoutManager(new LinearLayoutManager(this));
         binding.ic.bookDetailRvCatalog.setAdapter(mCatalogAdapter);
 
-        initChapters(false);
+        if (!thirdSource) initChapters(false);
 
         mCatalogAdapter.setOnItemClickListener((view, pos) -> {
             mBook.setHisttoryChapterNum(mChapters.size() - pos - 1);
@@ -401,7 +403,7 @@ public class BookDetailedActivity extends BaseActivity {
         BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
         binding.ih.bookDetailSource.setText(String.format("书源：%s", source.getSourceName()));
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(source);
-        if (rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) {
+        if ((rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) || thirdSource) {
             binding.pbLoading.setVisibility(View.VISIBLE);
             BookInfoCrawler bic = (BookInfoCrawler) rc;
             CommonApi.getBookInfo(mBook, bic).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Book>() {
@@ -409,6 +411,9 @@ public class BookDetailedActivity extends BaseActivity {
                 public void onNext(@NotNull Book book) {
                     if (!App.isDestroy(BookDetailedActivity.this)) {
                         mHandler.sendMessage(mHandler.obtainMessage(4));
+                    }
+                    if (thirdSource){
+                        initChapters(false);
                     }
                 }
 
@@ -477,7 +482,8 @@ public class BookDetailedActivity extends BaseActivity {
                         @Override
                         public void onError(Throwable e) {
                             binding.pbLoading.setVisibility(View.GONE);
-                            ToastUtils.showError("最新章节加载失败！");
+                            mCatalogAdapter.clear();
+                            ToastUtils.showError("最新章节加载失败，请尝试重新加载！");
                             if (App.isDebug()) e.printStackTrace();
                         }
                     });

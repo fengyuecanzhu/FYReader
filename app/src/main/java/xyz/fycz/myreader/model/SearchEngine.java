@@ -137,15 +137,7 @@ public class SearchEngine {
         searchSiteIndex++;
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
-            String searchKey = keyword;
-            if (crawler.getSearchCharset() != null && crawler.getSearchCharset().toLowerCase().equals("gbk")) {
-                try {
-                    searchKey = URLEncoder.encode(keyword, crawler.getSearchCharset());
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-            CommonApi.search(searchKey, crawler)
+            CommonApi.search(keyword, crawler)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<ConcurrentMultiValueMap<SearchBookBean, Book>>() {
@@ -191,15 +183,7 @@ public class SearchEngine {
         searchSiteIndex++;
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
-            String searchKey = title;
-            if (crawler.getSearchCharset().toLowerCase().equals("gbk")) {
-                try {
-                    searchKey = URLEncoder.encode(title, crawler.getSearchCharset());
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-            CommonApi.search(searchKey, crawler)
+            CommonApi.search(title, crawler)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<ConcurrentMultiValueMap<SearchBookBean, Book>>() {

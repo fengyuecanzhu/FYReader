@@ -2,6 +2,8 @@ package xyz.fycz.myreader.webapi;
 
 import android.text.TextUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -149,19 +151,27 @@ public class CommonApi {
         } else {
             charset = rc.getCharset();
         }
+        if (rc.getSearchCharset() != null && rc.getSearchCharset().toLowerCase().equals("gbk")) {
+            try {
+                key = URLEncoder.encode(key, rc.getSearchCharset());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
         String finalCharset = charset;
+        String finalKey = key;
         return Observable.create(emitter -> {
             try {
                 if (rc.isPost()) {
                     String url = rc.getSearchLink();
                     String[] urlInfo = url.split(",");
                     url = urlInfo[0];
-                    String body = makeSearchUrl(urlInfo[1], key);
+                    String body = makeSearchUrl(urlInfo[1], finalKey);
                     MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                     RequestBody requestBody = RequestBody.create(mediaType, body);
                     emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(url, requestBody, finalCharset, rc.getHeaders())));
                 } else {
-                    emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(makeSearchUrl(rc.getSearchLink(), key), finalCharset, rc.getHeaders())));
+                    emitter.onNext(rc.getBooksFromSearchHtml(OkHttpUtils.getHtml(makeSearchUrl(rc.getSearchLink(), finalKey), finalCharset, rc.getHeaders())));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
