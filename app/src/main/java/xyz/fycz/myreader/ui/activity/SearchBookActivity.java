@@ -170,7 +170,6 @@ public class SearchBookActivity extends BaseActivity {
     protected void initWidget() {
         super.initWidget();
         initSuggestionList();
-        binding.etSearchKey.requestFocus();//get the focus
         //enter事件
         binding.etSearchKey.setOnEditorActionListener((textView, i, keyEvent) -> {
             if (i == EditorInfo.IME_ACTION_UNSPECIFIED) {
@@ -243,6 +242,7 @@ public class SearchBookActivity extends BaseActivity {
             mHandler.sendMessage(mHandler.obtainMessage(1));
         });
         initHistoryList();
+        mHandler.postDelayed(() -> binding.etSearchKey.requestFocus(), 200);
     }
 
     @Override
@@ -557,8 +557,7 @@ public class SearchBookActivity extends BaseActivity {
             getData();
             mSearchHistoryService.addOrUpadteHistory(searchKey);
             //收起软键盘
-            InputMethodManager imm = (InputMethodManager) App.getmContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            assert imm != null;
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(binding.etSearchKey.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
