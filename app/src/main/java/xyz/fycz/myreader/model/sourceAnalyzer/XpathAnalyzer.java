@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.model.source;
+package xyz.fycz.myreader.model.sourceAnalyzer;
 
 import org.seimicrawler.xpath.JXDocument;
 import org.seimicrawler.xpath.JXNode;

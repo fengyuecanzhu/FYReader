@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.model.source;
+package xyz.fycz.myreader.model.sourceAnalyzer;
 
 import android.database.Cursor;
 import android.text.TextUtils;
@@ -6,7 +6,6 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,16 +18,18 @@ import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.observer.MyObserver;
+import xyz.fycz.myreader.entity.thirdsource.BookSource3Bean;
+import xyz.fycz.myreader.entity.thirdsource.BookSourceBean;
+import xyz.fycz.myreader.entity.thirdsource.ThirdSourceUtil;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.GreenDaoManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.gen.BookSourceDao;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.GsonUtils;
-import xyz.fycz.myreader.util.utils.MeUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
@@ -37,6 +38,7 @@ import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 
 
 public class BookSourceManager {
+    public static final int SOURCE_LENGTH = 500;
 
     public static List<BookSource> getEnabledBookSource() {
         return GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
@@ -326,43 +328,81 @@ public class BookSourceManager {
     }
 
     private static Observable<List<BookSource>> importBookSourceFromJson(String json) {
-        return Observable.create(e -> {
+        return Observable.create(emitter -> {
             List<BookSource> successImportSources = new ArrayList<>();
-            if (StringUtils.isJsonArray(json)) {
-                try {
-                    List<BookSource> bookSources = GsonUtils.parseJArray(json, BookSource.class);
-                    for (BookSource bookSource : bookSources) {
-                        if (bookSource.containsGroup("删除")) {
-                            GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
-                                    .where(BookSourceDao.Properties.SourceUrl.eq(bookSource.getSourceUrl()))
-                                    .buildDelete().executeDeleteWithoutDetachingEntities();
-                        } else {
-                            if (addBookSource(bookSource)) {
-                                successImportSources.add(bookSource);
-                            }
+            List<BookSource> bookSources = importSources(json);
+            if (bookSources != null) {
+                for (BookSource bookSource : bookSources) {
+                    if (bookSource.containsGroup("删除")) {
+                        GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+                                .where(BookSourceDao.Properties.SourceUrl.eq(bookSource.getSourceUrl()))
+                                .buildDelete().executeDeleteWithoutDetachingEntities();
+                    } else {
+                        if (addBookSource(bookSource)) {
+                            successImportSources.add(bookSource);
                         }
                     }
-                    e.onNext(successImportSources);
-                    e.onComplete();
-                    return;
-                } catch (Exception ignored) {
                 }
+                emitter.onNext(successImportSources);
+                emitter.onComplete();
+                return;
             }
-            if (StringUtils.isJsonObject(json)) {
-                try {
-                    BookSource bookSource = GsonUtils.parseJObject(json, BookSource.class);
-                    if (addBookSource(bookSource))
-                        successImportSources.add(bookSource);
-                    e.onNext(successImportSources);
-                    e.onComplete();
-                    return;
-                } catch (Exception ignored) {
-                }
-            }
-            e.onError(new Throwable("格式不对"));
+            emitter.onError(new Throwable("格式不对"));
         });
     }
 
+    private static List<BookSource> importSources(String json) {
+        if (StringUtils.isJsonArray(json)) {
+            try {
+                List<BookSource> sources = GsonUtils.parseJArray(json, BookSource.class);
+                String sourcesJson =  GsonExtensionsKt.getGSON().toJson(sources);
+                if (sources.size() > 0 && sourcesJson.length() > sources.size() * SOURCE_LENGTH){
+                    return sources;
+                }
+
+                List<BookSourceBean> source2s = GsonUtils.parseJArray(json, BookSourceBean.class);
+                String source2sJson =  GsonExtensionsKt.getGSON().toJson(source2s);
+                if (source2s.size() > 0 && source2sJson.length() > source2s.size() * SOURCE_LENGTH){
+                    return ThirdSourceUtil.source2sToSources(source2s);
+                }
+                List<BookSource3Bean> source3s = GsonUtils.parseJArray(json, BookSource3Bean.class);
+                String source3sJson =  GsonExtensionsKt.getGSON().toJson(source3s);
+                if (source3s.size() > 0 && source3sJson.length() > source3s.size() * SOURCE_LENGTH){
+                    return ThirdSourceUtil.source3sToSources(source3s);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        } else if (StringUtils.isJsonObject(json)) {
+            try {
+                List<BookSource> sources = new ArrayList<>();
+
+                BookSource source = GsonUtils.parseJObject(json, BookSource.class);
+                String sourceJson = GsonExtensionsKt.getGSON().toJson(source);
+                if (!StringHelper.isEmpty(sourceJson) && sourceJson.length() > SOURCE_LENGTH){
+                    sources.add(source);
+                    return sources;
+                }
+
+                BookSourceBean source2 = GsonUtils.parseJObject(json, BookSourceBean.class);
+                String source2Json = GsonExtensionsKt.getGSON().toJson(source2);
+                if (!StringHelper.isEmpty(source2Json) && source2Json.length() > SOURCE_LENGTH){
+                    sources.add(ThirdSourceUtil.source2ToSource(source2));
+                    return sources;
+                }
+
+                BookSource3Bean source3 = GsonUtils.parseJObject(json, BookSource3Bean.class);
+                String source3Json =  GsonExtensionsKt.getGSON().toJson(source3);
+                if (!StringHelper.isEmpty(source3Json) && source3Json.length() > SOURCE_LENGTH){
+                    sources.add(ThirdSourceUtil.source3ToSource(source3));
+                    return sources;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 
     public static void initDefaultSources() {
         Log.d("initDefaultSources", "execute");
@@ -383,11 +423,6 @@ public class BookSourceManager {
         String referenceSources = FileUtils.readAssertFile(App.getmContext(),
                 "ReferenceSources.json");
         Observable<List<BookSource>> observable = BookSourceManager.importBookSourceFromJson(referenceSources);
-        observable.subscribe(new MyObserver<List<BookSource>>() {
-            @Override
-            public void onNext(@NonNull List<BookSource> sources) {
-
-            }
-        });
+        observable.subscribe();
     }
 }

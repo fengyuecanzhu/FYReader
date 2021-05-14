@@ -1,6 +1,8 @@
 package xyz.fycz.myreader.greendao.entity;
 
 
+import android.text.TextUtils;
+
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
@@ -13,7 +15,11 @@ import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.util.SharedPreUtils;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+
+import static xyz.fycz.myreader.common.APPCONST.MAP_STRING;
 
 /**
  * 书
@@ -70,13 +76,18 @@ public class Book implements Serializable {
 
     private long lastReadTime;
 
-    @Generated(hash = 1963023743)
+    private String variable;
+
+    @Transient
+    private Map<String, String> variableMap;
+
+    @Generated(hash = 1284526947)
     public Book(String id, String name, String chapterUrl, String infoUrl, String imgUrl, String desc,
             String author, String type, String updateDate, String wordCount, String status,
             String newestChapterId, String newestChapterTitle, String newestChapterUrl, String historyChapterId,
             int histtoryChapterNum, int sortCode, int noReadNum, int chapterTotalNum, int lastReadPosition,
             String source, boolean isCloseUpdate, boolean isDownLoadAll, String groupId, int groupSort,
-            String tag, Boolean replaceEnable, long lastReadTime) {
+            String tag, Boolean replaceEnable, long lastReadTime, String variable) {
         this.id = id;
         this.name = name;
         this.chapterUrl = chapterUrl;
@@ -105,6 +116,7 @@ public class Book implements Serializable {
         this.tag = tag;
         this.replaceEnable = replaceEnable;
         this.lastReadTime = lastReadTime;
+        this.variable = variable;
     }
 
 
@@ -340,5 +352,28 @@ public class Book implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
+    public void putVariable(String key, String value) {
+        if (variableMap == null) {
+            variableMap = new HashMap<>();
+        }
+        variableMap.put(key, value);
+        variable = new Gson().toJson(variableMap);
+    }
 
+    public Map<String, String> getVariableMap() {
+        if (variableMap == null && !TextUtils.isEmpty(variable)) {
+            variableMap = new Gson().fromJson(variable, MAP_STRING);
+        }
+        return variableMap;
+    }
+
+
+    public String getVariable() {
+        return this.variable;
+    }
+
+
+    public void setVariable(String variable) {
+        this.variable = variable;
+    }
 }

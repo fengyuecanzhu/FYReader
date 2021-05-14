@@ -8,13 +8,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
@@ -26,13 +22,10 @@ import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
 import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.ReplaceRuleManager;
-import xyz.fycz.myreader.model.source.BookSourceManager;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.SourceEditActivity;
 import xyz.fycz.myreader.ui.adapter.BookSourceAdapter;
-import xyz.fycz.myreader.ui.dialog.ReplaceDialog;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;

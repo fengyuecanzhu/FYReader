@@ -2,16 +2,9 @@ package xyz.fycz.myreader.ui.adapter.holder;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Intent;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
-
-import com.zhy.view.flowlayout.FlowLayout;
-import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
 
 import java.util.ArrayList;
@@ -20,17 +13,14 @@ import java.util.List;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
-import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.model.source.BookSourceManager;
-import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.BookTagAdapter;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.KeyWordUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;

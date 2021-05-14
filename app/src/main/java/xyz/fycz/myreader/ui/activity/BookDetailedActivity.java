@@ -58,7 +58,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
-import xyz.fycz.myreader.model.source.BookSourceManager;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.BookTagAdapter;
 import xyz.fycz.myreader.ui.adapter.DetailCatalogAdapter;
 import xyz.fycz.myreader.ui.dialog.BookGroupDialog;

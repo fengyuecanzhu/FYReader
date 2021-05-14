@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;

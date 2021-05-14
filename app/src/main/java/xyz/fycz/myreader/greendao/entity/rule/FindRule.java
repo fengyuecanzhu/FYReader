@@ -14,6 +14,7 @@ import static xyz.fycz.myreader.util.utils.StringUtils.stringEquals;
  * @date 2021/2/10 8:57
  */
 public class FindRule implements Parcelable {
+    private String url;
     private String bookList;
     private String name;
     private String author;
@@ -30,6 +31,7 @@ public class FindRule implements Parcelable {
     }
 
     protected FindRule(Parcel in) {
+        url = in.readString();
         bookList = in.readString();
         name = in.readString();
         author = in.readString();
@@ -45,6 +47,7 @@ public class FindRule implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(url);
         dest.writeString(bookList);
         dest.writeString(name);
         dest.writeString(author);
@@ -74,6 +77,14 @@ public class FindRule implements Parcelable {
             return new FindRule[size];
         }
     };
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
     public String getBookList() {
         return bookList;
@@ -169,7 +180,8 @@ public class FindRule implements Parcelable {
         if (o == null) o = new FindRule();
         if (getClass() != o.getClass()) return false;
         FindRule findRule = (FindRule) o;
-        return  stringEquals(bookList, findRule.bookList) &&
+        return  stringEquals(url, findRule.url) &&
+                stringEquals(bookList, findRule.bookList) &&
                 stringEquals(name, findRule.name) &&
                 stringEquals(author, findRule.author) &&
                 stringEquals(type, findRule.type) &&

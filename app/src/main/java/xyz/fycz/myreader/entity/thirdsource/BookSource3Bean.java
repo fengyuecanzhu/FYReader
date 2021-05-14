@@ -263,4 +263,8 @@ public class BookSource3Bean {
                 userAgent //  httpUserAgent
         );
     }
+
+    public String getBookSourceComment() {
+        return bookSourceComment;
+    }
 }

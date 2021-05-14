@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import java.util.List;
 
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.R;
@@ -19,7 +18,7 @@ import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.databinding.FragmentLocalSourceBinding;
 import xyz.fycz.myreader.greendao.GreenDaoManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.source.BookSourceManager;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.BookSourceActivity;
 import xyz.fycz.myreader.ui.adapter.LocalSourceAdapter;
 import xyz.fycz.myreader.util.ToastUtils;

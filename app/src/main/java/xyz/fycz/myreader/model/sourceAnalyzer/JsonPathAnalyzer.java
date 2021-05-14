@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.model.source;
+package xyz.fycz.myreader.model.sourceAnalyzer;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

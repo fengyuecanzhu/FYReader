@@ -7,7 +7,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.source.BookSourceManager;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.BaseSourceCrawler;
@@ -26,6 +26,7 @@ import java.util.ResourceBundle;
 
 import static xyz.fycz.myreader.common.APPCONST.JSON_PATH;
 import static xyz.fycz.myreader.common.APPCONST.MATCHER;
+import static xyz.fycz.myreader.common.APPCONST.THIRD_SOURCE;
 import static xyz.fycz.myreader.common.APPCONST.XPATH;
 
 /**
@@ -190,6 +191,9 @@ public class ReadCrawlerUtil {
                         crawler = new XpathCrawler(source);
                         break;
                     case JSON_PATH:
+                        crawler = new JsonPathCrawler(source);
+                        break;
+                    case THIRD_SOURCE:
                         crawler = new JsonPathCrawler(source);
                         break;
                 }

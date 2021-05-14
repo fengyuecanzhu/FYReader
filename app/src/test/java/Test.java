@@ -1,9 +1,3 @@
-import android.util.Log;
-
-import com.liulishuo.filedownloader.BaseDownloadTask;
-import com.liulishuo.filedownloader.FileDownloadLargeFileListener;
-import com.liulishuo.filedownloader.FileDownloader;
-
 import org.seimicrawler.xpath.JXDocument;
 
 import java.io.File;
@@ -13,14 +7,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import xyz.fycz.myreader.ai.MatrixUtil;
-import xyz.fycz.myreader.model.source.BaseAnalyzer;
-import xyz.fycz.myreader.model.source.MatcherAnalyzer;
-import xyz.fycz.myreader.ui.dialog.UpdateDialog;
+import xyz.fycz.myreader.model.sourceAnalyzer.BaseAnalyzer;
 import xyz.fycz.myreader.util.utils.FileUtils;
-import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.GsonUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.webapi.CommonApi;
 
 /**
  * @author fengyue

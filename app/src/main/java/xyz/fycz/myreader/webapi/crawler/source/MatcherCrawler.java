@@ -1,6 +1,5 @@
 package xyz.fycz.myreader.webapi.crawler.source;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,10 +8,9 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.model.source.MatcherAnalyzer;
+import xyz.fycz.myreader.model.sourceAnalyzer.MatcherAnalyzer;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.crawler.base.BaseSourceCrawler;
 
 /**

@@ -6,7 +6,7 @@ import android.widget.TextView;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
 import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.model.source.BookSourceManager;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 
 /**
  * @author fengyue

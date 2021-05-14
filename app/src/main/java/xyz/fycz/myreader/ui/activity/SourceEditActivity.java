@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import androidx.appcompat.widget.Toolbar;
@@ -18,7 +16,6 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import xyz.fycz.myreader.R;
-import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySourceEditBinding;
@@ -26,8 +23,7 @@ import xyz.fycz.myreader.entity.sourcedebug.DebugEntity;
 import xyz.fycz.myreader.entity.sourceedit.EditEntity;
 import xyz.fycz.myreader.entity.sourceedit.EditEntityUtil;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.greendao.entity.rule.SearchRule;
-import xyz.fycz.myreader.model.source.BookSourceManager;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.SourceEditAdapter;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -115,8 +111,11 @@ public class SourceEditActivity extends BaseActivity {
             case APPCONST.XPATH:
                 sourceType = 1;
                 break;
-                case APPCONST.JSON_PATH:
+            case APPCONST.JSON_PATH:
                 sourceType = 2;
+                break;
+            case APPCONST.THIRD_SOURCE:
+                sourceType = 3;
                 break;
         }
         binding.sSourceType.setSelection(sourceType);
@@ -193,7 +192,7 @@ public class SourceEditActivity extends BaseActivity {
                             e.printStackTrace();
                         }
                         debugEntity.setUrl(source.getSearchRule().getSearchUrl().replace("{key}", text));
-                    }else {
+                    } else {
                         debugEntity.setUrl(text);
                     }
                 }, (dialog, which) -> {
@@ -255,7 +254,7 @@ public class SourceEditActivity extends BaseActivity {
         BookSource source = entityUtil.getSource(this.source, sourceEntities);
         source.setEnable(binding.cbSourceEnable.isChecked());
         String sourceType = APPCONST.MATCHER;
-        switch (binding.sSourceType.getSelectedItemPosition()){
+        switch (binding.sSourceType.getSelectedItemPosition()) {
             case 0:
                 sourceType = APPCONST.MATCHER;
                 break;
@@ -264,6 +263,9 @@ public class SourceEditActivity extends BaseActivity {
                 break;
             case 2:
                 sourceType = APPCONST.JSON_PATH;
+                break;
+            case 3:
+                sourceType = APPCONST.THIRD_SOURCE;
                 break;
         }
         source.setSourceType(sourceType);
