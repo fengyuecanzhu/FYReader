@@ -15,7 +15,6 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityBookInfoEditBinding;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
-import xyz.fycz.myreader.model.source.BookSourceManager;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.UriFileUtil;

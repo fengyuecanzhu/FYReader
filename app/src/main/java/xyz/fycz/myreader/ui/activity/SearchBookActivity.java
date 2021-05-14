@@ -49,7 +49,7 @@ import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.SearchHistoryService;
 import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.model.source.BookSourceManager;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.SearchBookAdapter;
 import xyz.fycz.myreader.ui.adapter.SearchHistoryAdapter;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;

@@ -1,8 +1,34 @@
 package xyz.fycz.myreader.model.analyzeRule;
 
+import android.annotation.SuppressLint;
+
 import androidx.annotation.Keep;
 
+import com.google.gson.Gson;
+
+import org.jsoup.nodes.Entities;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.script.SimpleBindings;
+
+import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.help.JsExtensions;
+import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.util.utils.StringUtils;
+
+import static xyz.fycz.myreader.common.APPCONST.EXP_PATTERN;
+import static xyz.fycz.myreader.common.APPCONST.JS_PATTERN;
+import static xyz.fycz.myreader.common.APPCONST.MAP_STRING;
+import static xyz.fycz.myreader.common.APPCONST.SCRIPT_ENGINE;
+import static xyz.fycz.myreader.util.StringHelper.isEmpty;
+import static xyz.fycz.myreader.util.utils.NetworkUtils.headerPattern;
 
 
 /**
@@ -12,10 +38,10 @@ import xyz.fycz.myreader.util.help.JsExtensions;
 @Keep
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class AnalyzeRule implements JsExtensions {
-    /*private static final Pattern putPattern = Pattern.compile("@put:(\\{[^}]+?\\})", Pattern.CASE_INSENSITIVE);
+    private static final Pattern putPattern = Pattern.compile("@put:(\\{[^}]+?\\})", Pattern.CASE_INSENSITIVE);
     private static final Pattern getPattern = Pattern.compile("@get:\\{([^}]+?)\\}", Pattern.CASE_INSENSITIVE);
 
-    private BaseBookBean book;
+    private Book book;
     private Object object;
     private Boolean isJSON = false;
     private String baseUrl = null;
@@ -28,11 +54,11 @@ public class AnalyzeRule implements JsExtensions {
     private boolean objectChangedJS = false;
     private boolean objectChangedJP = false;
 
-    public AnalyzeRule(BaseBookBean bookBean) {
+    public AnalyzeRule(Book bookBean) {
         book = bookBean;
     }
 
-    public void setBook(BaseBookBean book) {
+    public void setBook(Book book) {
         this.book = book;
     }
 
@@ -61,9 +87,9 @@ public class AnalyzeRule implements JsExtensions {
         return this.baseUrl;
     }
 
-    *//**
+    /**
      * 获取XPath解析类
-     *//*
+     */
     private AnalyzeByXPath getAnalyzeByXPath(Object o) {
         if (o != object) {
             return new AnalyzeByXPath().parse(o);
@@ -80,9 +106,9 @@ public class AnalyzeRule implements JsExtensions {
         return analyzeByXPath;
     }
 
-    *//**
+    /**
      * 获取JSOUP解析类
-     *//*
+     */
     private AnalyzeByJSoup getAnalyzeByJSoup(Object o) {
         if (o != object) {
             return new AnalyzeByJSoup().parse(o);
@@ -99,9 +125,9 @@ public class AnalyzeRule implements JsExtensions {
         return analyzeByJSoup;
     }
 
-    *//**
+    /**
      * 获取JSON解析类
-     *//*
+     */
     private AnalyzeByJSonPath getAnalyzeByJSonPath(Object o) {
         if (o != object) {
             return new AnalyzeByJSonPath().parse(o);
@@ -118,9 +144,9 @@ public class AnalyzeRule implements JsExtensions {
         return analyzeByJSonPath;
     }
 
-    *//**
+    /**
      * 获取文本列表
-     *//*
+     */
     public List<String> getStringList(String rule) throws Exception {
         return getStringList(rule, false);
     }
@@ -180,9 +206,9 @@ public class AnalyzeRule implements JsExtensions {
         return (List<String>) result;
     }
 
-    *//**
+    /**
      * 获取文本
-     *//*
+     */
     public String getString(String rule) throws Exception {
         return getString(rule, false);
     }
@@ -235,9 +261,9 @@ public class AnalyzeRule implements JsExtensions {
         }
     }
 
-    *//**
+    /**
      * 获取Element
-     *//*
+     */
     public Object getElement(String ruleStr) throws Exception {
         List<SourceRule> ruleList = splitSourceRule(ruleStr);
         Object result = object;
@@ -262,9 +288,9 @@ public class AnalyzeRule implements JsExtensions {
         return result;
     }
 
-    *//**
+    /**
      * 获取列表
-     *//*
+     */
     @SuppressWarnings("unchecked")
     public List<Object> getElements(String ruleStr) throws Exception {
         List<SourceRule> ruleList = splitSourceRule(ruleStr);
@@ -294,9 +320,9 @@ public class AnalyzeRule implements JsExtensions {
         return (List<Object>) result;
     }
 
-    *//**
+    /**
      * 保存变量
-     *//*
+     */
     private void putRule(Map<String, String> map) throws Exception {
         for (Map.Entry<String, String> entry : map.entrySet()) {
             if (book != null) {
@@ -305,9 +331,9 @@ public class AnalyzeRule implements JsExtensions {
         }
     }
 
-    *//**
+    /**
      * 分离并执行put规则
-     *//*
+     */
     private String splitPutRule(String ruleStr) throws Exception {
         Matcher putMatcher = putPattern.matcher(ruleStr);
         while (putMatcher.find()) {
@@ -318,9 +344,9 @@ public class AnalyzeRule implements JsExtensions {
         return ruleStr;
     }
 
-    *//**
+    /**
      * 替换@get
-     *//*
+     */
     public String replaceGet(String ruleStr) {
         Matcher getMatcher = getPattern.matcher(ruleStr);
         while (getMatcher.find()) {
@@ -334,9 +360,9 @@ public class AnalyzeRule implements JsExtensions {
         return ruleStr;
     }
 
-    *//**
+    /**
      * 正则替换
-     *//*
+     */
     private String replaceRegex(String result, SourceRule rule) {
         if (!isEmpty(rule.replaceRegex)) {
             if (rule.replaceFirst) {
@@ -354,9 +380,9 @@ public class AnalyzeRule implements JsExtensions {
         return result;
     }
 
-    *//**
+    /**
      * 替换JS
-     *//*
+     */
     @SuppressLint("DefaultLocale")
     private String replaceJs(String ruleStr) throws Exception {
         if (ruleStr.contains("{{") && ruleStr.contains("}}")) {
@@ -379,9 +405,9 @@ public class AnalyzeRule implements JsExtensions {
         return ruleStr;
     }
 
-    *//**
+    /**
      * 分解规则生成规则列表
-     *//*
+     */
     public List<SourceRule> splitSourceRule(String ruleStr) throws Exception {
         List<SourceRule> ruleList = new ArrayList<>();
         if (isEmpty(ruleStr)) return ruleList;
@@ -429,9 +455,9 @@ public class AnalyzeRule implements JsExtensions {
         return ruleList;
     }
 
-    *//**
+    /**
      * 规则类
-     *//*
+     */
     public static class SourceRule {
         Mode mode;
         String rule;
@@ -501,15 +527,15 @@ public class AnalyzeRule implements JsExtensions {
         return book.getVariableMap().get(key);
     }
 
-    *//**
+    /**
      * 执行JS
-     *//*
+     */
     private Object evalJS(String jsStr, Object result) throws Exception {
         SimpleBindings bindings = new SimpleBindings();
         bindings.put("java", this);
         bindings.put("result", result);
         bindings.put("baseUrl", baseUrl);
         return SCRIPT_ENGINE.eval(jsStr, bindings);
-    }*/
+    }
 
 }

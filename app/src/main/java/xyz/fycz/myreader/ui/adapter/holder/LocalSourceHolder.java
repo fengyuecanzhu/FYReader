@@ -1,7 +1,6 @@
 package xyz.fycz.myreader.ui.adapter.holder;
 
 import android.widget.CheckBox;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -10,8 +9,6 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
 import xyz.fycz.myreader.greendao.GreenDaoManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.source.BookSourceManager;
-import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 
 /**

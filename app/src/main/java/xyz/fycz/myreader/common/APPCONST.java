@@ -44,6 +44,7 @@ public class APPCONST {
     public static final String MATCHER = "Matcher";
     public static final String XPATH = "Xpath";
     public static final String JSON_PATH = "JsonPath";
+    public static final String THIRD_SOURCE = "ThirdSource";
 
     public static final String BOOK = "book";
     public static final String TITLE = "title";

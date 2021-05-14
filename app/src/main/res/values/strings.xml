@@ -563,5 +563,6 @@
         <item>Matcher</item>
         <item>Xpath</item>
         <item>JsonPath</item>
+        <item>第三方</item>
     </string-array>
 </resources>

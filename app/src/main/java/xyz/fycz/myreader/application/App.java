@@ -48,7 +48,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.model.source.BookSourceManager;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.dialog.APPDownloadTip;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;

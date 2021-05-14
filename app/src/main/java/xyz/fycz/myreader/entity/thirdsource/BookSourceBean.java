@@ -22,19 +22,14 @@ import static android.text.TextUtils.isEmpty;
  * Created by GKF on 2017/12/14.
  * 书源信息
  */
-@Entity
 public class BookSourceBean implements Cloneable {
-    @Id
     private String bookSourceUrl;
     private String bookSourceName;
     private String bookSourceGroup;
     private String bookSourceType;
     private String loginUrl;
     private Long lastUpdateTime;
-    @OrderBy
     private int serialNumber;
-    @OrderBy
-    @NotNull
     private int weight = 0;
     private boolean enable;
     //发现规则
@@ -78,10 +73,8 @@ public class BookSourceBean implements Cloneable {
     private String ruleBookContentReplace;
     private String httpUserAgent;
 
-    @Transient
     private transient ArrayList<String> groupList;
 
-    @Generated(hash = 243497779)
     public BookSourceBean(String bookSourceUrl, String bookSourceName, String bookSourceGroup, String bookSourceType, String loginUrl, Long lastUpdateTime, int serialNumber, int weight, boolean enable, String ruleFindUrl, String ruleFindList,
                           String ruleFindName, String ruleFindAuthor, String ruleFindKind, String ruleFindIntroduce, String ruleFindLastChapter, String ruleFindCoverUrl, String ruleFindNoteUrl, String ruleSearchUrl, String ruleSearchList,
                           String ruleSearchName, String ruleSearchAuthor, String ruleSearchKind, String ruleSearchIntroduce, String ruleSearchLastChapter, String ruleSearchCoverUrl, String ruleSearchNoteUrl, String ruleBookUrlPattern,

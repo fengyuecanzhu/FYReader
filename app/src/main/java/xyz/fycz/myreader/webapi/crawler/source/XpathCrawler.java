@@ -11,7 +11,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.entity.rule.SearchRule;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.model.source.XpathAnalyzer;
+import xyz.fycz.myreader.model.sourceAnalyzer.XpathAnalyzer;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.BaseSourceCrawler;
 

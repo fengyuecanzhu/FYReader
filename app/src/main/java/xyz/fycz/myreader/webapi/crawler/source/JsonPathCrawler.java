@@ -3,7 +3,6 @@ package xyz.fycz.myreader.webapi.crawler.source;
 import com.jayway.jsonpath.ReadContext;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,13 +11,9 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.entity.rule.SearchRule;
-import xyz.fycz.myreader.greendao.entity.rule.TocRule;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.model.source.JsonPathAnalyzer;
+import xyz.fycz.myreader.model.sourceAnalyzer.JsonPathAnalyzer;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.util.utils.OkHttpUtils;
-import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.webapi.crawler.base.BaseSourceCrawler;
 
 /**
