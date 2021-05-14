@@ -67,7 +67,7 @@ public class CatalogPresenter implements BasePresenter {
                 return;
             }
             mCatalogFragment.getPbLoading().setVisibility(View.VISIBLE);
-            CommonApi.getBookChapters(mBook.getChapterUrl(), ReadCrawlerUtil.getReadCrawler(mBook.getSource()))
+            CommonApi.getBookChapters(mBook, ReadCrawlerUtil.getReadCrawler(mBook.getSource()))
                     .compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<List<Chapter>>() {
                 @Override
                 public void onNext(@NotNull List<Chapter> chapters) {

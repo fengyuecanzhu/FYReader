@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.webapi.crawler.base;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
+import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;

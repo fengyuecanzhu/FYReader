@@ -81,6 +81,7 @@ import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
 
 /**
  * @author fengyue
@@ -460,7 +461,7 @@ public class BookDetailedActivity extends BaseActivity {
                 mChapters = mChapterService.findBookAllChapterByBookId(mBook.getId());
             }
             if (chaptersDis != null) chaptersDis.dispose();
-            CommonApi.getBookChapters(mBook.getChapterUrl(), mReadCrawler)
+            CommonApi.getBookChapters(mBook, mReadCrawler)
                     .flatMap((Function<List<Chapter>, ObservableSource<Boolean>>) chapters -> saveChapters(chapters, isChangeSource)).compose(RxUtils::toSimpleSingle)
                     .subscribe(new MyObserver<Boolean>() {
                         @Override

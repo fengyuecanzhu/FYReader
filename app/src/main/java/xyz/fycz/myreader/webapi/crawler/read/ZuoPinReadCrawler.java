@@ -12,14 +12,13 @@ import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 import java.util.ArrayList;
 
 
-public class ZuoPinReadCrawler extends BaseLocalCrawler implements BookInfoCrawler {
+public class ZuoPinReadCrawler extends BaseReadCrawler implements BookInfoCrawler {
     public static final String NAME_SPACE = "http://zuopinj.com";
     public static final String NOVEL_SEARCH = "http://so.zuopinj.com/search/index.php,tbname=bookname&show=title&tempid=3&keyboard={key}";
     public static final String CHARSET = "UTF-8";

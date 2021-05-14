@@ -12,9 +12,8 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 import java.util.ArrayList;
 
@@ -24,7 +23,7 @@ import java.util.ArrayList;
  * 已失效
  */
 @Deprecated
-public class PinShuReadCrawler extends BaseLocalCrawler implements BookInfoCrawler {
+public class PinShuReadCrawler extends BaseReadCrawler implements BookInfoCrawler {
     public static final String NAME_SPACE = "https://www.vodtw.com";
     public static final String NOVEL_SEARCH = "https://www.vodtw.com/Book/Search.aspx?SearchKey={key}&SearchClass=1";
     public static final String CHARSET = "gbk";

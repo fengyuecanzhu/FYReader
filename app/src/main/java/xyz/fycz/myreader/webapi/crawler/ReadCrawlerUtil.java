@@ -16,6 +16,7 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.FYReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.JsonPathCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.MatcherCrawler;
+import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.XpathCrawler;
 
 import java.util.ArrayList;
@@ -194,8 +195,7 @@ public class ReadCrawlerUtil {
                         crawler = new JsonPathCrawler(source);
                         break;
                     case THIRD_SOURCE:
-                        crawler = new JsonPathCrawler(source);
-                        break;
+                        return new ThirdCrawler(source);
                 }
                 if (source.getSearchRule().isRelatedWithInfo() || isInfo) {
                     return crawler;
@@ -203,7 +203,6 @@ public class ReadCrawlerUtil {
                     return new BaseSourceCrawlerNoInfo(crawler);
                 }
             } else {
-
                 Class clz = Class.forName(source.getSourceUrl());
                 return (ReadCrawler) clz.newInstance();
             }

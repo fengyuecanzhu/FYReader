@@ -24,6 +24,7 @@ public class RxUtils {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    @NotNull
     public static <T> ObservableSource<T> toSimpleSingle(Observable<T> upstream){
         return upstream.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

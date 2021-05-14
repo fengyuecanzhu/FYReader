@@ -13,8 +13,7 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
 import java.util.ArrayList;
 
@@ -22,7 +21,7 @@ import java.util.ArrayList;
  * 天籁小说网html解析工具
  */
 
-public class TianLaiReadCrawler extends BaseLocalCrawler {
+public class TianLaiReadCrawler extends BaseReadCrawler {
     public static final String NAME_SPACE = "https://www.23txt.com";
     public static final String NOVEL_SEARCH = "https://www.23txt.com/search.php?q={key}";
     public static final String CHARSET = "GBK";

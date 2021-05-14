@@ -19,12 +19,11 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
-import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
-public class ShuHaiGeReadCrawler extends BaseLocalCrawler implements BookInfoCrawler {
+public class ShuHaiGeReadCrawler extends BaseReadCrawler implements BookInfoCrawler {
     public static final String NAME_SPACE = "https://www.xinshuhaige.org";
     public static final String NOVEL_SEARCH = "https://www.xinshuhaige.org/search.html,searchkey={key}&searchtype=all";
     public static final String CHARSET = "utf-8";

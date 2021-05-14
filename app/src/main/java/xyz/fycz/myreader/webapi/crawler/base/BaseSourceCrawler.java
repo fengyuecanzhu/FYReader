@@ -31,7 +31,7 @@ import xyz.fycz.myreader.util.utils.StringUtils;
  * @author fengyue
  * @date 2021/2/14 18:28
  */
-public abstract class BaseSourceCrawler implements ReadCrawler, BookInfoCrawler {
+public abstract class BaseSourceCrawler extends BaseReadCrawler implements BookInfoCrawler {
 
     protected final BookSource source;
     protected BaseAnalyzer analyzer;

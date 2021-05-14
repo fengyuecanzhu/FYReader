@@ -12,8 +12,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -23,7 +22,7 @@ import java.util.regex.Pattern;
  * 风月小说网html解析工具
  */
 
-public class FYReadCrawler extends BaseLocalCrawler {
+public class FYReadCrawler extends BaseReadCrawler {
     public static final String NAME_SPACE = "https://novel.fycz.xyz";
     public static final String NOVEL_SEARCH  = "https://novel.fycz.xyz/search.html?keyword={key}";
     public static final String CHARSET = "utf-8";

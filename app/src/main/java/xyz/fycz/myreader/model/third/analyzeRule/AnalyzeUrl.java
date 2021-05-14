@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.model.analyzeRule;
+package xyz.fycz.myreader.model.third.analyzeRule;
 
 import android.annotation.SuppressLint;
 import android.text.TextUtils;

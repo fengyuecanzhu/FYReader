@@ -9,11 +9,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-import xyz.fycz.myreader.model.analyzeRule.AnalyzeUrl;
+import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeUrl;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 
@@ -26,33 +22,7 @@ public interface JsExtensions {
     default String ajax(String urlStr) {
         try {
             AnalyzeUrl analyzeUrl = new AnalyzeUrl(urlStr);
-            String res = Observable.create((ObservableOnSubscribe<String>) emitter -> {
-                StringBuilder sb = new StringBuilder();
-                for (String key : analyzeUrl.getQueryMap().keySet()){
-                    sb.append(key).append("=").append(analyzeUrl.getQueryMap().get(key));
-                    sb.append("&");
-                }
-                sb.deleteCharAt(sb.lastIndexOf("&"));
-                String body = sb.toString();
-                switch (analyzeUrl.getUrlMode()){
-                    case GET:
-                        String url = analyzeUrl.getUrl() + "?" + body;
-                        emitter.onNext(OkHttpUtils.getHtml(url, analyzeUrl.getCharCode(),
-                                analyzeUrl.getHeaderMap()));
-                        break;
-                    case POST:
-                        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-                        RequestBody requestBody = RequestBody.create(mediaType, body);
-                        emitter.onNext(OkHttpUtils.getHtml(analyzeUrl.getUrl(), requestBody,
-                                analyzeUrl.getCharCode(), analyzeUrl.getHeaderMap()));
-                        break;
-                    default:
-                        emitter.onNext(OkHttpUtils.getHtml(analyzeUrl.getUrl(),
-                                analyzeUrl.getCharCode(), analyzeUrl.getHeaderMap()));
-                        break;
-                }
-            }).blockingFirst();
-            return res;
+            return OkHttpUtils.getStrResponse(analyzeUrl).blockingFirst().body();
         } catch (Exception e) {
             return e.getLocalizedMessage();
         }

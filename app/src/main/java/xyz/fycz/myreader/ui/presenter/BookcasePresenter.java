@@ -406,22 +406,18 @@ public class BookcasePresenter implements BasePresenter {
             Thread update = new Thread(() -> {
                 final ArrayList<Chapter> mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
                 final ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(book.getSource());
-                CommonApi.getBookChapters(book.getChapterUrl(), mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
+                CommonApi.getBookChapters(book, mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
                     int noReadNum = chapters.size() - book.getChapterTotalNum();
                     book.setNoReadNum(Math.max(noReadNum, 0));
                     book.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
                     mBookcaseAdapter.getIsLoading().put(book.getId(), false);
                     mChapterService.updateAllOldChapterData(mChapters, chapters, book.getId());
                     mBookService.updateEntity(book);
+                    emitter.onNext(book);
                     emitter.onComplete();
                 })).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Object>() {
                     @Override
                     public void onNext(@NotNull Object o) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
                         mHandler.sendMessage(mHandler.obtainMessage(1));
                     }
 
@@ -784,11 +780,13 @@ public class BookcasePresenter implements BasePresenter {
                 chapter.setBookId(book.getId());
             }
             ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(book.getSource());
-            CommonApi.getChapterContent(chapter.getUrl(), mReadCrawler).flatMap(s -> Observable.create(emitter -> {
+            CommonApi.getChapterContent(chapter, book, mReadCrawler).flatMap(s -> Observable.create(emitter -> {
                 downloadingChapter = chapter.getTitle();
                 mChapterService.saveOrUpdateChapter(chapter, s);
                 successCathe++;
                 curCacheChapterNum++;
+                emitter.onNext(chapter);
+                emitter.onComplete();
             })).subscribeOn(Schedulers.from(App.getApplication().getmFixedThreadPool())).subscribe(new MyObserver<Object>() {
                 @Override
                 public void onNext(@NotNull Object o) {

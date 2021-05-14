@@ -10,8 +10,7 @@ import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
 import java.util.ArrayList;
 
@@ -19,7 +18,7 @@ import java.util.ArrayList;
  * 已失效
  */
 @Deprecated
-public class QiQiReadCrawler extends BaseLocalCrawler {
+public class QiQiReadCrawler extends BaseReadCrawler {
     public static final String NAME_SPACE = "https://www.qq717.com";
     public static final String NOVEL_SEARCH = "https://www.qq717.com/search.php?keyword={key}";
     public static final String CHARSET = "UTF-8";

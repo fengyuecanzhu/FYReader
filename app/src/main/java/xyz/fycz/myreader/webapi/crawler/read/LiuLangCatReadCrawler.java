@@ -16,14 +16,13 @@ import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConcurrentMultiValueMap;
-import xyz.fycz.myreader.webapi.crawler.base.BaseLocalCrawler;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
 /**
  * @author fengyue
  * @date 2020/11/27 14:09
  */
-public class LiuLangCatReadCrawler extends BaseLocalCrawler {
+public class LiuLangCatReadCrawler extends BaseReadCrawler {
     public static final String NAME_SPACE = "http://m.liulangcat.com";
     public static final String NOVEL_SEARCH = "http://m.liulangcat.com/get/get_search_result.php?page=0&keyword={key}";
     //    public static final String NOVEL_SEARCH  = "http://www.liulangcat.com/search.php?k={key}&submit=搜索&wgxojg=wc0yz&uwzgzw=yi1p7&amlmvy=mcp50&rybwbm=1s0y7";

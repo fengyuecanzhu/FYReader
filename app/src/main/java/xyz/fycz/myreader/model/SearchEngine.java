@@ -138,7 +138,7 @@ public class SearchEngine {
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
             String searchKey = keyword;
-            if (crawler.getSearchCharset().toLowerCase().equals("gbk")) {
+            if (crawler.getSearchCharset() != null && crawler.getSearchCharset().toLowerCase().equals("gbk")) {
                 try {
                     searchKey = URLEncoder.encode(keyword, crawler.getSearchCharset());
                 } catch (UnsupportedEncodingException e) {

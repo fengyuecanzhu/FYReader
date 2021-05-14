@@ -1,14 +1,26 @@
 package xyz.fycz.myreader.util.utils;
 
+import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.CookieManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import io.reactivex.Observable;
 import okhttp3.*;
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.entity.StrResponse;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
+import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeUrl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,7 +73,32 @@ public class OkHttpUtils {
     }
 
     public static String getHtml(String url, RequestBody requestBody, String encodeType, Map<String, String> headers) throws IOException {
+        Response response = getResponse(url, requestBody, headers);
+        ResponseBody body = response.body();
+        if (body == null) {
+            return "";
+        } else {
+            String bodyStr = new String(body.bytes(), encodeType);
+            Log.d("Http: read finish", bodyStr);
+            return bodyStr;
+        }
+    }
 
+    /**
+     * 同步获取StrResponse
+     */
+    public static StrResponse getStrResponse(String url, String encodeType, Map<String, String> headers) throws IOException {
+        return getStrResponse(url, null, encodeType, headers);
+    }
+
+    public static StrResponse getStrResponse(String url, RequestBody requestBody, String encodeType, Map<String, String> headers) throws IOException {
+        StrResponse strResponse = new StrResponse();
+        strResponse.setEncodeType(encodeType);
+        strResponse.setResponse(getResponse(url, requestBody, headers));
+        return strResponse;
+    }
+
+    public static Response getResponse(String url, RequestBody requestBody, Map<String, String> headers) throws IOException {
         Request.Builder builder = new Request.Builder()
                 .addHeader("Accept", "*/*")
                 .addHeader("Connection", "Keep-Alive")
@@ -82,17 +119,9 @@ public class OkHttpUtils {
         Request request = builder
                 .url(url)
                 .build();
-        Response response = getOkHttpClient()
+        return getOkHttpClient()
                 .newCall(request)
                 .execute();
-        ResponseBody body = response.body();
-        if (body == null) {
-            return "";
-        } else {
-            String bodyStr = new String(body.bytes(), encodeType);
-            Log.d("Http: read finish", bodyStr);
-            return bodyStr;
-        }
     }
 
     public static InputStream getInputStream(String url) throws IOException {
@@ -139,6 +168,108 @@ public class OkHttpUtils {
             content = doc.text();
             Log.d("Http: UpdateInfo", content);
             return content;
+        }
+    }
+
+    public static Observable<StrResponse> getStrResponse(AnalyzeUrl analyzeUrl) {
+        return Observable.create(emitter -> {
+            StringBuilder sb = new StringBuilder();
+            for (String key : analyzeUrl.getQueryMap().keySet()) {
+                sb.append(key).append("=").append(analyzeUrl.getQueryMap().get(key));
+                sb.append("&");
+            }
+            int index = sb.lastIndexOf("&");
+            if (index != -1) {
+                sb.deleteCharAt(index);
+            }
+            String body = sb.toString();
+            StrResponse strResponse = new StrResponse();
+            //strResponse.setEncodeType(analyzeUrl.getCharCode() != null ? analyzeUrl.getCharCode() : "UTF-8");
+            switch (analyzeUrl.getUrlMode()) {
+                case GET:
+                    String url = analyzeUrl.getUrl() + "?" + body;
+                    strResponse.setResponse(OkHttpUtils.getResponse(url, null, analyzeUrl.getHeaderMap()));
+                    break;
+                case POST:
+                    MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+                    RequestBody requestBody = RequestBody.create(mediaType, body);
+                    strResponse.setResponse(OkHttpUtils.getResponse(analyzeUrl.getUrl(), requestBody, analyzeUrl.getHeaderMap()));
+                    break;
+                default:
+                    strResponse.setResponse(OkHttpUtils.getResponse(analyzeUrl.getUrl(), null, analyzeUrl.getHeaderMap()));
+                    break;
+            }
+            emitter.onNext(strResponse);
+        });
+    }
+
+    @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})
+    public static Observable<String> getAjaxString(AnalyzeUrl analyzeUrl, String tag, String js) {
+        final Web web = new Web("加载超时");
+        if (!TextUtils.isEmpty(js)) {
+            web.js = js;
+        }
+        return Observable.create(e -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                Runnable timeoutRunnable;
+                WebView webView = new WebView(App.getmContext());
+                webView.getSettings().setJavaScriptEnabled(true);
+                webView.getSettings().setUserAgentString(analyzeUrl.getHeaderMap().get("User-Agent"));
+                //CookieManager cookieManager = CookieManager.getInstance();
+                Runnable retryRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        webView.evaluateJavascript(web.js, value -> {
+                            if (!TextUtils.isEmpty(value)) {
+                                web.content = StringEscapeUtils.unescapeJson(value);
+                                e.onNext(web.content);
+                                e.onComplete();
+                                webView.destroy();
+                                handler.removeCallbacks(this);
+                            } else {
+                                handler.postDelayed(this, 1000);
+                            }
+                        });
+                    }
+                };
+                timeoutRunnable = () -> {
+                    if (!e.isDisposed()) {
+                        handler.removeCallbacks(retryRunnable);
+                        e.onNext(web.content);
+                        e.onComplete();
+                        webView.destroy();
+                    }
+                };
+                handler.postDelayed(timeoutRunnable, 30000);
+                webView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public void onPageFinished(WebView view, String url) {
+                        /*DbHelper.getDaoSession().getCookieBeanDao()
+                                .insertOrReplace(new CookieBean(tag, cookieManager.getCookie(webView.getUrl())));*/
+                        handler.postDelayed(retryRunnable, 1000);
+                    }
+                });
+                switch (analyzeUrl.getUrlMode()) {
+                    case POST:
+                        webView.postUrl(analyzeUrl.getUrl(), analyzeUrl.getPostData());
+                        break;
+                    case GET:
+                        webView.loadUrl(String.format("%s?%s", analyzeUrl.getUrl(), analyzeUrl.getQueryStr()), analyzeUrl.getHeaderMap());
+                        break;
+                    default:
+                        webView.loadUrl(analyzeUrl.getUrl(), analyzeUrl.getHeaderMap());
+                }
+            });
+        });
+    }
+
+    private static class Web {
+        private String content;
+        private String js = "document.documentElement.outerHTML";
+
+        Web(String content) {
+            this.content = content;
         }
     }
 }
