@@ -397,10 +397,16 @@ public class BookDetailedActivity extends BaseActivity {
         binding.ih.bookDetailTvAuthor.setText(mBook.getAuthor());
         if (StringHelper.isEmpty(mBook.getImgUrl())) {
             mBook.setImgUrl("");
+        } else {
+            if (!App.isDestroy(this)) {
+                binding.ih.bookDetailIvCover.load(NetworkUtils.getAbsoluteURL(mReadCrawler.getNameSpace(), mBook.getImgUrl()), mBook.getName(), mBook.getAuthor());
+            }
         }
         initTagList();
         if (StringHelper.isEmpty(mBook.getDesc()))
             binding.ic.bookDetailTvDesc.setText("");
+        else
+            binding.ic.bookDetailTvDesc.setText(String.format("\t\t\t\t%s", mBook.getDesc()));
         BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
         binding.ih.bookDetailSource.setText(String.format("书源：%s", source.getSourceName()));
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(source);
@@ -413,7 +419,7 @@ public class BookDetailedActivity extends BaseActivity {
                     if (!App.isDestroy(BookDetailedActivity.this)) {
                         mHandler.sendMessage(mHandler.obtainMessage(4));
                     }
-                    if (thirdSource){
+                    if (thirdSource) {
                         initChapters(false);
                     }
                 }
@@ -421,7 +427,7 @@ public class BookDetailedActivity extends BaseActivity {
                 @Override
                 public void onError(Throwable e) {
                     ToastUtils.showError("书籍详情加载失败！");
-                    if (thirdSource){
+                    if (thirdSource) {
                         initChapters(false);
                     }
                     if (App.isDebug()) e.printStackTrace();
@@ -500,7 +506,7 @@ public class BookDetailedActivity extends BaseActivity {
         }
     }
 
-    private Observable<Boolean> saveChapters(List<Chapter> chapters, boolean isChangeSource){
+    private Observable<Boolean> saveChapters(List<Chapter> chapters, boolean isChangeSource) {
         return Observable.create(emitter -> {
             mBook.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
             if (isCollected) {

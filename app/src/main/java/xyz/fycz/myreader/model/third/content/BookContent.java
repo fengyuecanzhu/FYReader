@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 
 import io.reactivex.Observable;
 import xyz.fycz.myreader.entity.StrResponse;
-import xyz.fycz.myreader.greendao.GreenDaoManager;
+import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
@@ -77,7 +77,7 @@ public class BookContent {
                 if (nextChapterBean != null) {
                     nextChapter = nextChapterBean;
                 } else {
-                    nextChapter = GreenDaoManager.getDaoSession().getChapterDao().queryBuilder()
+                    nextChapter = DbManager.getDaoSession().getChapterDao().queryBuilder()
                             .where(ChapterDao.Properties.Url.eq(chapterBean.getUrl()),
                                     ChapterDao.Properties.Number.eq(chapterBean.getNumber() + 1))
                             .build().unique();

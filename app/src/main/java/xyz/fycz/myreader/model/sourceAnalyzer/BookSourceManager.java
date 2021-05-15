@@ -14,15 +14,13 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
-import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.entity.thirdsource.BookSource3Bean;
 import xyz.fycz.myreader.entity.thirdsource.BookSourceBean;
 import xyz.fycz.myreader.entity.thirdsource.ThirdSourceUtil;
 import xyz.fycz.myreader.enums.LocalBookSource;
-import xyz.fycz.myreader.greendao.GreenDaoManager;
+import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.gen.BookSourceDao;
 import xyz.fycz.myreader.util.SharedPreUtils;
@@ -41,7 +39,7 @@ public class BookSourceManager {
     public static final int SOURCE_LENGTH = 500;
 
     public static List<BookSource> getEnabledBookSource() {
-        return GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+        return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                 .where(BookSourceDao.Properties.Enable.eq(true))
                 .orderRaw(BookSourceDao.Properties.Weight.columnName + " DESC")
                 .orderAsc(BookSourceDao.Properties.OrderNum)
@@ -49,27 +47,27 @@ public class BookSourceManager {
     }
 
     public static List<BookSource> getAllBookSource() {
-        return GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+        return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                 .orderRaw(getBookSourceSort())
                 .orderAsc(BookSourceDao.Properties.OrderNum)
                 .list();
     }
 
     public static List<BookSource> getEnabledBookSourceByOrderNum() {
-        return GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+        return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                 .where(BookSourceDao.Properties.Enable.eq(true))
                 .orderAsc(BookSourceDao.Properties.OrderNum)
                 .list();
     }
 
     public static List<BookSource> getAllBookSourceByOrderNum() {
-        return GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+        return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                 .orderAsc(BookSourceDao.Properties.OrderNum)
                 .list();
     }
 
     public static List<BookSource> getEnableSourceByGroup(String group) {
-        return GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+        return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                 .where(BookSourceDao.Properties.Enable.eq(true))
                 .where(BookSourceDao.Properties.SourceGroup.like("%" + group + "%"))
                 .orderRaw(BookSourceDao.Properties.Weight.columnName + " DESC")
@@ -98,7 +96,7 @@ public class BookSourceManager {
      */
     public static BookSource getBookSourceByUrl(String url) {
         if (url == null) return getDefaultSource();
-        BookSource source = GreenDaoManager.getDaoSession().getBookSourceDao().load(url);
+        BookSource source = DbManager.getDaoSession().getBookSourceDao().load(url);
         if (source == null) return getDefaultSource();
         return source;
     }
@@ -113,7 +111,7 @@ public class BookSourceManager {
     public static BookSource getBookSourceByEName(String ename) {
         if (ename == null) return getDefaultSource();
         if ("local".equals(ename)) return getLocalSource();
-        BookSource source = GreenDaoManager.getDaoSession().getBookSourceDao().
+        BookSource source = DbManager.getDaoSession().getBookSourceDao().
                 queryBuilder()
                 .where(BookSourceDao.Properties.SourceEName.eq(ename))
                 .unique();
@@ -163,7 +161,7 @@ public class BookSourceManager {
      * @return
      */
     public static List<BookSource> getAllLocalSource() {
-        return GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+        return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                 .where(BookSourceDao.Properties.SourceEName.isNotNull())
                 .orderAsc(BookSourceDao.Properties.OrderNum)
                 .list();
@@ -175,7 +173,7 @@ public class BookSourceManager {
      * @return
      */
     public static List<BookSource> getAllNoLocalSource() {
-        return GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+        return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                 .where(BookSourceDao.Properties.SourceEName.isNull())
                 .orderAsc(BookSourceDao.Properties.OrderNum)
                 .list();
@@ -188,12 +186,12 @@ public class BookSourceManager {
      */
     public static void removeBookSource(BookSource source) {
         if (source == null) return;
-        GreenDaoManager.getDaoSession().getBookSourceDao().delete(source);
+        DbManager.getDaoSession().getBookSourceDao().delete(source);
     }
 
     public static void removeBookSources(List<BookSource> sources) {
         if (sources == null) return;
-        GreenDaoManager.getDaoSession().getBookSourceDao().deleteInTx(sources);
+        DbManager.getDaoSession().getBookSourceDao().deleteInTx(sources);
     }
 
 
@@ -220,23 +218,23 @@ public class BookSourceManager {
         if (bookSource.getSourceUrl().endsWith("/")) {
             bookSource.setSourceUrl(bookSource.getSourceUrl().replaceAll("/+$", ""));
         }
-        BookSource temp = GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+        BookSource temp = DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                 .where(BookSourceDao.Properties.SourceUrl.eq(bookSource.getSourceUrl())).unique();
         if (temp != null) {
             bookSource.setOrderNum(temp.getOrderNum());
         } else {
-            bookSource.setOrderNum((int) (GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder().count() + 1));
+            bookSource.setOrderNum((int) (DbManager.getDaoSession().getBookSourceDao().queryBuilder().count() + 1));
         }
-        GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplace(bookSource);
+        DbManager.getDaoSession().getBookSourceDao().insertOrReplace(bookSource);
         return true;
     }
 
     public static Single<Boolean> saveData(BookSource bookSource) {
         return Single.create((SingleOnSubscribe<Boolean>) emitter -> {
             if (bookSource.getOrderNum() == 0) {
-                bookSource.setOrderNum((int) (GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder().count() + 1));
+                bookSource.setOrderNum((int) (DbManager.getDaoSession().getBookSourceDao().queryBuilder().count() + 1));
             }
-            GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplace(bookSource);
+            DbManager.getDaoSession().getBookSourceDao().insertOrReplace(bookSource);
             emitter.onSuccess(true);
         }).compose(RxUtils::toSimpleSingle);
     }
@@ -245,10 +243,10 @@ public class BookSourceManager {
         return Single.create((SingleOnSubscribe<Boolean>) emitter -> {
             for (BookSource source : sources) {
                 if (source.getOrderNum() == 0) {
-                    source.setOrderNum((int) (GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder().count() + 1));
+                    source.setOrderNum((int) (DbManager.getDaoSession().getBookSourceDao().queryBuilder().count() + 1));
                 }
             }
-            GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(sources);
+            DbManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(sources);
             emitter.onSuccess(true);
         }).compose(RxUtils::toSimpleSingle);
     }
@@ -260,8 +258,8 @@ public class BookSourceManager {
                 List.get(i).setOrderNum(i + 1);
             }
             source.setOrderNum(0);
-            GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(List);
-            GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplace(source);
+            DbManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(List);
+            DbManager.getDaoSession().getBookSourceDao().insertOrReplace(source);
             e.onSuccess(true);
         }).compose(RxUtils::toSimpleSingle);
     }
@@ -272,7 +270,7 @@ public class BookSourceManager {
                 + BookSourceDao.Properties.SourceGroup.columnName
                 + " FROM " + BookSourceDao.TABLENAME
                 + " WHERE " + BookSourceDao.Properties.Enable.name + " = 1";
-        Cursor cursor = GreenDaoManager.getDaoSession().getDatabase().rawQuery(sql, null);
+        Cursor cursor = DbManager.getDaoSession().getDatabase().rawQuery(sql, null);
         if (!cursor.moveToFirst()) return groupList;
         do {
             String group = cursor.getString(0);
@@ -290,7 +288,7 @@ public class BookSourceManager {
     public static List<String> getNoLocalGroupList() {
         List<String> groupList = new ArrayList<>();
         String sql = "SELECT DISTINCT " + BookSourceDao.Properties.SourceGroup.columnName + " FROM " + BookSourceDao.TABLENAME;
-        Cursor cursor = GreenDaoManager.getDaoSession().getDatabase().rawQuery(sql, null);
+        Cursor cursor = DbManager.getDaoSession().getDatabase().rawQuery(sql, null);
         if (!cursor.moveToFirst()) return groupList;
         do {
             String group = cursor.getString(0);
@@ -334,7 +332,7 @@ public class BookSourceManager {
             if (bookSources != null) {
                 for (BookSource bookSource : bookSources) {
                     if (bookSource.containsGroup("删除")) {
-                        GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+                        DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                                 .where(BookSourceDao.Properties.SourceUrl.eq(bookSource.getSourceUrl()))
                                 .buildDelete().executeDeleteWithoutDetachingEntities();
                     } else {
@@ -406,7 +404,7 @@ public class BookSourceManager {
 
     public static void initDefaultSources() {
         Log.d("initDefaultSources", "execute");
-        GreenDaoManager.getDaoSession().getBookSourceDao().deleteAll();
+        DbManager.getDaoSession().getBookSourceDao().deleteAll();
         String searchSource = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.searchSource));
         boolean isEmpty = StringHelper.isEmpty(searchSource);
         for (LocalBookSource source : LocalBookSource.values()) {
@@ -418,7 +416,7 @@ public class BookSourceManager {
             source1.setEnable(isEmpty || searchSource.contains(source.toString()));
             source1.setSourceUrl(ReadCrawlerUtil.getReadCrawlerClz(source.toString()));
             source1.setOrderNum(0);
-            GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplace(source1);
+            DbManager.getDaoSession().getBookSourceDao().insertOrReplace(source1);
         }
         String referenceSources = FileUtils.readAssertFile(App.getmContext(),
                 "ReferenceSources.json");

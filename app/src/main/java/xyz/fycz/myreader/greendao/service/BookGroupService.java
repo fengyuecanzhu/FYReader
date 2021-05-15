@@ -2,7 +2,7 @@ package xyz.fycz.myreader.greendao.service;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.greendao.GreenDaoManager;
+import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.gen.BookGroupDao;
 import xyz.fycz.myreader.util.SharedPreUtils;
@@ -33,7 +33,7 @@ public class BookGroupService extends BaseService{
      * @return
      */
     public List<BookGroup> getAllGroups(){
-        return GreenDaoManager.getInstance().getSession().getBookGroupDao()
+        return DbManager.getInstance().getSession().getBookGroupDao()
                 .queryBuilder()
                 .orderAsc(BookGroupDao.Properties.Num)
                 .list();
@@ -45,7 +45,7 @@ public class BookGroupService extends BaseService{
      * @return
      */
     public BookGroup getGroupById(String groupId){
-        return GreenDaoManager.getInstance().getSession().getBookGroupDao()
+        return DbManager.getInstance().getSession().getBookGroupDao()
                 .queryBuilder()
                 .where(BookGroupDao.Properties.Id.eq(groupId))
                 .unique();
@@ -70,7 +70,7 @@ public class BookGroupService extends BaseService{
     }
 
     public void deleteGroupById(String id){
-        GreenDaoManager.getInstance().getSession().getBookGroupDao().deleteByKey(id);
+        DbManager.getInstance().getSession().getBookGroupDao().deleteByKey(id);
     }
 
     public void createPrivateGroup(){
@@ -97,7 +97,7 @@ public class BookGroupService extends BaseService{
     }
 
     private int countBookGroup(){
-        return (int) GreenDaoManager.getInstance().getSession().getBookGroupDao()
+        return (int) DbManager.getInstance().getSession().getBookGroupDao()
                 .queryBuilder()
                 .count();
     }

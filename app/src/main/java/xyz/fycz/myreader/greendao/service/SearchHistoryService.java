@@ -6,7 +6,7 @@ import xyz.fycz.myreader.greendao.entity.SearchHistory;
 import xyz.fycz.myreader.greendao.gen.SearchHistoryDao;
 import xyz.fycz.myreader.util.DateHelper;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.greendao.GreenDaoManager;
+import xyz.fycz.myreader.greendao.DbManager;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,7 +77,7 @@ public class SearchHistoryService extends BaseService {
      * 清空历史记录
      */
     public void clearHistory(){
-        SearchHistoryDao searchHistoryDao = GreenDaoManager.getInstance().getSession().getSearchHistoryDao();
+        SearchHistoryDao searchHistoryDao = DbManager.getInstance().getSession().getSearchHistoryDao();
         searchHistoryDao.deleteAll();
     }
 

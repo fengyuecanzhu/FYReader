@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
-import xyz.fycz.myreader.greendao.GreenDaoManager;
+import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.util.ToastUtils;
 
@@ -46,12 +46,12 @@ public class LocalSourceHolder extends ViewHolderImpl<BookSource> {
         tvEnable.setOnClickListener(v -> {
             data.setEnable(true);
             banOrUse(data);
-            GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplace(data);
+            DbManager.getDaoSession().getBookSourceDao().insertOrReplace(data);
         });
         tvDisable.setOnClickListener(v -> {
             data.setEnable(false);
             banOrUse(data);
-            GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplace(data);
+            DbManager.getDaoSession().getBookSourceDao().insertOrReplace(data);
         });
         tvCheck.setOnClickListener(v -> ToastUtils.showInfo("校验功能即将上线"));
     }

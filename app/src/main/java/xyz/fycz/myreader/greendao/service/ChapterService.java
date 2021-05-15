@@ -2,13 +2,12 @@ package xyz.fycz.myreader.greendao.service;
 
 import android.database.Cursor;
 
-import android.util.Log;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.gen.ChapterDao;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.StringHelper;
-import xyz.fycz.myreader.greendao.GreenDaoManager;
+import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.util.utils.FileUtils;
 
 import java.io.*;
@@ -60,7 +59,7 @@ public class ChapterService extends BaseService {
      * @return
      */
     public Chapter getChapterById(String id) {
-        ChapterDao chapterDao = GreenDaoManager.getInstance().getSession().getChapterDao();
+        ChapterDao chapterDao = DbManager.getInstance().getSession().getChapterDao();
         return chapterDao.load(id);
     }
 
@@ -119,7 +118,7 @@ public class ChapterService extends BaseService {
      * @param bookId
      */
     public void deleteBookALLChapterById(String bookId) {
-        GreenDaoManager.getInstance().getSession().getChapterDao()
+        DbManager.getInstance().getSession().getChapterDao()
                 .queryBuilder()
                 .where(ChapterDao.Properties.BookId.eq(bookId))
                 .buildDelete()
@@ -131,7 +130,7 @@ public class ChapterService extends BaseService {
      * 更新章节
      */
     public void updateChapter(Chapter chapter) {
-        ChapterDao chapterDao = GreenDaoManager.getInstance().getSession().getChapterDao();
+        ChapterDao chapterDao = DbManager.getInstance().getSession().getChapterDao();
         chapterDao.update(chapter);
     }
 
@@ -172,7 +171,7 @@ public class ChapterService extends BaseService {
      * 批量添加章节
      */
     public void addChapters(List<Chapter> chapters) {
-        ChapterDao chapterDao = GreenDaoManager.getInstance().getSession().getChapterDao();
+        ChapterDao chapterDao = DbManager.getInstance().getSession().getChapterDao();
         chapterDao.insertInTx(chapters);
     }
 

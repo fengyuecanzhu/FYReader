@@ -12,7 +12,7 @@ import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.application.SysManager
 import xyz.fycz.myreader.base.observer.MySingleObserver
 import xyz.fycz.myreader.common.APPCONST
-import xyz.fycz.myreader.greendao.GreenDaoManager
+import xyz.fycz.myreader.greendao.DbManager
 import xyz.fycz.myreader.greendao.service.BookService
 import xyz.fycz.myreader.greendao.service.SearchHistoryService
 import xyz.fycz.myreader.util.SharedPreUtils
@@ -74,28 +74,28 @@ object Backup {
                             .writeText(json)
                 }
             }
-            GreenDaoManager.getInstance().session.bookMarkDao.queryBuilder().list().let {
+            DbManager.getInstance().session.bookMarkDao.queryBuilder().list().let {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "myBookMark.json")
                             .writeText(json)
                 }
             }
-            GreenDaoManager.getInstance().session.bookGroupDao.queryBuilder().list().let {
+            DbManager.getInstance().session.bookGroupDao.queryBuilder().list().let {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "myBookGroup.json")
                             .writeText(json)
                 }
             }
-            GreenDaoManager.getInstance().session.replaceRuleBeanDao.queryBuilder().list().let {
+            DbManager.getInstance().session.replaceRuleBeanDao.queryBuilder().list().let {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "replaceRule.json")
                             .writeText(json)
                 }
             }
-            GreenDaoManager.getInstance().session.bookSourceDao.queryBuilder().list().let {
+            DbManager.getInstance().session.bookSourceDao.queryBuilder().list().let {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "bookSource.json")

@@ -1,20 +1,11 @@
 package xyz.fycz.myreader.greendao.service;
 
-import android.database.Cursor;
-import xyz.fycz.myreader.greendao.GreenDaoManager;
-import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.BookMark;
-import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.greendao.entity.SearchHistory;
-import xyz.fycz.myreader.greendao.gen.BookDao;
 import xyz.fycz.myreader.greendao.gen.BookMarkDao;
-import xyz.fycz.myreader.greendao.gen.ChapterDao;
-import xyz.fycz.myreader.greendao.gen.SearchHistoryDao;
-import xyz.fycz.myreader.util.DateHelper;
 import xyz.fycz.myreader.util.StringHelper;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -38,7 +29,7 @@ public class BookMarkService extends BaseService {
      * @return
      */
     public BookMark getBookById(String id) {
-        BookMarkDao bookMarkDao = GreenDaoManager.getInstance().getSession().getBookMarkDao();
+        BookMarkDao bookMarkDao = DbManager.getInstance().getSession().getBookMarkDao();
         return bookMarkDao.load(id);
     }
 
@@ -48,7 +39,7 @@ public class BookMarkService extends BaseService {
      * @return
      */
     public BookMark findBookMarkByTitle(String title){
-        return GreenDaoManager.getInstance().getSession().getBookMarkDao()
+        return DbManager.getInstance().getSession().getBookMarkDao()
                 .queryBuilder()
                 .where(BookMarkDao.Properties.Title.eq(title))
                 .unique();
@@ -62,7 +53,7 @@ public class BookMarkService extends BaseService {
         if (bookId == null) {
             return new ArrayList<>();
         }
-        return GreenDaoManager.getInstance().getSession().getBookMarkDao()
+        return DbManager.getInstance().getSession().getBookMarkDao()
                 .queryBuilder()
                 .where(BookMarkDao.Properties.BookId.eq(bookId))
                 .orderAsc(BookMarkDao.Properties.Number)
@@ -86,7 +77,7 @@ public class BookMarkService extends BaseService {
      * @param bookId
      */
     public void deleteBookALLBookMarkById(String bookId) {
-        GreenDaoManager.getInstance().getSession().getBookMarkDao()
+        DbManager.getInstance().getSession().getBookMarkDao()
                 .queryBuilder()
                 .where(BookMarkDao.Properties.BookId.eq(bookId))
                 .buildDelete()
@@ -108,7 +99,7 @@ public class BookMarkService extends BaseService {
      * @param id
      */
     public void deleteBookMarkById(String id){
-        BookMarkDao bookMarkDao = GreenDaoManager.getInstance().getSession().getBookMarkDao();
+        BookMarkDao bookMarkDao = DbManager.getInstance().getSession().getBookMarkDao();
         bookMarkDao.deleteByKey(id);
     }
 
@@ -136,7 +127,7 @@ public class BookMarkService extends BaseService {
             e.printStackTrace();
         }*/
 
-        return (int) GreenDaoManager.getInstance().getSession().getBookMarkDao()
+        return (int) DbManager.getInstance().getSession().getBookMarkDao()
                 .queryBuilder()
                 .where(BookMarkDao.Properties.BookId.eq(bookId))
                 .count();

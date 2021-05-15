@@ -40,7 +40,7 @@ public class CommonApi {
      */
     public static Observable<List<Chapter>> getBookChapters(Book book, final ReadCrawler rc) {
         if (rc instanceof ThirdCrawler) {
-            return getBookChaptersByTC(book, (ThirdCrawler) rc);
+            return ThirdSourceApi.getBookChaptersByTC(book, (ThirdCrawler) rc);
         }
         String url = book.getChapterUrl();
         String charset = rc.getCharset();
@@ -52,29 +52,6 @@ public class CommonApi {
         });
     }
 
-    private static Observable<List<Chapter>> getBookChaptersByTC(Book book, ThirdCrawler rc) {
-        BookSource source = rc.getSource();
-        BookChapterList bookChapterList = new BookChapterList(source.getSourceUrl(), source, true);
-        /*if (!TextUtils.isEmpty(bookShelfBean.getBookInfoBean().getChapterListHtml())) {
-            return bookChapterList.analyzeChapterList(bookShelfBean.getBookInfoBean().getChapterListHtml(), bookShelfBean, headerMap);
-        }*/
-        try {
-            AnalyzeUrl analyzeUrl = new AnalyzeUrl(book.getChapterUrl(), null, book.getInfoUrl());
-            return OkHttpUtils.getStrResponse(analyzeUrl)
-                    //.flatMap(response -> setCookie(response, tag))
-                    .flatMap(response -> bookChapterList.analyzeChapterList(response.body(), book, null))
-                    .flatMap(chapters -> Observable.create(emitter -> {
-                        for (int i = 0; i < chapters.size(); i++) {
-                            Chapter chapter = chapters.get(i);
-                            chapter.setNumber(i);
-                        }
-                        emitter.onNext(chapters);
-                        emitter.onComplete();
-                    }));
-        } catch (Exception e) {
-            return Observable.error(new Throwable(String.format("url错误:%s", book.getChapterUrl())));
-        }
-    }
 
     /**
      * 获取章节正文
@@ -83,7 +60,7 @@ public class CommonApi {
 
     public static Observable<String> getChapterContent(Chapter chapter, Book book,  final ReadCrawler rc) {
         if (rc instanceof ThirdCrawler) {
-            return getChapterContentByTC(chapter, book, (ThirdCrawler) rc);
+            return ThirdSourceApi.getChapterContentByTC(chapter, book, (ThirdCrawler) rc);
         }
         String url = chapter.getUrl();
         String charset = rc.getCharset();
@@ -95,41 +72,6 @@ public class CommonApi {
         });
     }
 
-    private static Observable<String> getChapterContentByTC(Chapter chapter, Book book, ThirdCrawler rc) {
-        BookSource source = rc.getSource();
-        BookContent bookContent = new BookContent(source.getSourceUrl(), source);
-        /*if (Objects.equals(chapterBean.getDurChapterUrl(), bookShelfBean.getBookInfoBean().getChapterUrl())
-                && !TextUtils.isEmpty(bookShelfBean.getBookInfoBean().getChapterListHtml())) {
-            return bookContent.analyzeBookContent(bookShelfBean.getBookInfoBean().getChapterListHtml(), chapterBean, nextChapterBean, bookShelfBean, headerMap);
-        }*/
-        try {
-            AnalyzeUrl analyzeUrl = new AnalyzeUrl(chapter.getUrl(), null, book.getChapterUrl());
-            String contentRule = source.getContentRule().getContent();
-            if (contentRule.startsWith("$") && !contentRule.startsWith("$.")) {
-                //动态网页第一个js放到webView里执行
-                contentRule = contentRule.substring(1);
-                String js = null;
-                Matcher jsMatcher = JS_PATTERN.matcher(contentRule);
-                if (jsMatcher.find()) {
-                    js = jsMatcher.group();
-                    if (js.startsWith("<js>")) {
-                        js = js.substring(4, js.lastIndexOf("<"));
-                    } else {
-                        js = js.substring(4);
-                    }
-                }
-                return OkHttpUtils.getAjaxString(analyzeUrl, source.getSourceUrl(), js)
-                        .flatMap(response -> bookContent.analyzeBookContent(response, chapter, null, book, null));
-            } else {
-                return OkHttpUtils.getStrResponse(analyzeUrl)
-                        //.flatMap(response -> setCookie(response, tag))
-                        .flatMap(response -> bookContent.analyzeBookContent(response, chapter, null, book, null));
-            }
-        } catch (Exception e) {
-            return Observable.error(new Throwable(String.format("url错误:%s", chapter.getUrl())));
-        }
-    }
-
 
     /**
      * 搜索小说
@@ -138,7 +80,7 @@ public class CommonApi {
      */
     public static Observable<ConMVMap<SearchBookBean, Book>> search(String key, final ReadCrawler rc) {
         if (rc instanceof ThirdCrawler) {
-            return searchByTC(key, (ThirdCrawler) rc);
+            return ThirdSourceApi.searchByTC(key, (ThirdCrawler) rc);
         }
         String charset = "utf-8";
         if (rc instanceof TianLaiReadCrawler) {
@@ -180,28 +122,7 @@ public class CommonApi {
         return url.replace("{key}", key);
     }
 
-    /**
-     * 第三方书源搜索
-     *
-     * @param key
-     * @param rc
-     * @return
-     */
-    public static Observable<ConMVMap<SearchBookBean, Book>> searchByTC(String key, final ThirdCrawler rc) {
-        try {
-            BookSource source = rc.getSource();
-            AnalyzeUrl analyzeUrl = new AnalyzeUrl(source.getSearchRule().getSearchUrl(),
-                    key, 1, null, source.getSourceUrl());
-            BookList bookList = new BookList(source.getSourceUrl(), source.getSourceName(), source, false);
-            return OkHttpUtils.getStrResponse(analyzeUrl).flatMap(bookList::analyzeSearchBook)
-                    .flatMap((Function<List<Book>, ObservableSource<ConMVMap<SearchBookBean, Book>>>) books -> Observable.create((ObservableOnSubscribe<ConMVMap<SearchBookBean, Book>>) emitter -> {
-                        emitter.onNext(rc.getBooks(books));
-                        emitter.onComplete();
-                    }));
-        } catch (Exception e) {
-            return Observable.error(e);
-        }
-    }
+
 
     /**
      * 获取小说详细信息
@@ -210,7 +131,7 @@ public class CommonApi {
      */
     public static Observable<Book> getBookInfo(final Book book, final BookInfoCrawler bic) {
         if (bic instanceof ThirdCrawler){
-            return getBookInfoByTC(book, (ThirdCrawler) bic);
+            return ThirdSourceApi.getBookInfoByTC(book, (ThirdCrawler) bic);
         }
         String url;
         url = book.getInfoUrl();
@@ -223,21 +144,7 @@ public class CommonApi {
         });
     }
 
-    private static Observable<Book> getBookInfoByTC(Book book, ThirdCrawler rc) {
-        BookSource source = rc.getSource();
-        BookInfo bookInfo = new BookInfo(source.getSourceUrl(), source.getSourceName(), source);
-        /*if (!TextUtils.isEmpty(book.getBookInfoBean().getBookInfoHtml())) {
-            return bookInfo.analyzeBookInfo(book.getBookInfoBean().getBookInfoHtml(), bookShelfBean);
-        }*/
-        try {
-            AnalyzeUrl analyzeUrl = new AnalyzeUrl(book.getInfoUrl(), null, source.getSourceUrl());
-            return OkHttpUtils.getStrResponse(analyzeUrl)
-                    //.flatMap(response -> setCookie(response, tag))
-                    .flatMap(response -> bookInfo.analyzeBookInfo(response.body(), book));
-        } catch (Exception e) {
-            return Observable.error(new Throwable(String.format("url错误:%s", book.getInfoUrl())));
-        }
-    }
+
 
     /**
      * 通过api获取蓝奏云可下载直链

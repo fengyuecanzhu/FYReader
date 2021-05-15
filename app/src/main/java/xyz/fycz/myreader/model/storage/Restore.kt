@@ -12,7 +12,7 @@ import xyz.fycz.myreader.application.SysManager
 import xyz.fycz.myreader.base.observer.MySingleObserver
 import xyz.fycz.myreader.entity.ReadStyle
 import xyz.fycz.myreader.entity.Setting
-import xyz.fycz.myreader.greendao.GreenDaoManager
+import xyz.fycz.myreader.greendao.DbManager
 import xyz.fycz.myreader.greendao.entity.*
 import xyz.fycz.myreader.greendao.entity.rule.BookSource
 import xyz.fycz.myreader.util.SharedPreUtils
@@ -60,7 +60,7 @@ object Restore {
                     if (bookshelf.bookInfoBean.noteUrl != null) {
                         DbHelper.getDaoSession().bookInfoBeanDao.insertOrReplace(bookshelf.bookInfoBean)
                     }*/
-                    GreenDaoManager.getInstance().session.bookDao.insertOrReplace(bookshelf)
+                    DbManager.getInstance().session.bookDao.insertOrReplace(bookshelf)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -69,7 +69,7 @@ object Restore {
                 val file = FileUtils.getFile(path + File.separator + "mySearchHistory.json")
                 val json = file.readText()
                 GSON.fromJsonArray<SearchHistory>(json)?.let {
-                    GreenDaoManager.getInstance().session.searchHistoryDao.insertOrReplaceInTx(it)
+                    DbManager.getInstance().session.searchHistoryDao.insertOrReplaceInTx(it)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -78,7 +78,7 @@ object Restore {
                 val file = FileUtils.getFile(path + File.separator + "myBookMark.json")
                 val json = file.readText()
                 GSON.fromJsonArray<BookMark>(json)?.let {
-                    GreenDaoManager.getInstance().session.bookMarkDao.insertOrReplaceInTx(it)
+                    DbManager.getInstance().session.bookMarkDao.insertOrReplaceInTx(it)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -87,7 +87,7 @@ object Restore {
                 val file = FileUtils.getFile(path + File.separator + "myBookGroup.json")
                 val json = file.readText()
                 GSON.fromJsonArray<BookGroup>(json)?.let {
-                    GreenDaoManager.getInstance().session.bookGroupDao.insertOrReplaceInTx(it)
+                    DbManager.getInstance().session.bookGroupDao.insertOrReplaceInTx(it)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -96,7 +96,7 @@ object Restore {
                 val file = FileUtils.getFile(path + File.separator + "replaceRule.json")
                 val json = file.readText()
                 GSON.fromJsonArray<ReplaceRuleBean>(json)?.let {
-                    GreenDaoManager.getInstance().session.replaceRuleBeanDao.insertOrReplaceInTx(it)
+                    DbManager.getInstance().session.replaceRuleBeanDao.insertOrReplaceInTx(it)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -105,7 +105,7 @@ object Restore {
                 val file = FileUtils.getFile(path + File.separator + "bookSource.json")
                 val json = file.readText()
                 GSON.fromJsonArray<BookSource>(json)?.let {
-                    GreenDaoManager.getInstance().session.bookSourceDao.insertOrReplaceInTx(it)
+                    DbManager.getInstance().session.bookSourceDao.insertOrReplaceInTx(it)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

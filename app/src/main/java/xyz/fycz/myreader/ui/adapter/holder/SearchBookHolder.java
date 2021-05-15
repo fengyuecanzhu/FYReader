@@ -89,6 +89,8 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
             if (!App.isDestroy((Activity) getContext())) {
                 ivBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), data.getImgUrl()), data.getName(), data.getAuthor());
             }
+        }else {
+            data.setImgUrl("");
         }
         KeyWordUtils.setKeyWord(tvBookName, data.getName(), keyWord);
         if (!StringHelper.isEmpty(data.getAuthor())) {
@@ -97,9 +99,13 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
         initTagList(data);
         if (!StringHelper.isEmpty(data.getLastChapter())) {
             tvNewestChapter.setText(getContext().getString(R.string.newest_chapter, data.getLastChapter()));
+        }else {
+            data.setLastChapter("");
         }
         if (!StringHelper.isEmpty(data.getDesc())) {
             tvDesc.setText(String.format("简介:%s", data.getDesc()));
+        }else {
+            data.setDesc("");
         }
         tvSource.setText(getContext().getString(R.string.source_title_num, source.getSourceName(), bookCount));
         App.getHandler().postDelayed(() -> {

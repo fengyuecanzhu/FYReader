@@ -2,7 +2,6 @@ package xyz.fycz.myreader.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -31,7 +30,7 @@ import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentImportSourceBinding;
-import xyz.fycz.myreader.greendao.GreenDaoManager;
+import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.gen.BookSourceDao;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
@@ -211,7 +210,7 @@ public class DIYSourceFragment extends BaseFragment {
             List<BookSource> sourceBeanList;
             if (isSearch) {
                 if (sourceActivity.getSearchView().getQuery().toString().equals("enabled")) {
-                    sourceBeanList = GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+                    sourceBeanList = DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                             .where(BookSourceDao.Properties.SourceEName.isNull())
                             .where(BookSourceDao.Properties.Enable.eq(1))
                             .orderRaw(BookSourceManager.getBookSourceSort())
@@ -219,7 +218,7 @@ public class DIYSourceFragment extends BaseFragment {
                             .list();
                 } else {
                     String term = "%" + sourceActivity.getSearchView().getQuery() + "%";
-                    sourceBeanList = GreenDaoManager.getDaoSession().getBookSourceDao().queryBuilder()
+                    sourceBeanList = DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                             .where(BookSourceDao.Properties.SourceEName.isNull())
                             .whereOr(BookSourceDao.Properties.SourceName.like(term),
                                     BookSourceDao.Properties.SourceGroup.like(term),
@@ -385,7 +384,7 @@ public class DIYSourceFragment extends BaseFragment {
         for (BookSource source : mBookSources) {
             source.setEnable(!source.getEnable());
         }
-        GreenDaoManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(mBookSources);
+        DbManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(mBookSources);
         mAdapter.notifyDataSetChanged();
     }
 
