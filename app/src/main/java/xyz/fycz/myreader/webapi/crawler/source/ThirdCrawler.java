@@ -56,11 +56,6 @@ public class ThirdCrawler extends BaseReadCrawler implements BookInfoCrawler {
         return null;
     }
 
-    @Override
-    public Map<String, String> getHeaders() {
-        return null;
-    }
-
     public ConMVMap<SearchBookBean, Book> getBooks(List<Book> books) {
         ConMVMap<SearchBookBean, Book> newBooks = new ConMVMap<>();
         for (Book book : books){

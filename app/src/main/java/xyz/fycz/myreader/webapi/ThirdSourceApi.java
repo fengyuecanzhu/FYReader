@@ -42,9 +42,11 @@ public class ThirdSourceApi {
      */
     public static Observable<ConMVMap<SearchBookBean, Book>> searchByTC(String key, final ThirdCrawler rc) {
         try {
+            Map<String, String> headers = rc.getHeaders();
+            headers.putAll(getCookies(rc.getNameSpace()));
             BookSource source = rc.getSource();
             AnalyzeUrl analyzeUrl = new AnalyzeUrl(source.getSearchRule().getSearchUrl(),
-                    key, 1, getCookies(source), source.getSourceUrl());
+                    key, 1, headers, source.getSourceUrl());
             BookList bookList = new BookList(source.getSourceUrl(), source.getSourceName(), source, false);
             return OkHttpUtils.getStrResponse(analyzeUrl).flatMap(bookList::analyzeSearchBook)
                     .flatMap((Function<List<Book>, ObservableSource<ConMVMap<SearchBookBean, Book>>>) books -> Observable.create((ObservableOnSubscribe<ConMVMap<SearchBookBean, Book>>) emitter -> {
@@ -63,7 +65,9 @@ public class ThirdSourceApi {
             return bookInfo.analyzeBookInfo(book.getBookInfoBean().getBookInfoHtml(), bookShelfBean);
         }*/
         try {
-            AnalyzeUrl analyzeUrl = new AnalyzeUrl(book.getInfoUrl(), getCookies(source), source.getSourceUrl());
+            Map<String, String> headers = rc.getHeaders();
+            headers.putAll(getCookies(rc.getNameSpace()));
+            AnalyzeUrl analyzeUrl = new AnalyzeUrl(book.getInfoUrl(), headers, source.getSourceUrl());
             return OkHttpUtils.getStrResponse(analyzeUrl)
                     .flatMap(response -> OkHttpUtils.setCookie(response, source.getSourceUrl()))
                     .flatMap(response -> bookInfo.analyzeBookInfo(response.body(), book));
@@ -79,10 +83,12 @@ public class ThirdSourceApi {
             return bookChapterList.analyzeChapterList(bookShelfBean.getBookInfoBean().getChapterListHtml(), bookShelfBean, headerMap);
         }*/
         try {
-            AnalyzeUrl analyzeUrl = new AnalyzeUrl(book.getChapterUrl(), getCookies(source), book.getInfoUrl());
+            Map<String, String> headers = rc.getHeaders();
+            headers.putAll(getCookies(rc.getNameSpace()));
+            AnalyzeUrl analyzeUrl = new AnalyzeUrl(book.getChapterUrl(), headers, book.getInfoUrl());
             return OkHttpUtils.getStrResponse(analyzeUrl)
                     .flatMap(response -> OkHttpUtils.setCookie(response, source.getSourceUrl()))
-                    .flatMap(response -> bookChapterList.analyzeChapterList(response.body(), book, getCookies(source)))
+                    .flatMap(response -> bookChapterList.analyzeChapterList(response.body(), book, headers))
                     .flatMap(chapters -> Observable.create(emitter -> {
                         for (int i = 0; i < chapters.size(); i++) {
                             Chapter chapter = chapters.get(i);
@@ -104,7 +110,9 @@ public class ThirdSourceApi {
             return bookContent.analyzeBookContent(bookShelfBean.getBookInfoBean().getChapterListHtml(), chapterBean, nextChapterBean, bookShelfBean, headerMap);
         }*/
         try {
-            AnalyzeUrl analyzeUrl = new AnalyzeUrl(chapter.getUrl(), getCookies(source), book.getChapterUrl());
+            Map<String, String> headers = rc.getHeaders();
+            headers.putAll(getCookies(rc.getNameSpace()));
+            AnalyzeUrl analyzeUrl = new AnalyzeUrl(chapter.getUrl(), headers, book.getChapterUrl());
             String contentRule = source.getContentRule().getContent();
             if (contentRule.startsWith("$") && !contentRule.startsWith("$.")) {
                 //动态网页第一个js放到webView里执行
@@ -120,11 +128,11 @@ public class ThirdSourceApi {
                     }
                 }
                 return OkHttpUtils.getAjaxString(analyzeUrl, source.getSourceUrl(), js)
-                        .flatMap(response -> bookContent.analyzeBookContent(response, chapter, null, book, getCookies(source)));
+                        .flatMap(response -> bookContent.analyzeBookContent(response, chapter, null, book, headers));
             } else {
                 return OkHttpUtils.getStrResponse(analyzeUrl)
                         .flatMap(response -> OkHttpUtils.setCookie(response, source.getSourceUrl()))
-                        .flatMap(response -> bookContent.analyzeBookContent(response, chapter, null, book, getCookies(source)));
+                        .flatMap(response -> bookContent.analyzeBookContent(response, chapter, null, book, headers));
             }
         } catch (Exception e) {
             return Observable.error(new Throwable(String.format("url错误:%s", chapter.getUrl())));
