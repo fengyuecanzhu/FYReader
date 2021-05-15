@@ -353,7 +353,7 @@
         在“安全选项” 中找到“第三方应用管理”，并选择“添加应用”，输入名称如“风月读书”后，会生成密码，
         选择完成；其中<a href="https://dav.jianguoyun.com/dav/">https://dav.jianguoyun.com/dav/</a>就是填入“WebDAV 服务器地址”的内容，“使用情况”后面的邮箱地址就是你的“WebDAV 账号”，点击显示密码后得到的密码就是你的“WebDAV 密码”。）
         \n\n2、 无需操作，APP默认每天自动云备份一次。</string>
-    <string name="DIY_source_tip">1、风月读书支持用户自定义书源，编写书源可参考<a href="https://blog.csdn.net/fengyuecanzhu/article/details/113826962">\"风月读书书源说明\"</a>，同时软件内置了几个参考DIY书源供参考编写.\n\n2、风月读书兼容第三方书源，提供多种导入方式.您可点击<a href="http://yck.mumuceo.com/yuedu/shuyuan/index.html">\"第三方书源仓库\"</a>，选择需要的书源，点"生成书源"，复制后再应用内点网络导入.\n\n3、第三方书源目前处于测试阶段，可能存在未知bug，理性使用.</string>
+    <string name="DIY_source_tip">1、风月读书支持用户自定义书源，编写书源可参考<a href="https://blog.csdn.net/fengyuecanzhu/article/details/113826962">\"风月读书书源说明\"</a>，同时软件内置了几个参考DIY书源供参考编写.\n\n2、风月读书兼容第三方书源，提供多种导入方式.您可从网络或QQ群(1085028304)获取书源.\n\n3、第三方书源目前处于测试阶段，可能存在未知bug，理性使用.</string>
     <string name="source_tab_base">基本</string>
     <string name="source_tab_search">搜索</string>
     <string name="source_tab_find">发现</string>
