@@ -21,8 +21,7 @@ import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.CookieBean;
-import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeUrl;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
 
 import java.io.IOException;
 import java.io.InputStream;

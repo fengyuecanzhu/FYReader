@@ -61,7 +61,7 @@ import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
 import xyz.fycz.myreader.util.*;
 import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.webapi.CommonApi;
+import xyz.fycz.myreader.webapi.BookApi;
 
 import static xyz.fycz.myreader.application.App.checkVersionByServer;
 
@@ -406,7 +406,7 @@ public class BookcasePresenter implements BasePresenter {
             Thread update = new Thread(() -> {
                 final ArrayList<Chapter> mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
                 final ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(book.getSource());
-                CommonApi.getBookChapters(book, mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
+                BookApi.getBookChapters(book, mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
                     int noReadNum = chapters.size() - book.getChapterTotalNum();
                     book.setNoReadNum(Math.max(noReadNum, 0));
                     book.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
@@ -780,7 +780,7 @@ public class BookcasePresenter implements BasePresenter {
                 chapter.setBookId(book.getId());
             }
             ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(book.getSource());
-            CommonApi.getChapterContent(chapter, book, mReadCrawler).flatMap(s -> Observable.create(emitter -> {
+            BookApi.getChapterContent(chapter, book, mReadCrawler).flatMap(s -> Observable.create(emitter -> {
                 downloadingChapter = chapter.getTitle();
                 mChapterService.saveOrUpdateChapter(chapter, s);
                 successCathe++;

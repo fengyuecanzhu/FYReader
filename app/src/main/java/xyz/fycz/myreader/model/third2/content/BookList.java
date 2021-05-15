@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.model.third.content;
+package xyz.fycz.myreader.model.third2.content;
 
 import android.os.Build;
 import android.text.TextUtils;
@@ -20,8 +20,8 @@ import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.entity.rule.FindRule;
 import xyz.fycz.myreader.greendao.entity.rule.InfoRule;
 import xyz.fycz.myreader.greendao.entity.rule.SearchRule;
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeByRegex;
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeRule;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeByRegex;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeRule;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 

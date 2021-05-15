@@ -10,6 +10,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.webapi.LanZousApi;
 import xyz.fycz.myreader.webapi.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.MainActivity;
@@ -17,7 +18,6 @@ import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
-import xyz.fycz.myreader.webapi.CommonApi;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -74,7 +74,7 @@ public class APPDownloadTip {
         mBookcaseFragment.getRlDownloadTip().setVisibility(View.VISIBLE);
         mBookcaseFragment.getPbDownload().setProgress(0);
         mBookcaseFragment.getTvDownloadTip().setText("正在获取下载链接...");
-        CommonApi.getUrl(url, new ResultCallback() {
+        LanZousApi.getUrl(url, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
                 final String downloadUrl = (String) o;

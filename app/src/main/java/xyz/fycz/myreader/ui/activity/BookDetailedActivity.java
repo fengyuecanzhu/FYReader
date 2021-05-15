@@ -77,7 +77,7 @@ import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
-import xyz.fycz.myreader.webapi.CommonApi;
+import xyz.fycz.myreader.webapi.BookApi;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
@@ -413,7 +413,7 @@ public class BookDetailedActivity extends BaseActivity {
         if ((rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) || (thirdSource && !isCollected)) {
             binding.pbLoading.setVisibility(View.VISIBLE);
             BookInfoCrawler bic = (BookInfoCrawler) rc;
-            CommonApi.getBookInfo(mBook, bic).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Book>() {
+            BookApi.getBookInfo(mBook, bic).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Book>() {
                 @Override
                 public void onNext(@NotNull Book book) {
                     if (!App.isDestroy(BookDetailedActivity.this)) {
@@ -476,7 +476,7 @@ public class BookDetailedActivity extends BaseActivity {
                 mChapters = mChapterService.findBookAllChapterByBookId(mBook.getId());
             }
             if (chaptersDis != null) chaptersDis.dispose();
-            CommonApi.getBookChapters(mBook, mReadCrawler)
+            BookApi.getBookChapters(mBook, mReadCrawler)
                     .flatMap((Function<List<Chapter>, ObservableSource<Boolean>>) chapters -> saveChapters(chapters, isChangeSource)).compose(RxUtils::toSimpleSingle)
                     .subscribe(new MyObserver<Boolean>() {
                         @Override

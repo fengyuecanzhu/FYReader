@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeUrl;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 

@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.Observable;
-import io.reactivex.internal.schedulers.ExecutorScheduler;
 import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
@@ -97,7 +96,7 @@ import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.ScreenUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.util.utils.SystemBarUtils;
-import xyz.fycz.myreader.webapi.CommonApi;
+import xyz.fycz.myreader.webapi.BookApi;
 import xyz.fycz.myreader.webapi.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
@@ -1008,7 +1007,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 });
             } else {
                 mPageLoader.setmStatus(PageLoader.STATUS_LOADING_CHAPTER);
-                CommonApi.getBookChapters(mBook, mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
+                BookApi.getBookChapters(mBook, mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
                     updateAllOldChapterData(chapters);
                     initChapters();
                     emitter.onNext(chapters);
@@ -1585,7 +1584,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 if (StringHelper.isEmpty(chapter.getBookId())) {
                     chapter.setId(mBook.getId());
                 }
-                CommonApi.getChapterContent(chapter, mBook, mReadCrawler)
+                BookApi.getChapterContent(chapter, mBook, mReadCrawler)
                         .subscribeOn(Schedulers.from(App.getApplication().getmFixedThreadPool()))
                         .subscribe(new MyObserver<String>() {
                             @Override

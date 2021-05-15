@@ -3,24 +3,14 @@ package xyz.fycz.myreader.webapi;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.functions.Function;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeUrl;
-import xyz.fycz.myreader.model.third.content.BookChapterList;
-import xyz.fycz.myreader.model.third.content.BookContent;
-import xyz.fycz.myreader.model.third.content.BookInfo;
-import xyz.fycz.myreader.model.third.content.BookList;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
@@ -28,10 +18,8 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.TianLaiReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
 
-import static xyz.fycz.myreader.common.APPCONST.JS_PATTERN;
 
-
-public class CommonApi {
+public class BookApi {
 
     /**
      * 获取章节列表
@@ -143,51 +131,4 @@ public class CommonApi {
             emitter.onComplete();
         });
     }
-
-
-
-    /**
-     * 通过api获取蓝奏云可下载直链
-     *
-     * @param lanZouUrl
-     * @param callback
-     */
-    public static void getUrl(final String lanZouUrl, final ResultCallback callback) {
-        LanZousApi.getUrl1(lanZouUrl, new ResultCallback() {
-            @Override
-            public void onFinish(final Object o, int code) {
-                LanZousApi.getKey((String) o, new ResultCallback() {
-                    final String referer = (String) o;
-
-                    @Override
-                    public void onFinish(Object o, int code) {
-                        LanZousApi.getUrl2((String) o, new ResultCallback() {
-                            @Override
-                            public void onFinish(Object o, int code) {
-                                LanZousApi.getRedirectUrl((String) o, callback);
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                callback.onError(e);
-                            }
-                        }, referer);
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        callback.onError(e);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
-            }
-        });
-
-    }
-
-
 }

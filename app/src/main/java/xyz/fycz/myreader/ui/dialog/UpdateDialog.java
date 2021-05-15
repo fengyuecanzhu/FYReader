@@ -40,7 +40,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.databinding.FragmentUpdateBinding;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.webapi.CommonApi;
+import xyz.fycz.myreader.webapi.LanZousApi;
 import xyz.fycz.myreader.webapi.ResultCallback;
 
 
@@ -368,7 +368,7 @@ public class UpdateDialog extends Fragment {
     private void downloadWithLanzous(String apkUrl) {
         binding.tvProgress.setText("正在获取下载链接...");
         binding.barPercentView.setPercentage(0);
-        CommonApi.getUrl(apkUrl, new ResultCallback() {
+        LanZousApi.getUrl(apkUrl, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
                 String downloadUrl = (String) o;

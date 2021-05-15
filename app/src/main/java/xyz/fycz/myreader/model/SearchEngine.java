@@ -16,7 +16,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.webapi.CommonApi;
+import xyz.fycz.myreader.webapi.BookApi;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
@@ -135,7 +135,7 @@ public class SearchEngine {
         searchSiteIndex++;
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
-            CommonApi.search(keyword, crawler)
+            BookApi.search(keyword, crawler)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<ConMVMap<SearchBookBean, Book>>() {
@@ -182,7 +182,7 @@ public class SearchEngine {
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
             String searchKey = title;
-            CommonApi.search(searchKey, crawler)
+            BookApi.search(searchKey, crawler)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<ConMVMap<SearchBookBean, Book>>() {
@@ -229,7 +229,7 @@ public class SearchEngine {
     }
 
     public synchronized void getBookInfo(Book book, BookInfoCrawler bic, OnGetBookInfoListener listener){
-        CommonApi.getBookInfo(book, bic)
+        BookApi.getBookInfo(book, bic)
                 .subscribeOn(scheduler)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Book>() {
