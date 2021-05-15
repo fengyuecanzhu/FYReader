@@ -269,7 +269,7 @@ public class SplashActivity extends BaseActivity {
         SharedPreUtils preUtils = SharedPreUtils.getInstance();
         String splashImageMD5 = preUtils.getString("splashImageMD5");
         if (!imgFile.exists() || preUtils.getBoolean("needUdSI") ||
-                !splashImageMD5.equals(MD5Utils.getFileMD5s(imgFile, 16))) {
+                !splashImageMD5.equals(MD5Utils.INSTANCE.getFileMD5s(imgFile, 16))) {
             if ("".equals(splashImageMD5)) return;
             downLoadImage();
             return;

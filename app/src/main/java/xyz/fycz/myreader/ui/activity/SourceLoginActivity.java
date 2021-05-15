@@ -15,9 +15,8 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySourceLoginBinding;
-import xyz.fycz.myreader.greendao.DbManager;
-import xyz.fycz.myreader.greendao.entity.CookieBean;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
+import xyz.fycz.myreader.greendao.service.CookieStore;
 import xyz.fycz.myreader.util.ToastUtils;
 
 /**
@@ -67,14 +66,14 @@ public class SourceLoginActivity extends BaseActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 String cookie = cookieManager.getCookie(url);
-                DbManager.getDaoSession().getCookieBeanDao().insertOrReplace(new CookieBean(bookSource.getLoginUrl(), cookie));
+                CookieStore.INSTANCE.setCookie(bookSource.getSourceUrl(), cookie);
                 super.onPageStarted(view, url, favicon);
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 String cookie = cookieManager.getCookie(url);
-                DbManager.getDaoSession().getCookieBeanDao().insertOrReplace(new CookieBean(bookSource.getLoginUrl(), cookie));
+                CookieStore.INSTANCE.setCookie(bookSource.getSourceUrl(), cookie);
                 if (checking)
                     finish();
                 else

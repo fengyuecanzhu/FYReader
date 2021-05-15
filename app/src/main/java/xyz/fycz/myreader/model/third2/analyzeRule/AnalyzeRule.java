@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import javax.script.SimpleBindings;
 
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.service.CookieStore;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.help.JsExtensions;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -533,9 +534,9 @@ public class AnalyzeRule implements JsExtensions {
     private Object evalJS(String jsStr, Object result) throws Exception {
         SimpleBindings bindings = new SimpleBindings();
         bindings.put("java", this);
+        bindings.put("cookie", CookieStore.INSTANCE);
         bindings.put("result", result);
         bindings.put("baseUrl", baseUrl);
-        bindings.put("book", book);
         return SCRIPT_ENGINE.eval(jsStr, bindings);
     }
 

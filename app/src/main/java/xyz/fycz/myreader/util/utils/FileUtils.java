@@ -256,7 +256,7 @@ public class FileUtils {
         FileOutputStream fos = null;
         File temFile = null;
         try {
-            temFile = getFile(APPCONST.TEM_FILE_DIR + "tem.fy");
+            temFile = getFile(getCachePath() + File.separator + "tem.fy");
             fis = new FileInputStream(file);
             fos = new FileOutputStream(temFile);
             //用10kb作为试探
@@ -878,83 +878,6 @@ public class FileUtils {
         return null;
     }
 
-    public static byte[] File2byte(String filePath)
-    {
-        byte[] buffer = null;
-        try
-        {
-            File file = new File(filePath);
-            FileInputStream fis = new FileInputStream(file);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            byte[] b = new byte[1024];
-            int n;
-            while ((n = fis.read(b)) != -1)
-            {
-                bos.write(b, 0, n);
-            }
-            fis.close();
-            bos.close();
-            buffer = bos.toByteArray();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return buffer;
-    }
-
-    public static void byte2File(byte[] buf, String filePath, String fileName)
-    {
-        BufferedOutputStream bos = null;
-        FileOutputStream fos = null;
-        File file = null;
-        try
-        {
-            File dir = new File(filePath);
-            if (!dir.exists() && dir.isDirectory())
-            {
-                dir.mkdirs();
-            }
-            file = new File(filePath + File.separator + fileName);
-            fos = new FileOutputStream(file);
-            bos = new BufferedOutputStream(fos);
-            bos.write(buf);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            if (bos != null)
-            {
-                try
-                {
-                    bos.close();
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-            if (fos != null)
-            {
-                try
-                {
-                    fos.close();
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
     public static String getFileSuffix(String filePath) {
         File file = new File(filePath);
         return getFileSuffix(file);
@@ -968,4 +891,21 @@ public class FileUtils {
         int dotIndex = fileName.lastIndexOf(".");
         return dotIndex > 0 ? fileName.substring(dotIndex) : "";
     }
+
+    /**
+     * 获取文件名（不包括扩展名）
+     */
+    public static String getNameExcludeExtension(String filePath) {
+        try {
+            String fileName = new File(filePath).getName();
+            int lastIndexOf = fileName.lastIndexOf(".");
+            if (lastIndexOf != -1) {
+                fileName = fileName.substring(0, lastIndexOf);
+            }
+            return fileName;
+        } catch (Exception e) {
+           return "";
+        }
+    }
+
 }
