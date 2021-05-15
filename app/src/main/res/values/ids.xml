@@ -6,4 +6,7 @@
     <item name="tag2" type="id" />
 
     <item type="id" name="status_bar"/>
+
+    <item name="fast_scroller" type="id" />
+
 </resources>

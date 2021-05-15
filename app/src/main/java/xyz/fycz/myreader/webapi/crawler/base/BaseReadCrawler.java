@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.webapi.crawler.base;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 public abstract class BaseReadCrawler implements ReadCrawler {
     @Override
     public Map<String, String> getHeaders() {
-        return null;
+        return new HashMap<>();
     }
 
     @Override
@@ -39,16 +40,25 @@ public abstract class BaseReadCrawler implements ReadCrawler {
 
     @Override
     public Observable<ConMVMap<SearchBookBean, Book>> getBooksFromStrResponse(StrResponse response) {
-        return null;
+        return Observable.create(emitter -> {
+           emitter.onNext(getBooksFromSearchHtml(response.body()));
+           emitter.onComplete();
+        });
     }
 
     @Override
     public Observable<List<Chapter>> getChaptersFromStrResponse(StrResponse response) {
-        return null;
+        return Observable.create(emitter -> {
+            emitter.onNext(getChaptersFromHtml(response.body()));
+            emitter.onComplete();
+        });
     }
 
     @Override
     public Observable<String> getContentFormStrResponse(StrResponse response) {
-        return null;
+        return Observable.create(emitter -> {
+            emitter.onNext(getContentFormHtml(response.body()));
+            emitter.onComplete();
+        });
     }
 }

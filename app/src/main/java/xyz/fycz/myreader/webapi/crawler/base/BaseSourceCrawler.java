@@ -348,7 +348,7 @@ public abstract class BaseSourceCrawler extends BaseReadCrawler implements BookI
     @Override
     public Map<String, String> getHeaders() {
         if (!StringUtils.isJsonObject(source.getSourceHeaders()))
-            return null;
+            return super.getHeaders();
         try {
             JSONObject headersJson = new JSONObject(source.getSourceHeaders());
             Map<String, String> headers = new HashMap<>();
@@ -362,7 +362,7 @@ public abstract class BaseSourceCrawler extends BaseReadCrawler implements BookI
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
+        return super.getHeaders();
     }
 
     /**
