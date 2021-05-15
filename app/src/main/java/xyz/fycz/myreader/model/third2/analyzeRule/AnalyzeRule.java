@@ -535,6 +535,7 @@ public class AnalyzeRule implements JsExtensions {
         bindings.put("java", this);
         bindings.put("result", result);
         bindings.put("baseUrl", baseUrl);
+        bindings.put("book", book);
         return SCRIPT_ENGINE.eval(jsStr, bindings);
     }
 

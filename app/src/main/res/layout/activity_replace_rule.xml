@@ -7,10 +7,15 @@
 
     <include layout="@layout/toolbar"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_rule_list"
-        android:background="@color/colorForeground"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+        <xyz.fycz.myreader.widget.scroller.FastScrollRecyclerView
+            android:id="@+id/rv_rule_list"
+            android:background="@color/colorForeground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
 
 </LinearLayout>

@@ -25,6 +25,7 @@ import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
 
 import static xyz.fycz.myreader.common.APPCONST.JS_PATTERN;
+import static xyz.fycz.myreader.util.utils.OkHttpUtils.getCookies;
 
 /**
  * @author fengyue
@@ -130,14 +131,4 @@ public class ThirdSourceApi {
         }
     }
 
-    private static Map<String, String> getCookies(BookSource bookSource){
-        Map<String, String> cookieMap = new HashMap<>();
-        if (bookSource != null){
-            CookieBean cookie = DbManager.getDaoSession().getCookieBeanDao().load(bookSource.getSourceUrl());
-            if (cookie != null) {
-                cookieMap.put("Cookie", cookie.getCookie());
-            }
-        }
-        return cookieMap;
-    }
 }
