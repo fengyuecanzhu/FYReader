@@ -60,6 +60,7 @@ public class SourceLoginActivity extends BaseActivity {
         settings.setSupportZoom(true);
         settings.setBuiltInZoomControls(true);
         settings.setDefaultTextEncodingName("UTF-8");
+        //settings.setUserAgentString(APPCONST.DEFAULT_USER_AGENT);
         settings.setJavaScriptEnabled(true);
         CookieManager cookieManager = CookieManager.getInstance();
         binding.webView.setWebViewClient(new WebViewClient() {

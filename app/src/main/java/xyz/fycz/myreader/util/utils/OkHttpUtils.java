@@ -18,6 +18,7 @@ import org.jsoup.nodes.Document;
 import io.reactivex.Observable;
 import okhttp3.*;
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.CookieBean;
@@ -107,10 +108,14 @@ public class OkHttpUtils {
                 .addHeader("Connection", "Keep-Alive")
                 //.addHeader("Charsert", "utf-8")
                 .addHeader("Cache-Control", "no-cache")
-                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36");
+                .addHeader("User-Agent", APPCONST.DEFAULT_USER_AGENT);
         if (headers != null) {
             for (String name : headers.keySet()) {
-                builder.addHeader(name, headers.get(name));
+                if (name.toLowerCase().equals("user-agent")) {
+                    builder.header(name, headers.get(name));
+                } else {
+                    builder.addHeader(name, headers.get(name));
+                }
             }
         }
         if (requestBody != null) {
@@ -129,7 +134,7 @@ public class OkHttpUtils {
 
     public static InputStream getInputStream(String url) throws IOException {
         Request.Builder builder = new Request.Builder()
-                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36");
+                .addHeader("user-agent", APPCONST.DEFAULT_USER_AGENT);
         Request request = builder
                 .url(url)
                 .build();
@@ -150,7 +155,7 @@ public class OkHttpUtils {
         String url = "https://www.yuque.com/api/docs/" + key + "?book_id=19981967&include_contributors=true&include_hits=true&include_like=true&include_pager=true&include_suggests=true";
         String referer = "https://www.yuque.com/books/share/bf61f5fb-6eff-4740-ab38-749300e79306/" + key;
         Request.Builder builder = new Request.Builder()
-                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36")
+                .addHeader("User-Agent", APPCONST.DEFAULT_USER_AGENT)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Referer", referer);
         Request request = builder
