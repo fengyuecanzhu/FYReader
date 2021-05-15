@@ -318,6 +318,7 @@ public class BookDetailedActivity extends BaseActivity {
         mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
             Book bookTem = (Book) mBook.clone();
             bookTem.setChapterUrl(bean.getChapterUrl());
+            bookTem.setInfoUrl(bean.getInfoUrl());
             if (!StringHelper.isEmpty(bean.getImgUrl())) {
                 bookTem.setImgUrl(bean.getImgUrl());
             }
@@ -326,6 +327,15 @@ public class BookDetailedActivity extends BaseActivity {
             }
             if (!StringHelper.isEmpty(bean.getDesc())) {
                 bookTem.setDesc(bean.getDesc());
+            }
+            if (!StringHelper.isEmpty(bean.getUpdateDate())){
+                bookTem.setUpdateDate(bean.getUpdateDate());
+            }
+            if (!StringHelper.isEmpty(bean.getWordCount())){
+                bookTem.setWordCount(bean.getWordCount());
+            }
+            if (!StringHelper.isEmpty(bean.getStatus())){
+                bookTem.setStatus(bean.getStatus());
             }
             bookTem.setSource(bean.getSource());
             if (isCollected) {

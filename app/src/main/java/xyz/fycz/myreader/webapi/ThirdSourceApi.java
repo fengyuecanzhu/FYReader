@@ -1,6 +1,5 @@
 package xyz.fycz.myreader.webapi;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -10,10 +9,8 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 import xyz.fycz.myreader.entity.SearchBookBean;
-import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.greendao.entity.CookieBean;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;

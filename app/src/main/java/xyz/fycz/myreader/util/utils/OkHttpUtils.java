@@ -15,23 +15,29 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import io.reactivex.Observable;
-import okhttp3.*;
-import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.entity.StrResponse;
-import xyz.fycz.myreader.greendao.DbManager;
-import xyz.fycz.myreader.greendao.entity.CookieBean;
-import xyz.fycz.myreader.greendao.entity.rule.BookSource;
-import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
-
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.entity.StrResponse;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
+import xyz.fycz.myreader.greendao.service.CookieStore;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
 
 import static xyz.fycz.myreader.util.help.SSLSocketClient.createSSLSocketFactory;
 import static xyz.fycz.myreader.util.help.SSLSocketClient.createTrustAllManager;
@@ -82,7 +88,7 @@ public class OkHttpUtils {
         if (body == null) {
             return "";
         } else {
-            String bodyStr = new String(body.bytes(), encodeType);
+            String bodyStr = new String(body.bytes(), Charset.forName(encodeType));
             Log.d("Http: read finish", bodyStr);
             return bodyStr;
         }
@@ -253,8 +259,7 @@ public class OkHttpUtils {
                 webView.setWebViewClient(new WebViewClient() {
                     @Override
                     public void onPageFinished(WebView view, String url) {
-                        DbManager.getDaoSession().getCookieBeanDao()
-                                .insertOrReplace(new CookieBean(tag, cookieManager.getCookie(webView.getUrl())));
+                        CookieStore.INSTANCE.setCookie(tag, cookieManager.getCookie(webView.getUrl()));
                         handler.postDelayed(retryRunnable, 1000);
                     }
                 });
@@ -286,7 +291,7 @@ public class OkHttpUtils {
                 }
                 String cookie = cookieBuilder.toString();
                 if (!TextUtils.isEmpty(cookie)) {
-                    DbManager.getDaoSession().getCookieBeanDao().insertOrReplace(new CookieBean(tag, cookie));
+                    CookieStore.INSTANCE.setCookie(tag, cookie);
                 }
             }
             e.onNext(response);
@@ -304,10 +309,7 @@ public class OkHttpUtils {
     public static Map<String, String> getCookies(String url) {
         Map<String, String> cookieMap = new HashMap<>();
         if (url != null) {
-            CookieBean cookie = DbManager.getDaoSession().getCookieBeanDao().load(url);
-            if (cookie != null) {
-                cookieMap.put("Cookie", cookie.getCookie());
-            }
+            cookieMap.put("Cookie", CookieStore.INSTANCE.getCookie(url));
         }
         return cookieMap;
     }

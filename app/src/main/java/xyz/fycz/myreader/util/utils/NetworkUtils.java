@@ -50,6 +50,7 @@ public class NetworkUtils {
             return false;
         }
     }
+
     public static String getUrl(Response response) {
         okhttp3.Response networkResponse = response.networkResponse();
         if (networkResponse != null) {
@@ -104,11 +105,31 @@ public class NetworkUtils {
         }
         return relativePath;
     }
+
     public static boolean isUrl(String urlStr) {
         if (urlStr == null) return false;
         String regex = "^(https?)://.+$";//设置正则表达式
         return urlStr.matches(regex);
     }
+
+    public static String getBaseUrl(String url) {
+        if (url == null || !url.startsWith("http")) return null;
+        int index = url.indexOf("/", 9);
+        if (index == -1) {
+            return url;
+        } else return url.substring(0, index);
+    }
+
+    public static String getSubDomain(String url) {
+        String baseUrl = getBaseUrl(url);
+        if (baseUrl == null) return "";
+        if (baseUrl.indexOf(".") == baseUrl.lastIndexOf(".")) {
+            return baseUrl.substring(baseUrl.lastIndexOf("/") + 1);
+        } else {
+            return baseUrl.substring(baseUrl.indexOf(".") + 1);
+        }
+    }
+
     /**
      * Ipv4 address check.
      */
