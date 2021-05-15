@@ -43,6 +43,7 @@ public class BookSource implements Parcelable, Cloneable {
     private String sourceCharset;
     private String sourceType;
     private String sourceHeaders;
+    private String loginUrl;
     private String sourceComment;
     private Long lastUpdateTime;
 
@@ -72,11 +73,12 @@ public class BookSource implements Parcelable, Cloneable {
     @Convert(converter = FindRuleConvert.class, columnType = String.class)
     private FindRule findRule;
 
-    @Generated(hash = 1082429073)
+    @Generated(hash = 277037260)
     public BookSource(String sourceUrl, String sourceEName, String sourceName, String sourceGroup,
-            String sourceCharset, String sourceType, String sourceHeaders, String sourceComment,
-            Long lastUpdateTime, int orderNum, int weight, boolean enable, SearchRule searchRule,
-            InfoRule infoRule, TocRule tocRule, ContentRule contentRule, FindRule findRule) {
+            String sourceCharset, String sourceType, String sourceHeaders, String loginUrl,
+            String sourceComment, Long lastUpdateTime, int orderNum, int weight, boolean enable,
+            SearchRule searchRule, InfoRule infoRule, TocRule tocRule, ContentRule contentRule,
+            FindRule findRule) {
         this.sourceUrl = sourceUrl;
         this.sourceEName = sourceEName;
         this.sourceName = sourceName;
@@ -84,6 +86,7 @@ public class BookSource implements Parcelable, Cloneable {
         this.sourceCharset = sourceCharset;
         this.sourceType = sourceType;
         this.sourceHeaders = sourceHeaders;
+        this.loginUrl = loginUrl;
         this.sourceComment = sourceComment;
         this.lastUpdateTime = lastUpdateTime;
         this.orderNum = orderNum;
@@ -109,6 +112,7 @@ public class BookSource implements Parcelable, Cloneable {
         sourceCharset = in.readString();
         sourceType = in.readString();
         sourceHeaders = in.readString();
+        loginUrl = in.readString();
         sourceComment = in.readString();
         if (in.readByte() == 0) {
             lastUpdateTime = null;
@@ -134,6 +138,7 @@ public class BookSource implements Parcelable, Cloneable {
         dest.writeString(sourceCharset);
         dest.writeString(sourceType);
         dest.writeString(sourceHeaders);
+        dest.writeString(loginUrl);
         dest.writeString(sourceComment);
         if (lastUpdateTime == null) {
             dest.writeByte((byte) 0);
@@ -181,6 +186,7 @@ public class BookSource implements Parcelable, Cloneable {
                 stringEquals(sourceCharset, source.sourceCharset) &&
                 stringEquals(sourceType, source.sourceType) &&
                 stringEquals(sourceHeaders, source.sourceHeaders) &&
+                stringEquals(loginUrl, source.loginUrl) &&
                 stringEquals(sourceComment, source.sourceComment) &&
                 Objects.equals(searchRule, source.searchRule) &&
                 Objects.equals(infoRule, source.infoRule) &&
@@ -382,5 +388,13 @@ public class BookSource implements Parcelable, Cloneable {
 
     public void setSourceHeaders(String sourceHeaders) {
         this.sourceHeaders = sourceHeaders;
+    }
+
+    public String getLoginUrl() {
+        return this.loginUrl;
+    }
+
+    public void setLoginUrl(String loginUrl) {
+        this.loginUrl = loginUrl;
     }
 }

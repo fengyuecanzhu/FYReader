@@ -8,14 +8,11 @@ import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
-import io.reactivex.annotations.NonNull;
-import xyz.fycz.myreader.greendao.GreenDaoManager;
+import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
-import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.gen.ReplaceRuleBeanDao;
 import xyz.fycz.myreader.util.utils.GsonUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -33,7 +30,7 @@ public class ReplaceRuleManager {
 
     public static List<ReplaceRuleBean> getEnabled() {
         if (replaceRuleBeansEnabled == null) {
-            replaceRuleBeansEnabled = GreenDaoManager.getDaoSession()
+            replaceRuleBeansEnabled = DbManager.getDaoSession()
                     .getReplaceRuleBeanDao().queryBuilder()
                     .where(ReplaceRuleBeanDao.Properties.Enable.eq(true))
                     .orderAsc(ReplaceRuleBeanDao.Properties.SerialNumber)
@@ -54,11 +51,11 @@ public class ReplaceRuleManager {
 
         int sn = replaceRuleBean.getSerialNumber();
         if (sn == 0) {
-            sn = (int) (GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().queryBuilder().count() + 1);
+            sn = (int) (DbManager.getDaoSession().getReplaceRuleBeanDao().queryBuilder().count() + 1);
             replaceRuleBean.setSerialNumber(sn);
         }
 
-        List<ReplaceRuleBean> list = GreenDaoManager.getDaoSession()
+        List<ReplaceRuleBean> list = DbManager.getDaoSession()
                 .getReplaceRuleBeanDao().queryBuilder()
                 .where(ReplaceRuleBeanDao.Properties.Enable.eq(true))
                 .where(ReplaceRuleBeanDao.Properties.ReplaceSummary.eq(replaceRuleBean.getReplaceSummary()))
@@ -79,9 +76,9 @@ public class ReplaceRuleManager {
 
             return Single.create((SingleOnSubscribe<Boolean>) emitter -> {
 
-                GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplace(replaceRuleBean);
+                DbManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplace(replaceRuleBean);
                 for (ReplaceRuleBean li : list) {
-                    GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().delete(li);
+                    DbManager.getDaoSession().getReplaceRuleBeanDao().delete(li);
                 }
                 refreshDataS();
                 emitter.onSuccess(true);
@@ -130,14 +127,14 @@ public class ReplaceRuleManager {
         return buffer.toString().trim();
     }
     public static Single<List<ReplaceRuleBean>> getAll() {
-        return Single.create((SingleOnSubscribe<List<ReplaceRuleBean>>) emitter -> emitter.onSuccess(GreenDaoManager.getDaoSession()
+        return Single.create((SingleOnSubscribe<List<ReplaceRuleBean>>) emitter -> emitter.onSuccess(DbManager.getDaoSession()
                 .getReplaceRuleBeanDao().queryBuilder()
                 .orderAsc(ReplaceRuleBeanDao.Properties.SerialNumber)
                 .list())).compose(RxUtils::toSimpleSingle);
     }
 
     public static List<ReplaceRuleBean> getAllRules() {
-        return GreenDaoManager.getDaoSession()
+        return DbManager.getDaoSession()
                 .getReplaceRuleBeanDao().queryBuilder()
                 .orderAsc(ReplaceRuleBeanDao.Properties.SerialNumber)
                 .list();
@@ -146,29 +143,29 @@ public class ReplaceRuleManager {
     public static Single<Boolean> saveData(ReplaceRuleBean replaceRuleBean) {
         return Single.create((SingleOnSubscribe<Boolean>) emitter -> {
             if (replaceRuleBean.getSerialNumber() == 0) {
-                replaceRuleBean.setSerialNumber((int) (GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().queryBuilder().count() + 1));
+                replaceRuleBean.setSerialNumber((int) (DbManager.getDaoSession().getReplaceRuleBeanDao().queryBuilder().count() + 1));
             }
-            GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplace(replaceRuleBean);
+            DbManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplace(replaceRuleBean);
             refreshDataS();
             emitter.onSuccess(true);
         }).compose(RxUtils::toSimpleSingle);
     }
 
     public static void delData(ReplaceRuleBean replaceRuleBean) {
-        GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().delete(replaceRuleBean);
+        DbManager.getDaoSession().getReplaceRuleBeanDao().delete(replaceRuleBean);
         refreshDataS();
     }
 
     public static void addDataS(List<ReplaceRuleBean> replaceRuleBeans) {
         if (replaceRuleBeans != null && replaceRuleBeans.size() > 0) {
-            GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplaceInTx(replaceRuleBeans);
+            DbManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplaceInTx(replaceRuleBeans);
             refreshDataS();
         }
     }
 
     public static void delDataS(List<ReplaceRuleBean> replaceRuleBeans) {
         if (replaceRuleBeans == null) return;
-        GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().deleteInTx(replaceRuleBeans);
+        DbManager.getDaoSession().getReplaceRuleBeanDao().deleteInTx(replaceRuleBeans);
         refreshDataS();
     }
 
@@ -179,14 +176,14 @@ public class ReplaceRuleManager {
                 beans.get(i).setSerialNumber(i + 1);
             }
             bean.setSerialNumber(0);
-            GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplaceInTx(beans);
-            GreenDaoManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplace(bean);
+            DbManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplaceInTx(beans);
+            DbManager.getDaoSession().getReplaceRuleBeanDao().insertOrReplace(bean);
             e.onSuccess(true);
         }).compose(RxUtils::toSimpleSingle);
     }
 
     private static void refreshDataS() {
-        replaceRuleBeansEnabled = GreenDaoManager.getDaoSession()
+        replaceRuleBeansEnabled = DbManager.getDaoSession()
                 .getReplaceRuleBeanDao().queryBuilder()
                 .where(ReplaceRuleBeanDao.Properties.Enable.eq(true))
                 .orderAsc(ReplaceRuleBeanDao.Properties.SerialNumber)

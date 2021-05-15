@@ -13,7 +13,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.gen.BookDao;
 import xyz.fycz.myreader.util.*;
-import xyz.fycz.myreader.greendao.GreenDaoManager;
+import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
@@ -57,7 +57,7 @@ public class BookService extends BaseService {
      * @return
      */
     public Book getBookById(String id) {
-        BookDao bookDao = GreenDaoManager.getInstance().getSession().getBookDao();
+        BookDao bookDao = DbManager.getInstance().getSession().getBookDao();
         return bookDao.load(id);
     }
 
@@ -67,7 +67,7 @@ public class BookService extends BaseService {
      * @return
      */
     public List<Book> getAllBooks() {
-        return GreenDaoManager.getInstance().getSession().getBookDao()
+        return DbManager.getInstance().getSession().getBookDao()
                 .queryBuilder()
                 .orderAsc(BookDao.Properties.SortCode)
                 .list();
@@ -97,7 +97,7 @@ public class BookService extends BaseService {
         if (StringHelper.isEmpty(groupId)){
             return getAllBooksNoHide();
         }
-        return GreenDaoManager.getInstance().getSession().getBookDao()
+        return DbManager.getInstance().getSession().getBookDao()
                 .queryBuilder()
                 .where(BookDao.Properties.GroupId.eq(groupId))
                 .orderAsc(BookDao.Properties.GroupSort)
@@ -148,13 +148,13 @@ public class BookService extends BaseService {
      */
     public Book findBookByAuthorAndName(String bookName, String author) {
         try {
-            return GreenDaoManager.getInstance().getSession().getBookDao()
+            return DbManager.getInstance().getSession().getBookDao()
                     .queryBuilder()
                     .where(BookDao.Properties.Name.eq(bookName), BookDao.Properties.Author.eq(author))
                     .unique();
         } catch (Exception e) {
             e.printStackTrace();
-            return GreenDaoManager.getInstance().getSession().getBookDao()
+            return DbManager.getInstance().getSession().getBookDao()
                     .queryBuilder()
                     .where(BookDao.Properties.Name.eq(bookName), BookDao.Properties.Author.eq(author))
                     .list().get(0);
@@ -169,13 +169,13 @@ public class BookService extends BaseService {
      */
     public Book findBookByPath(String path) {
         try {
-            return GreenDaoManager.getInstance().getSession().getBookDao()
+            return DbManager.getInstance().getSession().getBookDao()
                     .queryBuilder()
                     .where(BookDao.Properties.ChapterUrl.eq(path))
                     .unique();
         } catch (Exception e) {
             e.printStackTrace();
-            return GreenDaoManager.getInstance().getSession().getBookDao()
+            return DbManager.getInstance().getSession().getBookDao()
                     .queryBuilder()
                     .where(BookDao.Properties.ChapterUrl.eq(path))
                     .list().get(0);
@@ -188,7 +188,7 @@ public class BookService extends BaseService {
      * @param id
      */
     public void deleteBookById(String id) {
-        BookDao bookDao = GreenDaoManager.getInstance().getSession().getBookDao();
+        BookDao bookDao = DbManager.getInstance().getSession().getBookDao();
         bookDao.deleteByKey(id);
         mChapterService.deleteBookALLChapterById(id);
         mBookMarkService.deleteBookALLBookMarkById(id);
@@ -249,7 +249,7 @@ public class BookService extends BaseService {
      * @param books
      */
     public void updateBooks(List<Book> books) {
-        BookDao bookDao = GreenDaoManager.getInstance().getSession().getBookDao();
+        BookDao bookDao = DbManager.getInstance().getSession().getBookDao();
         bookDao.updateInTx(books);
     }
 

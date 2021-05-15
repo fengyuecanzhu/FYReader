@@ -1,9 +1,12 @@
 package xyz.fycz.myreader.webapi.crawler.base;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
 import xyz.fycz.myreader.entity.SearchBookBean;
+import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
@@ -31,6 +34,21 @@ public abstract class BaseReadCrawler implements ReadCrawler {
 
     @Override
     public String getContentFormHtml(String html) {
+        return null;
+    }
+
+    @Override
+    public Observable<ConMVMap<SearchBookBean, Book>> getBooksFromStrResponse(StrResponse response) {
+        return null;
+    }
+
+    @Override
+    public Observable<List<Chapter>> getChaptersFromStrResponse(StrResponse response) {
+        return null;
+    }
+
+    @Override
+    public Observable<String> getContentFormStrResponse(StrResponse response) {
         return null;
     }
 }

@@ -161,7 +161,7 @@ public class SplashActivity extends BaseActivity {
         } else {
             App.getHandler().postDelayed(() -> {
                 binding.tvSkip.setVisibility(View.VISIBLE);
-            }, 3000);
+            }, 2000);
             AdUtils.checkHasAd()
                     .subscribe(new MySingleObserver<Boolean>() {
                         @Override

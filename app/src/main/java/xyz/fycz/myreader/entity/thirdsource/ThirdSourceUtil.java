@@ -22,6 +22,7 @@ public class ThirdSourceUtil {
         bookSource.setSourceName(bean.getBookSourceName());
         bookSource.setSourceGroup(bean.getBookSourceGroup());
         bookSource.setSourceType(APPCONST.THIRD_SOURCE);
+        bookSource.setLoginUrl(bean.getLoginUrl());
         bookSource.setLastUpdateTime(bean.getLastUpdateTime());
         bookSource.setOrderNum(bean.getSerialNumber());
         bookSource.setWeight(bean.getWeight());

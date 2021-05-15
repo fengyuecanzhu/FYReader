@@ -19,6 +19,8 @@ import io.reactivex.Observable;
 import okhttp3.*;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.entity.StrResponse;
+import xyz.fycz.myreader.greendao.DbManager;
+import xyz.fycz.myreader.greendao.entity.CookieBean;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeUrl;
 
@@ -216,7 +218,7 @@ public class OkHttpUtils {
                 WebView webView = new WebView(App.getmContext());
                 webView.getSettings().setJavaScriptEnabled(true);
                 webView.getSettings().setUserAgentString(analyzeUrl.getHeaderMap().get("User-Agent"));
-                //CookieManager cookieManager = CookieManager.getInstance();
+                CookieManager cookieManager = CookieManager.getInstance();
                 Runnable retryRunnable = new Runnable() {
                     @Override
                     public void run() {
@@ -245,8 +247,8 @@ public class OkHttpUtils {
                 webView.setWebViewClient(new WebViewClient() {
                     @Override
                     public void onPageFinished(WebView view, String url) {
-                        /*DbHelper.getDaoSession().getCookieBeanDao()
-                                .insertOrReplace(new CookieBean(tag, cookieManager.getCookie(webView.getUrl())));*/
+                        DbManager.getDaoSession().getCookieBeanDao()
+                                .insertOrReplace(new CookieBean(tag, cookieManager.getCookie(webView.getUrl())));
                         handler.postDelayed(retryRunnable, 1000);
                     }
                 });
@@ -261,6 +263,28 @@ public class OkHttpUtils {
                         webView.loadUrl(analyzeUrl.getUrl(), analyzeUrl.getHeaderMap());
                 }
             });
+        });
+    }
+
+    public static Observable<StrResponse> setCookie(StrResponse response, String tag) {
+        return Observable.create(e -> {
+            if (!response.getResponse().headers("Set-Cookie").isEmpty()) {
+                StringBuilder cookieBuilder = new StringBuilder();
+                for (String s : response.getResponse().headers("Set-Cookie")) {
+                    String[] x = s.split(";");
+                    for (String y : x) {
+                        if (!TextUtils.isEmpty(y)) {
+                            cookieBuilder.append(y).append(";");
+                        }
+                    }
+                }
+                String cookie = cookieBuilder.toString();
+                if (!TextUtils.isEmpty(cookie)) {
+                    DbManager.getDaoSession().getCookieBeanDao().insertOrReplace(new CookieBean(tag, cookie));
+                }
+            }
+            e.onNext(response);
+            e.onComplete();
         });
     }
 
