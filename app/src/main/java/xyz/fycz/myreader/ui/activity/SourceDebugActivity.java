@@ -10,34 +10,47 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.tabs.TabLayout;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.databinding.ActivitySourceDebugBinding;
+import xyz.fycz.myreader.entity.SearchBookBean;
+import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.entity.sourcedebug.DebugBook;
 import xyz.fycz.myreader.entity.sourcedebug.DebugChapter;
 import xyz.fycz.myreader.entity.sourcedebug.DebugEntity;
 import xyz.fycz.myreader.entity.sourcedebug.ListResult;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
+import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
+import xyz.fycz.myreader.webapi.BookApi;
+import xyz.fycz.myreader.webapi.ThirdSourceApi;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
 import xyz.fycz.myreader.widget.codeview.Language;
+
+import static xyz.fycz.myreader.util.utils.OkHttpUtils.getCookies;
 
 /**
  * @author fengyue
@@ -149,52 +162,31 @@ public class SourceDebugActivity extends BaseActivity {
 
     private void initDebugEntity() {
         loadingDialog.show();
-        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-            try {
+        Observable<Boolean> observable;
+        if (rc instanceof ThirdCrawler) {
+            observable = debugThirdSource();
+        } else {
+            observable = Observable.create((ObservableOnSubscribe<StrResponse>) emitter -> {
                 String url = debugEntity.getUrl();
+                Map<String, String> headers = rc.getHeaders();
+                headers.putAll(getCookies(rc.getNameSpace()));
                 if (debugEntity.getDebugMode() == DebugEntity.SEARCH && rc.isPost()) {
                     String[] urlInfo = url.split(",");
                     url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), urlInfo[0]);
                     String body = urlInfo[1];
                     MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                     RequestBody requestBody = RequestBody.create(mediaType, body);
-                    debugEntity.setHtml(OkHttpUtils.getHtml(url, requestBody, rc.getCharset(), rc.getHeaders()));
+                    emitter.onNext(OkHttpUtils.getStrResponse(url, requestBody, rc.getCharset(), headers));
                 } else {
-                    debugEntity.setHtml(OkHttpUtils.getHtml(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url), rc.getCharset(), rc.getHeaders()));
+                    emitter.onNext((OkHttpUtils.getStrResponse(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url), rc.getCharset(), headers)));
                 }
-                ListResult listResult = new ListResult();
-                switch (debugEntity.getDebugMode()) {
-                    case DebugEntity.SEARCH:
-                    default:
-                        List<DebugBook> debugBooks = book2DebugBook(rc.getBooksFromSearchHtml(debugEntity.getHtml()).values());
-                        listResult.set信息(String.format("解析完毕，共%s本书籍", debugBooks.size()));
-                        listResult.set结果(debugBooks);
-                        debugEntity.setParseResult(GsonExtensionsKt.getGSON()
-                                .toJson(listResult));
-                        break;
-                    case DebugEntity.INFO:
-                        debugEntity.setParseResult(GsonExtensionsKt.getGSON()
-                                .toJson(book2DebugBook(((BookInfoCrawler) rc).getBookInfo(debugEntity.getHtml(), new Book()))));
-                        break;
-                    case DebugEntity.TOC:
-                        List<DebugChapter> debugChapters = chapter2DebugChapter(rc.getChaptersFromHtml(debugEntity.getHtml()));
-                        listResult.set信息(String.format("解析完毕，共%s个章节", debugChapters.size()));
-                        listResult.set结果(debugChapters);
-                        debugEntity.setParseResult(GsonExtensionsKt.getGSON()
-                                .toJson(listResult));
-                        break;
-                    case DebugEntity.CONTENT:
-                        debugEntity.setParseResult(rc.getContentFormHtml(debugEntity.getHtml()));
-                        break;
-                }
-                emitter.onNext(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-                emitter.onError(e);
-            }
-            emitter.onComplete();
-        }).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Boolean>() {
+                emitter.onComplete();
 
+            }).flatMap(response -> OkHttpUtils.setCookie(response, rc.getNameSpace()))
+                    .flatMap((Function<StrResponse, ObservableSource<Boolean>>) this::debugSource);
+        }
+
+        observable.compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Boolean>() {
             @Override
             public void onSubscribe(Disposable d) {
                 disposable = d;
@@ -214,8 +206,100 @@ public class SourceDebugActivity extends BaseActivity {
                 binding.rvSourceCode.setCode(debugEntity.getHtml()).apply();
                 loadingDialog.dismiss();
             }
-
         });
+    }
+
+    private Observable<Boolean> debugSource(StrResponse response) {
+        debugEntity.setHtml(response.body());
+        ListResult listResult = new ListResult();
+        switch (debugEntity.getDebugMode()) {
+            case DebugEntity.SEARCH:
+            default:
+                return rc.getBooksFromStrResponse(response)
+                        .flatMap((Function<ConMVMap<SearchBookBean, Book>, ObservableSource<Boolean>>) books -> Observable.create(emitter -> {
+                            List<DebugBook> debugBooks = book2DebugBook(books.values());
+                            listResult.set信息(String.format("解析完毕，共%s本书籍", debugBooks.size()));
+                            listResult.set结果(debugBooks);
+                            debugEntity.setParseResult(GsonExtensionsKt.getGSON()
+                                    .toJson(listResult));
+                            emitter.onNext(true);
+                            emitter.onComplete();
+                        }));
+            case DebugEntity.INFO:
+                return ((BookInfoCrawler) rc).getBookInfo(response, new Book())
+                        .flatMap((Function<Book, ObservableSource<Boolean>>) book -> Observable.create(emitter -> {
+                            debugEntity.setParseResult(GsonExtensionsKt.getGSON().toJson(book2DebugBook(book)));
+                            emitter.onNext(true);
+                            emitter.onComplete();
+                        }));
+            case DebugEntity.TOC:
+                return rc.getChaptersFromStrResponse(response)
+                        .flatMap((Function<List<Chapter>, ObservableSource<Boolean>>) chapters -> Observable.create(emitter -> {
+                            List<DebugChapter> debugChapters = chapter2DebugChapter(chapters);
+                            listResult.set信息(String.format("解析完毕，共%s个章节", debugChapters.size()));
+                            listResult.set结果(debugChapters);
+                            debugEntity.setParseResult(GsonExtensionsKt.getGSON()
+                                    .toJson(listResult));
+                            emitter.onNext(true);
+                            emitter.onComplete();
+                        }));
+            case DebugEntity.CONTENT:
+                return rc.getContentFormStrResponse(response)
+                        .flatMap((Function<String, ObservableSource<Boolean>>) content -> Observable.create(emitter -> {
+                            debugEntity.setParseResult(content);
+                            emitter.onNext(true);
+                            emitter.onComplete();
+                        }));
+        }
+    }
+
+    private Observable<Boolean> debugThirdSource() {
+        debugEntity.setHtml("第三方书源不支持查看源码");
+        ListResult listResult = new ListResult();
+        Book book = new Book();
+        book.setChapterUrl(debugEntity.getUrl());
+        switch (debugEntity.getDebugMode()) {
+            case DebugEntity.SEARCH:
+            default:
+                return BookApi.search(debugEntity.getKey(), rc)
+                        .flatMap((Function<ConMVMap<SearchBookBean, Book>, ObservableSource<Boolean>>) books -> Observable.create(emitter -> {
+                            List<DebugBook> debugBooks = book2DebugBook(books.values());
+                            listResult.set信息(String.format("解析完毕，共%s本书籍", debugBooks.size()));
+                            listResult.set结果(debugBooks);
+                            debugEntity.setParseResult(GsonExtensionsKt.getGSON()
+                                    .toJson(listResult));
+                            emitter.onNext(true);
+                            emitter.onComplete();
+                        }));
+            case DebugEntity.INFO:
+                return BookApi.getBookInfo(book, (BookInfoCrawler) rc)
+                        .flatMap((Function<Book, ObservableSource<Boolean>>) book1 -> Observable.create(emitter -> {
+                            debugEntity.setParseResult(GsonExtensionsKt.getGSON().toJson(book2DebugBook(book1)));
+                            emitter.onNext(true);
+                            emitter.onComplete();
+                        }));
+            case DebugEntity.TOC:
+                return BookApi.getBookChapters(book, rc)
+                        .flatMap((Function<List<Chapter>, ObservableSource<Boolean>>) chapters -> Observable.create(emitter -> {
+                            List<DebugChapter> debugChapters = chapter2DebugChapter(chapters);
+                            listResult.set信息(String.format("解析完毕，共%s个章节", debugChapters.size()));
+                            listResult.set结果(debugChapters);
+                            debugEntity.setParseResult(GsonExtensionsKt.getGSON()
+                                    .toJson(listResult));
+                            emitter.onNext(true);
+                            emitter.onComplete();
+                        }));
+            case DebugEntity.CONTENT:
+                Chapter chapter = new Chapter();
+                book.setChapterUrl(rc.getNameSpace());
+                chapter.setUrl(debugEntity.getUrl());
+                return BookApi.getChapterContent(chapter, book, rc)
+                        .flatMap((Function<String, ObservableSource<Boolean>>) content -> Observable.create(emitter -> {
+                            debugEntity.setParseResult(content);
+                            emitter.onNext(true);
+                            emitter.onComplete();
+                        }));
+        }
     }
 
     private List<DebugBook> book2DebugBook(List<Book> books) {

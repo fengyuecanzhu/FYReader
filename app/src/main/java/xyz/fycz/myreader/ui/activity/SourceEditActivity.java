@@ -143,30 +143,12 @@ public class SourceEditActivity extends BaseActivity {
 
             }
         });
-        binding.sSourceType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                invalidateOptionsMenu();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_source_edit, menu);
         return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem debug = menu.findItem(R.id.action_debug);
-        debug.setVisible(!APPCONST.THIRD_SOURCE.equals(getSource().getSourceType()));
-        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -216,6 +198,7 @@ public class SourceEditActivity extends BaseActivity {
         MyAlertDialog.createInputDia(this, String.valueOf(title), hint,
                 "", true, 500, text -> {
                     if (debugMode == DebugEntity.SEARCH) {
+                        debugEntity.setKey(text);
                         try {
                             MatcherCrawler sc = new MatcherCrawler(source);
                             if (!sc.getSearchCharset().toLowerCase().equals("utf-8")) {

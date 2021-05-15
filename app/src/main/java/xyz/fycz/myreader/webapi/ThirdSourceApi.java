@@ -40,7 +40,7 @@ public class ThirdSourceApi {
      * @param rc
      * @return
      */
-    public static Observable<ConMVMap<SearchBookBean, Book>> searchByTC(String key, final ThirdCrawler rc) {
+    protected static Observable<ConMVMap<SearchBookBean, Book>> searchByTC(String key, final ThirdCrawler rc) {
         try {
             Map<String, String> headers = rc.getHeaders();
             headers.putAll(getCookies(rc.getNameSpace()));

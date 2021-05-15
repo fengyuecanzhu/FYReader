@@ -108,7 +108,6 @@ public class FYReadCrawler extends BaseReadCrawler {
             book.setAuthor(div.getElementsByTag("a").get(2).text());
             book.setType(div.getElementsByTag("a").get(3).text());
             book.setNewestChapterTitle(div.getElementsByTag("a").get(4).text());
-            book.setNewestChapterUrl(div.getElementsByTag("a").get(4).attr("href"));
             Element img = div.getElementsByTag("img").get(0);
             book.setImgUrl(img.attr("data-original"));
             Element chapterUrl = div.getElementsByTag("a").get(1);

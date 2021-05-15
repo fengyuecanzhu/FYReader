@@ -27,6 +27,7 @@ public class BookInfo {
     public Observable<Book> analyzeBookInfo(String s, final Book book) {
         return Observable.create(e -> {
             String baseUrl = book.getInfoUrl();
+            book.setInfoUrl(baseUrl);
             InfoRule infoRule = source.getInfoRule();
             if (TextUtils.isEmpty(s)) {
                 e.onError(new Throwable("书籍信息获取失败" + baseUrl));
