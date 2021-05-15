@@ -22,11 +22,6 @@ import java.util.Objects;
 
 import static xyz.fycz.myreader.common.APPCONST.MAP_STRING;
 
-/**
- * 书
- * Created by fengyue on 2020/08/23.
- */
-
 @Entity
 public class Book implements Serializable {
     @Transient
@@ -47,7 +42,6 @@ public class Book implements Serializable {
     private String status;
     private String newestChapterId;//最新章节id
     private String newestChapterTitle;//最新章节标题
-    private String newestChapterUrl;//最新章节url
     private String historyChapterId;//上次关闭时的章节ID
     private int histtoryChapterNum;//上次关闭时的章节数
 
@@ -82,13 +76,17 @@ public class Book implements Serializable {
     @Transient
     private Map<String, String> variableMap;
 
-    @Generated(hash = 1284526947)
+    @Generated(hash = 1839243756)
+    public Book() {
+    }
+
+    @Generated(hash = 1910282685)
     public Book(String id, String name, String chapterUrl, String infoUrl, String imgUrl, String desc,
             String author, String type, String updateDate, String wordCount, String status,
-            String newestChapterId, String newestChapterTitle, String newestChapterUrl, String historyChapterId,
-            int histtoryChapterNum, int sortCode, int noReadNum, int chapterTotalNum, int lastReadPosition,
-            String source, boolean isCloseUpdate, boolean isDownLoadAll, String groupId, int groupSort,
-            String tag, Boolean replaceEnable, long lastReadTime, String variable) {
+            String newestChapterId, String newestChapterTitle, String historyChapterId, int histtoryChapterNum,
+            int sortCode, int noReadNum, int chapterTotalNum, int lastReadPosition, String source,
+            boolean isCloseUpdate, boolean isDownLoadAll, String groupId, int groupSort, String tag,
+            Boolean replaceEnable, long lastReadTime, String variable) {
         this.id = id;
         this.name = name;
         this.chapterUrl = chapterUrl;
@@ -102,7 +100,6 @@ public class Book implements Serializable {
         this.status = status;
         this.newestChapterId = newestChapterId;
         this.newestChapterTitle = newestChapterTitle;
-        this.newestChapterUrl = newestChapterUrl;
         this.historyChapterId = historyChapterId;
         this.histtoryChapterNum = histtoryChapterNum;
         this.sortCode = sortCode;
@@ -118,11 +115,6 @@ public class Book implements Serializable {
         this.replaceEnable = replaceEnable;
         this.lastReadTime = lastReadTime;
         this.variable = variable;
-    }
-
-
-    @Generated(hash = 1839243756)
-    public Book() {
     }
 
     @Override
@@ -195,12 +187,6 @@ public class Book implements Serializable {
     }
     public void setNewestChapterTitle(String newestChapterTitle) {
         this.newestChapterTitle = newestChapterTitle;
-    }
-    public String getNewestChapterUrl() {
-        return this.newestChapterUrl;
-    }
-    public void setNewestChapterUrl(String newestChapterUrl) {
-        this.newestChapterUrl = newestChapterUrl;
     }
     public String getHistoryChapterId() {
         return this.historyChapterId;

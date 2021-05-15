@@ -210,7 +210,7 @@ public class BookDetailedActivity extends BaseActivity {
         binding.ic.bookDetailRvCatalog.setLayoutManager(new LinearLayoutManager(this));
         binding.ic.bookDetailRvCatalog.setAdapter(mCatalogAdapter);
 
-        if (!thirdSource || isCollected) initChapters(false);
+        if (!thirdSource) initChapters(false);
 
         mCatalogAdapter.setOnItemClickListener((view, pos) -> {
             mBook.setHisttoryChapterNum(mChapters.size() - pos - 1);
@@ -410,7 +410,7 @@ public class BookDetailedActivity extends BaseActivity {
         BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
         binding.ih.bookDetailSource.setText(String.format("书源：%s", source.getSourceName()));
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(source);
-        if ((rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) || (thirdSource && !isCollected)) {
+        if ((rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) || thirdSource) {
             binding.pbLoading.setVisibility(View.VISIBLE);
             BookInfoCrawler bic = (BookInfoCrawler) rc;
             BookApi.getBookInfo(mBook, bic).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Book>() {
@@ -418,17 +418,21 @@ public class BookDetailedActivity extends BaseActivity {
                 public void onNext(@NotNull Book book) {
                     if (!App.isDestroy(BookDetailedActivity.this)) {
                         mHandler.sendMessage(mHandler.obtainMessage(4));
+                        if (thirdSource) {
+                            initChapters(false);
+                        }
                     }
-                    if (thirdSource) {
-                        initChapters(false);
-                    }
+
                 }
 
                 @Override
                 public void onError(Throwable e) {
-                    ToastUtils.showError("书籍详情加载失败！");
-                    if (thirdSource) {
-                        initChapters(false);
+                    if (!App.isDestroy(BookDetailedActivity.this)) {
+                        ToastUtils.showError("书籍详情加载失败！");
+                        if (thirdSource) {
+                            initChapters(false);
+                        }
+                        binding.pbLoading.setVisibility(View.GONE);
                     }
                     if (App.isDebug()) e.printStackTrace();
                 }

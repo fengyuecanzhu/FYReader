@@ -2,21 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="8dp"
-    android:paddingRight="8dp"
-    android:paddingTop="18dp"
-    android:paddingBottom="18dp"
+    android:background="@color/colorBackground"
     android:gravity="center"
-    android:background="@color/colorBackground">
+    android:paddingLeft="8dp"
+    android:paddingTop="18dp"
+    android:paddingRight="8dp"
+    android:paddingBottom="18dp">
 
-   <TextView
-       android:id="@+id/tv_type_name"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:textColor="@color/textSecondary"
-       android:text="玄幻小说"
-       android:textSize="14sp">
+    <TextView
+        android:id="@+id/tv_type_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLength="4"
+        android:textColor="@color/textSecondary"
+        android:textSize="13sp">
 
-   </TextView>
+    </TextView>
 
 </LinearLayout>

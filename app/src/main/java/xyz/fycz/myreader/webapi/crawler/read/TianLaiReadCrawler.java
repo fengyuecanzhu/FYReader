@@ -143,7 +143,6 @@ public class TianLaiReadCrawler extends BaseReadCrawler {
                     book.setUpdateDate(infoStr.replace("更新时间：", "").replace(" ", ""));
                 } else {
                     Element newChapter = element1.child(1);
-                    book.setNewestChapterUrl(newChapter.attr("href"));
                     book.setNewestChapterTitle(newChapter.text());
                 }
             }

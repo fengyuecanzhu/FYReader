@@ -5,6 +5,8 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,5 +79,11 @@ public interface JsExtensions {
                 .execute();
     }
 
-
+    /**
+     * 时间格式化
+     */
+    default String timeFormat(long time) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        return sdf.format(new Date(time));
+    }
 }

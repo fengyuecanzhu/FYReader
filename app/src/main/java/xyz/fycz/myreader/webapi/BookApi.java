@@ -123,7 +123,6 @@ public class BookApi {
     /**
      * 获取章节正文
      */
-
     public static Observable<String> getChapterContent(Chapter chapter, Book book, final ReadCrawler rc) {
         if (rc instanceof ThirdCrawler) {
             return ThirdSourceApi.getChapterContentByTC(chapter, book, (ThirdCrawler) rc);

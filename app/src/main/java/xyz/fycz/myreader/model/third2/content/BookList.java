@@ -171,6 +171,7 @@ public class BookList {
         item.setTag(tag);
         item.setSource(bookSource.getSourceUrl());
         item.setChapterUrl(baseUrl);
+        item.setInfoUrl(baseUrl);
         Log.d(tag, ">书籍网址:" + baseUrl);
         Log.d(tag, "┌获取书名");
         String bookName = StringUtils.formatHtml(analyzer.getString(infoRule.getName()));
@@ -185,13 +186,17 @@ public class BookList {
             Log.d(tag, "└" + item.getType());
             Log.d(tag, "┌获取最新章节");
             item.setNewestChapterTitle(analyzer.getString(infoRule.getLastChapter()));
-            Log.d(tag, "└" + item.getNewestChapterId());
+            Log.d(tag, "└" + item.getNewestChapterTitle());
             Log.d(tag, "┌获取简介");
             item.setDesc(analyzer.getString(infoRule.getDesc()));
             Log.d(tag, "└" + item.getDesc());
             Log.d(tag, "┌获取封面");
             item.setImgUrl(analyzer.getString(infoRule.getImgUrl(), true));
             Log.d(tag, "└" + item.getImgUrl());
+            Log.d(tag, "┌获取目录网址");
+            String bookCatalogUrl = analyzer.getString(infoRule.getTocUrl(), true);
+            if (!isEmpty(bookCatalogUrl)) item.setChapterUrl(bookCatalogUrl);;
+            Log.d(tag, "└" + item.getChapterUrl());
             return item;
         }
         return null;
@@ -216,7 +221,7 @@ public class BookList {
             if (printLog) Log.d(tag,"└" + item.getType());
             if (printLog) Log.d(tag,  "┌获取最新章节");
             item.setNewestChapterTitle(String.valueOf(nativeObject.get(ruleLastChapter)));
-            if (printLog) Log.d(tag, "└" + item.getNewestChapterId());
+            if (printLog) Log.d(tag, "└" + item.getNewestChapterTitle());
             if (printLog) Log.d(tag,  "┌获取简介");
             item.setDesc(String.valueOf(nativeObject.get(ruleIntroduce)));
             if (printLog) Log.d(tag, "└" + item.getDesc());

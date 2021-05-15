@@ -231,7 +231,6 @@ public class BiQuGeReadCrawler extends BaseReadCrawler implements BookInfoCrawle
         Element p3 = ps.get(3);
         a = p3.getElementsByTag("a").get(0);
         book.setNewestChapterTitle(a.attr("title"));
-        book.setNewestChapterUrl(book.getChapterUrl() + a.attr("href"));
 
         //类型
         String type = doc.select("meta[property=og:novel:category]").attr("content");
