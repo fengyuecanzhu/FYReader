@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.model.third.content;
+package xyz.fycz.myreader.model.third2.content;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +9,7 @@ import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.entity.WebChapterBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeUrl;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 
 public class AnalyzeNextUrlTask {

@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.model.third.analyzeRule;
+package xyz.fycz.myreader.model.third2.analyzeRule;
 
 import android.text.TextUtils;
 

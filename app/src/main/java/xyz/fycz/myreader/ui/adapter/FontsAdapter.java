@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
+import xyz.fycz.myreader.webapi.LanZousApi;
 import xyz.fycz.myreader.webapi.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
@@ -39,7 +40,6 @@ import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.webapi.CommonApi;
 import xyz.fycz.myreader.widget.ProgressButton;
 
 
@@ -208,7 +208,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
         }
         final String[] url = {URLCONST.FONT_DOWNLOAD_URL + font.toString() + ".ttf"};
         viewHolder.btnFontUse.setText("获取连接...");
-        CommonApi.getUrl(font.downloadPath, new ResultCallback() {
+        LanZousApi.getUrl(font.downloadPath, new ResultCallback() {
             @Override
             public void onFinish(Object o, int code) {
                 String downloadUrl = (String) o;

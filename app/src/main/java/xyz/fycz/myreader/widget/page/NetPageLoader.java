@@ -22,7 +22,7 @@ import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
-import xyz.fycz.myreader.webapi.CommonApi;
+import xyz.fycz.myreader.webapi.BookApi;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 public class NetPageLoader extends PageLoader {
@@ -226,7 +226,7 @@ public class NetPageLoader extends PageLoader {
      * @param chapter
      */
     public void getChapterContent(Chapter chapter) {
-        CommonApi.getChapterContent(chapter, mCollBook, mReadCrawler).flatMap(s -> Observable.create(emitter -> {
+        BookApi.getChapterContent(chapter, mCollBook, mReadCrawler).flatMap(s -> Observable.create(emitter -> {
             loadingChapters.remove(chapter);
             String content = StringHelper.isEmpty(s) ? "章节内容为空" : s;
             mChapterService.saveOrUpdateChapter(chapter, content);

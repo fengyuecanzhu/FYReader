@@ -24,6 +24,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.base.observer.MyObserver;
@@ -39,6 +40,7 @@ import xyz.fycz.myreader.ui.activity.SourceEditActivity;
 import xyz.fycz.myreader.ui.adapter.BookSourceAdapter;
 import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -66,6 +68,7 @@ public class DIYSourceFragment extends BaseFragment {
     private boolean isSearch;
     private PopupMenu featuresMenu;
     private ItemTouchCallback itemTouchCallback;
+    private Disposable importSourceDis;
 
     public DIYSourceFragment() {
         sourceActivity = (BookSourceActivity) getActivity();
@@ -178,9 +181,20 @@ public class DIYSourceFragment extends BaseFragment {
     }
 
     public void importDataS(String text) {
+        LoadingDialog dialog = new LoadingDialog(getContext(), "正在导入", () -> {
+            if (importSourceDis != null) {
+                importSourceDis.dispose();
+            }
+        });
+        dialog.show();
         Observable<List<BookSource>> observable = BookSourceManager.importSource(text);
         if (observable != null) {
             observable.subscribe(new MyObserver<List<BookSource>>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    importSourceDis = d;
+                }
+
                 @Override
                 public void onNext(List<BookSource> sources) {
                     int size = sources.size();
@@ -190,11 +204,13 @@ public class DIYSourceFragment extends BaseFragment {
                     } else {
                         ToastUtils.showError("格式不对");
                     }
+                    dialog.dismiss();
                 }
 
                 @Override
                 public void onError(Throwable e) {
                     ToastUtils.showError("格式不对");
+                    dialog.dismiss();
                 }
             });
         } else {

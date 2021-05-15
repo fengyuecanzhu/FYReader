@@ -20,7 +20,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.ui.adapter.ChapterTitleAdapter;
 import xyz.fycz.myreader.ui.fragment.CatalogFragment;
-import xyz.fycz.myreader.webapi.CommonApi;
+import xyz.fycz.myreader.webapi.BookApi;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,7 +67,7 @@ public class CatalogPresenter implements BasePresenter {
                 return;
             }
             mCatalogFragment.getPbLoading().setVisibility(View.VISIBLE);
-            CommonApi.getBookChapters(mBook, ReadCrawlerUtil.getReadCrawler(mBook.getSource()))
+            BookApi.getBookChapters(mBook, ReadCrawlerUtil.getReadCrawler(mBook.getSource()))
                     .compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<List<Chapter>>() {
                 @Override
                 public void onNext(@NotNull List<Chapter> chapters) {

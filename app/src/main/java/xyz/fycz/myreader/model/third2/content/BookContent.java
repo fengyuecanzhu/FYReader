@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.model.third.content;
+package xyz.fycz.myreader.model.third2.content;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,8 +17,8 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.entity.rule.ContentRule;
 import xyz.fycz.myreader.greendao.gen.ChapterDao;
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeRule;
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeUrl;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeRule;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;

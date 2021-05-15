@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.model.third.content;
+package xyz.fycz.myreader.model.third2.content;
 
 import android.os.Build;
 import android.text.TextUtils;
@@ -25,9 +25,9 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.entity.rule.TocRule;
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeByRegex;
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeRule;
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeUrl;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeByRegex;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeRule;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 
 public class BookChapterList {
@@ -53,8 +53,8 @@ public class BookChapterList {
                 e.onError(new Throwable("目录获取失败" + book.getChapterUrl()));
                 return;
             } else {
-                Log.d(tag, "┌成功获取目录页" + analyzeNextUrl);
-                Log.d(tag, "└" + book.getChapterUrl() + analyzeNextUrl);
+                Log.d(tag, "┌成功获取目录页");
+                Log.d(tag, "└" + book.getChapterUrl());
             }
             book.setTag(tag);
             AnalyzeRule analyzer = new AnalyzeRule(book);

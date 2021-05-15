@@ -16,11 +16,11 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.CookieBean;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
-import xyz.fycz.myreader.model.third.analyzeRule.AnalyzeUrl;
-import xyz.fycz.myreader.model.third.content.BookChapterList;
-import xyz.fycz.myreader.model.third.content.BookContent;
-import xyz.fycz.myreader.model.third.content.BookInfo;
-import xyz.fycz.myreader.model.third.content.BookList;
+import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
+import xyz.fycz.myreader.model.third2.content.BookChapterList;
+import xyz.fycz.myreader.model.third2.content.BookContent;
+import xyz.fycz.myreader.model.third2.content.BookInfo;
+import xyz.fycz.myreader.model.third2.content.BookList;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
 

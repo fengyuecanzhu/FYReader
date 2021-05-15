@@ -135,6 +135,7 @@
         <activity android:name=".ui.activity.AdSettingActivity" />
         <activity android:name=".ui.activity.DonateActivity" />
         <activity android:name=".ui.activity.BookInfoEditActivity" />
+        <activity android:name=".ui.activity.SourceLoginActivity" />
 
         <receiver android:name=".util.notification.NotificationClickReceiver" />
         <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver" />

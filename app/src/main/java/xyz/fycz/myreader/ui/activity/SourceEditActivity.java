@@ -24,6 +24,7 @@ import xyz.fycz.myreader.databinding.ActivitySourceEditBinding;
 import xyz.fycz.myreader.entity.sourcedebug.DebugEntity;
 import xyz.fycz.myreader.entity.sourceedit.EditEntity;
 import xyz.fycz.myreader.entity.sourceedit.EditEntityUtil;
+import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.SourceEditAdapter;
@@ -187,6 +188,18 @@ public class SourceEditActivity extends BaseActivity {
             debug(item.getTitle(), DebugEntity.TOC);
         } else if (item.getItemId() == R.id.action_debug_content) {
             debug(item.getTitle(), DebugEntity.CONTENT);
+        } else if (item.getItemId() == R.id.action_login) {
+            BookSource source = getSource();
+            if (!StringHelper.isEmpty(source.getLoginUrl())) {
+                Intent intent = new Intent(this, SourceLoginActivity.class);
+                intent.putExtra(APPCONST.BOOK_SOURCE, source);
+                startActivity(intent);
+            } else {
+                ToastUtils.showWarring("当前书源没有配置登录地址");
+            }
+        } else if (item.getItemId() == R.id.action_clear_cookie) {
+            DbManager.getDaoSession().getCookieBeanDao().deleteByKey(getSource().getSourceUrl());
+            ToastUtils.showSuccess("Cookie清除成功");
         }
         return super.onOptionsItemSelected(item);
     }

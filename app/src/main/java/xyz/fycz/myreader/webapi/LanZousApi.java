@@ -27,6 +27,50 @@ import xyz.fycz.myreader.util.utils.RxUtils;
 public class LanZousApi {
 
     /**
+     * 通过api获取蓝奏云可下载直链
+     *
+     * @param lanZouUrl
+     * @param callback
+     */
+    public static void getUrl(final String lanZouUrl, final ResultCallback callback) {
+        LanZousApi.getUrl1(lanZouUrl, new ResultCallback() {
+            @Override
+            public void onFinish(final Object o, int code) {
+                LanZousApi.getKey((String) o, new ResultCallback() {
+                    final String referer = (String) o;
+
+                    @Override
+                    public void onFinish(Object o, int code) {
+                        LanZousApi.getUrl2((String) o, new ResultCallback() {
+                            @Override
+                            public void onFinish(Object o, int code) {
+                                LanZousApi.getRedirectUrl((String) o, callback);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                callback.onError(e);
+                            }
+                        }, referer);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        callback.onError(e);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                callback.onError(e);
+            }
+        });
+
+    }
+
+
+    /**
      * 获取蓝奏云含有key的url
      *
      * @param lanZouUrl
