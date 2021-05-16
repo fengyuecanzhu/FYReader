@@ -362,7 +362,7 @@ public class BookstoreActivity extends BaseActivity {
      */
     private void goToBookDetail(Book book) {
         Intent intent = new Intent(this, BookDetailedActivity.class);
-        intent.putExtra(APPCONST.BOOK, book);
+        BitIntentDataManager.getInstance().putData(intent, book);
         BookstoreActivity.this.startActivity(intent);
     }
 

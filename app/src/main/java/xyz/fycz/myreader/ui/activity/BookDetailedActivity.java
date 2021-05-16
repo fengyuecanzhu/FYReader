@@ -156,16 +156,10 @@ public class BookDetailedActivity extends BaseActivity {
         super.initData(savedInstanceState);
         mBookService = BookService.getInstance();
         mChapterService = ChapterService.getInstance();
-        aBooks = (ArrayList<Book>) BitIntentDataManager.getInstance().getData(getIntent());
-        sourceIndex = getIntent().getIntExtra(APPCONST.SOURCE_INDEX, 0);
-        if (aBooks != null) {
-            mBook = aBooks.get(sourceIndex);
-        } else {
-            mBook = (Book) getIntent().getSerializableExtra(APPCONST.BOOK);
-        }
-        if (mBook == null) {
+        if (!initBook()){
             ToastUtils.showError("无法获取书籍！");
             finish();
+            return;
         }
         isCollected = isBookCollected();
         if (isCollected) {
@@ -181,6 +175,21 @@ public class BookDetailedActivity extends BaseActivity {
         }
         mBookGroupDia = new BookGroupDialog(this);
         mReadCrawler = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
+    }
+
+    private boolean initBook() {
+        Object obj = BitIntentDataManager.getInstance().getData(getIntent());
+        sourceIndex = getIntent().getIntExtra(APPCONST.SOURCE_INDEX, 0);
+        if (obj == null) {
+            return false;
+        }
+        if (obj instanceof Book) {
+            mBook = (Book) obj;
+        } else if (obj instanceof List) {
+            aBooks = (ArrayList<Book>) obj;
+            mBook = aBooks.get(sourceIndex);
+        }
+        return mBook != null;
     }
 
     private void initTagList() {
@@ -376,8 +385,7 @@ public class BookDetailedActivity extends BaseActivity {
      */
     public void goToMoreChapter() {
         Intent intent = new Intent(this, CatalogActivity.class);
-        intent.putExtra(APPCONST.BOOK, mBook);
-        //BitIntentDataManager.getInstance().putData(intent, mBook);
+        BitIntentDataManager.getInstance().putData(intent, mBook);
         startActivityForResult(intent, APPCONST.REQUEST_CHAPTER_PAGE);
     }
 
@@ -560,7 +568,7 @@ public class BookDetailedActivity extends BaseActivity {
             mBookService.addBook(mBook);
         }
         Intent intent = new Intent(this, ReadActivity.class);
-        intent.putExtra(APPCONST.BOOK, mBook);
+        BitIntentDataManager.getInstance().putData(intent, mBook);
         intent.putExtra("isCollected", isCollected);
         startActivityForResult(intent, APPCONST.REQUEST_READ);
     }
@@ -628,7 +636,7 @@ public class BookDetailedActivity extends BaseActivity {
                 break;
             case R.id.action_edit:
                 Intent editIntent = new Intent(this, BookInfoEditActivity.class);
-                editIntent.putExtra(APPCONST.BOOK, mBook);
+                BitIntentDataManager.getInstance().putData(editIntent, mBook);
                 startActivityForResult(editIntent, APPCONST.REQUEST_EDIT_BOOK);
                 break;
             case R.id.action_reload:  //重新加载

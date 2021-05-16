@@ -10,6 +10,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityCatalogBinding;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -48,7 +49,7 @@ public class CatalogActivity extends BaseActivity {
     @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
-        mBook = (Book) getIntent().getSerializableExtra(APPCONST.BOOK);
+        mBook = (Book) BitIntentDataManager.getInstance().getData(getIntent());
     }
 
 

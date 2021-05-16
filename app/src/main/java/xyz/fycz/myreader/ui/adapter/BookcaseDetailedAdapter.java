@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
@@ -128,13 +129,13 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
             }
             viewHolder.llBookRead.setOnClickListener(v -> {
                 Intent intent = new Intent(mContext, ReadActivity.class);
-                intent.putExtra(APPCONST.BOOK, book);
+                BitIntentDataManager.getInstance().putData(intent, book);
                 mBookService.updateEntity(book);
                 mContext.startActivity(intent);
             });
             viewHolder.ivBookImg.setOnClickListener(v -> {
                 Intent intent = new Intent(mContext, BookDetailedActivity.class);
-                intent.putExtra(APPCONST.BOOK, book);
+                BitIntentDataManager.getInstance().putData(intent, book);
                 mContext.startActivity(intent);
             });
             viewHolder.llBookRead.setOnLongClickListener(v -> {
