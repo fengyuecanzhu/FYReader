@@ -47,12 +47,8 @@ public class APPCONST {
     public static final String THIRD_SOURCE = "ThirdSource";
 
     public static final String DATA_KEY = "data_key";
-    public static final String BOOK = "book";
-    public static final String TITLE = "title";
     public static final String FIND_CRAWLER = "findCrawler";
     public static final String CHAPTER_PAGE = "chapter_page";
-    public static final String SETTING = "setting";
-    public static final String SEARCH_BOOK_BEAN = "SearchBookBean";
     public static final String SOURCE_INDEX = "sourceIndex";
     public static final String FONT = "font";
     public static final String BOOK_SOURCE = "bookSource";

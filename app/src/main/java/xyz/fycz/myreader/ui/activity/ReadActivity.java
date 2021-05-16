@@ -54,6 +54,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
@@ -480,8 +481,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             mBook = bookTem;
             toggleMenu(true);
             Intent intent = new Intent(this, ReadActivity.class)
-                    .putExtra(APPCONST.BOOK, mBook)
                     .putExtra("hasChangeSource", true);
+            BitIntentDataManager.getInstance().putData(intent, mBook);
             if (!isCollected) {
                 intent.putExtra("isCollected", false);
             }
@@ -536,7 +537,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             //跳转
             mHandler.postDelayed(() -> {
                 Intent intent = new Intent(this, CatalogActivity.class);
-                intent.putExtra(APPCONST.BOOK, mBook);
+                BitIntentDataManager.getInstance().putData(intent, mBook);
                 this.startActivityForResult(intent, APPCONST.REQUEST_CHAPTER_PAGE);
             }, mBottomOutAnim.getDuration());
         });
@@ -909,7 +910,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             addLocalBook(path);
         } else {
             //路径为空，说明不是直接打开txt文件
-            mBook = (Book) getIntent().getSerializableExtra(APPCONST.BOOK);
+            mBook = (Book) BitIntentDataManager.getInstance().getData(getIntent());
             //mBook为空，说明是从快捷方式启动
             if (mBook == null) {
                 String bookId = SharedPreUtils.getInstance().getString(getString(R.string.lastRead), "");

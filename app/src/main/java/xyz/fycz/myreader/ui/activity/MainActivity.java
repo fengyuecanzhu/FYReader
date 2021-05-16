@@ -31,6 +31,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityMainBinding;
 import xyz.fycz.myreader.entity.SharedBook;
@@ -363,7 +364,7 @@ public class MainActivity extends BaseActivity {
                                 if (sharedBook != null && !StringHelper.isEmpty(sharedBook.getChapterUrl())) {
                                     Book book = SharedBook.sharedBookToBook(sharedBook);
                                     Intent intent = new Intent(this, BookDetailedActivity.class);
-                                    intent.putExtra(APPCONST.BOOK, book);
+                                    BitIntentDataManager.getInstance().putData(intent, book);
                                     startActivity(intent);
                                 } else {
                                     ToastUtils.showError("书籍加载失败");
