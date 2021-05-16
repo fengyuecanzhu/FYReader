@@ -26,6 +26,7 @@ public class FindRule implements Parcelable {
     private String updateTime;
     private String imgUrl;
     private String tocUrl;
+    private String infoUrl;
 
     public FindRule() {
     }
@@ -43,6 +44,7 @@ public class FindRule implements Parcelable {
         updateTime = in.readString();
         imgUrl = in.readString();
         tocUrl = in.readString();
+        infoUrl = in.readString();
     }
 
     @Override
@@ -59,6 +61,7 @@ public class FindRule implements Parcelable {
         dest.writeString(updateTime);
         dest.writeString(imgUrl);
         dest.writeString(tocUrl);
+        dest.writeString(infoUrl);
     }
 
     @Override
@@ -174,6 +177,14 @@ public class FindRule implements Parcelable {
         this.tocUrl = tocUrl;
     }
 
+    public String getInfoUrl() {
+        return infoUrl;
+    }
+
+    public void setInfoUrl(String infoUrl) {
+        this.infoUrl = infoUrl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -191,7 +202,8 @@ public class FindRule implements Parcelable {
                 stringEquals(lastChapter, findRule.lastChapter) &&
                 stringEquals(updateTime, findRule.updateTime) &&
                 stringEquals(imgUrl, findRule.imgUrl) &&
-                stringEquals(tocUrl, findRule.tocUrl);
+                stringEquals(tocUrl, findRule.tocUrl) &&
+                stringEquals(infoUrl, findRule.infoUrl);
     }
 
 }

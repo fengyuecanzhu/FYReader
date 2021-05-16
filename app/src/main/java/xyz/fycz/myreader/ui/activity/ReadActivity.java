@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -64,11 +65,13 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookMark;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.greendao.service.BookMarkService;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.model.audio.ReadAloudService;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.ui.dialog.AudioPlayerDialog;
 import xyz.fycz.myreader.ui.dialog.CopyContentDialog;
@@ -752,6 +755,15 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             startActivity(intent);
         } else if (itemId == R.id.action_download) {
             download();
+        } else if (itemId == R.id.action_edit_source) {
+            BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
+            if (!TextUtils.isEmpty(source.getSourceEName())) {
+                ToastUtils.showWarring("内置书源无法编辑！");
+            } else {
+                Intent sourceIntent = new Intent(this, SourceEditActivity.class);
+                sourceIntent.putExtra(APPCONST.BOOK_SOURCE, source);
+                startActivity(sourceIntent);
+            }
         }
         return super.onOptionsItemSelected(item);
     }

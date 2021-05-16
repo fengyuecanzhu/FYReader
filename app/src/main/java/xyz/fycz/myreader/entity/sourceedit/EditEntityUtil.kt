@@ -52,6 +52,8 @@ object EditEntityUtil {
     fun getInfoEntities(infoRule: InfoRule? = InfoRule()): List<EditEntity> {
         val infoEntities: ArrayList<EditEntity> = ArrayList()
         infoEntities.apply {
+            add(EditEntity("urlPattern", infoRule?.urlPattern, R.string.book_url_pattern, ""))
+            add(EditEntity("init", infoRule?.init, R.string.rule_book_info_init))
             add(EditEntity("name", infoRule?.name, R.string.r_book_name))
             add(EditEntity("author", infoRule?.author, R.string.r_author))
             add(EditEntity("type", infoRule?.type, R.string.rule_book_type))
@@ -142,6 +144,8 @@ object EditEntityUtil {
         val infoRule = InfoRule()
         infoRuleEntities.forEach {
             when (it.key) {
+                "urlPattern" -> infoRule.urlPattern = it.value
+                "init" -> infoRule.init = it.value
                 "name" -> infoRule.name = it.value
                 "author" -> infoRule.author = it.value
                 "type" -> infoRule.type = it.value

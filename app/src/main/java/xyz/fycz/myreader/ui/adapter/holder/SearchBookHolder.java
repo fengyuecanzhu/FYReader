@@ -78,7 +78,8 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
     public void onBind(SearchBookBean data, int pos) {
         List<Book> aBooks = mBooks.getValues(data);
         if (aBooks == null || aBooks.size() == 0){
-            return;
+            aBooks = new ArrayList<>();
+            aBooks.add(searchBookBean2Book(data));
         }
         int bookCount = aBooks.size();
         Book book = aBooks.get(0);
@@ -116,7 +117,7 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
                     initOtherInfo(data, rc);
                     return;
                 }
-                Log.i(book.getName(), "initOtherInfo");
+                Log.i(data.getName(), "initOtherInfo");
                 BookInfoCrawler bic = (BookInfoCrawler) rc;
                 searchEngine.getBookInfo(book, bic, isSuccess -> {
                     if (isSuccess) {
@@ -228,6 +229,19 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
                 break;
             }
         }
+    }
+
+    private Book searchBookBean2Book(SearchBookBean bean){
+        Book book = new Book();
+        book.setName(bean.getName());
+        book.setAuthor(bean.getAuthor());
+        book.setType(bean.getType());
+        book.setDesc(bean.getDesc());
+        book.setStatus(bean.getStatus());
+        book.setUpdateDate(bean.getUpdateTime());
+        book.setNewestChapterTitle(bean.getLastChapter());
+        book.setWordCount(bean.getWordCount());
+        return book;
     }
 
     private boolean needGetInfo(SearchBookBean bookBean) {

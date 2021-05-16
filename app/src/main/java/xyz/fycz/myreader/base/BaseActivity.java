@@ -23,6 +23,7 @@ import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.application.CrashHandler;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.util.StatusBarUtil;

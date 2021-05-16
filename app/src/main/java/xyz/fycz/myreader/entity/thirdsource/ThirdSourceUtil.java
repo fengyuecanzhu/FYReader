@@ -37,11 +37,13 @@ public class ThirdSourceUtil {
         searchRule.setDesc(bean.getRuleSearchIntroduce());
         searchRule.setLastChapter(bean.getRuleSearchLastChapter());
         searchRule.setImgUrl(bean.getRuleSearchCoverUrl());
-        searchRule.setTocUrl(bean.getRuleSearchNoteUrl());
+        searchRule.setInfoUrl(bean.getRuleSearchNoteUrl());
         searchRule.setRelatedWithInfo(true);
         bookSource.setSearchRule(searchRule);
 
         InfoRule infoRule = new InfoRule();
+        infoRule.setUrlPattern(bean.getRuleBookUrlPattern());
+        infoRule.setInit(bean.getRuleBookInfoInit());
         infoRule.setName(bean.getRuleBookName());
         infoRule.setAuthor(bean.getRuleBookAuthor());
         infoRule.setType(bean.getRuleBookKind());
@@ -72,7 +74,7 @@ public class ThirdSourceUtil {
         findRule.setDesc(bean.getRuleFindIntroduce());
         findRule.setLastChapter(bean.getRuleFindLastChapter());
         findRule.setImgUrl(bean.getRuleFindCoverUrl());
-        findRule.setTocUrl(bean.getRuleFindNoteUrl());
+        findRule.setInfoUrl(bean.getRuleFindNoteUrl());
         bookSource.setFindRule(findRule);
         return bookSource;
     }

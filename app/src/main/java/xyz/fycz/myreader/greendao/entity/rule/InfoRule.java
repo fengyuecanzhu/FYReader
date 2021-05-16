@@ -16,6 +16,8 @@ import static xyz.fycz.myreader.util.utils.StringUtils.stringEquals;
  * @date 2021/2/8 17:53
  */
 public class InfoRule implements Parcelable {
+    private String urlPattern;
+    private String init;
     private String name;
     private String author;
     private String type;
@@ -31,6 +33,8 @@ public class InfoRule implements Parcelable {
     }
 
     protected InfoRule(Parcel in) {
+        urlPattern = in.readString();
+        init = in.readString();
         name = in.readString();
         author = in.readString();
         type = in.readString();
@@ -45,6 +49,8 @@ public class InfoRule implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(urlPattern);
+        dest.writeString(init);
         dest.writeString(name);
         dest.writeString(author);
         dest.writeString(type);
@@ -80,7 +86,9 @@ public class InfoRule implements Parcelable {
         if (o == null) o = new InfoRule();
         if (getClass() != o.getClass()) return false;
         InfoRule infoRule = (InfoRule) o;
-        return stringEquals(name, infoRule.name) &&
+        return stringEquals(urlPattern, infoRule.urlPattern) &&
+                stringEquals(init, infoRule.init) &&
+                stringEquals(name, infoRule.name) &&
                 stringEquals(author, infoRule.author) &&
                 stringEquals(type, infoRule.type) &&
                 stringEquals(desc, infoRule.desc) &&
@@ -92,6 +100,21 @@ public class InfoRule implements Parcelable {
                 stringEquals(tocUrl, infoRule.tocUrl);
     }
 
+    public String getUrlPattern() {
+        return urlPattern;
+    }
+
+    public void setUrlPattern(String urlPattern) {
+        this.urlPattern = urlPattern;
+    }
+
+    public String getInit() {
+        return init;
+    }
+
+    public void setInit(String init) {
+        this.init = init;
+    }
 
     public String getName() {
         return name;

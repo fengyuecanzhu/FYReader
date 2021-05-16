@@ -81,11 +81,9 @@ public class BookSourceManager {
      * @return
      */
     public static BookSource getBookSourceByStr(String str) {
-        if (NetworkUtils.isUrl(str)) {
-            return getBookSourceByUrl(str);
-        } else {
-            return getBookSourceByEName(str);
-        }
+        BookSource source = getBookSourceByEName(str);
+        if (source == null) source = getBookSourceByUrl(str);
+        return source;
     }
 
     /**
@@ -94,7 +92,7 @@ public class BookSourceManager {
      * @param url
      * @return
      */
-    public static BookSource getBookSourceByUrl(String url) {
+    private static BookSource getBookSourceByUrl(String url) {
         if (url == null) return getDefaultSource();
         BookSource source = DbManager.getDaoSession().getBookSourceDao().load(url);
         if (source == null) return getDefaultSource();
@@ -107,15 +105,13 @@ public class BookSourceManager {
      * @param ename
      * @return
      */
-    @Nullable
-    public static BookSource getBookSourceByEName(String ename) {
-        if (ename == null) return getDefaultSource();
+    private static BookSource getBookSourceByEName(String ename) {
+        if (ename == null) return null;
         if ("local".equals(ename)) return getLocalSource();
         BookSource source = DbManager.getDaoSession().getBookSourceDao().
                 queryBuilder()
                 .where(BookSourceDao.Properties.SourceEName.eq(ename))
                 .unique();
-        if (source == null) return getDefaultSource();
         return source;
     }
 

@@ -41,4 +41,10 @@
                 android:title="@string/menu_open_link"
                 app:showAsAction="never"/>
     </group>
+
+    <item
+        android:id="@+id/action_edit_source"
+        android:icon="@drawable/ic_source"
+        android:title="@string/book_source"
+        app:showAsAction="ifRoom"/>
 </menu>
