@@ -38,6 +38,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySearchBookBinding;
@@ -546,7 +547,7 @@ public class SearchBookActivity extends BaseActivity {
                 if (books == null || books.size() == 0) return;
                 searchBookBean2Book(data, books.get(0));
                 Intent intent = new Intent(this, BookDetailedActivity.class);
-                intent.putExtra(APPCONST.SEARCH_BOOK_BEAN, books);
+                BitIntentDataManager.getInstance().putData(intent, books);
                 startActivity(intent);
             });
             binding.srlSearchBookList.setEnableRefresh(true);

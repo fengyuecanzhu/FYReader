@@ -2,6 +2,7 @@ package xyz.fycz.myreader.model.third2.analyzeRule;
 
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,11 +22,16 @@ public class AnalyzeByRegex {
 
     // 纯java模式正则表达式获取书籍详情信息
     public static void getInfoOfRegex(String res, String[] regs, int index,
-                                      Book book, AnalyzeRule analyzer, BookSource source, String baseUrl, String tag) throws Exception {
+                                      Book book, AnalyzeRule analyzer, BookSource source, String tag) throws Exception {
         Matcher resM = Pattern.compile(regs[index]).matcher(res);
+        String baseUrl = book.getInfoUrl();
         // 判断规则是否有效,当搜索列表规则无效时跳过详情页处理
         if (!resM.find()) {
+            Log.d(tag, "└详情预处理失败,跳过详情页解析");
+            Log.d(tag, "┌获取目录网址");
             book.setChapterUrl(baseUrl);
+            book.putCathe("ChapterListHtml", res);
+            Log.d(tag, "└" + baseUrl);
             return;
         }
         // 判断索引的规则是最后一个规则
@@ -78,18 +84,37 @@ public class AnalyzeByRegex {
                 book.setName(StringUtils.formatHtml(ruleVal.get("BookName")));
             if (!isEmpty(ruleVal.get("BookAuthor")))
                 book.setAuthor(StringUtils.formatHtml(ruleVal.get("BookAuthor")));
-            if (!isEmpty(ruleVal.get("LastChapter"))) book.setNewestChapterTitle(ruleVal.get("LastChapter"));
+            if (!isEmpty(ruleVal.get("LastChapter")))
+                book.setNewestChapterTitle(ruleVal.get("LastChapter"));
             if (!isEmpty(ruleVal.get("Introduce")))
                 book.setDesc(StringUtils.formatHtml(ruleVal.get("Introduce")));
             if (!isEmpty(ruleVal.get("CoverUrl"))) book.setImgUrl(ruleVal.get("CoverUrl"));
-            if (!isEmpty(ruleVal.get("ChapterUrl"))) book.setChapterUrl(NetworkUtils.getAbsoluteURL(baseUrl, ruleVal.get("ChapterUrl")));
+            if (!isEmpty(ruleVal.get("ChapterUrl")))
+                book.setChapterUrl(NetworkUtils.getAbsoluteURL(baseUrl, ruleVal.get("ChapterUrl")));
             else book.setChapterUrl(baseUrl);
+            //如果目录页和详情页相同,暂存页面内容供获取目录用
+            if (book.getChapterUrl().equals(baseUrl)) book.putCathe("ChapterListHtml", res);
+            // 输出调试信息
+            Log.d(tag, "└详情预处理完成");
+            Log.d(tag, "┌获取书籍名称");
+            Log.d(tag, "└" + book.getName());
+            Log.d(tag, "┌获取作者名称");
+            Log.d(tag, "└" + book.getAuthor());
+            Log.d(tag, "┌获取最新章节");
+            Log.d(tag, "└" + book.getNewestChapterTitle());
+            Log.d(tag, "┌获取简介内容");
+            Log.d(tag, "└" + book.getDesc());
+            Log.d(tag, "┌获取封面网址");
+            Log.d(tag, "└" + book.getImgUrl());
+            Log.d(tag, "┌获取目录网址");
+            Log.d(tag, "└" + book.getChapterUrl());
+            Log.d(tag, "-详情页解析完成");
         } else {
             StringBuilder result = new StringBuilder();
             do {
                 result.append(resM.group());
             } while (resM.find());
-            getInfoOfRegex(result.toString(), regs, ++index, book, analyzer, source, baseUrl, tag);
+            getInfoOfRegex(result.toString(), regs, ++index, book, analyzer, source, tag);
         }
     }
 

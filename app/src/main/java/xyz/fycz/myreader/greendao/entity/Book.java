@@ -11,6 +11,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
+
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
@@ -76,17 +77,20 @@ public class Book implements Serializable {
     @Transient
     private Map<String, String> variableMap;
 
+    @Transient
+    private Map<String, String> catheMap;
+
     @Generated(hash = 1839243756)
     public Book() {
     }
 
     @Generated(hash = 1910282685)
     public Book(String id, String name, String chapterUrl, String infoUrl, String imgUrl, String desc,
-            String author, String type, String updateDate, String wordCount, String status,
-            String newestChapterId, String newestChapterTitle, String historyChapterId, int histtoryChapterNum,
-            int sortCode, int noReadNum, int chapterTotalNum, int lastReadPosition, String source,
-            boolean isCloseUpdate, boolean isDownLoadAll, String groupId, int groupSort, String tag,
-            Boolean replaceEnable, long lastReadTime, String variable) {
+                String author, String type, String updateDate, String wordCount, String status,
+                String newestChapterId, String newestChapterTitle, String historyChapterId, int histtoryChapterNum,
+                int sortCode, int noReadNum, int chapterTotalNum, int lastReadPosition, String source,
+                boolean isCloseUpdate, boolean isDownLoadAll, String groupId, int groupSort, String tag,
+                Boolean replaceEnable, long lastReadTime, String variable) {
         this.id = id;
         this.name = name;
         this.chapterUrl = chapterUrl;
@@ -131,96 +135,127 @@ public class Book implements Serializable {
     public String getId() {
         return this.id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
+
     public String getName() {
         return this.name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getChapterUrl() {
         return this.chapterUrl;
     }
+
     public void setChapterUrl(String chapterUrl) {
         this.chapterUrl = chapterUrl;
     }
+
     public String getImgUrl() {
         return this.imgUrl;
     }
+
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
     }
+
     public String getDesc() {
         return this.desc;
     }
+
     public void setDesc(String desc) {
         this.desc = desc;
     }
+
     public String getAuthor() {
         return this.author;
     }
+
     public void setAuthor(String author) {
         this.author = BookService.formatAuthor(author);
     }
+
     public String getType() {
         return this.type;
     }
+
     public void setType(String type) {
         this.type = type;
     }
+
     public String getUpdateDate() {
         return this.updateDate;
     }
+
     public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
     }
+
     public String getNewestChapterId() {
         return this.newestChapterId;
     }
+
     public void setNewestChapterId(String newestChapterId) {
         this.newestChapterId = newestChapterId;
     }
+
     public String getNewestChapterTitle() {
         return this.newestChapterTitle;
     }
+
     public void setNewestChapterTitle(String newestChapterTitle) {
         this.newestChapterTitle = newestChapterTitle;
     }
+
     public String getHistoryChapterId() {
         return this.historyChapterId;
     }
+
     public void setHistoryChapterId(String historyChapterId) {
         this.historyChapterId = historyChapterId;
     }
+
     public int getHisttoryChapterNum() {
         return this.histtoryChapterNum;
     }
+
     public void setHisttoryChapterNum(int histtoryChapterNum) {
         this.histtoryChapterNum = histtoryChapterNum;
     }
+
     public int getSortCode() {
         return this.sortCode;
     }
+
     public void setSortCode(int sortCode) {
         this.sortCode = sortCode;
     }
+
     public int getNoReadNum() {
         return this.noReadNum;
     }
+
     public void setNoReadNum(int noReadNum) {
         this.noReadNum = noReadNum;
     }
+
     public int getChapterTotalNum() {
         return this.chapterTotalNum;
     }
+
     public void setChapterTotalNum(int chapterTotalNum) {
         this.chapterTotalNum = chapterTotalNum;
     }
+
     public int getLastReadPosition() {
         return this.lastReadPosition;
     }
+
     public void setLastReadPosition(int lastReadPosition) {
         this.lastReadPosition = lastReadPosition;
     }
@@ -249,6 +284,7 @@ public class Book implements Serializable {
     public void setIsDownLoadAll(boolean isDownLoadAll) {
         this.isDownLoadAll = isDownLoadAll;
     }
+
     public String getGroupId() {
         return this.groupId;
     }
@@ -283,9 +319,6 @@ public class Book implements Serializable {
     }
 
     public String getInfoUrl() {
-        if (StringHelper.isEmpty(infoUrl)){
-            return chapterUrl;
-        }
         return this.infoUrl;
     }
 
@@ -342,6 +375,7 @@ public class Book implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
+
     public void putVariable(String key, String value) {
         if (variableMap == null) {
             variableMap = new HashMap<>();
@@ -365,5 +399,19 @@ public class Book implements Serializable {
 
     public void setVariable(String variable) {
         this.variable = variable;
+    }
+
+    public void putCathe(String key, String value) {
+        if (catheMap == null) {
+            catheMap = new HashMap<>();
+        }
+        catheMap.put(key, value);
+    }
+
+    public String getCathe(String key){
+        if (catheMap == null){
+            return "";
+        }
+        return catheMap.get(key);
     }
 }

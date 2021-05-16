@@ -258,6 +258,7 @@ public class SourceDebugActivity extends BaseActivity {
         ListResult listResult = new ListResult();
         Book book = new Book();
         book.setChapterUrl(debugEntity.getUrl());
+        book.setInfoUrl(debugEntity.getUrl());
         switch (debugEntity.getDebugMode()) {
             case DebugEntity.SEARCH:
             default:

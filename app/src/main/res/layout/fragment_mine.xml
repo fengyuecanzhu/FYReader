@@ -159,8 +159,8 @@
 
             <ImageView
                 android:id="@+id/iv_book_source"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:layout_width="21dp"
+                android:layout_height="21dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:src="@drawable/ic_source"
@@ -171,7 +171,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="18dp"
                 android:layout_toEndOf="@id/iv_book_source"
                 android:text="@string/book_source_man"
                 android:textColor="@color/textSecondary"

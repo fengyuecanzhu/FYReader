@@ -388,7 +388,7 @@
     <string name="rule_last_chapter">最新章节规则</string>
     <string name="rule_word_count">字数规则</string>
     <string name="rule_status">连载状态规则</string>
-    <string name="book_url_pattern">书籍URL正则</string>
+    <string name="book_url_pattern">书籍详情URL正则</string>
     <string name="rule_book_info_init">预处理规则</string>
     <string name="rule_toc_url">目录URL规则</string>
     <string name="rule_toc_internal">目录列表区间</string>
@@ -486,6 +486,7 @@
     <string name="success">成功</string>
     <string name="check_host_cookie">正在打开首页，成功自动返回主界面</string>
     <string name="clear_cookie">清除Cookie</string>
+    <string name="book_source">编辑书源</string>
 
 
     <string-array name="reset_screen_time">

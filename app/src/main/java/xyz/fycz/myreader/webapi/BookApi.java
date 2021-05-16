@@ -19,6 +19,7 @@ import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
+import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
@@ -108,6 +109,7 @@ public class BookApi {
             return ThirdSourceApi.getBookChaptersByTC(book, (ThirdCrawler) rc);
         }
         String url = book.getChapterUrl();
+        if (StringHelper.isEmpty(url)) url = book.getInfoUrl();
         String charset = rc.getCharset();
         url = NetworkUtils.getAbsoluteURL(rc.getNameSpace(), url);
         String finalUrl = url;

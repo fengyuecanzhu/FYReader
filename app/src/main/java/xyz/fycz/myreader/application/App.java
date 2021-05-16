@@ -76,6 +76,7 @@ public class App extends Application {
         super.onCreate();
         application = this;
         debug = isApkInDebug(this);
+        CrashHandler.register(this);
         firstInit();
         SSLSocketClient.trustAllHosts();//信任所有证书
         RxJavaPlugins.setErrorHandler(Functions.emptyConsumer());
@@ -283,7 +284,7 @@ public class App extends Application {
         App.getApplication().newThread(() -> {
             try {
                 String url = "https://shimo.im/docs/cqkgjPRRydYYhQKt/read";
-                if (getApplication().debug) {
+                if (debug) {
                     url = "https://shimo.im/docs/zfzpda7MUGskOC9v/read";
                 }
                 String html = OkHttpUtils.getHtml(url);

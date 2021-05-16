@@ -54,7 +54,7 @@ object MD5Utils {
         if (!file.isFile) {
             return null
         }
-        var digest: MessageDigest? = null
+        val digest: MessageDigest?
         var `in`: FileInputStream? = null
         val buffer = ByteArray(1024)
         var len: Int

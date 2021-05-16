@@ -1,7 +1,10 @@
 package xyz.fycz.myreader.webapi;
 
+import android.text.TextUtils;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 
 import io.reactivex.Observable;
@@ -58,9 +61,9 @@ public class ThirdSourceApi {
     protected static Observable<Book> getBookInfoByTC(Book book, ThirdCrawler rc) {
         BookSource source = rc.getSource();
         BookInfo bookInfo = new BookInfo(source.getSourceUrl(), source.getSourceName(), source);
-        /*if (!TextUtils.isEmpty(book.getBookInfoBean().getBookInfoHtml())) {
-            return bookInfo.analyzeBookInfo(book.getBookInfoBean().getBookInfoHtml(), bookShelfBean);
-        }*/
+        if (!TextUtils.isEmpty(book.getCathe("BookInfoHtml"))) {
+            return bookInfo.analyzeBookInfo(book.getCathe("BookInfoHtml"), book);
+        }
         try {
             Map<String, String> headers = rc.getHeaders();
             headers.putAll(getCookies(rc.getNameSpace()));
@@ -75,13 +78,13 @@ public class ThirdSourceApi {
 
     protected static Observable<List<Chapter>> getBookChaptersByTC(Book book, ThirdCrawler rc) {
         BookSource source = rc.getSource();
+        Map<String, String> headers = rc.getHeaders();
+        headers.putAll(getCookies(rc.getNameSpace()));
         BookChapterList bookChapterList = new BookChapterList(source.getSourceUrl(), source, true);
-        /*if (!TextUtils.isEmpty(bookShelfBean.getBookInfoBean().getChapterListHtml())) {
-            return bookChapterList.analyzeChapterList(bookShelfBean.getBookInfoBean().getChapterListHtml(), bookShelfBean, headerMap);
-        }*/
+        if (!TextUtils.isEmpty(book.getCathe("ChapterListHtml"))) {
+            return bookChapterList.analyzeChapterList(book.getCathe("ChapterListHtml"), book, headers);
+        }
         try {
-            Map<String, String> headers = rc.getHeaders();
-            headers.putAll(getCookies(rc.getNameSpace()));
             AnalyzeUrl analyzeUrl = new AnalyzeUrl(book.getChapterUrl(), headers, book.getInfoUrl());
             return OkHttpUtils.getStrResponse(analyzeUrl)
                     .flatMap(response -> OkHttpUtils.setCookie(response, source.getSourceUrl()))
@@ -101,14 +104,14 @@ public class ThirdSourceApi {
 
     protected static Observable<String> getChapterContentByTC(Chapter chapter, Book book, ThirdCrawler rc) {
         BookSource source = rc.getSource();
+        Map<String, String> headers = rc.getHeaders();
+        headers.putAll(getCookies(rc.getNameSpace()));
         BookContent bookContent = new BookContent(source.getSourceUrl(), source);
-        /*if (Objects.equals(chapterBean.getDurChapterUrl(), bookShelfBean.getBookInfoBean().getChapterUrl())
-                && !TextUtils.isEmpty(bookShelfBean.getBookInfoBean().getChapterListHtml())) {
-            return bookContent.analyzeBookContent(bookShelfBean.getBookInfoBean().getChapterListHtml(), chapterBean, nextChapterBean, bookShelfBean, headerMap);
-        }*/
+        if (Objects.equals(chapter.getUrl(), book.getChapterUrl())
+                && !TextUtils.isEmpty(book.getCathe("ChapterListHtml"))) {
+            return bookContent.analyzeBookContent(book.getCathe("ChapterListHtml"), chapter, null, book, headers);
+        }
         try {
-            Map<String, String> headers = rc.getHeaders();
-            headers.putAll(getCookies(rc.getNameSpace()));
             AnalyzeUrl analyzeUrl = new AnalyzeUrl(chapter.getUrl(), headers, book.getChapterUrl());
             String contentRule = source.getContentRule().getContent();
             if (contentRule.startsWith("$") && !contentRule.startsWith("$.")) {

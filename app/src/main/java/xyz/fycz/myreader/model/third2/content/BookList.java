@@ -65,67 +65,76 @@ public class BookList {
             AnalyzeRule analyzer = new AnalyzeRule(null);
             analyzer.setContent(body, baseUrl);
             //如果符合详情页url规则
-
-            initRule();
-            List<Object> collections;
-            boolean reverse = false;
-            boolean allInOne = false;
-            if (ruleList.startsWith("-")) {
-                reverse = true;
-                ruleList = ruleList.substring(1);
-            }
-            // 仅使用java正则表达式提取书籍列表
-            if (ruleList.startsWith(":")) {
-                ruleList = ruleList.substring(1);
-                Log.d(tag, "┌解析搜索列表");
-                getBooksOfRegex(body, ruleList.split("&&"), 0, analyzer, books);
+            if (!isEmpty(bookSource.getInfoRule().getUrlPattern())
+                    && baseUrl.matches(bookSource.getInfoRule().getUrlPattern())) {
+                Log.d(tag, ">搜索结果为详情页");
+                Book item = getItem(analyzer, baseUrl);
+                if (item != null) {
+                    item.putCathe("BookInfoHtml", body);
+                    books.add(item);
+                }
             } else {
-                if (ruleList.startsWith("+")) {
-                    allInOne = true;
+                initRule();
+                List<Object> collections;
+                boolean reverse = false;
+                boolean allInOne = false;
+                if (ruleList.startsWith("-")) {
+                    reverse = true;
                     ruleList = ruleList.substring(1);
                 }
-                //获取列表
-                Log.d(tag, "┌解析搜索列表");
-                collections = analyzer.getElements(ruleList);
-                if (collections.size() == 0) {
-                    Log.d(tag, "└搜索列表为空,当做详情页处理");
-                    Book item = getItem(analyzer, baseUrl);
-                    if (item != null) {
-                        //item.setBookInfoHtml(body);
-                        books.add(item);
-                    }
+                // 仅使用java正则表达式提取书籍列表
+                if (ruleList.startsWith(":")) {
+                    ruleList = ruleList.substring(1);
+                    Log.d(tag, "┌解析搜索列表");
+                    getBooksOfRegex(body, ruleList.split("&&"), 0, analyzer, books);
                 } else {
-                    Log.d(tag, "└找到 " + collections.size() + " 个匹配的结果");
-                    if (allInOne) {
-                        for (int i = 0; i < collections.size(); i++) {
-                            Object object = collections.get(i);
-                            Book item = getItemAllInOne(analyzer, object, baseUrl, i == 0);
-                            if (item != null) {
-                                //如果网址相同则缓存
-                                /*if (baseUrl.equals(item.getNoteUrl())) {
-                                    item.setBookInfoHtml(body);
-                                }*/
-                                books.add(item);
-                            }
+                    if (ruleList.startsWith("+")) {
+                        allInOne = true;
+                        ruleList = ruleList.substring(1);
+                    }
+                    //获取列表
+                    Log.d(tag, "┌解析搜索列表");
+                    collections = analyzer.getElements(ruleList);
+                    if (collections.size() == 0 && isEmpty(bookSource.getInfoRule().getUrlPattern())) {
+                        Log.d(tag, "└搜索列表为空,当做详情页处理");
+                        Book item = getItem(analyzer, baseUrl);
+                        if (item != null) {
+                            item.putCathe("BookInfoHtml", body);
+                            books.add(item);
                         }
                     } else {
-                        for (int i = 0; i < collections.size(); i++) {
-                            Object object = collections.get(i);
-                            analyzer.setContent(object, baseUrl);
-                            Book item = getItemInList(analyzer, baseUrl, i == 0);
-                            if (item != null) {
-                                //如果网址相同则缓存
-                                /*if (baseUrl.equals(item.getNoteUrl())) {
-                                    item.setBookInfoHtml(body);
-                                }*/
-                                books.add(item);
+                        Log.d(tag, "└找到 " + collections.size() + " 个匹配的结果");
+                        if (allInOne) {
+                            for (int i = 0; i < collections.size(); i++) {
+                                Object object = collections.get(i);
+                                Book item = getItemAllInOne(analyzer, object, baseUrl, i == 0);
+                                if (item != null) {
+                                    //如果网址相同则缓存
+                                    if (baseUrl.equals(item.getInfoUrl())) {
+                                        item.putCathe("BookInfoHtml", body);
+                                    }
+                                    books.add(item);
+                                }
+                            }
+                        } else {
+                            for (int i = 0; i < collections.size(); i++) {
+                                Object object = collections.get(i);
+                                analyzer.setContent(object, baseUrl);
+                                Book item = getItemInList(analyzer, baseUrl, i == 0);
+                                if (item != null) {
+                                    //如果网址相同则缓存
+                                    if (baseUrl.equals(item.getInfoUrl())) {
+                                        item.putCathe("BookInfoHtml", body);
+                                    }
+                                    books.add(item);
+                                }
                             }
                         }
                     }
                 }
-            }
-            if (books.size() > 1 && reverse) {
-                Collections.reverse(books);
+                if (books.size() > 1 && reverse) {
+                    Collections.reverse(books);
+                }
             }
             if (books.isEmpty()) {
                 e.onError(new Throwable("未获取到书名"));
@@ -147,7 +156,7 @@ public class BookList {
             ruleIntroduce = findRule.getDesc();
             ruleCoverUrl = findRule.getImgUrl();
             ruleLastChapter = findRule.getLastChapter();
-            ruleNoteUrl = findRule.getTocUrl();
+            ruleNoteUrl = findRule.getInfoUrl();
         } else {
             SearchRule searchRule = bookSource.getSearchRule();
             ruleList = searchRule.getList();
@@ -157,7 +166,7 @@ public class BookList {
             ruleIntroduce = searchRule.getDesc();
             ruleCoverUrl = searchRule.getImgUrl();
             ruleLastChapter = searchRule.getLastChapter();
-            ruleNoteUrl = searchRule.getTocUrl();
+            ruleNoteUrl = searchRule.getInfoUrl();
         }
     }
 
@@ -170,8 +179,24 @@ public class BookList {
         analyzer.setBook(item);
         item.setTag(tag);
         item.setSource(bookSource.getSourceUrl());
-        item.setChapterUrl(baseUrl);
         item.setInfoUrl(baseUrl);
+        // 获取详情页预处理规则
+        String ruleInfoInit = infoRule.getInit();
+        if (!isEmpty(ruleInfoInit)) {
+            // 仅使用java正则表达式提取书籍详情
+            if (ruleInfoInit.startsWith(":")) {
+                ruleInfoInit = ruleInfoInit.substring(1);
+                Log.d(tag, "┌详情信息预处理");
+                AnalyzeByRegex.getInfoOfRegex(String.valueOf(analyzer.getContent()), ruleInfoInit.split("&&"), 0, item, analyzer, bookSource, tag);
+                if (isEmpty(item.getName())) return null;
+                return item;
+            } else {
+                Object object = analyzer.getElement(ruleInfoInit);
+                if (object != null) {
+                    analyzer.setContent(object);
+                }
+            }
+        }
         Log.d(tag, ">书籍网址:" + baseUrl);
         Log.d(tag, "┌获取书名");
         String bookName = StringUtils.formatHtml(analyzer.getString(infoRule.getName()));
@@ -193,10 +218,6 @@ public class BookList {
             Log.d(tag, "┌获取封面");
             item.setImgUrl(analyzer.getString(infoRule.getImgUrl(), true));
             Log.d(tag, "└" + item.getImgUrl());
-            Log.d(tag, "┌获取目录网址");
-            String bookCatalogUrl = analyzer.getString(infoRule.getTocUrl(), true);
-            if (!isEmpty(bookCatalogUrl)) item.setChapterUrl(bookCatalogUrl);;
-            Log.d(tag, "└" + item.getChapterUrl());
             return item;
         }
         return null;
@@ -206,7 +227,7 @@ public class BookList {
         Book item = new Book();
         analyzer.setBook(item);
         NativeObject nativeObject = (NativeObject) object;
-        if (printLog) Log.d(tag,  "┌获取书名");
+        if (printLog) Log.d(tag, "┌获取书名");
         String bookName = StringUtils.formatHtml(String.valueOf(nativeObject.get(ruleName)));
         if (printLog) Log.d(tag, "└" + bookName);
         if (!isEmpty(bookName)) {
@@ -216,24 +237,24 @@ public class BookList {
             if (printLog) Log.d(tag, "┌获取作者");
             item.setAuthor(StringUtils.formatHtml(String.valueOf(nativeObject.get(ruleAuthor))));
             if (printLog) Log.d(tag, "└" + item.getAuthor());
-            if (printLog)  Log.d(tag, "┌获取分类");
+            if (printLog) Log.d(tag, "┌获取分类");
             item.setType(String.valueOf(nativeObject.get(ruleKind)));
-            if (printLog) Log.d(tag,"└" + item.getType());
-            if (printLog) Log.d(tag,  "┌获取最新章节");
+            if (printLog) Log.d(tag, "└" + item.getType());
+            if (printLog) Log.d(tag, "┌获取最新章节");
             item.setNewestChapterTitle(String.valueOf(nativeObject.get(ruleLastChapter)));
             if (printLog) Log.d(tag, "└" + item.getNewestChapterTitle());
-            if (printLog) Log.d(tag,  "┌获取简介");
+            if (printLog) Log.d(tag, "┌获取简介");
             item.setDesc(String.valueOf(nativeObject.get(ruleIntroduce)));
             if (printLog) Log.d(tag, "└" + item.getDesc());
-            if (printLog) Log.d(tag,  "┌获取封面");
+            if (printLog) Log.d(tag, "┌获取封面");
             if (!isEmpty(ruleCoverUrl))
                 item.setImgUrl(NetworkUtils.getAbsoluteURL(baseUrl, String.valueOf(nativeObject.get(ruleCoverUrl))));
             if (printLog) Log.d(tag, "└" + item.getImgUrl());
             if (printLog) Log.d(tag, "┌获取书籍网址");
             String resultUrl = String.valueOf(nativeObject.get(ruleNoteUrl));
             if (isEmpty(resultUrl)) resultUrl = baseUrl;
-            item.setChapterUrl(resultUrl);
-            if (printLog) Log.d(tag, "└" + item.getChapterUrl());
+            item.setInfoUrl(resultUrl);
+            if (printLog) Log.d(tag, "└" + item.getInfoUrl());
             return item;
         }
         return null;
@@ -264,12 +285,12 @@ public class BookList {
             if (printLog) Log.d(tag, "└" + item.getDesc());
             if (printLog) Log.d(tag, "┌获取封面");
             item.setImgUrl(analyzer.getString(ruleCoverUrl, true));
-            if (printLog) Log.d(tag,  "└" + item.getImgUrl());
+            if (printLog) Log.d(tag, "└" + item.getImgUrl());
             Log.d(tag, "┌获取书籍网址");
             String resultUrl = analyzer.getString(ruleNoteUrl, true);
             if (isEmpty(resultUrl)) resultUrl = baseUrl;
-            item.setChapterUrl(resultUrl);
-            if (printLog) Log.d(tag, "└" + item.getChapterUrl());
+            item.setInfoUrl(resultUrl);
+            if (printLog) Log.d(tag, "└" + item.getInfoUrl());
             return item;
         }
         return null;
@@ -344,12 +365,13 @@ public class BookList {
                 item.setNewestChapterTitle(ruleVal.get("ruleLastChapter"));
                 item.setDesc(ruleVal.get("ruleIntroduce"));
                 item.setImgUrl(ruleVal.get("ruleCoverUrl"));
-                item.setChapterUrl(NetworkUtils.getAbsoluteURL(baseUrl, ruleVal.get("ruleNoteUrl")));
+                item.setInfoUrl(NetworkUtils.getAbsoluteURL(baseUrl, ruleVal.get("ruleNoteUrl")));
                 books.add(item);
                 // 判断搜索结果是否为详情页
                 if (books.size() == 1 && (isEmpty(ruleVal.get("ruleNoteUrl")) || ruleVal.get("ruleNoteUrl").equals(baseUrl))) {
-                    books.get(0).setChapterUrl(baseUrl);
-                    //books.get(0).setBookInfoHtml(res);
+                    books.get(0).setInfoUrl(baseUrl);
+                    books.get(0).putCathe("BookInfoHtml", res);
+                    ;
                     return;
                 }
             } while (resM.find());
@@ -368,7 +390,7 @@ public class BookList {
             Log.d(tag, "┌获取封面");
             Log.d(tag, "└" + books.get(0).getImgUrl());
             Log.d(tag, "┌获取书籍");
-            Log.d(tag, "└" + books.get(0).getChapterUrl());
+            Log.d(tag, "└" + books.get(0).getInfoUrl());
         } else {
             StringBuilder result = new StringBuilder();
             do {

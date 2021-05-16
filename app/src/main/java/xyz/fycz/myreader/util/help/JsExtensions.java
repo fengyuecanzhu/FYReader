@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import androidx.annotation.Keep;
+
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
@@ -30,7 +32,7 @@ import xyz.fycz.myreader.util.utils.MD5Utils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings({"unused"})
 public interface JsExtensions {
     String TAG = JsExtensions.class.getSimpleName();
 

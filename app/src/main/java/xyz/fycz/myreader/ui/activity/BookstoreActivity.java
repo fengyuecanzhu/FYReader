@@ -19,6 +19,7 @@ import java.util.List;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActiityBookstoreBinding;
 import xyz.fycz.myreader.entity.bookstore.BookType;
@@ -159,7 +160,7 @@ public class BookstoreActivity extends BaseActivity {
                 mSourceDia = new SourceExchangeDialog(this, book);
                 mSourceDia.setOnSourceChangeListener((bean, pos1) -> {
                     Intent intent = new Intent(this, BookDetailedActivity.class);
-                    intent.putExtra(APPCONST.SEARCH_BOOK_BEAN, (ArrayList<Book>) mSourceDia.getaBooks());
+                    BitIntentDataManager.getInstance().putData(intent, mSourceDia.getaBooks());
                     intent.putExtra(APPCONST.SOURCE_INDEX, pos1);
                     BookstoreActivity.this.startActivity(intent);
                     mSourceDia.dismiss();

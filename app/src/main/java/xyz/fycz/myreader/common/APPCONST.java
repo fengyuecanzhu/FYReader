@@ -46,6 +46,7 @@ public class APPCONST {
     public static final String JSON_PATH = "JsonPath";
     public static final String THIRD_SOURCE = "ThirdSource";
 
+    public static final String DATA_KEY = "data_key";
     public static final String BOOK = "book";
     public static final String TITLE = "title";
     public static final String FIND_CRAWLER = "findCrawler";
