@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -22,10 +23,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 import okhttp3.Request;
@@ -89,7 +92,7 @@ public class OkHttpUtils {
             return "";
         } else {
             String bodyStr = new String(body.bytes(), Charset.forName(encodeType));
-            Log.d("Http: read finish", bodyStr);
+            Log.d("Http -> read finish", bodyStr);
             return bodyStr;
         }
     }
@@ -180,7 +183,7 @@ public class OkHttpUtils {
             String content = jsonObj.getString("content");
             Document doc = Jsoup.parse(content);
             content = doc.text();
-            Log.d("Http: UpdateInfo", content);
+            Log.d("Http -> UpdateInfo", content);
             return content;
         }
     }
@@ -320,6 +323,33 @@ public class OkHttpUtils {
 
         Web(String content) {
             this.content = content;
+        }
+    }
+
+
+    public static String upload(String url, String filePath, String fileName) throws IOException {
+        OkHttpClient client = getOkHttpClient();
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", fileName,
+                        RequestBody.create(MediaType.parse("multipart/form-data"), new File(filePath)))
+                .build();
+
+        Request request = new Request.Builder()
+                .header("Authorization", "Client-ID " + UUID.randomUUID())
+                .url(url)
+                .post(requestBody)
+                .build();
+
+        Response response = client.newCall(request).execute();
+        if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+        ResponseBody body = response.body();
+        if (body == null) {
+            return "";
+        } else {
+            String bodyStr = new String(body.bytes(), StandardCharsets.UTF_8);
+            Log.d("Http -> upload finish", bodyStr);
+            return bodyStr;
         }
     }
 }

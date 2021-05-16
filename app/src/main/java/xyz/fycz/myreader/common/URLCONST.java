@@ -21,6 +21,7 @@ public class URLCONST {
     public static final String FY_READER_URL = "https://fyreader.fycz.tk";
 
     public static final String AD_URL = FY_READER_URL + "/ad";
+    public static final String LOG_UPLOAD_URL = FY_READER_URL + "/logUpload";
 
     public static final String DONATE = "https://gitee.com/fengyuecanzhu/Donate/raw/master";
 
