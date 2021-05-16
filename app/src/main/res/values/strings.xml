@@ -102,6 +102,7 @@
     <string name="share_app">分享软件</string>
     <string name="update_log">更新日志</string>
     <string name="git_hub">GitHub</string>
+    <string name="share_log">分享崩溃日志</string>
     <string name="email">邮箱：fy@fycz.xyz</string>
     <string name="this_github_url">https://github.com/fengyuecanzhu/FYReader</string>
     <string name="update">检查更新</string>

@@ -6,9 +6,8 @@ import android.content.Intent;
 import java.io.File;
 
 
-
 public class OpenFileHelper {
-    private final static String[][] MIME_MapTable={
+    private final static String[][] MIME_MapTable = {
 //{后缀名，MIME类型}
             {".3gp", "video/3gpp"},
             {".apk", "application/vnd.android.package-archive"},
@@ -80,23 +79,24 @@ public class OpenFileHelper {
 
     /**
      * 打开文件
+     *
      * @param file
      */
-    public static void openFile(Context context,File file){
+    public static void openFile(Context context, File file) {
 
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-      //设置intent的Action属性
+        //设置intent的Action属性
         intent.setAction(Intent.ACTION_VIEW);
-       //获取文件file的MIME类型
+        //获取文件file的MIME类型
         String type = getMIMEType(file);
-       //设置intent的data和Type属性。
-        intent.setDataAndType(/*uri*/UriFileUtil.getUriForFile(context,file), type);
-         //跳转
+        //设置intent的data和Type属性。
+        intent.setDataAndType(/*uri*/UriFileUtil.getUriForFile(context, file), type);
+        //跳转
         try {
             context.startActivity(intent); //这里最好try一下，有可能会报错。 比如说你的MIME类型是打开邮箱，但是你手机里面没装邮箱客户端，就会报错。
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             ToastUtils.showError("没有安装相应的文件读取工具或者文件错误");
         }
@@ -104,26 +104,26 @@ public class OpenFileHelper {
     }
 
 
-
     /**
      * 根据文件后缀名获得对应的MIME类型。
+     *
      * @param file
      */
     private static String getMIMEType(File file) {
 
-        String type="*/*";
+        String type = "*/*";
         String fName = file.getName();
 //获取后缀名前的分隔符"."在fName中的位置。
         int dotIndex = fName.lastIndexOf(".");
-        if(dotIndex < 0){
+        if (dotIndex < 0) {
             return type;
         }
-/* 获取文件的后缀名*/
-        String end=fName.substring(dotIndex,fName.length()).toLowerCase();
-        if(end=="")return type;
-//在MIME和文件类型的匹配表中找到对应的MIME类型。
-        for(int i=0;i<MIME_MapTable.length;i++){ //MIME_MapTable??在这里你一定有疑问，这个MIME_MapTable是什么？
-            if(end.equals(MIME_MapTable[i][0]))
+        /* 获取文件的后缀名*/
+        String end = fName.substring(dotIndex).toLowerCase();
+        if (end.equals("")) return type;
+        //在MIME和文件类型的匹配表中找到对应的MIME类型。
+        for (int i = 0; i < MIME_MapTable.length; i++) { //MIME_MapTable??在这里你一定有疑问，这个MIME_MapTable是什么？
+            if (end.equals(MIME_MapTable[i][0]))
                 type = MIME_MapTable[i][1];
         }
         return type;

@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
@@ -29,9 +31,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Function;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.ui.activity.SplashActivity;
 import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.utils.OkHttpUtils;
 
 /**
  * @author fengyue
@@ -40,6 +47,7 @@ import xyz.fycz.myreader.util.utils.FileUtils;
 public final class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     private DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+
     /**
      * 注册 Crash 监听
      */
@@ -62,14 +70,11 @@ public final class CrashHandler implements Thread.UncaughtExceptionHandler {
     @SuppressLint("ApplySharedPref")
     @Override
     public void uncaughtException(@NonNull Thread thread, @NonNull Throwable throwable) {
-
         saveCrashLog(throwable);
-
         // 不去触发系统的崩溃处理（com.android.internal.os.RuntimeInit$KillApplicationHandler）
         if (mNextHandler != null && !mNextHandler.getClass().getName().startsWith("com.android.internal.os")) {
             mNextHandler.uncaughtException(thread, throwable);
         }
-
         // 杀死进程（这个事应该是系统干的，但是它会多弹出一个崩溃对话框，所以需要我们自己手动杀死进程）
         android.os.Process.killProcess(android.os.Process.myPid());
         System.exit(10);
@@ -135,7 +140,8 @@ public final class CrashHandler implements Thread.UncaughtExceptionHandler {
         String time = formatter.format(new Date());
         String fileName = "crash-" + time + "-" + timestamp + ".log";
         String path = APPCONST.LOG_DIR + fileName;
-        FileUtils.writeText(mPhoneInfo + "\n\n" + mStackTrace, FileUtils.getFile(path));
+        File file = FileUtils.getFile(path);
+        FileUtils.writeText(mPhoneInfo + "\n\n" + mStackTrace, file);
     }
 
     /**
