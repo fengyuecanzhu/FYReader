@@ -568,14 +568,15 @@ public class BookDetailedActivity extends BaseActivity {
             mBookService.addBook(mBook);
         }
         Intent intent = new Intent(this, ReadActivity.class);
-        aBooks = mSourceDialog.getaBooks();
+        /*aBooks = mSourceDialog.getaBooks();
         if (aBooks != null) {
             aBooks.set(mSourceDialog.getSourceIndex(), mBook);
             BitIntentDataManager.getInstance().putData(intent, aBooks);
             intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
         } else {
             BitIntentDataManager.getInstance().putData(intent, mBook);
-        }
+        }*/
+        BitIntentDataManager.getInstance().putData(intent, mBook);
         intent.putExtra("isCollected", isCollected);
         startActivityForResult(intent, APPCONST.REQUEST_READ);
     }
