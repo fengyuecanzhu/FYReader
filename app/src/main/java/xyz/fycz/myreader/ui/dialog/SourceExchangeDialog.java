@@ -47,11 +47,18 @@ public class SourceExchangeDialog extends Dialog {
 
     private int sourceIndex = -1;
 
+    private boolean isRead;//是否在阅读界面换源
+
     /***************************************************************************/
     public SourceExchangeDialog(@NonNull Activity activity, Book bookBean) {
         super(activity);
         mActivity = activity;
         mShelfBook = bookBean;
+    }
+
+    public SourceExchangeDialog(@NonNull Activity activity, Book bookBean, boolean isRead) {
+        this(activity, bookBean);
+        this.isRead = isRead;
     }
 
     public void setShelfBook(Book mShelfBook) {
@@ -65,12 +72,19 @@ public class SourceExchangeDialog extends Dialog {
     public void setSourceIndex(int sourceIndex){
         this.sourceIndex = sourceIndex;
     }
-
+    public int getSourceIndex() {
+        return sourceIndex;
+    }
     public void setOnSourceChangeListener(OnSourceChangeListener listener) {
         this.listener = listener;
     }
 
     public List<Book> getaBooks(){return aBooks;}
+
+    public Book getmShelfBook() {
+        return mShelfBook;
+    }
+
     /*****************************Initialization********************************/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,11 +135,11 @@ public class SourceExchangeDialog extends Dialog {
             aBooks = new ArrayList<>();
         }
 
-        mAdapter = new SourceExchangeAdapter();
+        mAdapter = new SourceExchangeAdapter(this);
         binding.dialogRvContent.setLayoutManager(new LinearLayoutManager(mActivity));
         binding.dialogRvContent.setAdapter(mAdapter);
 
-        searchEngine = new SearchEngine();
+        searchEngine = new SearchEngine(isRead);
         searchEngine.initSearchEngine(ReadCrawlerUtil.getEnableReadCrawlers());
     }
 

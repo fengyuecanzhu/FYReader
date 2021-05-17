@@ -2,6 +2,8 @@ package xyz.fycz.myreader.model;
 
 
 import androidx.annotation.NonNull;
+
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -43,10 +45,17 @@ public class SearchEngine {
     private int searchSuccessNum;
     private int searchFinishNum;
 
+    private boolean isRead = false;//是否在阅读界面换源
+
     private OnSearchListener searchListener;
 
     public SearchEngine() {
         threadsNum = SharedPreUtils.getInstance().getInt(App.getmContext().getString(R.string.threadNum), 8);
+    }
+
+    public SearchEngine(boolean isRead) {
+        this();
+        this.isRead = isRead;
     }
 
     public void setOnSearchListener(OnSearchListener searchListener) {
@@ -183,6 +192,7 @@ public class SearchEngine {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
             String searchKey = title;
             BookApi.search(searchKey, crawler)
+                    .flatMap(bookMap -> getBookInfo(bookMap, crawler))
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<ConMVMap<SearchBookBean, Book>>() {
@@ -228,7 +238,7 @@ public class SearchEngine {
 
     }
 
-    public synchronized void getBookInfo(Book book, BookInfoCrawler bic, OnGetBookInfoListener listener){
+    public void getBookInfo(Book book, BookInfoCrawler bic, OnGetBookInfoListener listener) {
         BookApi.getBookInfo(book, bic)
                 .subscribeOn(scheduler)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -255,6 +265,19 @@ public class SearchEngine {
                 });
     }
 
+    public Observable<ConMVMap<SearchBookBean, Book>> getBookInfo(ConMVMap<SearchBookBean, Book> bookMap, ReadCrawler rc) {
+        return Observable.create(emitter -> {
+            if (isRead && rc instanceof BookInfoCrawler) {
+                List<Book> books = bookMap.values();
+                for (Book book : books) {
+                    BookApi.getBookInfo(book, (BookInfoCrawler) rc).subscribe();
+                }
+            }
+            emitter.onNext(bookMap);
+            emitter.onComplete();
+        });
+    }
+
 
     /************************************************************************/
     public interface OnSearchListener {
@@ -269,15 +292,15 @@ public class SearchEngine {
 
     }
 
-    public interface OnGetBookInfoListener{
+    public interface OnGetBookInfoListener {
         void loadFinish(Boolean isSuccess);
     }
 
-    public interface OnGetBookChaptersListener{
+    public interface OnGetBookChaptersListener {
         void loadFinish(List<Chapter> chapters, Boolean isSuccess);
     }
 
-    public interface OnGetChapterContentListener{
+    public interface OnGetChapterContentListener {
         void loadFinish(String content, Boolean isSuccess);
     }
 }
