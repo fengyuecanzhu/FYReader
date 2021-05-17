@@ -126,6 +126,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
     /***************************variable*****************************/
     private Book mBook;
+    private List<Book> aBooks;
     private ArrayList<Chapter> mChapters = new ArrayList<>();
     private ChapterService mChapterService;
     private BookService mBookService;
@@ -324,7 +325,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
         mPageLoader = binding.readPvContent.getPageLoader(mBook, mReadCrawler, mSetting);
         //Dialog
-        mSourceDialog = new SourceExchangeDialog(this, mBook);
+        mSourceDialog = new SourceExchangeDialog(this, mBook, true);
+        if (aBooks != null) {
+            mSourceDialog.setABooks(aBooks);
+        }
     }
 
     @Override
@@ -479,10 +483,13 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 mBookService.updateBook(mBook, bookTem);
             }
             mBook = bookTem;
+            aBooks = mSourceDialog.getaBooks();
+            aBooks.set(pos, mBook);
             toggleMenu(true);
             Intent intent = new Intent(this, ReadActivity.class)
-                    .putExtra("hasChangeSource", true);
-            BitIntentDataManager.getInstance().putData(intent, mBook);
+                    .putExtra("hasChangeSource", true)
+                    .putExtra(APPCONST.SOURCE_INDEX, pos);
+            BitIntentDataManager.getInstance().putData(intent, aBooks);
             if (!isCollected) {
                 intent.putExtra("isCollected", false);
             }
@@ -910,7 +917,16 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             addLocalBook(path);
         } else {
             //路径为空，说明不是直接打开txt文件
-            mBook = (Book) BitIntentDataManager.getInstance().getData(getIntent());
+            Object obj = BitIntentDataManager.getInstance().getData(getIntent());
+            if (obj instanceof Book) {
+                mBook = (Book) obj;
+            } else if (obj instanceof List) {
+                aBooks = (List<Book>) obj;
+                int bookPos = getIntent().getIntExtra(APPCONST.SOURCE_INDEX, 0);
+                if (aBooks.size() > bookPos) {
+                    mBook = aBooks.get(bookPos);
+                }
+            }
             //mBook为空，说明是从快捷方式启动
             if (mBook == null) {
                 String bookId = SharedPreUtils.getInstance().getString(getString(R.string.lastRead), "");

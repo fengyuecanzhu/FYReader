@@ -7,6 +7,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
+import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 
 /**
  * @author fengyue
@@ -16,6 +17,12 @@ public class SourceExchangeHolder extends ViewHolderImpl<Book> {
     TextView sourceTvTitle;
     TextView sourceTvChapter;
     ImageView sourceIv;
+    private SourceExchangeDialog dialog;
+
+    public SourceExchangeHolder(SourceExchangeDialog dialog) {
+        this.dialog = dialog;
+    }
+
     @Override
     protected int getItemLayoutId() {
         return R.layout.item_change_source;
@@ -32,7 +39,7 @@ public class SourceExchangeHolder extends ViewHolderImpl<Book> {
     public void onBind(Book data, int pos) {
         sourceTvTitle.setText(BookSourceManager.getSourceNameByStr(data.getSource()));
         sourceTvChapter.setText(data.getNewestChapterTitle());
-        if (Boolean.parseBoolean(data.getNewestChapterId()))
+        if (data.getSource() != null && data.getSource().equals(dialog.getmShelfBook().getSource()))
             sourceIv.setVisibility(View.VISIBLE);
         else
             sourceIv.setVisibility(View.GONE);

@@ -94,7 +94,7 @@ public class BookDetailedActivity extends BaseActivity {
     private static final String TAG = BookDetailedActivity.class.getSimpleName();
 
     private Book mBook;
-    private ArrayList<Book> aBooks;
+    private List<Book> aBooks;
     private BookService mBookService;
     private ChapterService mChapterService;
     private ReadCrawler mReadCrawler;
@@ -156,7 +156,7 @@ public class BookDetailedActivity extends BaseActivity {
         super.initData(savedInstanceState);
         mBookService = BookService.getInstance();
         mChapterService = ChapterService.getInstance();
-        if (!initBook()){
+        if (!initBook()) {
             ToastUtils.showError("无法获取书籍！");
             finish();
             return;
@@ -568,7 +568,14 @@ public class BookDetailedActivity extends BaseActivity {
             mBookService.addBook(mBook);
         }
         Intent intent = new Intent(this, ReadActivity.class);
-        BitIntentDataManager.getInstance().putData(intent, mBook);
+        aBooks = mSourceDialog.getaBooks();
+        if (aBooks != null) {
+            aBooks.set(mSourceDialog.getSourceIndex(), mBook);
+            BitIntentDataManager.getInstance().putData(intent, aBooks);
+            intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
+        } else {
+            BitIntentDataManager.getInstance().putData(intent, mBook);
+        }
         intent.putExtra("isCollected", isCollected);
         startActivityForResult(intent, APPCONST.REQUEST_READ);
     }

@@ -13,6 +13,7 @@ public class SharedBook {
     private String desc;
     private String imgUrl;
     private String chapterUrl;
+    private String infoUrl;
     private String source;
 
     public String getName() {
@@ -63,6 +64,14 @@ public class SharedBook {
         this.chapterUrl = chapterUrl;
     }
 
+    public String getInfoUrl() {
+        return infoUrl;
+    }
+
+    public void setInfoUrl(String infoUrl) {
+        this.infoUrl = infoUrl;
+    }
+
     public String getSource() {
         return source;
     }
@@ -84,6 +93,7 @@ public class SharedBook {
         sharedBook.setDesc(desc);
         sharedBook.setImgUrl(book.getImgUrl());
         sharedBook.setChapterUrl(book.getChapterUrl());
+        sharedBook.setInfoUrl(book.getInfoUrl());
         sharedBook.setSource(book.getSource());
         return sharedBook;
     }
@@ -96,6 +106,7 @@ public class SharedBook {
         book.setDesc(sharedBook.desc);
         book.setImgUrl(sharedBook.imgUrl);
         book.setChapterUrl(sharedBook.chapterUrl);
+        book.setInfoUrl(sharedBook.infoUrl);
         book.setSource(sharedBook.source);
         return book;
     }
