@@ -493,7 +493,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             if (!isCollected) {
                 intent.putExtra("isCollected", false);
             }
-            finish();
+            //finish();
+            exit();
             startActivity(intent);
         });
 

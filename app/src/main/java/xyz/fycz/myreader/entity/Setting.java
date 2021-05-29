@@ -180,6 +180,7 @@ public class Setting implements Serializable {
             readStyle.setBgPath("");
             readStyle.setBlueFilterPercent(30);
             readStyle.setProtectEye(false);
+            readStyle.setEnType(false);
             readStyle.setComposition(1);
 
             readStyles.add(readStyle);
@@ -707,5 +708,12 @@ public class Setting implements Serializable {
 
     public void setLightNovelParagraph(boolean lightNovelParagraph) {
         this.lightNovelParagraph = lightNovelParagraph;
+    }
+    public boolean isEnType() {
+        return getCurReadStyle().isEnType();
+    }
+
+    public void setEnType(boolean enType) {
+        getCurReadStyle().setEnType(enType);
     }
 }

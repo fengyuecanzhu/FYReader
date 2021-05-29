@@ -46,6 +46,7 @@ import xyz.fycz.myreader.ui.fragment.MineFragment;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 
 import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT;
@@ -220,6 +221,7 @@ public class MainActivity extends BaseActivity {
             ToastUtils.showError(e.getLocalizedMessage());
             e.printStackTrace();
         }
+        AdUtils.adRecord("Usage", "usTimes");
     }
 
     private void reLoadFragment() {

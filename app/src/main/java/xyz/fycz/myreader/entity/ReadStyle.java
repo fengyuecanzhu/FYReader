@@ -72,6 +72,8 @@ public class ReadStyle implements Serializable {
 
     private int blueFilterPercent;//蓝光过滤比率
 
+    private boolean enType;//英文排版
+
     @Override
     public Object clone() {
         try {
@@ -314,5 +316,13 @@ public class ReadStyle implements Serializable {
 
     public void setBlueFilterPercent(int blueFilterPercent) {
         this.blueFilterPercent = blueFilterPercent;
+    }
+
+    public boolean isEnType() {
+        return enType;
+    }
+
+    public void setEnType(boolean enType) {
+        this.enType = enType;
     }
 }

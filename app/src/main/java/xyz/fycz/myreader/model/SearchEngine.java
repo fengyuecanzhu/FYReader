@@ -21,6 +21,7 @@ import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.BookApi;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -267,7 +268,7 @@ public class SearchEngine {
 
     public Observable<ConMVMap<SearchBookBean, Book>> getBookInfo(ConMVMap<SearchBookBean, Book> bookMap, ReadCrawler rc) {
         return Observable.create(emitter -> {
-            if (isRead && rc instanceof BookInfoCrawler) {
+            if (isRead && rc instanceof ThirdCrawler) {
                 List<Book> books = bookMap.values();
                 for (Book book : books) {
                     BookApi.getBookInfo(book, (BookInfoCrawler) rc).subscribe();
