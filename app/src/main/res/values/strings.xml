@@ -488,6 +488,7 @@
     <string name="check_host_cookie">正在打开首页，成功自动返回主界面</string>
     <string name="clear_cookie">清除Cookie</string>
     <string name="book_source">编辑书源</string>
+    <string name="adapt_en_type">适配英文排版</string>
 
 
     <string-array name="reset_screen_time">

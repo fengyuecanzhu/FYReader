@@ -1673,7 +1673,11 @@ public abstract class PageLoader {
                 }
                 // 重置段落
                 if (!showTitle) {
-                    paragraph = StringUtils.trim(paragraph.replace("\t", ""));
+                    if (mSettingManager.isEnType()) {
+                        paragraph = StringUtils.trim(paragraph.replace("\t", ""));
+                    } else {
+                        paragraph = paragraph.replaceAll("\\s", "");
+                    }
                     // 如果只有换行符，那么就不执行
                     if (paragraph.equals("")) continue;
                     paragraph = indent + paragraph + "\n";

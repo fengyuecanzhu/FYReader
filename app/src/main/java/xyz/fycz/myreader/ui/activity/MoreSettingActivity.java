@@ -67,6 +67,7 @@ public class MoreSettingActivity extends BaseActivity {
     private boolean alwaysNext;
     private boolean noMenuTitle;
     private boolean readAloudVolumeTurnPage;
+    private boolean enType;
 
     private ArrayList<Book> mBooks;
     int booksCount;
@@ -110,6 +111,7 @@ public class MoreSettingActivity extends BaseActivity {
         isLongPress = mSetting.isCanSelectText();
         noMenuTitle = mSetting.isNoMenuChTitle();
         readAloudVolumeTurnPage = mSetting.isReadAloudVolumeTurnPage();
+        enType = mSetting.isEnType();
         threadNum = SharedPreUtils.getInstance().getInt(getString(R.string.threadNum), 8);
         isWebDav = getIntent().getBooleanExtra(APPCONST.WEB_DAV, false);
     }
@@ -193,6 +195,7 @@ public class MoreSettingActivity extends BaseActivity {
         binding.scShowStatus.setChecked(isShowStatusBar);
         binding.scLongPress.setChecked(isLongPress);
         binding.scNoMenuTitle.setChecked(noMenuTitle);
+        binding.scAdaptEnType.setChecked(enType);
         binding.scReadAloudVolumeTurnPage.setChecked(readAloudVolumeTurnPage);
     }
 
@@ -215,11 +218,7 @@ public class MoreSettingActivity extends BaseActivity {
 
         binding.rlVolume.setOnClickListener(
                 (v) -> {
-                    if (isVolumeTurnPage) {
-                        isVolumeTurnPage = false;
-                    } else {
-                        isVolumeTurnPage = true;
-                    }
+                    isVolumeTurnPage = !isVolumeTurnPage;
                     binding.scVolume.setChecked(isVolumeTurnPage);
                     mSetting.setVolumeTurnPage(isVolumeTurnPage);
                     SysManager.saveSetting(mSetting);
@@ -227,11 +226,7 @@ public class MoreSettingActivity extends BaseActivity {
         );
         binding.rlAlwaysNext.setOnClickListener(
                 (v) -> {
-                    if (alwaysNext) {
-                        alwaysNext = false;
-                    } else {
-                        alwaysNext = true;
-                    }
+                    alwaysNext = !alwaysNext;
                     binding.scAlwaysNext.setChecked(alwaysNext);
                     mSetting.setAlwaysNext(alwaysNext);
                     SysManager.saveSetting(mSetting);
@@ -240,11 +235,7 @@ public class MoreSettingActivity extends BaseActivity {
         binding.rlShowStatus.setOnClickListener(
                 (v) -> {
                     needRefresh = true;
-                    if (isShowStatusBar) {
-                        isShowStatusBar = false;
-                    } else {
-                        isShowStatusBar = true;
-                    }
+                    isShowStatusBar = !isShowStatusBar;
                     binding.scShowStatus.setChecked(isShowStatusBar);
                     mSetting.setShowStatusBar(isShowStatusBar);
                     SysManager.saveSetting(mSetting);
@@ -253,11 +244,7 @@ public class MoreSettingActivity extends BaseActivity {
         binding.rlLongPress.setOnClickListener(
                 (v) -> {
                     needRefresh = false;
-                    if (isLongPress) {
-                        isLongPress = false;
-                    } else {
-                        isLongPress = true;
-                    }
+                    isLongPress = !isLongPress;
                     binding.scLongPress.setChecked(isLongPress);
                     mSetting.setCanSelectText(isLongPress);
                     SysManager.saveSetting(mSetting);
@@ -266,11 +253,7 @@ public class MoreSettingActivity extends BaseActivity {
         binding.rlContentReplace.setOnClickListener(v -> startActivity(new Intent(this, ReplaceRuleActivity.class)));
         binding.rlReadAloudVolumeTurnPage.setOnClickListener(
                 (v) -> {
-                    if (readAloudVolumeTurnPage) {
-                        readAloudVolumeTurnPage = false;
-                    } else {
-                        readAloudVolumeTurnPage = true;
-                    }
+                    readAloudVolumeTurnPage = !readAloudVolumeTurnPage;
                     binding.scReadAloudVolumeTurnPage.setChecked(readAloudVolumeTurnPage);
                     mSetting.setReadAloudVolumeTurnPage(readAloudVolumeTurnPage);
                     SysManager.saveSetting(mSetting);
@@ -279,13 +262,19 @@ public class MoreSettingActivity extends BaseActivity {
         binding.rlNoMenuTitle.setOnClickListener(
                 (v) -> {
                     upMenu = true;
-                    if (noMenuTitle) {
-                        noMenuTitle = false;
-                    } else {
-                        noMenuTitle = true;
-                    }
+                    noMenuTitle = !noMenuTitle;
                     binding.scNoMenuTitle.setChecked(noMenuTitle);
                     mSetting.setNoMenuChTitle(noMenuTitle);
+                    SysManager.saveSetting(mSetting);
+                }
+        );
+
+        binding.rlAdaptEnType.setOnClickListener(
+                (v) -> {
+                    needRefresh = true;
+                    enType = !enType;
+                    binding.scAdaptEnType.setChecked(enType);
+                    mSetting.setEnType(enType);
                     SysManager.saveSetting(mSetting);
                 }
         );
@@ -320,11 +309,7 @@ public class MoreSettingActivity extends BaseActivity {
 
         binding.rlAutoRefresh.setOnClickListener(
                 (v) -> {
-                    if (autoRefresh) {
-                        autoRefresh = false;
-                    } else {
-                        autoRefresh = true;
-                    }
+                    autoRefresh = !autoRefresh;
                     binding.scAutoRefresh.setChecked(autoRefresh);
                     mSetting.setRefreshWhenStart(autoRefresh);
                     SysManager.saveSetting(mSetting);

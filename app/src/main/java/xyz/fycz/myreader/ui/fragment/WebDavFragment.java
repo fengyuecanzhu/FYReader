@@ -1,11 +1,14 @@
 package xyz.fycz.myreader.ui.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.NumberPicker;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -14,12 +17,15 @@ import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentWebdavSettingBinding;
 import xyz.fycz.myreader.model.storage.BackupRestoreUi;
+import xyz.fycz.myreader.model.storage.Restore;
 import xyz.fycz.myreader.model.storage.WebDavHelp;
+import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StringHelper;
@@ -113,7 +119,22 @@ public class WebDavFragment extends BaseFragment {
                     .subscribe(new MySingleObserver<ArrayList<String>>() {
                         @Override
                         public void onSuccess(ArrayList<String> strings) {
-                            if (!WebDavHelp.INSTANCE.showRestoreDialog(getContext(), strings, BackupRestoreUi.INSTANCE)) {
+                            if (!WebDavHelp.INSTANCE.showRestoreDialog(getContext(), strings, new Restore.CallBack() {
+                                @Override
+                                public void restoreSuccess() {
+                                    SysManager.regetmSetting();
+                                    ToastUtils.showSuccess("成功将书架从网络同步至本地！");
+                                    if (getActivity() != null) {
+                                        getActivity().finish();
+                                    }
+                                    startActivity(new Intent(getContext(), MainActivity.class));
+                                }
+
+                                @Override
+                                public void restoreError(@NotNull String msg) {
+                                    ToastUtils.showError(msg);
+                                }
+                            })) {
                                 ToastUtils.showWarring("WebDav服务端没有备份或WebDav配置错误");
                             }
                         }

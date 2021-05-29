@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +44,7 @@ import xyz.fycz.myreader.ui.activity.AdSettingActivity;
 import xyz.fycz.myreader.ui.activity.BookSourceActivity;
 import xyz.fycz.myreader.ui.activity.DonateActivity;
 import xyz.fycz.myreader.ui.activity.FeedbackActivity;
+import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -167,7 +170,22 @@ public class MineFragment extends BaseFragment {
                     .subscribe(new MySingleObserver<ArrayList<String>>() {
                         @Override
                         public void onSuccess(ArrayList<String> strings) {
-                            if (!WebDavHelp.INSTANCE.showRestoreDialog(getContext(), strings, BackupRestoreUi.INSTANCE)) {
+                            if (!WebDavHelp.INSTANCE.showRestoreDialog(getContext(), strings, new Restore.CallBack() {
+                                @Override
+                                public void restoreSuccess() {
+                                    SysManager.regetmSetting();
+                                    ToastUtils.showSuccess("成功将书架从网络同步至本地！");
+                                    if (getActivity() != null) {
+                                        getActivity().finish();
+                                    }
+                                    startActivity(new Intent(getContext(), MainActivity.class));
+                                }
+
+                                @Override
+                                public void restoreError(@NotNull String msg) {
+                                    ToastUtils.showError(msg);
+                                }
+                            })) {
                                 ToastUtils.showWarring("WebDav服务端没有备份或WebDav配置错误");
                             }
                         }
@@ -353,6 +371,10 @@ public class MineFragment extends BaseFragment {
 //                                    "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");
                             SysManager.regetmSetting();
                             ToastUtils.showSuccess("书架恢复成功！");
+                            if (getActivity() != null) {
+                                getActivity().finish();
+                            }
+                            startActivity(new Intent(getContext(), MainActivity.class));
                         }
 
                         @Override
@@ -441,6 +463,10 @@ public class MineFragment extends BaseFragment {
 //                                            "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");、
                                     SysManager.regetmSetting();
                                     ToastUtils.showSuccess("成功将书架从网络同步至本地！");
+                                    if (getActivity() != null) {
+                                        getActivity().finish();
+                                    }
+                                    startActivity(new Intent(getContext(), MainActivity.class));
                                 } else {
                                     DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！");
                                 }
