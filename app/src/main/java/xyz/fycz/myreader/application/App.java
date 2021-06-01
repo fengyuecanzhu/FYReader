@@ -25,6 +25,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.kongzue.dialogx.DialogX;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
 
@@ -97,7 +98,9 @@ public class App extends Application {
         mFixedThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());//初始化线程池
         initNightTheme();
 //        LLog.init(APPCONST.LOG_DIR);
+        initDialogX();
     }
+
 
     private void firstInit() {
         SharedPreUtils sru = SharedPreUtils.getInstance();
@@ -107,14 +110,22 @@ public class App extends Application {
         }
     }
 
+    private void initDialogX() {
+        DialogX.init(this);
+        DialogX.DEBUGMODE = debug;
+    }
+
     public void initNightTheme() {
         if (isNightFS()) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+            DialogX.globalTheme = DialogX.THEME.AUTO;
         } else {
             if (isNightTheme()) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                DialogX.globalTheme = DialogX.THEME.DARK;
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                DialogX.globalTheme = DialogX.THEME.LIGHT;
             }
         }
     }

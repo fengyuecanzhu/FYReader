@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.kongzue.dialogx.dialogs.BottomMenu;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -117,7 +119,7 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
             });
             viewHolder.ivBookImg.setOnLongClickListener(v -> {
                 if (!ismEditState()) {
-                    AlertDialog bookDialog = MyAlertDialog.build(mContext)
+                    /*AlertDialog bookDialog = MyAlertDialog.build(mContext)
                             .setTitle(book.getName())
                             .setItems(menu, (dialog, which) -> {
                                         switch (which) {
@@ -168,7 +170,55 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
                             .setNegativeButton(null, null)
                             .setPositiveButton(null, null)
                             .create();
-                    bookDialog.show();
+                    bookDialog.show();*/
+                    BottomMenu.show(book.getName(), menu)
+                            .setOnMenuItemClickListener((dialog, text, which) -> {
+                                switch (which) {
+                                    case 0:
+                                        Intent intent = new Intent(mContext, BookDetailedActivity.class);
+                                        BitIntentDataManager.getInstance().putData(intent, book);
+                                        mContext.startActivity(intent);
+                                        break;
+                                    case 1:
+                                        if (!isGroup) {
+                                            book.setSortCode(0);
+                                        }else {
+                                            book.setGroupSort(0);
+                                        }
+                                        mBookService.updateEntity(book);
+                                        mBookcasePresenter.init();
+                                        ToastUtils.showSuccess("书籍《" + book.getName() + "》移至顶部成功！");
+                                        break;
+                                    case 2:
+                                        downloadBook(book);
+                                        break;
+                                    case 3:
+                                        App.getApplication().newThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                try {
+                                                    if (unionChapterCathe(book)) {
+                                                        DialogCreator.createTipDialog(mContext,
+                                                                "缓存导出成功，导出目录："
+                                                                        + APPCONST.TXT_BOOK_DIR);
+                                                    } else {
+                                                        DialogCreator.createTipDialog(mContext,
+                                                                "章节目录为空或未找到缓存文件，缓存导出失败！");
+                                                    }
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                    DialogCreator.createTipDialog(mContext,
+                                                            "章节目录为空或未找到缓存文件，缓存导出失败！");
+                                                }
+                                            }
+                                        });
+                                        break;
+                                    case 4:
+                                        showDeleteBookDialog(book);
+                                        break;
+                                }
+                                return false;
+                            });
                     return true;
                 }
                 return false;

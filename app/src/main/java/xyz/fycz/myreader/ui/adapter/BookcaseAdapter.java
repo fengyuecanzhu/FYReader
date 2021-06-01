@@ -1,7 +1,13 @@
 package xyz.fycz.myreader.ui.adapter;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.*;
+
+import com.kongzue.dialogx.dialogs.BottomDialog;
+import com.kongzue.dialogx.dialogs.BottomMenu;
+import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
+import com.kongzue.dialogx.interfaces.OnMenuItemSelectListener;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -274,7 +280,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
         }
         final int[] begin = new int[1];
         final int[] end = new int[1];
-        MyAlertDialog.build(mContext)
+        /*MyAlertDialog.build(mContext)
                 .setTitle("缓存书籍")
                 .setSingleChoiceItems(mContext.getResources().getStringArray(R.array.download), selectedIndex,
                         (dialog, which) -> selectedIndex = which).setNegativeButton("取消", ((dialog, which) -> dialog.dismiss())).setPositiveButton("确定",
@@ -302,7 +308,40 @@ public abstract class BookcaseAdapter extends DragAdapter {
                         mBookcasePresenter.addDownload(book, chapters, begin[0], end[0], false);
                     });
                     mBookcasePresenter.getEs().submit(downloadThread);
-                }).show();
+                }).show();*/
+        BottomMenu.show("缓存书籍", mContext.getResources().getStringArray(R.array.download))
+                .setSelection(selectedIndex)
+                .setOnMenuItemClickListener(new OnMenuItemSelectListener<BottomMenu>() {
+                    @Override
+                    public void onOneItemSelect(BottomMenu dialog, CharSequence text, int which) {
+                        selectedIndex = which;
+                    }
+                }).setOkButton("确定", (baseDialog, v) -> {
+                    switch (selectedIndex) {
+                        case 0:
+                            begin[0] = book.getHisttoryChapterNum();
+                            end[0] = book.getHisttoryChapterNum() + 50;
+                            break;
+                        case 1:
+                            begin[0] = book.getHisttoryChapterNum() - 50;
+                            end[0] = book.getHisttoryChapterNum() + 50;
+                            break;
+                        case 2:
+                            begin[0] = book.getHisttoryChapterNum();
+                            end[0] = 99999;
+                            break;
+                        case 3:
+                            begin[0] = 0;
+                            end[0] = 99999;
+                            break;
+                    }
+                    Thread downloadThread = new Thread(() -> {
+                        ArrayList<Chapter> chapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
+                        mBookcasePresenter.addDownload(book, chapters, begin[0], end[0], false);
+                    });
+                    mBookcasePresenter.getEs().submit(downloadThread);
+                    return false;
+                }).setCancelButton(R.string.cancel);
     }
 
     static class ViewHolder {

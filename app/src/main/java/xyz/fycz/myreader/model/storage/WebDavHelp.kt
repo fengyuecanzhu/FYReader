@@ -3,11 +3,14 @@ package xyz.fycz.myreader.model.storage
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import com.kongzue.dialogx.dialogs.BottomMenu
+import com.kongzue.dialogx.interfaces.OnMenuItemClickListener
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.selector
+import xyz.fycz.myreader.R
 import xyz.fycz.myreader.base.observer.MySingleObserver
 import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.util.SharedPreUtils
@@ -68,11 +71,21 @@ object WebDavHelp {
 
     fun showRestoreDialog(context: Context, names: ArrayList<String>, callBack: Restore.CallBack?): Boolean {
         return if (names.isNotEmpty()) {
-            context.selector(title = "选择恢复文件", items = names) { _, index ->
+            /*context.selector(title = "选择恢复文件", items = names) { _, index ->
                 if (index in 0 until 30.coerceAtLeast(names.size)) {
                     restoreWebDav(names[index], callBack)
                 }
-            }
+            }*/
+            BottomMenu.build().setTitle("选择恢复文件")
+                .setMenuStringList(names)
+                .setOnMenuItemClickListener { dialog, text, which ->
+                    if (which in 0 until 30.coerceAtLeast(names.size)) {
+                        restoreWebDav(names[which], callBack)
+                    }
+                    false
+                }
+                .setCancelButton(R.string.cancel)
+                .show()
             true
         } else {
             false

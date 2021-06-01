@@ -39,6 +39,10 @@ import androidx.core.content.ContextCompat;
 
 import com.gyf.immersionbar.ImmersionBar;
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
+import com.kongzue.dialogx.dialogs.BottomDialog;
+import com.kongzue.dialogx.dialogs.BottomMenu;
+import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
+import com.kongzue.dialogx.interfaces.OnMenuItemSelectListener;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -1555,7 +1559,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             return;
         }
         App.runOnUiThread(() -> {
-            MyAlertDialog.build(this)
+            /*MyAlertDialog.build(this)
                     .setTitle("缓存书籍")
                     .setSingleChoiceItems(getResources().getStringArray(R.array.download), selectedIndex,
                             (dialog, which) -> selectedIndex = which).setNegativeButton("取消", ((dialog, which) -> dialog.dismiss())).setPositiveButton("确定",
@@ -1574,7 +1578,31 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                                 addDownload(0, mChapters.size());
                                 break;
                         }
-                    }).show();
+                    }).show();*/
+            BottomMenu.show("缓存书籍", getResources().getStringArray(R.array.download))
+                    .setSelection(selectedIndex)
+                    .setOnMenuItemClickListener(new OnMenuItemSelectListener<BottomMenu>() {
+                        @Override
+                        public void onOneItemSelect(BottomMenu dialog, CharSequence text, int which) {
+                            selectedIndex = which;
+                        }
+                    }).setOkButton("确定", (baseDialog, v) -> {
+                        switch (selectedIndex) {
+                            case 0:
+                                addDownload(mPageLoader.getChapterPos(), mPageLoader.getChapterPos() + 50);
+                                break;
+                            case 1:
+                                addDownload(mPageLoader.getChapterPos() - 50, mPageLoader.getChapterPos() + 50);
+                                break;
+                            case 2:
+                                addDownload(mPageLoader.getChapterPos(), mChapters.size());
+                                break;
+                            case 3:
+                                addDownload(0, mChapters.size());
+                                break;
+                        }
+                        return false;
+                    }).setCancelButton(R.string.cancel);
         });
     }
 
@@ -1952,7 +1980,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         break;
                     case 3:
                         selectString = StringUtils.deleteWhitespace(binding.readPvContent.getSelectStr());
-                        MyAlertDialog.build(ReadActivity.this)
+                        /*MyAlertDialog.build(ReadActivity.this)
                                 .setTitle(R.string.search)
                                 .setItems(R.array.search_way, (dialog, which) -> {
                                     String url = "";
@@ -1978,7 +2006,33 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                                         ToastUtils.showError(e.getLocalizedMessage());
                                     }
                                 }).setNegativeButton("取消", null)
-                                .show();
+                                .show();*/
+                        BottomMenu.show(R.string.search, getResources().getStringArray(R.array.search_way))
+                                .setOnMenuItemClickListener((dialog, text, which) -> {
+                                    String url = "";
+                                    switch (which) {
+                                        case 0:
+                                            url = URLCONST.BAI_DU_SEARCH;
+                                            break;
+                                        case 1:
+                                            url = URLCONST.GOOGLE_SEARCH;
+                                            break;
+                                        case 2:
+                                            url = URLCONST.YOU_DAO_SEARCH;
+                                            break;
+                                    }
+                                    url = url.replace("{key}", selectString);
+                                    Log.d("SEARCH_URL", url);
+                                    try {
+                                        Uri uri = Uri.parse(url);
+                                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                        startActivity(intent);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        ToastUtils.showError(e.getLocalizedMessage());
+                                    }
+                                    return false;
+                                }).setCancelButton(R.string.cancel);
                         clearSelect();
                         break;
                     case 4:

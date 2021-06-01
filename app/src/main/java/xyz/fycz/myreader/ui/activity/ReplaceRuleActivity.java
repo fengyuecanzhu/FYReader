@@ -17,6 +17,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.kongzue.dialogx.dialogs.BottomMenu;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -187,7 +189,7 @@ public class ReplaceRuleActivity extends BaseActivity {
             });
             replaceDialog.show(getSupportFragmentManager(), "replaceRule");
         } else if (itemId == R.id.action_import) {
-            MyAlertDialog.build(this)
+            /*MyAlertDialog.build(this)
                     .setTitle("导入规则")
                     .setItems(R.array.import_rule, (dialog, which) -> {
                         if (which == 0) {
@@ -211,7 +213,32 @@ public class ReplaceRuleActivity extends BaseActivity {
                                     (dialog1, which1) -> importDataS(url[0]));
 
                         }
-                    }).show();
+                    }).show();*/
+            BottomMenu.show("导入规则", getResources().getStringArray(R.array.import_rule))
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        if (which == 0) {
+                            String pasteText = ClipBoardUtil.paste(this);
+                            if (!isEmpty(pasteText)) {
+                                importDataS(pasteText);
+                            } else {
+                                ToastUtils.showError("剪切板内容为空，导入失败");
+                            }
+                        } else if (which == 1) {
+                            ToastUtils.showInfo("请选择内容替换规则JSON文件");
+                            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                            intent.addCategory(Intent.CATEGORY_OPENABLE);
+                            intent.setType("application/json");
+                            startActivityForResult(intent, APPCONST.REQUEST_IMPORT_REPLACE_RULE);
+                        } else {
+                            String[] url = new String[1];
+                            MyAlertDialog.createInputDia(this, "网络导入",
+                                    "请输入网址", "", true, 200,
+                                    text0 -> url[0] = text0,
+                                    (dialog1, which1) -> importDataS(url[0]));
+
+                        }
+                        return false;
+                    }).setCancelButton(R.string.cancel);
         } else if (itemId == R.id.action_export) {
             if (mReplaceRules == null || mReplaceRules.size() == 0) {
                 ToastUtils.showWarring("当前没有任何规则，无法导出！");

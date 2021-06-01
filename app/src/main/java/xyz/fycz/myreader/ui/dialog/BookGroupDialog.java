@@ -14,6 +14,9 @@ import android.widget.EditText;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.kongzue.dialogx.dialogs.BottomMenu;
+import com.kongzue.dialogx.interfaces.BaseDialog;
+import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,9 +77,10 @@ public class BookGroupDialog {
 
     /**
      * 加入分组
+     *
      * @param book
      */
-    public void addGroup(Book book, OnGroup onGroup){
+    public void addGroup(Book book, OnGroup onGroup) {
         List<Book> books = new ArrayList<>();
         books.add(book);
         addGroup(books, onGroup);
@@ -84,10 +88,11 @@ public class BookGroupDialog {
 
     /**
      * 加入批量分组
+     *
      * @param mSelectBooks
      * @param onGroup
      */
-    public void addGroup(List<Book> mSelectBooks, OnGroup onGroup){
+    public void addGroup(List<Book> mSelectBooks, OnGroup onGroup) {
         initBookGroups(true);
         showSelectGroupDia((dialog, which) -> {
             if (which < mBookGroups.size()) {
@@ -108,10 +113,11 @@ public class BookGroupDialog {
             }
         });
     }
+
     /**
      * 添加/重命名分组对话框
      */
-    public void showAddOrRenameGroupDia(boolean isRename, boolean isAddGroup, int groupNum, OnGroup onGroup){
+    public void showAddOrRenameGroupDia(boolean isRename, boolean isAddGroup, int groupNum, OnGroup onGroup) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.edit_dialog, null);
         TextInputLayout textInputLayout = view.findViewById(R.id.text_input_lay);
         int maxLen = 20;
@@ -125,7 +131,7 @@ public class BookGroupDialog {
         }
         editText.requestFocus();
         InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-        mHandler.postDelayed(() ->{
+        mHandler.postDelayed(() -> {
             imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
         }, 220);
         AlertDialog newGroupDia = MyAlertDialog.build(mContext)
@@ -139,8 +145,8 @@ public class BookGroupDialog {
         posBtn.setEnabled(false);
         posBtn.setOnClickListener(v1 -> {
             CharSequence newGroupName = editText.getText().toString();
-            for (CharSequence oldGroupName : mGroupNames){
-                if (oldGroupName.equals(newGroupName)){
+            for (CharSequence oldGroupName : mGroupNames) {
+                if (oldGroupName.equals(newGroupName)) {
                     ToastUtils.showWarring("分组[" + newGroupName + "]已存在，无法" + (!isRename ? "添加！" : "重命名！"));
                     return;
                 }
@@ -148,10 +154,10 @@ public class BookGroupDialog {
             bookGroup.setName(newGroupName.toString());
             if (!isRename) {
                 mBookGroupService.addBookGroup(bookGroup);
-            }else {
+            } else {
                 mBookGroupService.updateEntity(bookGroup);
                 SharedPreUtils spu = SharedPreUtils.getInstance();
-                if (spu.getString(mContext.getString(R.string.curBookGroupName), "").equals(oldName)){
+                if (spu.getString(mContext.getString(R.string.curBookGroupName), "").equals(oldName)) {
                     spu.putString(mContext.getString(R.string.curBookGroupName), newGroupName.toString());
                     if (onGroup != null) onGroup.change();
                 }
@@ -161,7 +167,7 @@ public class BookGroupDialog {
                     + bookGroup.getName() + "]");
             imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
             newGroupDia.dismiss();
-            if (isAddGroup){
+            if (isAddGroup) {
                 if (onGroup != null) onGroup.addGroup();
             }
         });
@@ -202,11 +208,11 @@ public class BookGroupDialog {
                             sb.append(mBookGroups.get(i).getName()).append("、");
                         }
                     }
-                    if (sb.length() > 0){
+                    if (sb.length() > 0) {
                         sb.deleteCharAt(sb.lastIndexOf("、"));
                     }
                     SharedPreUtils spu = SharedPreUtils.getInstance();
-                    if (mBookGroupService.getGroupById(spu.getString(mContext.getString(R.string.curBookGroupId), "")) == null){
+                    if (mBookGroupService.getGroupById(spu.getString(mContext.getString(R.string.curBookGroupId), "")) == null) {
                         spu.putString(mContext.getString(R.string.curBookGroupId), "");
                         spu.putString(mContext.getString(R.string.curBookGroupName), "");
                         onGroup.change();
@@ -214,17 +220,23 @@ public class BookGroupDialog {
                     ToastUtils.showSuccess("分组[" + sb.toString() + "]删除成功！");
                 }, null, null);
     }
+
     //显示选择书籍对话框
-    public void showSelectGroupDia(DialogInterface.OnClickListener onClickListener){
-        MyAlertDialog.build(mContext)
+    public void showSelectGroupDia(DialogInterface.OnClickListener onClickListener) {
+        /*MyAlertDialog.build(mContext)
                 .setTitle("选择分组")
                 .setItems(mGroupNames, onClickListener)
                 .setCancelable(false)
                 .setPositiveButton("取消", null)
-                .show();
+                .show();*/
+        BottomMenu.show("选择分组", mGroupNames)
+                .setOnMenuItemClickListener((dialog, text, which) -> {
+                    onClickListener.onClick(null, which);
+                    return false;
+                }).setCancelButton(R.string.cancel);
     }
 
-    public abstract static class OnGroup{
+    public abstract static class OnGroup {
         public abstract void change();
 
         public void addGroup() {

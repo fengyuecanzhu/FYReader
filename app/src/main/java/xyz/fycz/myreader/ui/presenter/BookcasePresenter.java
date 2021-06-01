@@ -17,6 +17,8 @@ import android.widget.PopupMenu;
 
 import androidx.core.app.ActivityCompat;
 
+import com.kongzue.dialogx.dialogs.BottomMenu;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.text.Collator;
@@ -586,7 +588,7 @@ public class BookcasePresenter implements BasePresenter {
      * 分组管理对话框
      */
     private void showGroupManDia() {
-        MyAlertDialog.build(mMainActivity)
+        /*MyAlertDialog.build(mMainActivity)
                 .setTitle("分组管理")
                 .setItems(mMainActivity.getResources().getStringArray(R.array.group_man)
                         , (dialog, which) -> {
@@ -630,7 +632,51 @@ public class BookcasePresenter implements BasePresenter {
                                     });
                                     break;
                             }
-                        }).show();
+                        }).show();*/
+        BottomMenu.show("分组管理", mMainActivity.getResources().getStringArray(R.array.group_man))
+                .setOnMenuItemClickListener((dialog, text, which) -> {
+                    mBookGroupDia.initBookGroups(false);
+                    switch (which) {
+                        case 0:
+                            mBookGroupDia.showAddOrRenameGroupDia(false, false, 0, new BookGroupDialog.OnGroup() {
+                                @Override
+                                public void change() {
+                                    ogcl.onChange();
+                                }
+
+                                @Override
+                                public void addGroup() {
+                                    mBookcaseFragment.getmBtnAddGroup().performClick();
+                                }
+                            });
+                            break;
+                        case 1:
+                            mBookGroupDia.showSelectGroupDia((dialog1, which1) -> {
+                                mBookGroupDia.showAddOrRenameGroupDia(true, false, which1, new BookGroupDialog.OnGroup() {
+                                    @Override
+                                    public void change() {
+                                        ogcl.onChange();
+                                    }
+
+                                    @Override
+                                    public void addGroup() {
+                                        mBookcaseFragment.getmBtnAddGroup().performClick();
+                                    }
+                                });
+                            });
+                            break;
+                        case 2:
+                            mBookGroupDia.showDeleteGroupDia(new BookGroupDialog.OnGroup() {
+                                @Override
+                                public void change() {
+                                    ogcl.onChange();
+                                    init();
+                                }
+                            });
+                            break;
+                    }
+                    return false;
+                }).setCancelButton(R.string.cancel);
     }
 
     //分组切换监听器

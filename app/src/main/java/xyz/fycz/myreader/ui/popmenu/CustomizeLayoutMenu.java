@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
+import com.kongzue.dialogx.dialogs.BottomMenu;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -156,7 +157,7 @@ public class CustomizeLayoutMenu extends FrameLayout {
                 }
                 items[i] = "布局" + (i + 1);
             }
-            MyAlertDialog.build(context)
+            /*MyAlertDialog.build(context)
                     .setTitle("选择布局保存的位置")
                     .setItems(items, (dialog, which) -> {
                         if (which == 5) which = 6;
@@ -164,7 +165,16 @@ public class CustomizeLayoutMenu extends FrameLayout {
                         SysManager.saveSetting(setting);
                         callback.upStyle();
                         ToastUtils.showSuccess("布局保存成功");
-                    }).show();
+                    }).show();*/
+            BottomMenu.show("选择布局保存的位置", items)
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        if (which == 5) which = 6;
+                        setting.saveLayout(which);
+                        SysManager.saveSetting(setting);
+                        callback.upStyle();
+                        ToastUtils.showSuccess("布局保存成功");
+                        return false;
+                    });
         });
         binding.tvImportLayout.setOnClickListener(v -> importLayout());
         binding.tvExportLayout.setOnClickListener(v -> exportLayout());
@@ -217,14 +227,22 @@ public class CustomizeLayoutMenu extends FrameLayout {
         for (int i = 0; i < items.length; i++) {
             items[i] = "布局" + (i + 1);
         }
-        MyAlertDialog.build(context)
+        /*MyAlertDialog.build(context)
                 .setTitle("选择需要导出的布局")
                 .setItems(items, (dialog, which) -> {
                     if (setting.exportLayout(which)){
                         DialogCreator.createTipDialog(context,
                                 "布局配置导出成功，导出位置：" + APPCONST.FILE_DIR + "readConfig.zip");
                     }
-                }).show();
+                }).show();*/
+        BottomMenu.show("选择需要导出的布局", items)
+                .setOnMenuItemClickListener((dialog, text, which) -> {
+                    if (setting.exportLayout(which)){
+                        DialogCreator.createTipDialog(context,
+                                "布局配置导出成功，导出位置：" + APPCONST.FILE_DIR + "readConfig.zip");
+                    }
+                    return false;
+                });
     }
 
     public void zip2Layout(String zipPath) {
@@ -240,7 +258,7 @@ public class CustomizeLayoutMenu extends FrameLayout {
             for (int i = 0; i < items.length; i++) {
                 items[i] = "布局" + (i + 1);
             }
-            MyAlertDialog.build(context)
+            /*MyAlertDialog.build(context)
                     .setTitle("选择要覆盖的布局")
                     .setItems(items, (dialog, which) -> {
                         setting.importLayout(which, readStyle);
@@ -252,7 +270,20 @@ public class CustomizeLayoutMenu extends FrameLayout {
                         FileUtils.deleteFile(APPCONST.TEM_FILE_DIR + "bg.fyl");
                         ToastUtils.showSuccess("配置导入成功");
                         callback.upStyle();
-                    }).show();
+                    }).show();*/
+            BottomMenu.show("选择要覆盖的布局", items)
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        setting.importLayout(which, readStyle);
+                        if (!readStyle.bgIsColor() && !readStyle.bgIsAssert()){
+                            FileUtils.copy(APPCONST.TEM_FILE_DIR + "bg.fyl",APPCONST.BG_FILE_DIR + "bg" + which + ".fyl");
+                            readStyle.setBgPath(APPCONST.BG_FILE_DIR + "bg" + which + ".fyl");
+                        }
+                        FileUtils.deleteFile(APPCONST.TEM_FILE_DIR + "readConfig.fyl");
+                        FileUtils.deleteFile(APPCONST.TEM_FILE_DIR + "bg.fyl");
+                        ToastUtils.showSuccess("配置导入成功");
+                        callback.upStyle();
+                        return false;
+                    });
         } catch (IOException e) {
             e.printStackTrace();
             ToastUtils.showError("配置导入失败" + e.getLocalizedMessage());

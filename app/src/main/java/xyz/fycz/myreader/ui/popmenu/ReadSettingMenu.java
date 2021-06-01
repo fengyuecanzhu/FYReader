@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
+import com.kongzue.dialogx.dialogs.BottomMenu;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.databinding.MenuReadSettingBinding;
@@ -116,7 +118,7 @@ public class ReadSettingMenu extends FrameLayout {
         binding.tvLineSpacing0.setOnClickListener(v -> ((ReadActivity) context).showCustomizeMenu());
         //缩进
         binding.tvIntent.setOnClickListener(v -> {
-            AlertDialog dialog = new AlertDialog.Builder(context, R.style.alertDialogTheme)
+            /*AlertDialog dialog = new AlertDialog.Builder(context, R.style.alertDialogTheme)
                     .setTitle("缩进")
                     .setSingleChoiceItems(context.getResources().getStringArray(R.array.indent),
                             setting.getIntent(),
@@ -127,7 +129,15 @@ public class ReadSettingMenu extends FrameLayout {
                                 dialogInterface.dismiss();
                             })
                     .create();
-            dialog.show();
+            dialog.show();*/
+            BottomMenu.show("缩进", getResources().getStringArray(R.array.indent))
+                    .setSelection(setting.getIntent())
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        setting.setIntent(which);
+                        SysManager.saveSetting(setting);
+                        callback.onRefreshUI();
+                        return false;
+                    }).setCancelButton(R.string.cancel);
         });
         //样式选择
         binding.ivCommonStyle.setOnClickListener(v -> selectedStyle(0));
@@ -170,7 +180,7 @@ public class ReadSettingMenu extends FrameLayout {
                 default:
                     checkedItem = 0;
             }
-            MyAlertDialog.build(context)
+            /*MyAlertDialog.build(context)
                     .setTitle("翻页模式")
                     .setSingleChoiceItems(R.array.page_mode, checkedItem, (dialog, which) -> {
                         switch (which) {
@@ -196,7 +206,35 @@ public class ReadSettingMenu extends FrameLayout {
                         dialog.dismiss();
                         SysManager.saveSetting(setting);
                         callback.onPageModeChange();
-                    }).show();
+                    }).show();*/
+            BottomMenu.show("翻页模式", getResources().getStringArray(R.array.page_mode))
+                    .setSelection(checkedItem)
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        switch (which) {
+                            case 0:
+                                setting.setPageMode(PageMode.COVER);
+                                break;
+                            case 1:
+                                setting.setPageMode(PageMode.SIMULATION);
+                                break;
+                            case 2:
+                                setting.setPageMode(PageMode.SLIDE);
+                                break;
+                            case 3:
+                                setting.setPageMode(PageMode.VERTICAL_COVER);
+                                break;
+                            case 4:
+                                setting.setPageMode(PageMode.SCROLL);
+                                break;
+                            case 5:
+                                setting.setPageMode(PageMode.NONE);
+                                break;
+                        }
+                        dialog.dismiss();
+                        SysManager.saveSetting(setting);
+                        callback.onPageModeChange();
+                        return false;
+                    }).setCancelButton(R.string.cancel);
         });
         //横屏竖屏切换
         binding.readTvHvScreen.setOnClickListener(v -> {

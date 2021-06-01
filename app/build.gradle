@@ -99,7 +99,11 @@ android {
     }
     productFlavors {
     }
-
+    packagingOptions {
+        // pickFirsts:当出现重复文件，会使用第一个匹配的文件打包进入apk
+        pickFirst 'lib/*/libRSSupport.so'
+        pickFirst 'lib/*/librsjni.so'
+    }
 }
 
 
@@ -112,6 +116,7 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.aar'])
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(path: ':DialogX')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
