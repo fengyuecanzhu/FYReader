@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="MaxRelativeLayout">
+        <attr name="maxLayoutWidth" format="dimension"/>
+        <attr name="maxLayoutHeight" format="dimension"/>
+        <attr name="lockWidth" format="boolean"/>
+        <attr name="interceptTouch" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="RealtimeBlurView">
+        <attr name="realtimeBlurRadius" format="dimension"/>
+        <attr name="realtimeDownsampleFactor" format="float"/>
+        <attr name="realtimeOverlayColor" format="color"/>
+        <attr name="radius" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="ProgressView">
+        <attr name="progressStrokeWidth" format="dimension"/>
+        <attr name="progressStrokeColor" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="DialogXBaseRelativeLayout">
+        <attr name="baseFocusable" format="boolean"/>
+    </declare-styleable>
+
+
+</resources>

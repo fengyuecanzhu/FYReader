@@ -5,6 +5,8 @@ import android.view.View;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.kongzue.dialogx.dialogs.BottomMenu;
+
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
@@ -116,14 +118,22 @@ public class AdSettingActivity extends BaseActivity {
                             checked = i;
                         }
                     }
-                    MyAlertDialog.build(AdSettingActivity.this)
+                    /*MyAlertDialog.build(AdSettingActivity.this)
                             .setTitle(getString(R.string.splash_ad_times))
                             .setSingleChoiceItems(adTimes, checked, (dialog, which) -> {
                                 curAdTimes = ints[which];
                                 spu.putInt("curAdTimes", curAdTimes);
                                 binding.tvSplashCurAdTimes.setText(getString(R.string.splash_cur_ad_times, adTimes[which],  curAdCount + "次"));
                                 dialog.dismiss();
-                            }).setNegativeButton("取消", null).show();
+                            }).setNegativeButton("取消", null).show();*/
+                    BottomMenu.show(getString(R.string.splash_ad_times), adTimes)
+                            .setSelection(checked)
+                            .setOnMenuItemClickListener((dialog, text, which) -> {
+                                curAdTimes = ints[which];
+                                spu.putInt("curAdTimes", curAdTimes);
+                                binding.tvSplashCurAdTimes.setText(getString(R.string.splash_cur_ad_times, adTimes[which],  curAdCount + "次"));
+                                return false;
+                            }).setCancelButton(R.string.cancel);
                 }
 
                 @Override

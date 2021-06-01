@@ -16,6 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.kongzue.dialogx.dialogs.BottomMenu;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -139,7 +141,7 @@ public class DIYSourceFragment extends BaseFragment {
                 startActivityForResult(new Intent(getContext(), SourceEditActivity.class),
                         APPCONST.REQUEST_EDIT_BOOK_SOURCE));
         binding.tvImportSource.setOnClickListener(v -> {
-            MyAlertDialog.build(getContext())
+            /*MyAlertDialog.build(getContext())
                     .setTitle("导入书源")
                     .setItems(R.array.import_rule, (dialog, which) -> {
                         if (which == 0) {
@@ -163,7 +165,32 @@ public class DIYSourceFragment extends BaseFragment {
                                     (dialog1, which1) -> importDataS(url[0]));
 
                         }
-                    }).show();
+                    }).show();*/
+            BottomMenu.show("导入书源", getResources().getStringArray(R.array.import_rule))
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        if (which == 0) {
+                            String pasteText = ClipBoardUtil.paste(getContext());
+                            if (!isEmpty(pasteText)) {
+                                importDataS(pasteText);
+                            } else {
+                                ToastUtils.showError("剪切板内容为空，导入失败");
+                            }
+                        } else if (which == 1) {
+                            ToastUtils.showInfo("请选择书源JSON文件");
+                            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                            intent.addCategory(Intent.CATEGORY_OPENABLE);
+                            intent.setType("application/json");
+                            startActivityForResult(intent, APPCONST.REQUEST_IMPORT_BOOK_SOURCE);
+                        } else {
+                            String[] url = new String[1];
+                            MyAlertDialog.createInputDia(getContext(), "网络导入",
+                                    "请输入网址", "", true, 200,
+                                    text0 -> url[0] = text0,
+                                    (dialog1, which1) -> importDataS(url[0]));
+
+                        }
+                        return false;
+                    }).setCancelButton(R.string.cancel);
         });
 
         binding.tvSourceTip.setOnClickListener(v -> {

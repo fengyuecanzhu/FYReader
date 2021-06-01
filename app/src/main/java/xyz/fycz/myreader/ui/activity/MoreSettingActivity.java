@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.kongzue.dialogx.dialogs.BottomMenu;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -280,7 +282,7 @@ public class MoreSettingActivity extends BaseActivity {
         );
 
         binding.llBookSort.setOnClickListener(v -> {
-            MyAlertDialog.build(this)
+            /*MyAlertDialog.build(this)
                     .setTitle(getString(R.string.book_sort))
                     .setSingleChoiceItems(R.array.book_sort, sortStyle, (dialog, which) -> {
                         sortStyle = which;
@@ -298,7 +300,26 @@ public class MoreSettingActivity extends BaseActivity {
                             binding.tvBookSort.setText(getString(R.string.book_name_sort));
                         }
                         dialog.dismiss();
-                    }).setNegativeButton("取消", null).show();
+                    }).setNegativeButton("取消", null).show();*/
+            BottomMenu.show(getString(R.string.book_sort), getResources().getStringArray(R.array.book_sort))
+                    .setSelection(sortStyle)
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        sortStyle = which;
+                        mSetting.setSortStyle(sortStyle);
+                        SysManager.saveSetting(mSetting);
+                        if (sortStyle == 0) {
+                            binding.tvBookSort.setText(getString(R.string.manual_sort));
+                            if (!SharedPreUtils.getInstance().getBoolean("manualSortTip")) {
+                                DialogCreator.createTipDialog(this, "可在书架编辑状态下长按移动书籍进行排序！");
+                                SharedPreUtils.getInstance().putBoolean("manualSortTip", true);
+                            }
+                        } else if (sortStyle == 1) {
+                            binding.tvBookSort.setText(getString(R.string.time_sort));
+                        } else if (sortStyle == 2) {
+                            binding.tvBookSort.setText(getString(R.string.book_name_sort));
+                        }
+                        return false;
+                    }).setCancelButton(R.string.cancel);
         });
 
         binding.rlPrivateBookcase.setOnClickListener(v -> {

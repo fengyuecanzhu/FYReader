@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
+import com.kongzue.dialogx.dialogs.BottomMenu;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
@@ -65,9 +67,9 @@ public class MineFragment extends BaseFragment {
 
     //private boolean isLogin;
     private Setting mSetting;
-    private String[] webSynMenu;
+//    private String[] webSynMenu;
     private String[] backupMenu;
-    private AlertDialog themeModeDia;
+//    private AlertDialog themeModeDia;
     private int themeMode;
     private String[] themeModeArr;
     @SuppressLint("HandlerLeak")
@@ -102,11 +104,11 @@ public class MineFragment extends BaseFragment {
         super.initData(savedInstanceState);
         //isLogin = UserService.isLogin();
         mSetting = SysManager.getSetting();
-        webSynMenu = new String[]{
+        /*webSynMenu = new String[]{
                 App.getmContext().getString(R.string.menu_backup_webBackup),
                 App.getmContext().getString(R.string.menu_backup_webRestore),
                 App.getmContext().getString(R.string.menu_backup_autoSyn)
-        };
+        };*/
         backupMenu = new String[]{
                 App.getmContext().getResources().getString(R.string.menu_backup_backup),
                 App.getmContext().getResources().getString(R.string.menu_backup_restore),
@@ -196,7 +198,7 @@ public class MineFragment extends BaseFragment {
         });
 
         binding.mineRlBackup.setOnClickListener(v -> {
-            AlertDialog bookDialog = MyAlertDialog.build(getContext())
+            /*AlertDialog bookDialog = MyAlertDialog.build(getContext())
                     .setTitle(getContext().getResources().getString(R.string.menu_bookcase_backup))
                     .setItems(backupMenu, (dialog, which) -> {
                         switch (which) {
@@ -211,7 +213,19 @@ public class MineFragment extends BaseFragment {
                     .setNegativeButton(null, null)
                     .setPositiveButton(null, null)
                     .create();
-            bookDialog.show();
+            bookDialog.show();*/
+            BottomMenu.show(getContext().getResources().getString(R.string.menu_bookcase_backup), backupMenu)
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        switch (which) {
+                            case 0:
+                                mHandler.sendMessage(mHandler.obtainMessage(2));
+                                break;
+                            case 1:
+                                mHandler.sendMessage(mHandler.obtainMessage(3));
+                                break;
+                        }
+                        return false;
+                    }).setCancelButton(R.string.cancel);
         });
         /*binding.mineRlSyn.setOnClickListener(v -> {
             if (!UserService.isLogin()) {
@@ -258,7 +272,7 @@ public class MineFragment extends BaseFragment {
             startActivity(settingIntent);
         });
         binding.mineRlThemeMode.setOnClickListener(v -> {
-            if (themeModeDia != null) {
+            /*if (themeModeDia != null) {
                 themeModeDia.show();
                 return;
             }
@@ -292,8 +306,34 @@ public class MineFragment extends BaseFragment {
                             })
                     .setNegativeButton("取消", null)
                     .create();
-            themeModeDia.show();
-
+            themeModeDia.show();*/
+            BottomMenu.show("主题模式", themeModeArr)
+                    .setSelection(themeMode)
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        if (themeMode == which) {
+                            return false;
+                        }
+                        themeMode = which;
+                        switch (which) {
+                            case 0:
+                                SharedPreUtils.getInstance().putBoolean(getString(R.string.isNightFS), true);
+                                break;
+                            case 1:
+                                SharedPreUtils.getInstance().putBoolean(getString(R.string.isNightFS), false);
+                                mSetting.setDayStyle(true);
+                                SysManager.saveSetting(mSetting);
+                                break;
+                            case 2:
+                                SharedPreUtils.getInstance().putBoolean(getString(R.string.isNightFS), false);
+                                mSetting.setDayStyle(false);
+                                SysManager.saveSetting(mSetting);
+                                break;
+                        }
+                        dialog.dismiss();
+                        binding.tvThemeModeSelect.setText(themeModeArr[themeMode]);
+                        App.getApplication().initNightTheme();
+                        return false;
+                    }).setCancelButton(R.string.cancel);
         });
 
         binding.mineRlAdSetting.setOnClickListener(v -> startActivity(new Intent(getActivity(), AdSettingActivity.class)));
