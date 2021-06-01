@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.kongzue.dialogx.dialogs.BottomDialog;
+import com.kongzue.dialogx.dialogs.MessageDialog;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,7 +36,7 @@ public class DialogCreator {
      * @return
      */
     public static AlertDialog createCommonDialog(Context context, String title, String mesage, boolean isCancelable,
-                                                                        DialogInterface.OnClickListener positiveListener, DialogInterface.OnClickListener negativeListener) {
+                                                 DialogInterface.OnClickListener positiveListener, DialogInterface.OnClickListener negativeListener) {
 
         final AlertDialog.Builder normalDialog = MyAlertDialog.build(context);
 //        normalDialog.setIcon(R.drawable.icon_dialog);
@@ -51,9 +54,7 @@ public class DialogCreator {
                 e.printStackTrace();
             }
         });
-
         return alertDialog;
-
     }
 
     /**
@@ -141,42 +142,6 @@ public class DialogCreator {
 
 
     /**
-     * 创建一个进度对话框（圆形、旋转）
-     *
-     * @param context
-     * @param title
-     * @param message
-     * @return
-     */
-    public static ProgressDialog createProgressDialog
-    (Context context, String title, String message/*,
-             DialogInterface.OnClickListener positiveListener,DialogInterface.OnClickListener negativeListener*/) {
-
-        final ProgressDialog progressDialog = new ProgressDialog(context, R.style.alertDialogTheme);
-//        normalDialog.setIcon(R.drawable.icon_dialog);
-        if (!StringHelper.isEmpty(title)) {
-            progressDialog.setTitle(title);
-        }
-        if (!StringHelper.isEmpty(message)) {
-            progressDialog.setMessage(message);
-        }
-        progressDialog.setCancelable(false);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-      /*  progressDialog.setPositiveButton("确定",positiveListener);
-        progressDialog.setNegativeButton("取消",negativeListener);*/
-        // 显示
-        App.runOnUiThread(() -> {
-            try {
-                progressDialog.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        return progressDialog;
-    }
-
-
-    /**
      * 三按键对话框
      *
      * @param context
@@ -191,11 +156,11 @@ public class DialogCreator {
      * @return
      */
     public static void createThreeButtonDialog(Context context, String title, String msg, boolean isCancelable,
-                                                      String btnText1, String btnText2, String btnText3,
-                                                      DialogInterface.OnClickListener neutralListener,
-                                                      DialogInterface.OnClickListener negativeListener,
-                                                      DialogInterface.OnClickListener positiveListener) {
-      /*  final EditText et = new EditText(context);*/
+                                               String btnText1, String btnText2, String btnText3,
+                                               DialogInterface.OnClickListener neutralListener,
+                                               DialogInterface.OnClickListener negativeListener,
+                                               DialogInterface.OnClickListener positiveListener) {
+        /*  final EditText et = new EditText(context);*/
         try {
             final AlertDialog.Builder dialog = MyAlertDialog.build(context);
             dialog.setTitle(title);
@@ -224,37 +189,41 @@ public class DialogCreator {
             dialog.setCancelable(isCancelable);
 
             //  Diglog的显示
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void createTipDialog(Context mContext, String message){
-        DialogCreator.createCommonDialog(mContext, "提示",
+    public static void createTipDialog(Context mContext, String message) {
+        /*DialogCreator.createCommonDialog(mContext, "提示",
                 message, true, "知道了", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
-                });
+                });*/
+        BottomDialog.show("提示", message).setCancelButton("知道了");
     }
-    public static void createTipDialog(Context mContext, String title, String message){
-        DialogCreator.createCommonDialog(mContext, title,
+
+    public static void createTipDialog(Context mContext, String title, String message) {
+        /*DialogCreator.createCommonDialog(mContext, title,
                 message, true, "知道了", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
-                });
+                });*/
+        BottomDialog.show(title, message).setCancelButton("知道了");
     }
 
     /**
      * 从assets文件夹之中读取文件并显示提示框
+     *
      * @param mContext
      * @param title
      * @param assetName 需要后缀名
      */
-    public static void createAssetTipDialog(Context mContext, String title, String assetName){
+    public static void createAssetTipDialog(Context mContext, String title, String assetName) {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(mContext.getAssets().open(assetName)));
@@ -280,12 +249,13 @@ public class DialogCreator {
         void onClick(Dialog dialog, View view);
     }
 
-    public interface OnSkipChapterListener{
+    public interface OnSkipChapterListener {
         void onClick(TextView chapterTitle, TextView chapterUrl, SeekBar sbReadChapterProgress);
     }
 
-    public interface OnMultiDialogListener{
-        void onItemClick(DialogInterface dialog,int which,boolean isChecked);
+    public interface OnMultiDialogListener {
+        void onItemClick(DialogInterface dialog, int which, boolean isChecked);
+
         void onSelectAll(boolean isSelectAll);
     }
 }
