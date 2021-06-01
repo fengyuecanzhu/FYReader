@@ -17,6 +17,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.kongzue.dialogx.dialogs.BottomDialog;
+import com.kongzue.dialogx.dialogs.CustomDialog;
+import com.kongzue.dialogx.interfaces.OnBindView;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
@@ -215,10 +218,18 @@ public class MyAlertDialog {
         showTipDialogWithLink(context,"提示", msgId);
     }
     public static void showTipDialogWithLink(Context context, String title, int msgId){
-        TextView view = (TextView) LayoutInflater.from(context).inflate(R.layout.dialog_textview, null);
+        /*TextView view = (TextView) LayoutInflater.from(context).inflate(R.layout.dialog_textview, null);
         view.setText(msgId);
         view.setMovementMethod(LinkMovementMethod.getInstance());
-        build(context).setTitle(title).setView(view).setPositiveButton("知道了", null).show();
+        build(context).setTitle(title).setView(view).setPositiveButton("知道了", null).show();*/
+        BottomDialog.show(title, new OnBindView<BottomDialog>(R.layout.dialog_textview){
+            @Override
+            public void onBind(BottomDialog dialog, View v) {
+                TextView view = (TextView) v;
+                view.setText(msgId);
+                view.setMovementMethod(LinkMovementMethod.getInstance());
+            }
+        }).setCancelButton("知道了");
     }
 
     public interface OnVerify {
