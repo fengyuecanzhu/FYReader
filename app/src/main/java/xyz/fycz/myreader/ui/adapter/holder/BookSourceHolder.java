@@ -27,7 +27,7 @@ import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.SourceEditActivity;
 import xyz.fycz.myreader.ui.adapter.BookSourceAdapter;
 import xyz.fycz.myreader.util.ShareUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout;

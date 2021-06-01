@@ -12,7 +12,7 @@ import com.jayway.jsonpath.spi.json.GsonJsonProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 
 /**
  * @author fengyue

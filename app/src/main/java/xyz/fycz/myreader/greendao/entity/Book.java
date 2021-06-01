@@ -14,7 +14,6 @@ import org.greenrobot.greendao.annotation.Transient;
 
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
 
 import java.io.Serializable;
 import java.util.HashMap;

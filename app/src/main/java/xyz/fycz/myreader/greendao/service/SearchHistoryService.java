@@ -4,8 +4,8 @@ import android.database.Cursor;
 
 import xyz.fycz.myreader.greendao.entity.SearchHistory;
 import xyz.fycz.myreader.greendao.gen.SearchHistoryDao;
-import xyz.fycz.myreader.util.DateHelper;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.DateHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.greendao.DbManager;
 
 import java.util.ArrayList;

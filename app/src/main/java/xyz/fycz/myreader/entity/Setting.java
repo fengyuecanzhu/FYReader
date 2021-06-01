@@ -16,7 +16,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.enums.BookcaseStyle;
 import xyz.fycz.myreader.enums.Font;
 import xyz.fycz.myreader.enums.Language;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ZipUtils;
 import xyz.fycz.myreader.util.utils.BitmapUtil;
 import xyz.fycz.myreader.util.utils.FileUtils;

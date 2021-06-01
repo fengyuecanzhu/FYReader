@@ -12,7 +12,7 @@ import xyz.fycz.myreader.base.adapter.BaseListAdapter;
 import xyz.fycz.myreader.base.adapter.IViewHolder;
 import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
 import xyz.fycz.myreader.ui.adapter.holder.ReplaceRuleHolder;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 
 /**
  * @author fengyue

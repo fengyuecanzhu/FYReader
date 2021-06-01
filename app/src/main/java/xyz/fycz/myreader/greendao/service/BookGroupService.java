@@ -6,7 +6,7 @@ import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.gen.BookGroupDao;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 
 import java.util.List;
 

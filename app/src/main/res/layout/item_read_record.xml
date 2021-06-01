@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rl_book_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp">
+
+    <LinearLayout
+        android:id="@+id/ll_book_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <CheckBox
+            android:id="@+id/cb_book_select"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:clickable="false"
+            android:enabled="true"
+            android:focusable="true"
+            android:paddingEnd="2dp"
+            android:theme="@style/MyCheckBox"
+            android:visibility="gone" />
+
+        <xyz.fycz.myreader.widget.CoverImageView
+            android:id="@+id/iv_book_img"
+            android:layout_width="48dp"
+            android:layout_height="66dp"
+            android:scaleType="fitXY"
+            app:srcCompat="@mipmap/default_cover" />
+
+        <LinearLayout
+            android:id="@+id/ll_book_read"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_book_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:padding="4dp"
+                android:text="bookname"
+                android:textColor="@color/textPrimary"
+                android:textSize="16dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:padding="3dp"
+                    app:srcCompat="@drawable/ic_author"
+                    app:tint="@color/textSecondary" />
+
+                <TextView
+                    android:id="@+id/tv_book_author"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:text="辰东"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12dp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:padding="3dp"
+                    app:srcCompat="@drawable/ic_book_last"
+                    app:tint="@color/textSecondary" />
+
+                <TextView
+                    android:id="@+id/tv_book_read_record"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="一天前 · 5分钟3秒"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_default_size" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="5dp"
+        app:srcCompat="@drawable/ic_more"
+        app:tint="@color/textSecondary" />
+</RelativeLayout>

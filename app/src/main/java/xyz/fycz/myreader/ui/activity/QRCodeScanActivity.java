@@ -23,7 +23,7 @@ import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.databinding.ActivityQrcodeCaptureBinding;
 import xyz.fycz.myreader.util.PermissionsChecker;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 

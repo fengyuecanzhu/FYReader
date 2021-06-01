@@ -7,10 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import xyz.fycz.myreader.base.adapter.IViewHolder;
-import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.ui.adapter.holder.LocalSourceHolder;
-import xyz.fycz.myreader.util.StringHelper;
 
 /**
  * @author fengyue

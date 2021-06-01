@@ -6,8 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.app.AlertDialog;
-
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
 import java.io.IOException;
@@ -19,11 +17,10 @@ import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
 import xyz.fycz.myreader.ui.presenter.BookcasePresenter;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;

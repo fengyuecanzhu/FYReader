@@ -68,7 +68,7 @@ import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.BitmapUtil;

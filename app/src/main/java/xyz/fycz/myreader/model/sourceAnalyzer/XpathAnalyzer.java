@@ -6,7 +6,7 @@ import org.seimicrawler.xpath.JXNode;
 import java.util.ArrayList;
 import java.util.List;
 
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 
 /**
  * @author fengyue

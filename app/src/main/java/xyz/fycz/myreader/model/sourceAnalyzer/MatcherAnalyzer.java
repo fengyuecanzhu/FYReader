@@ -11,7 +11,7 @@ import xyz.fycz.myreader.greendao.entity.rule.ContentRule;
 import xyz.fycz.myreader.greendao.entity.rule.InfoRule;
 import xyz.fycz.myreader.greendao.entity.rule.SearchRule;
 import xyz.fycz.myreader.greendao.entity.rule.TocRule;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 

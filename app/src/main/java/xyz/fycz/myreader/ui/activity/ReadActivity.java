@@ -39,9 +39,7 @@ import androidx.core.content.ContextCompat;
 
 import com.gyf.immersionbar.ImmersionBar;
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
-import com.kongzue.dialogx.dialogs.BottomDialog;
 import com.kongzue.dialogx.dialogs.BottomMenu;
-import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
 import com.kongzue.dialogx.interfaces.OnMenuItemSelectListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +50,7 @@ import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
@@ -66,22 +65,24 @@ import xyz.fycz.myreader.databinding.ActivityReadBinding;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.enums.Font;
+import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookMark;
 import xyz.fycz.myreader.greendao.entity.Chapter;
+import xyz.fycz.myreader.greendao.entity.ReadRecord;
 import xyz.fycz.myreader.greendao.entity.ReplaceRuleBean;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.greendao.service.BookMarkService;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
+import xyz.fycz.myreader.greendao.service.ReadRecordService;
 import xyz.fycz.myreader.model.audio.ReadAloudService;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.ui.dialog.AudioPlayerDialog;
 import xyz.fycz.myreader.ui.dialog.CopyContentDialog;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.ui.dialog.ReplaceDialog;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.ui.popmenu.AutoPageMenu;
@@ -90,10 +91,10 @@ import xyz.fycz.myreader.ui.popmenu.CustomizeComMenu;
 import xyz.fycz.myreader.ui.popmenu.CustomizeLayoutMenu;
 import xyz.fycz.myreader.ui.popmenu.ReadSettingMenu;
 import xyz.fycz.myreader.util.BrightUtil;
-import xyz.fycz.myreader.util.DateHelper;
+import xyz.fycz.myreader.util.help.DateHelper;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.SystemUtil;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
@@ -137,6 +138,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private BookMarkService mBookMarkService;
     private NotificationUtil notificationUtil;
     private Setting mSetting;
+    private ReadRecord record;
 
     private boolean isCollected = true;//是否在书架中
 
@@ -155,6 +157,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private Runnable keepScreenRunnable;//息屏线程
     private Runnable autoPageRunnable;//自动翻页
     private Runnable sendDownloadNotification;
+
     private static boolean isStopDownload = true;
 
     private int tempCacheChapterNum;
@@ -162,8 +165,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private String downloadingChapter;
 
     private ReadCrawler mReadCrawler;
-
-    private int upHpbInterval = 30;//更新翻页进度速度
 
     private int downloadInterval = 150;
 
@@ -181,6 +182,9 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private Animation mBottomInAnim;
     private Animation mBottomOutAnim;
     private int lastX, lastY;
+
+    private long lastRecordTime;//上次记录时间
+
 
     // 接收电池信息和时间更新的广播
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -333,6 +337,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         if (aBooks != null) {
             mSourceDialog.setABooks(aBooks);
         }
+        lastRecordTime = System.currentTimeMillis();
     }
 
     @Override
@@ -411,6 +416,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     @Override
                     public void onChapterChange(int pos) {
                         mBook.setHistoryChapterId(mChapters.get(pos).getTitle());
+                        recordReadTime();
                     }
 
                     @Override
@@ -425,6 +431,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     @Override
                     public void onPageChange(int pos, boolean resetRead) {
                         mHandler.sendMessage(mHandler.obtainMessage(4));
+                        recordReadTime();
                         if (ReadAloudService.running) {
                             if (mPageLoader.hasChapterData(mChapters.get(mPageLoader.getChapterPos()))) {
                                 if (resetRead) {
@@ -1587,22 +1594,22 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                             selectedIndex = which;
                         }
                     }).setOkButton("确定", (baseDialog, v) -> {
-                        switch (selectedIndex) {
-                            case 0:
-                                addDownload(mPageLoader.getChapterPos(), mPageLoader.getChapterPos() + 50);
-                                break;
-                            case 1:
-                                addDownload(mPageLoader.getChapterPos() - 50, mPageLoader.getChapterPos() + 50);
-                                break;
-                            case 2:
-                                addDownload(mPageLoader.getChapterPos(), mChapters.size());
-                                break;
-                            case 3:
-                                addDownload(0, mChapters.size());
-                                break;
-                        }
-                        return false;
-                    }).setCancelButton(R.string.cancel);
+                switch (selectedIndex) {
+                    case 0:
+                        addDownload(mPageLoader.getChapterPos(), mPageLoader.getChapterPos() + 50);
+                        break;
+                    case 1:
+                        addDownload(mPageLoader.getChapterPos() - 50, mPageLoader.getChapterPos() + 50);
+                        break;
+                    case 2:
+                        addDownload(mPageLoader.getChapterPos(), mChapters.size());
+                        break;
+                    case 3:
+                        addDownload(0, mChapters.size());
+                        break;
+                }
+                return false;
+            }).setCancelButton(R.string.cancel);
         });
     }
 
@@ -2085,5 +2092,31 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             textToSpeech.stop();
         textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, "select_text");
         lastText = "";
+    }
+
+    /**
+     * 记录阅读时间
+     */
+    private void recordReadTime() {
+        Single.create(emitter -> {
+            if (mBook == null) return;
+            if (record == null) {
+                record = ReadRecordService.getInstance().get(mBook.getName(), mBook.getAuthor());
+                if (record == null) {
+                    record = new ReadRecord();
+                    record.setId(StringHelper.getStringRandom(25));
+                    record.setBookName(mBook.getName());
+                    record.setBookAuthor(mBook.getAuthor());
+                    record.setBookImg(NetworkUtils.getAbsoluteURL(mReadCrawler.getNameSpace(),
+                            mBook.getImgUrl()));
+                }
+            }
+            long curTime = System.currentTimeMillis();
+            long deltaTime = curTime - lastRecordTime;
+            lastRecordTime = curTime;
+            record.setUpdateTime(curTime);
+            record.setReadTime(record.getReadTime() + deltaTime);
+            DbManager.getDaoSession().getReadRecordDao().insertOrReplace(record);
+        }).subscribe();
     }
 }
