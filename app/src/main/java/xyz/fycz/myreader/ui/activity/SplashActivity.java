@@ -31,7 +31,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySplashBinding;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
-import xyz.fycz.myreader.util.DateHelper;
+import xyz.fycz.myreader.util.help.DateHelper;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.PermissionsChecker;
 import xyz.fycz.myreader.util.SharedPreUtils;

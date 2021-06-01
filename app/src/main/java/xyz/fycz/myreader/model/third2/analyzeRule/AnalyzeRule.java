@@ -19,7 +19,7 @@ import javax.script.SimpleBindings;
 
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.CookieStore;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.help.JsExtensions;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
@@ -28,7 +28,7 @@ import static xyz.fycz.myreader.common.APPCONST.EXP_PATTERN;
 import static xyz.fycz.myreader.common.APPCONST.JS_PATTERN;
 import static xyz.fycz.myreader.common.APPCONST.MAP_STRING;
 import static xyz.fycz.myreader.common.APPCONST.SCRIPT_ENGINE;
-import static xyz.fycz.myreader.util.StringHelper.isEmpty;
+import static xyz.fycz.myreader.util.help.StringHelper.isEmpty;
 import static xyz.fycz.myreader.util.utils.NetworkUtils.headerPattern;
 
 

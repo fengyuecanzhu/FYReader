@@ -78,7 +78,7 @@ object WebDavHelp {
             }*/
             BottomMenu.build().setTitle("选择恢复文件")
                 .setMenuStringList(names)
-                .setOnMenuItemClickListener { dialog, text, which ->
+                .setOnMenuItemClickListener { _, _, which ->
                     if (which in 0 until 30.coerceAtLeast(names.size)) {
                         restoreWebDav(names[which], callBack)
                     }

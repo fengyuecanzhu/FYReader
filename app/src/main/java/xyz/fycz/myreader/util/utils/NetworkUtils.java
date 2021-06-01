@@ -8,7 +8,7 @@ import android.net.NetworkInfo;
 
 import okhttp3.Response;
 import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 
 
 import java.net.InetAddress;

@@ -1,14 +1,18 @@
 package xyz.fycz.myreader.ui.fragment;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentFindBinding;
 import xyz.fycz.myreader.ui.activity.BookstoreActivity;
+import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 import xyz.fycz.myreader.webapi.crawler.find.Ben100FindCrawler;
 import xyz.fycz.myreader.webapi.crawler.find.MiaoBiFindCrawler;
@@ -27,6 +31,20 @@ public class FindFragment extends BaseFragment {
     protected View bindView(LayoutInflater inflater, ViewGroup container) {
         binding = FragmentFindBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    @Override
+    protected void initWidget(Bundle savedInstanceState) {
+        super.initWidget(savedInstanceState);
+        if (!App.isDestroy(getActivity())) {
+            ImageLoader.INSTANCE.load(getContext(), "http://yunjuw.cn/template/mytheme/statics/img/logo.png")
+                    .into(binding.ivDyys);
+        }
+        binding.mineRlDyys.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("http://yunjuw.cn/"));
+            startActivity(intent);
+        });
     }
 
     @Override

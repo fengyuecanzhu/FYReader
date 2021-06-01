@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.kongzue.dialogx.dialogs.BottomDialog;
-import com.kongzue.dialogx.dialogs.CustomDialog;
 import com.kongzue.dialogx.interfaces.OnBindView;
 
 import xyz.fycz.myreader.R;
@@ -27,7 +26,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FingerprintUtils;
 

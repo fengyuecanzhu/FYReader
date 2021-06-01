@@ -22,7 +22,7 @@ import xyz.fycz.myreader.greendao.entity.rule.TocRule;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.sourceAnalyzer.BaseAnalyzer;
 import xyz.fycz.myreader.model.sourceAnalyzer.MatcherAnalyzer;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;

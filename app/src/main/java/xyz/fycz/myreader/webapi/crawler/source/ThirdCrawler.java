@@ -1,13 +1,12 @@
 package xyz.fycz.myreader.webapi.crawler.source;
 
 import java.util.List;
-import java.util.Map;
 
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 

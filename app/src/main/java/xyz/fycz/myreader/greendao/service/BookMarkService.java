@@ -3,7 +3,7 @@ package xyz.fycz.myreader.greendao.service;
 import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.BookMark;
 import xyz.fycz.myreader.greendao.gen.BookMarkDao;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;

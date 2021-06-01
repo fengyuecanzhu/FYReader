@@ -2,6 +2,7 @@ package xyz.fycz.myreader.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -35,6 +36,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentMineBinding;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.entity.ReadRecord;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.model.storage.Backup;
@@ -48,10 +50,13 @@ import xyz.fycz.myreader.ui.activity.DonateActivity;
 import xyz.fycz.myreader.ui.activity.FeedbackActivity;
 import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
+import xyz.fycz.myreader.ui.activity.ReadRecordActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
+import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.ResultCallback;
 
@@ -67,9 +72,9 @@ public class MineFragment extends BaseFragment {
 
     //private boolean isLogin;
     private Setting mSetting;
-//    private String[] webSynMenu;
+    //    private String[] webSynMenu;
     private String[] backupMenu;
-//    private AlertDialog themeModeDia;
+    //    private AlertDialog themeModeDia;
     private int themeMode;
     private String[] themeModeArr;
     @SuppressLint("HandlerLeak")
@@ -159,7 +164,7 @@ public class MineFragment extends BaseFragment {
         binding.mineRlSyn.setOnClickListener(v -> {
             String account = SharedPreUtils.getInstance().getString("webdavAccount");
             String password = SharedPreUtils.getInstance().getString("webdavPassword");
-            if (TextUtils.isEmpty(account) || TextUtils.isEmpty(password)){
+            if (TextUtils.isEmpty(account) || TextUtils.isEmpty(password)) {
                 ToastUtils.showWarring("请先配置WebDav账户");
                 binding.mineRlWebdav.performClick();
                 return;
@@ -267,6 +272,10 @@ public class MineFragment extends BaseFragment {
                     .setPositiveButton(null, null)
                     .show();
         });*/
+
+        binding.mineRlReadRecord.setOnClickListener(v -> {
+            startActivity(new Intent(getContext(), ReadRecordActivity.class));
+        });
         binding.mineRlSetting.setOnClickListener(v -> {
             Intent settingIntent = new Intent(getActivity(), MoreSettingActivity.class);
             startActivity(settingIntent);

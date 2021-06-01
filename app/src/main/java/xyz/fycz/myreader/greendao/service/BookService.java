@@ -15,6 +15,7 @@ import xyz.fycz.myreader.greendao.gen.BookDao;
 import xyz.fycz.myreader.util.*;
 import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 

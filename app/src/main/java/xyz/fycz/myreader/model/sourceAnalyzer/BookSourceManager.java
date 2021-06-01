@@ -4,8 +4,6 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +22,7 @@ import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.gen.BookSourceDao;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.GsonUtils;

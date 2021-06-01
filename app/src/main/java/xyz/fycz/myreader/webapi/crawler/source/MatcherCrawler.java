@@ -9,7 +9,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.sourceAnalyzer.MatcherAnalyzer;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.crawler.base.BaseSourceCrawler;
 

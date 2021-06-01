@@ -6,7 +6,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.gen.ChapterDao;
 import xyz.fycz.myreader.util.IOUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.util.utils.FileUtils;
 

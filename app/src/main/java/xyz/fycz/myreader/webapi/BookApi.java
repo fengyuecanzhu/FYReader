@@ -1,17 +1,12 @@
 package xyz.fycz.myreader.webapi;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.functions.Function;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import xyz.fycz.myreader.entity.SearchBookBean;
@@ -19,7 +14,7 @@ import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;

@@ -1,9 +1,12 @@
-package xyz.fycz.myreader.util;
+package xyz.fycz.myreader.util.help;
 
 import android.content.Context;
 import android.content.Intent;
 
 import java.io.File;
+
+import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.UriFileUtil;
 
 
 public class OpenFileHelper {

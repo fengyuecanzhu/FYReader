@@ -11,7 +11,7 @@ import java.util.List;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 
 

@@ -22,7 +22,7 @@ import xyz.fycz.myreader.entity.bookstore.SortBook;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 
 import java.io.BufferedReader;

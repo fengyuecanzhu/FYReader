@@ -9,7 +9,7 @@ import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.BaseSourceCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BaseSourceCrawlerNoInfo;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;

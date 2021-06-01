@@ -26,7 +26,7 @@ import xyz.fycz.myreader.model.ReplaceRuleManager;
 import xyz.fycz.myreader.ui.adapter.ReplaceRuleAdapter;
 import xyz.fycz.myreader.ui.dialog.ReplaceDialog;
 import xyz.fycz.myreader.util.ShareUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout;

@@ -13,7 +13,6 @@ import android.util.Log;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -35,10 +34,8 @@ import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.util.IOUtils;
-import xyz.fycz.myreader.util.StringHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 
 
 public class FileUtils {
