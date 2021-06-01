@@ -201,15 +201,18 @@ public class SplashActivity extends BaseActivity {
             if (BookGroupService.getInstance().curGroupIsPrivate()) {
                 App.runOnUiThread(() -> {
                     MyAlertDialog.showPrivateVerifyDia(SplashActivity.this, needGoTo -> {
-                        (new Thread(start)).start();
+                        if (!hasStart)
+                            (new Thread(start)).start();
                     }, () -> {
                         SharedPreUtils.getInstance().putString(SplashActivity.this.getString(R.string.curBookGroupId), "");
                         SharedPreUtils.getInstance().putString(SplashActivity.this.getString(R.string.curBookGroupName), "");
-                        (new Thread(start)).start();
+                        if (!hasStart)
+                            (new Thread(start)).start();
                     });
                 });
             } else {
-                (new Thread(start)).start();
+                if (!hasStart)
+                    (new Thread(start)).start();
             }
         }
     }
