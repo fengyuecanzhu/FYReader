@@ -57,12 +57,13 @@ public class SplashActivity extends BaseActivity {
     private SharedPreUtils spu;
     private int todayAdCount;
     private int adTimes;
+    private boolean hasStart = false;
 
     private PermissionsChecker mPermissionsChecker;
     //创建子线程
-    private Thread start = new Thread() {
-        @Override
-        public void run() {
+    private Runnable start = () -> {
+        if (!hasStart && !App.isDestroy(SplashActivity.this)) {
+            hasStart = true;
             try {
                 Thread.sleep(WAIT_INTERVAL);//使程序休眠
                 Intent it = new Intent(SplashActivity.this, MainActivity.class);//启动MainActivity
@@ -200,21 +201,15 @@ public class SplashActivity extends BaseActivity {
             if (BookGroupService.getInstance().curGroupIsPrivate()) {
                 App.runOnUiThread(() -> {
                     MyAlertDialog.showPrivateVerifyDia(SplashActivity.this, needGoTo -> {
-                        if (!start.isAlive()) {
-                            start.start();
-                        }
+                        (new Thread(start)).start();
                     }, () -> {
                         SharedPreUtils.getInstance().putString(SplashActivity.this.getString(R.string.curBookGroupId), "");
                         SharedPreUtils.getInstance().putString(SplashActivity.this.getString(R.string.curBookGroupName), "");
-                        if (!start.isAlive()) {
-                            start.start();
-                        }
+                        (new Thread(start)).start();
                     });
                 });
             } else {
-                if (!start.isAlive()) {
-                    start.start();
-                }
+                (new Thread(start)).start();
             }
         }
     }
