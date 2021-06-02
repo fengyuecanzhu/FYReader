@@ -392,7 +392,7 @@ public class MoreSettingActivity extends BaseActivity {
 
             });
             MyAlertDialog.build(this)
-                    .setTitle("搜索线程数")
+                    .setTitle(R.string.thread_num)
                     .setView(view)
                     .setPositiveButton("确定", (dialog, which) -> {
                         threadNum = threadPick.getValue();
