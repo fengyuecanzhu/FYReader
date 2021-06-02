@@ -185,6 +185,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
     private long lastRecordTime;//上次记录时间
 
+    private boolean isPrivate;//是否私密书籍
+
 
     // 接收电池信息和时间更新的广播
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -281,6 +283,24 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     }
 
     @Override
+    protected void onStop() {
+        recordReadTime();
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        lastRecordTime = System.currentTimeMillis();
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hideSystemBar();
+    }
+
+    @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mBook != null) {
@@ -337,7 +357,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         if (aBooks != null) {
             mSourceDialog.setABooks(aBooks);
         }
-        lastRecordTime = System.currentTimeMillis();
+        String privateGroupId = SharedPreUtils.getInstance().getString("privateGroupId");
+        isPrivate = privateGroupId.equals(mBook.getGroupId());
     }
 
     @Override
@@ -588,9 +609,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
         registerReceiver(mReceiver, intentFilter);
         //当书籍Collected且书籍id不为空的时候保存上次阅读信息
-        String privateGroupId = SharedPreUtils.getInstance().getString("privateGroupId");
         if (isCollected && !StringHelper.isEmpty(mBook.getId())
-                && !privateGroupId.equals(mBook.getGroupId())) {
+                && !isPrivate) {
             //保存上次阅读信息
             SharedPreUtils.getInstance().putString(getString(R.string.lastRead), mBook.getId());
         }
@@ -599,11 +619,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         getData();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        hideSystemBar();
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -2098,6 +2113,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 记录阅读时间
      */
     private void recordReadTime() {
+        if (isPrivate) return;
         Single.create(emitter -> {
             if (mBook == null) return;
             if (record == null) {

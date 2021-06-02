@@ -1,71 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingHorizontal="25dp"
+    android:paddingVertical="10dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="10dp" >
+        android:orientation="vertical">
 
         <xyz.fycz.myreader.widget.CoverImageView
-                android:id="@+id/iv_book_img"
-                android:layout_width="80dp"
-                android:layout_height="110dp"
-                android:layout_gravity="center"
-                android:scaleType="fitXY"
-                app:srcCompat="@mipmap/default_cover" />
+            android:id="@+id/iv_book_img"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"
+            app:srcCompat="@mipmap/default_cover" />
 
         <TextView
-            android:layout_marginTop="5dp"
-            android:layout_gravity="center"
             android:id="@+id/tv_book_name"
-            android:layout_width="86dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
             android:ellipsize="end"
-            android:text="bookname"
             android:gravity="center"
-            android:textColor="@color/textPrimary"/>
+            android:maxLines="2"
+            android:text="@string/app_name"
+            android:textColor="@color/textPrimary" />
 
     </LinearLayout>
 
 
     <xyz.fycz.myreader.widget.BadgeView
-            android:id="@+id/tv_no_read_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="25dp"
-            android:includeFontPadding="false" />
+        android:id="@+id/tv_no_read_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="3dp"
+        android:includeFontPadding="false" />
 
     <ProgressBar
-            android:id="@+id/pb_loading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="28dp"
-            android:visibility="gone"
-            android:layout_alignParentEnd="true"
-            style="?android:attr/progressBarStyleSmall"
-    />
+        android:id="@+id/pb_loading"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="3dp"
+        android:visibility="gone" />
 
     <CheckBox
-            android:id="@+id/cb_book_select"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:enabled="true"
-            android:clickable="false"
-            android:focusable="true"
-            android:layout_margin="5dp"
-            android:paddingEnd="2dp"
-            android:theme="@style/MyCheckBox"
-            android:visibility="visible"/>
+        android:id="@+id/cb_book_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:clickable="false"
+        android:enabled="true"
+        android:focusable="true"
+        android:theme="@style/MyCheckBox"
+        android:visibility="visible" />
 
 
 </RelativeLayout>

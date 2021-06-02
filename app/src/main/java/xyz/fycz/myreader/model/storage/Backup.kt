@@ -41,6 +41,7 @@ object Backup {
                 "readStyles.json",
                 "replaceRule.json",
                 "bookSource.json",
+                "readRecord.json",
                 "config.xml"
         )
     }
@@ -100,6 +101,13 @@ object Backup {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "bookSource.json")
                             .writeText(json)
+                }
+            }
+            DbManager.getInstance().session.readRecordDao.queryBuilder().list().let {
+                if (it.isNotEmpty()) {
+                    val json = GSON.toJson(it)
+                    FileUtils.getFile(backupPath + File.separator + "readRecord.json")
+                        .writeText(json)
                 }
             }
             try {
