@@ -6,7 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+
 import com.kongzue.dialogx.dialogs.BottomMenu;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +20,7 @@ import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
+import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
@@ -36,28 +41,43 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
             App.getmContext().getResources().getString(R.string.menu_book_cache),
             App.getmContext().getResources().getString(R.string.menu_book_delete)
     };
+
     public BookcaseDragAdapter(Context context, int textViewResourceId, ArrayList<Book> objects,
                                boolean editState, BookcasePresenter bookcasePresenter, boolean isGroup) {
         super(context, textViewResourceId, objects, editState, bookcasePresenter, isGroup);
+        itemTouchCallbackListener = new ItemTouchCallback.OnItemTouchListener() {
+            @Override
+            public void onSwiped(int adapterPosition) {
+
+            }
+
+            @Override
+            public boolean onMove(int srcPosition, int targetPosition) {
+                Book shelfBean = list.get(srcPosition);
+                list.remove(srcPosition);
+                list.add(targetPosition, shelfBean);
+                notifyItemMoved(srcPosition, targetPosition);
+                int start = srcPosition;
+                int end = targetPosition;
+                if (start > end) {
+                    start = targetPosition;
+                    end = srcPosition;
+                }
+                notifyItemRangeChanged(start, end - start + 1);
+                return true;
+            }
+        };
     }
 
+    @Override
+    public BookcaseAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+        return new ViewHolder(LayoutInflater.from(mContext).inflate(mResourceId, null));
+    }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null || convertView.getTag() instanceof BookcaseDetailedAdapter.ViewHolder) {
-            viewHolder = new ViewHolder();
-            convertView = LayoutInflater.from(mContext).inflate(mResourceId, null);
-            viewHolder.cbBookChecked = convertView.findViewById(R.id.cb_book_select);
-            viewHolder.ivBookImg = convertView.findViewById(R.id.iv_book_img);
-            viewHolder.tvBookName = convertView.findViewById(R.id.tv_book_name);
-            viewHolder.tvNoReadNum = convertView.findViewById(R.id.tv_no_read_num);
-            viewHolder.pbLoading = convertView.findViewById(R.id.pb_loading);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
+    public void onBindViewHolder(@NonNull @NotNull BookcaseAdapter.ViewHolder holder, int position) {
+        viewHolder = (ViewHolder) holder;
         initView(position);
-        return convertView;
     }
 
     private void initView(int position) {
@@ -67,7 +87,7 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
         }
 
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(book.getSource());
-        viewHolder.ivBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), book.getImgUrl()), book.getName(),book.getAuthor());
+        viewHolder.ivBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), book.getImgUrl()), book.getName(), book.getAuthor());
 
         viewHolder.tvBookName.setText(book.getName());
 
@@ -179,7 +199,7 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
                                     case 1:
                                         if (!isGroup) {
                                             book.setSortCode(0);
-                                        }else {
+                                        } else {
                                             book.setGroupSort(0);
                                         }
                                         mBookService.updateEntity(book);
@@ -224,6 +244,14 @@ public class BookcaseDragAdapter extends BookcaseAdapter {
 
     }
 
-    class ViewHolder extends BookcaseAdapter.ViewHolder {
+    static class ViewHolder extends BookcaseAdapter.ViewHolder {
+        public ViewHolder(@NonNull @NotNull View itemView) {
+            super(itemView);
+            cbBookChecked = itemView.findViewById(R.id.cb_book_select);
+            ivBookImg = itemView.findViewById(R.id.iv_book_img);
+            tvBookName = itemView.findViewById(R.id.tv_book_name);
+            tvNoReadNum = itemView.findViewById(R.id.tv_no_read_num);
+            pbLoading = itemView.findViewById(R.id.pb_loading);
+        }
     }
 }

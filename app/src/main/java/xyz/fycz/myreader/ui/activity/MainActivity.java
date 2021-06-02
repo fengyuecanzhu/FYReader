@@ -48,6 +48,7 @@ import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
+import xyz.fycz.myreader.widget.NoScrollViewPager;
 
 import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT;
 
@@ -231,7 +232,7 @@ public class MainActivity extends BaseActivity {
         mMineFragment = (MineFragment) fragments.get(2);
     }
 
-    public ViewPager getViewPagerMain() {
+    public NoScrollViewPager getViewPagerMain() {
         return binding.viewPagerMain;
     }
 
@@ -250,10 +251,6 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean isEdit = mBookcaseFragment.getmBookcasePresenter() != null && mBookcaseFragment.getmBookcasePresenter().ismEditState();
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            menu.findItem(R.id.action_refresh).setVisible(!isEdit);
-        }
         if (binding.viewPagerMain.getCurrentItem() == 0) {
             if (mBookcaseFragment.getmBookcasePresenter() != null && mBookcaseFragment.getmBookcasePresenter().ismEditState()) {
                 menu.findItem(R.id.action_finish).setVisible(true);
@@ -295,8 +292,6 @@ public class MainActivity extends BaseActivity {
                     getSupportActionBar().setSubtitle(groupName);
                 });
             }
-        } else if (itemId == R.id.action_refresh) {
-            mBookcaseFragment.getmBookcasePresenter().initNoReadNum();
         } else if (itemId == R.id.action_edit) {
             if (mBookcaseFragment.getmBookcasePresenter().canEditBookcase()) {
                 invalidateOptionsMenu();

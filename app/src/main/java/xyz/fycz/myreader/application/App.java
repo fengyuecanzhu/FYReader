@@ -51,7 +51,6 @@ import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.MainActivity;
-import xyz.fycz.myreader.ui.dialog.APPDownloadTip;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
 import xyz.fycz.myreader.util.help.SSLSocketClient;
@@ -369,62 +368,6 @@ public class App extends Application {
         });
     }
 
-    /**
-     * App自动升级
-     *
-     * @param activity
-     * @param versionCode
-     */
-    public void updateApp(final AppCompatActivity activity, final String url, final int versionCode, String message,
-                          final boolean isForceUpdate, final BookcaseFragment mBookcaseFragment) {
-        //String version = (versionCode / 100 % 10) + "." + (versionCode / 10 % 10) + "." + (versionCode % 10);
-        String cancelTitle;
-        if (isForceUpdate) {
-            cancelTitle = "退出";
-        } else {
-            cancelTitle = "忽略此版本";
-        }
-        if (mBookcaseFragment == null) {
-            DialogCreator.createCommonDialog(activity, "发现新版本：", message, true, "取消", "立即更新", null,
-                    (dialog, which) -> goDownload(activity, url));
-            return;
-        }
-
-        DialogCreator.createThreeButtonDialog(activity, "发现新版本：", message, !isForceUpdate, cancelTitle, "直接下载",
-                "浏览器下载", (dialog, which) -> {
-                    if (isForceUpdate) {
-                        activity.finish();
-                    }
-                }, (dialog, which) -> {
-                    if (activity instanceof MainActivity) {
-                        MainActivity mainActivity = (MainActivity) activity;
-                        mainActivity.getViewPagerMain().setCurrentItem(0);
-                        String filePath = APPCONST.UPDATE_APK_FILE_DIR + "FYReader.apk";
-                        if (apkInfo(filePath) == versionCode) {
-                            mainActivity.installApk(FileUtils.getFile(filePath), isForceUpdate);
-                            return;
-                        }
-                    }
-                    if (url == null || "".equals(url)) {
-                        ToastUtils.showError("获取链接失败，请前往浏览器下载！");
-                        Intent intent = new Intent();
-                        intent.setAction(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(URLCONST.APP_DIR_UR));
-                        activity.startActivity(intent);
-                        if (isForceUpdate) {
-                            activity.finish();
-                        }
-                    } else {
-                        APPDownloadTip downloadTip = new APPDownloadTip(url, mBookcaseFragment, activity, isForceUpdate);
-                        downloadTip.downloadApp();
-                    }
-                }, (dialog, which) -> {
-                    goDownload(activity, url);
-                    if (isForceUpdate) {
-                        activity.finish();
-                    }
-                });
-    }
 
     public void updateApp2(final AppCompatActivity activity, final String url, final int versionCode, String message,
                            final boolean isForceUpdate) {

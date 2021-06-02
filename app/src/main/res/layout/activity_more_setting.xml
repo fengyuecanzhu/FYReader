@@ -432,7 +432,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
-                        android:text="@string/search_setting"
+                        android:text="@string/thread_setting"
                         android:textColor="@color/textPrimary" />
                 </RelativeLayout>
 

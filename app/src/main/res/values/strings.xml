@@ -137,7 +137,7 @@
     <string name="other_setting">其他设置</string>
     <string name="open_store">开启书城</string>
     <string name="open_bookstore_tip">打开软件时开启书城</string>
-    <string name="search_setting">搜索设置</string>
+    <string name="thread_setting">线程设置</string>
     <string name="disable_source">禁用书源</string>
     <string name="disable_source_tip">选择搜索时禁用的书源</string>
     <string name="loading_tip">正在加载...</string>
@@ -152,7 +152,7 @@
     <string name="menu_change_group">分组切换</string>
     <string name="menu_group_man">分组管理</string>
     <string name="menu_group_setting">设置分组</string>
-    <string name="thread_num">搜索线程数</string>
+    <string name="thread_num">更新/搜索线程数</string>
     <string name="cur_thread_num">当前线程数：%1$d</string>
     <string name="newest_chapter">最新章节:%1$s</string>
     <string name="source_title_num">书源:%1$s  共%2$d个源</string>
