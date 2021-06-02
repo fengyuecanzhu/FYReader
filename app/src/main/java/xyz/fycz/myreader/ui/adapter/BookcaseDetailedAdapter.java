@@ -8,16 +8,22 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.kongzue.dialogx.dialogs.BottomMenu;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.ui.activity.ReadActivity;
+import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
@@ -40,28 +46,34 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
     public BookcaseDetailedAdapter(Context context, int textViewResourceId, ArrayList<Book> objects,
                                    boolean editState, BookcasePresenter bookcasePresenter, boolean isGroup) {
         super(context, textViewResourceId, objects, editState, bookcasePresenter, isGroup);
+        itemTouchCallbackListener = new ItemTouchCallback.OnItemTouchListener() {
+            @Override
+            public void onSwiped(int adapterPosition) {
+
+            }
+
+            @Override
+            public boolean onMove(int srcPosition, int targetPosition) {
+                Collections.swap(list, srcPosition, targetPosition);
+                notifyItemMoved(srcPosition, targetPosition);
+                notifyItemChanged(srcPosition);
+                notifyItemChanged(targetPosition);
+                return true;
+            }
+        };
+    }
+
+    @NonNull
+    @NotNull
+    @Override
+    public BookcaseAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+        return new ViewHolder(LayoutInflater.from(mContext).inflate(mResourceId, null));
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null || convertView.getTag() instanceof BookcaseDragAdapter.ViewHolder) {
-            viewHolder = new ViewHolder();
-            convertView = LayoutInflater.from(mContext).inflate(mResourceId, null);
-            viewHolder.cbBookChecked = convertView.findViewById(R.id.cb_book_select);
-            viewHolder.ivBookImg = convertView.findViewById(R.id.iv_book_img);
-            viewHolder.tvBookName = convertView.findViewById(R.id.tv_book_name);
-            viewHolder.tvNoReadNum = convertView.findViewById(R.id.tv_no_read_num);
-            viewHolder.tvBookAuthor = convertView.findViewById(R.id.tv_book_author);
-            viewHolder.tvHistoryChapter = convertView.findViewById(R.id.tv_book_history_chapter);
-            viewHolder.tvNewestChapter = convertView.findViewById(R.id.tv_book_newest_chapter);
-            viewHolder.llBookRead = convertView.findViewById(R.id.ll_book_read);
-            viewHolder.pbLoading = convertView.findViewById(R.id.pb_loading);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
+    public void onBindViewHolder(@NonNull @NotNull BookcaseAdapter.ViewHolder holder, int position) {
+        viewHolder = (ViewHolder) holder;
         initView(position);
-        return convertView;
     }
 
     private void initView(int position) {
@@ -70,7 +82,7 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
             book.setImgUrl("");
         }
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(book.getSource());
-        viewHolder.ivBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), book.getImgUrl()), book.getName(),book.getAuthor());
+        viewHolder.ivBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), book.getImgUrl()), book.getName(), book.getAuthor());
 
         viewHolder.tvBookName.setText(book.getName());
 
@@ -189,7 +201,7 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
                                     case 0:
                                         if (!isGroup) {
                                             book.setSortCode(0);
-                                        }else {
+                                        } else {
                                             book.setGroupSort(0);
                                         }
                                         mBookService.updateEntity(book);
@@ -230,12 +242,24 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
         }
     }
 
-
     static class ViewHolder extends BookcaseAdapter.ViewHolder {
         TextView tvBookAuthor;
         TextView tvHistoryChapter;
         TextView tvNewestChapter;
         LinearLayout llBookRead;
+
+        public ViewHolder(@NonNull @NotNull View itemView) {
+            super(itemView);
+            cbBookChecked = itemView.findViewById(R.id.cb_book_select);
+            ivBookImg = itemView.findViewById(R.id.iv_book_img);
+            tvBookName = itemView.findViewById(R.id.tv_book_name);
+            tvNoReadNum = itemView.findViewById(R.id.tv_no_read_num);
+            tvBookAuthor = itemView.findViewById(R.id.tv_book_author);
+            tvHistoryChapter = itemView.findViewById(R.id.tv_book_history_chapter);
+            tvNewestChapter = itemView.findViewById(R.id.tv_book_newest_chapter);
+            llBookRead = itemView.findViewById(R.id.ll_book_read);
+            pbLoading = itemView.findViewById(R.id.pb_loading);
+        }
     }
 
 }

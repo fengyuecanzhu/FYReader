@@ -4,10 +4,15 @@ import android.content.Context;
 import android.view.View;
 import android.widget.*;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.kongzue.dialogx.dialogs.BottomDialog;
 import com.kongzue.dialogx.dialogs.BottomMenu;
 import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
 import com.kongzue.dialogx.interfaces.OnMenuItemSelectListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,6 +25,7 @@ import java.util.*;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.widget.CoverImageView;
@@ -38,7 +44,7 @@ import xyz.fycz.myreader.widget.BadgeView;
  * @author fengyue
  * @date 2020/4/19 11:23
  */
-public abstract class BookcaseAdapter extends DragAdapter {
+public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapter.ViewHolder> {
 
     private final Map<String, Boolean> isLoading = new HashMap<>();
     private final Map<String, Boolean> mCheckMap = new LinkedHashMap<>();
@@ -59,7 +65,7 @@ public abstract class BookcaseAdapter extends DragAdapter {
             App.getmContext().getResources().getString(R.string.menu_book_cache),
             App.getmContext().getResources().getString(R.string.menu_book_delete)
     };
-
+    protected ItemTouchCallback.OnItemTouchListener itemTouchCallbackListener;
 
     public BookcaseAdapter(Context context, int textViewResourceId, ArrayList<Book> objects
             , boolean editState, BookcasePresenter bookcasePresenter, boolean isGroup) {
@@ -75,25 +81,10 @@ public abstract class BookcaseAdapter extends DragAdapter {
 
 
     @Override
-    public void onDataModelMove(int from, int to) {
-        Book b = list.remove(from);
-        list.add(to, b);
-        for (int i = 0; i < list.size(); i++) {
-            if (!isGroup) {
-                list.get(i).setSortCode(i);
-            }else {
-                list.get(i).setGroupSort(i);
-            }
-        }
-        mBookService.updateBooks(list);
-    }
-
-    @Override
-    public int getCount() {
+    public int getItemCount() {
         return list.size();
     }
 
-    @Override
     public Book getItem(int position) {
         return list.get(position);
     }
@@ -103,6 +94,16 @@ public abstract class BookcaseAdapter extends DragAdapter {
         return !isGroup ? list.get(position).getSortCode() : list.get(position).getGroupSort();
     }
 
+    public void onDataMove() {
+        for (int i = 0; i < list.size(); i++) {
+            if (!isGroup) {
+                list.get(i).setSortCode(i);
+            } else {
+                list.get(i).setGroupSort(i);
+            }
+        }
+        mBookService.updateBooks(list);
+    }
 
     public void remove(Book item) {
         list.remove(item);
@@ -124,9 +125,9 @@ public abstract class BookcaseAdapter extends DragAdapter {
                         ToastUtils.showSuccess("书籍删除成功！");
                         mBookcasePresenter.init();
                     }, null);
-        }else {
+        } else {
             DialogCreator.createCommonDialog(mContext, "删除/移除书籍", "您是希望删除《" + book.getName() + "》及其所有缓存还是从分组中移除该书籍(不会删除书籍)呢？",
-                    true, "删除书籍", "从分组中移除",(dialogInterface, i) -> {
+                    true, "删除书籍", "从分组中移除", (dialogInterface, i) -> {
                         remove(book);
                         ToastUtils.showSuccess("书籍删除成功！");
                         mBookcasePresenter.init();
@@ -151,6 +152,8 @@ public abstract class BookcaseAdapter extends DragAdapter {
                 mCheckMap.put(book.getId(), false);
             }
             mCheckedCount = 0;
+        } else {
+            onDataMove();
         }
         this.mEditState = mEditState;
         notifyDataSetChanged();
@@ -171,6 +174,10 @@ public abstract class BookcaseAdapter extends DragAdapter {
 
     public boolean isBookLoading(String bookID) {
         return isLoading.get(bookID);
+    }
+
+    public ItemTouchCallback.OnItemTouchListener getItemTouchCallbackListener() {
+        return itemTouchCallbackListener;
     }
 
     public boolean unionChapterCathe(Book book) throws IOException {
@@ -317,39 +324,52 @@ public abstract class BookcaseAdapter extends DragAdapter {
                         selectedIndex = which;
                     }
                 }).setOkButton("确定", (baseDialog, v) -> {
-                    switch (selectedIndex) {
-                        case 0:
-                            begin[0] = book.getHisttoryChapterNum();
-                            end[0] = book.getHisttoryChapterNum() + 50;
-                            break;
-                        case 1:
-                            begin[0] = book.getHisttoryChapterNum() - 50;
-                            end[0] = book.getHisttoryChapterNum() + 50;
-                            break;
-                        case 2:
-                            begin[0] = book.getHisttoryChapterNum();
-                            end[0] = 99999;
-                            break;
-                        case 3:
-                            begin[0] = 0;
-                            end[0] = 99999;
-                            break;
-                    }
-                    Thread downloadThread = new Thread(() -> {
-                        ArrayList<Chapter> chapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
-                        mBookcasePresenter.addDownload(book, chapters, begin[0], end[0], false);
-                    });
-                    mBookcasePresenter.getEs().submit(downloadThread);
-                    return false;
-                }).setCancelButton(R.string.cancel);
+            switch (selectedIndex) {
+                case 0:
+                    begin[0] = book.getHisttoryChapterNum();
+                    end[0] = book.getHisttoryChapterNum() + 50;
+                    break;
+                case 1:
+                    begin[0] = book.getHisttoryChapterNum() - 50;
+                    end[0] = book.getHisttoryChapterNum() + 50;
+                    break;
+                case 2:
+                    begin[0] = book.getHisttoryChapterNum();
+                    end[0] = 99999;
+                    break;
+                case 3:
+                    begin[0] = 0;
+                    end[0] = 99999;
+                    break;
+            }
+            Thread downloadThread = new Thread(() -> {
+                ArrayList<Chapter> chapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
+                mBookcasePresenter.addDownload(book, chapters, begin[0], end[0], false);
+            });
+            mBookcasePresenter.getEs().submit(downloadThread);
+            return false;
+        }).setCancelButton(R.string.cancel);
     }
 
-    static class ViewHolder {
+    public void refreshBook(String chapterUrl){
+        for (int i = 0; i < list.size(); i++) {
+            if (Objects.equals(list.get(i).getChapterUrl(), chapterUrl)) {
+                notifyItemChanged(i);
+            }
+        }
+    }
+
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
         CheckBox cbBookChecked;
         CoverImageView ivBookImg;
         TextView tvBookName;
         BadgeView tvNoReadNum;
         ProgressBar pbLoading;
+
+        public ViewHolder(@NonNull @NotNull View itemView) {
+            super(itemView);
+        }
     }
 
     public void setOnBookCheckedListener(OnBookCheckedListener listener) {

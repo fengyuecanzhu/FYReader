@@ -14,9 +14,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
+import xyz.fycz.myreader.databinding.FragmentBookListBinding;
 import xyz.fycz.myreader.databinding.FragmentBookcaseBinding;
 import xyz.fycz.myreader.ui.presenter.BookcasePresenter;
 import xyz.fycz.myreader.widget.custom.DragSortGridView;
@@ -26,7 +28,7 @@ import xyz.fycz.myreader.widget.custom.DragSortGridView;
  */
 public class BookcaseFragment extends Fragment {
 
-    private FragmentBookcaseBinding binding;
+    private FragmentBookListBinding binding;
 
     private BookcasePresenter mBookcasePresenter;
 
@@ -39,7 +41,7 @@ public class BookcaseFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = FragmentBookcaseBinding.inflate(inflater, container, false);
+        binding = FragmentBookListBinding.inflate(inflater, container, false);
         mBookcasePresenter = new BookcasePresenter(this);
         mBookcasePresenter.start();
         return binding.getRoot();
@@ -52,8 +54,8 @@ public class BookcaseFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         mBookcasePresenter.init();
     }
 
@@ -61,28 +63,12 @@ public class BookcaseFragment extends Fragment {
         return binding.llNoDataTips;
     }
 
-    public DragSortGridView getGvBook() {
-        return binding.gvBook;
+    public RecyclerView getRvBook() {
+        return binding.rvBookList;
     }
 
     public SmartRefreshLayout getSrlContent() {
-        return binding.srlContent;
-    }
-
-    public RelativeLayout getRlDownloadTip() {
-        return binding.rlDownloadTip;
-    }
-
-    public TextView getTvDownloadTip() {
-        return binding.tvDownloadTip;
-    }
-
-    public TextView getTvStopDownload() {
-        return binding.tvStopDownload;
-    }
-
-    public ProgressBar getPbDownload() {
-        return binding.pbDownload;
+        return binding.srlBookList;
     }
 
     public BookcasePresenter getmBookcasePresenter() {

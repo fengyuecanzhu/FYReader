@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/ll_no_data_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:srcCompat="@drawable/ic_vector_add_bookcase"
+            app:tint="@color/textSecondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="当前无任何书籍，点击添加"
+            android:textColor="@color/textSecondary"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/srl_book_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.scwang.smartrefresh.header.MaterialHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_book_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"/>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_book_edit"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorForeground"
+        android:gravity="center_vertical"
+        android:paddingEnd="10dp"
+        android:visibility="gone">
+
+        <CheckBox
+            android:id="@+id/book_selected_all"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
+            android:text="全选"
+            android:textColor="@color/textSecondary"
+            android:textSize="15dp"
+            android:theme="@style/MyCheckBox" />
+
+        <Button
+            android:id="@+id/book_add_group"
+            android:layout_width="90dp"
+            android:layout_height="35dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/selector_btn_add"
+            android:clickable="false"
+            android:enabled="false"
+            android:minWidth="110dp"
+            android:text="加入分组"
+            android:textColor="@color/selector_btn_file_add" />
+
+        <Button
+            android:id="@+id/book_btn_delete"
+            android:layout_width="90dp"
+            android:layout_height="35dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="15dp"
+            android:layout_toLeftOf="@id/book_add_group"
+            android:background="@drawable/selector_btn_add"
+            android:clickable="false"
+            android:enabled="false"
+            android:text="删除/移除"
+            android:textColor="@color/selector_btn_file_add" />
+    </RelativeLayout>
+</RelativeLayout>

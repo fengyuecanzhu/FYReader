@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,9 @@ import android.view.View;
 import android.widget.PopupMenu;
 
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
@@ -31,12 +35,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.base.observer.MyObserver;
+import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
 import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.RxUtils;
@@ -81,7 +88,8 @@ public class BookcasePresenter implements BasePresenter {
     private boolean isBookcaseStyleChange;
     private Setting mSetting;
     private final List<Book> errorLoadingBooks = new ArrayList<>();
-    private int finishLoadBookCount = 0;
+    private int threadsNum = 6;
+    private int refreshIndex;//刷新书籍索引
     //    private int notifyId = 11;
     private ExecutorService es = Executors.newFixedThreadPool(1);//更新/下载线程池
 
@@ -106,6 +114,7 @@ public class BookcasePresenter implements BasePresenter {
     private boolean isGroup;
     private MainActivity.OnGroupChangeListener ogcl;
     private final BookGroupDialog mBookGroupDia;
+    private ItemTouchCallback itemTouchCallback;
 
     public static final String CANCEL_ACTION = "cancelAction";
 
@@ -119,27 +128,13 @@ public class BookcasePresenter implements BasePresenter {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    if (!App.isDestroy(mMainActivity)) {
-                        App.runOnUiThread(() -> mBookcaseAdapter.notifyDataSetChanged());
-                        finishLoadBookCount++;
-                        mBookcaseFragment.getSrlContent().finishRefresh();
-                    }
                     break;
                 case 2:
-                    mBookcaseFragment.getSrlContent().finishRefresh();
                     break;
                 case 3:
-                    mBookcaseAdapter.notifyDataSetChanged();
                     break;
                 case 4:
-                    showErrorLoadingBooks();
-                    if (App.isDebug()) {
-                        if (isFirstRefresh) {
-                            initBook();
-                            isFirstRefresh = false;
-                        }
-                        downloadAll(false, false);
-                    }
+
                     break;
                 case 5:
                     break;
@@ -156,9 +151,6 @@ public class BookcasePresenter implements BasePresenter {
                     isDownloadFinish = true;
                     break;
                 case 10:
-                    mBookcaseFragment.getTvDownloadTip().setText("正在初始化缓存任务...");
-                    mBookcaseFragment.getPbDownload().setProgress(0);
-                    mBookcaseFragment.getRlDownloadTip().setVisibility(View.VISIBLE);
                     break;
                 case 11:
                     ToastUtils.showInfo("正在后台缓存书籍，具体进度可查看通知栏！");
@@ -197,31 +189,16 @@ public class BookcasePresenter implements BasePresenter {
             synBookcaseToWeb(true);
         }*/
 
-        //是否启用下拉刷新（默认启用）
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            mBookcaseFragment.getSrlContent().setEnableRefresh(false);
-        }
         //设置是否启用内容视图拖动效果
         mBookcaseFragment.getSrlContent().setEnableHeaderTranslationContent(false);
         //设置刷新监听器
-        mBookcaseFragment.getSrlContent().setOnRefreshListener(refreshlayout -> initNoReadNum());
+        mBookcaseFragment.getSrlContent().setOnRefreshListener(listener -> initNoReadNum());
         //搜索按钮监听器
         mBookcaseFragment.getLlNoDataTips().setOnClickListener(view -> {
             Intent intent = new Intent(mBookcaseFragment.getContext(), SearchBookActivity.class);
             mBookcaseFragment.startActivity(intent);
         });
 
-        //长按事件监听
-        mBookcaseFragment.getGvBook().setOnItemLongClickListener((parent, view, position, id) -> false);
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            //滑动监听器
-            mBookcaseFragment.getGvBook().getmScrollView().setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                if (!mBookcaseAdapter.ismEditState()) {
-                    mBookcaseFragment.getSrlContent().setEnableRefresh(scrollY == 0);
-                }
-            });
-        }
 
         //全选监听器
         mBookcaseFragment.getmCbSelectAll().setOnClickListener(v -> {
@@ -296,18 +273,18 @@ public class BookcasePresenter implements BasePresenter {
     public void init() {
         initBook();
         if (mBooks.size() == 0) {
-            mBookcaseFragment.getGvBook().setVisibility(View.GONE);
+            mBookcaseFragment.getSrlContent().setVisibility(View.GONE);
             mBookcaseFragment.getLlNoDataTips().setVisibility(View.VISIBLE);
         } else {
             if (mBookcaseAdapter == null || isBookcaseStyleChange) {
                 switch (mSetting.getBookcaseStyle()) {
                     case listMode:
                         mBookcaseAdapter = new BookcaseDetailedAdapter(mMainActivity, R.layout.gridview_book_detailed_item, mBooks, false, this, isGroup);
-                        mBookcaseFragment.getGvBook().setNumColumns(1);
+                        mBookcaseFragment.getRvBook().setLayoutManager(new LinearLayoutManager(mMainActivity));
                         break;
                     case threePalaceMode:
                         mBookcaseAdapter = new BookcaseDragAdapter(mMainActivity, R.layout.gridview_book_item, mBooks, false, this, isGroup);
-                        mBookcaseFragment.getGvBook().setNumColumns(3);
+                        mBookcaseFragment.getRvBook().setLayoutManager(new GridLayoutManager(mMainActivity, 3));
                         break;
                 }
                 mBookcaseAdapter.setOnBookCheckedListener(isChecked -> {
@@ -315,30 +292,19 @@ public class BookcasePresenter implements BasePresenter {
                     //设置删除和加入分组按钮是否可用
                     setBtnClickable(mBookcaseAdapter.getmCheckedCount() > 0);
                 });
-                mBookcaseFragment.getGvBook().setDragModel(-1);
-                mBookcaseFragment.getGvBook().setTouchClashparent(mMainActivity.getViewPagerMain());
-                mBookcaseFragment.getGvBook().setOnDragSelectListener(new DragSortGridView.OnDragSelectListener() {
-                    @Override
-                    public void onDragSelect(View mirror) {
-                        if (mSetting.getBookcaseStyle() == BookcaseStyle.listMode) {
-                            mirror.setBackgroundColor(mMainActivity.getResources().getColor(R.color.colorBackground));
-                        } else {
-                            mirror.setScaleX(1.05f);
-                        }
-                        mirror.setScaleY(1.05f);
-                    }
-
-                    @Override
-                    public void onPutDown(View itemView) {
-                    }
-                });
-                mBookcaseFragment.getGvBook().setAdapter(mBookcaseAdapter);
+                itemTouchCallback = new ItemTouchCallback();
+                itemTouchCallback.setViewPager(mMainActivity.getViewPagerMain());
+                mBookcaseFragment.getRvBook().setAdapter(mBookcaseAdapter);
+                ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
+                itemTouchHelper.attachToRecyclerView(mBookcaseFragment.getRvBook());
+                itemTouchCallback.setOnItemTouchListener(mBookcaseAdapter.getItemTouchCallbackListener());
+                itemTouchCallback.setDragEnable(false);
                 isBookcaseStyleChange = false;
             } else {
                 mBookcaseAdapter.notifyDataSetChanged();
             }
             mBookcaseFragment.getLlNoDataTips().setVisibility(View.GONE);
-            mBookcaseFragment.getGvBook().setVisibility(View.VISIBLE);
+            mBookcaseFragment.getSrlContent().setVisibility(View.VISIBLE);
         }
     }
 
@@ -389,30 +355,32 @@ public class BookcasePresenter implements BasePresenter {
         }
     }
 
-    //检查书籍更新
     public void initNoReadNum() {
         errorLoadingBooks.clear();
-        finishLoadBookCount = 0;
-        for (Book book : mBooks) {
-            mBookcaseAdapter.getIsLoading().put(book.getId(), true);
-        }
         if (mBooks.size() > 0) {
-            mHandler.sendMessage(mHandler.obtainMessage(3));
-        }
-        for (final Book book : mBooks) {
-            if ("本地书籍".equals(book.getType()) || book.getIsCloseUpdate()) {
-                mBookcaseAdapter.getIsLoading().put(book.getId(), false);
-                mHandler.sendMessage(mHandler.obtainMessage(1));
-                continue;
+            mBookcaseAdapter.notifyDataSetChanged();
+            threadsNum = SharedPreUtils.getInstance().getInt(App.getmContext().getString(R.string.threadNum), 8);
+            refreshIndex = -1;
+            for (int i = 0; i < threadsNum; i++) {
+                refreshBookshelf();
             }
-            Thread update = new Thread(() -> {
+        }
+    }
+
+
+    private synchronized void refreshBookshelf() {
+        refreshIndex++;
+        if (refreshIndex < mBooks.size()) {
+            Book book = mBooks.get(refreshIndex);
+            if (!"本地书籍".equals(book.getType()) && !book.getIsCloseUpdate()) {
+                mBookcaseAdapter.getIsLoading().put(book.getId(), true);
+                mBookcaseAdapter.refreshBook(book.getChapterUrl());
                 final ArrayList<Chapter> mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
                 final ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(book.getSource());
                 BookApi.getBookChapters(book, mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
                     int noReadNum = chapters.size() - book.getChapterTotalNum();
                     book.setNoReadNum(Math.max(noReadNum, 0));
                     book.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
-                    mBookcaseAdapter.getIsLoading().put(book.getId(), false);
                     mChapterService.updateAllOldChapterData(mChapters, chapters, book.getId());
                     mBookService.updateEntity(book);
                     emitter.onNext(book);
@@ -420,30 +388,38 @@ public class BookcasePresenter implements BasePresenter {
                 })).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Object>() {
                     @Override
                     public void onNext(@NotNull Object o) {
-                        mHandler.sendMessage(mHandler.obtainMessage(1));
+                        mBookcaseAdapter.getIsLoading().put(book.getId(), false);
+                        mBookcaseFragment.getSrlContent().finishRefresh();
+                        mBookcaseAdapter.refreshBook(book.getChapterUrl());
+                        refreshBookshelf();
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         mBookcaseAdapter.getIsLoading().put(book.getId(), false);
+                        mBookcaseFragment.getSrlContent().finishRefresh();
+                        mBookcaseAdapter.refreshBook(book.getChapterUrl());
                         errorLoadingBooks.add(book);
-                        mHandler.sendMessage(mHandler.obtainMessage(1));
                         if (App.isDebug()) e.printStackTrace();
+                        refreshBookshelf();
                     }
                 });
-            });
-            es.submit(update);
-        }
-        App.getApplication().newThread(() -> {
-            while (true) {
-                if (finishLoadBookCount == mBooks.size()) {
-                    mHandler.sendMessage(mHandler.obtainMessage(4));
-                    mHandler.sendMessage(mHandler.obtainMessage(2));
-                    break;
-                }
+            } else {
+                refreshBookshelf();
+                mBookcaseFragment.getSrlContent().finishRefresh();
             }
-        });
+        } else if (refreshIndex >= mBooks.size() + threadsNum - 1) {
+            showErrorLoadingBooks();
+            if (App.isDebug()) {
+                if (isFirstRefresh) {
+                    initBook();
+                    isFirstRefresh = false;
+                }
+                downloadAll(false, false);
+            }
+        }
     }
+
 
     /**
      * 显示更新失败的书籍信息
@@ -471,7 +447,6 @@ public class BookcasePresenter implements BasePresenter {
                 editBookcase(true);
                 return true;
             case R.id.action_styleChange:
-                mBookcaseFragment.getGvBook().getmScrollView().setScrollY(0);
                 if (mSetting.getBookcaseStyle().equals(BookcaseStyle.listMode)) {
                     mSetting.setBookcaseStyle(BookcaseStyle.threePalaceMode);
                     ToastUtils.show("已切换为三列网格视图！");
@@ -552,11 +527,10 @@ public class BookcasePresenter implements BasePresenter {
     private void editBookcase(boolean isEdit) {
         if (isEdit) {
             if (canEditBookcase()) {
+                mMainActivity.getViewPagerMain().setEnableScroll(false);
                 mBookcaseFragment.getSrlContent().setEnableRefresh(false);
+                itemTouchCallback.setDragEnable(mSetting.getSortStyle() == 0);
                 mBookcaseAdapter.setmEditState(true);
-                if (mSetting.getSortStyle() == 0) {
-                    mBookcaseFragment.getGvBook().setDragModel(DragSortGridView.DRAG_BY_LONG_CLICK);
-                }
                 mBookcaseFragment.getRlBookEdit().setVisibility(View.VISIBLE);
                 mMainActivity.initMenuAnim();
                 mBookcaseFragment.getRlBookEdit().startAnimation(mMainActivity.getmBottomInAnim());
@@ -567,11 +541,9 @@ public class BookcasePresenter implements BasePresenter {
                 ToastUtils.showWarring("当前无任何书籍，无法编辑书架!");
             }
         } else {
-            if (mBookcaseFragment.getGvBook().getmScrollView().getScrollY() == 0
-                    && android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                mBookcaseFragment.getSrlContent().setEnableRefresh(true);
-            }
-            mBookcaseFragment.getGvBook().setDragModel(-1);
+            mMainActivity.getViewPagerMain().setEnableScroll(true);
+            mBookcaseFragment.getSrlContent().setEnableRefresh(true);
+            itemTouchCallback.setDragEnable(false);
             mBookcaseAdapter.setmEditState(false);
             mBookcaseFragment.getRlBookEdit().setVisibility(View.GONE);
             mMainActivity.initMenuAnim();
