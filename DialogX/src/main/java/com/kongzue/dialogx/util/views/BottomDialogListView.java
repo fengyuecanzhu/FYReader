@@ -71,26 +71,25 @@ public class BottomDialogListView extends ListView {
             if (bottomMenuListViewTouchEvent != null) {
                 bottomMenuListViewTouchEvent.down(ev);
             }
-            mPosition = pointToPosition((int) ev.getX(), (int) ev.getY());
-            return super.dispatchTouchEvent(ev);
+            /*mPosition = pointToPosition((int) ev.getX(), (int) ev.getY());
+            return super.dispatchTouchEvent(ev);*/
         }
         
         if (actionMasked == MotionEvent.ACTION_MOVE) {
             if (bottomMenuListViewTouchEvent != null) {
                 bottomMenuListViewTouchEvent.move(ev);
             }
-            return true;
+            /*setPressed(pointToPosition((int) ev.getX(), (int) ev.getY()) == mPosition);
+            invalidate();
+            return true;*/
         }
         if (actionMasked == MotionEvent.ACTION_UP || actionMasked == MotionEvent.ACTION_CANCEL) {
             if (bottomMenuListViewTouchEvent != null) {
                 bottomMenuListViewTouchEvent.up(ev);
             }
-            if (pointToPosition((int) ev.getX(), (int) ev.getY()) == mPosition) {
-                super.dispatchTouchEvent(ev);
-            } else {
-                setPressed(false);
-                invalidate();
-            }
+            /*if (pointToPosition((int) ev.getX(), (int) ev.getY()) != mPosition) {
+                return true;
+            }*/
         }
         
         return super.dispatchTouchEvent(ev);

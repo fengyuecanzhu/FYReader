@@ -1608,7 +1608,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         public void onOneItemSelect(BottomMenu dialog, CharSequence text, int which) {
                             selectedIndex = which;
                         }
-                    }).setOkButton("确定", (baseDialog, v) -> {
+                    }).setCancelButton("确定", (baseDialog, v) -> {
                 switch (selectedIndex) {
                     case 0:
                         addDownload(mPageLoader.getChapterPos(), mPageLoader.getChapterPos() + 50);
@@ -1624,7 +1624,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         break;
                 }
                 return false;
-            }).setCancelButton(R.string.cancel);
+            });
         });
     }
 

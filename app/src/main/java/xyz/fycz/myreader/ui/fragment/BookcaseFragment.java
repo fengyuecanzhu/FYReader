@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
 import xyz.fycz.myreader.databinding.FragmentBookListBinding;
-import xyz.fycz.myreader.databinding.FragmentBookcaseBinding;
 import xyz.fycz.myreader.ui.presenter.BookcasePresenter;
 import xyz.fycz.myreader.widget.custom.DragSortGridView;
 
@@ -56,6 +55,10 @@ public class BookcaseFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        mBookcasePresenter.init();
+    }
+
+    public void init(){
         mBookcasePresenter.init();
     }
 

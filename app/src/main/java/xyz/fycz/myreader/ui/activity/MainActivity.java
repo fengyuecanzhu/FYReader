@@ -484,7 +484,7 @@ public class MainActivity extends BaseActivity {
         if (mBookcaseFragment.isRecreate()) {
             reLoadFragment();
         }
-        mBookcaseFragment.onResume();
+        mBookcaseFragment.init();
     }
 
     /**
