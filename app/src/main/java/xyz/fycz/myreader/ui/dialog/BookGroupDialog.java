@@ -15,8 +15,6 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.kongzue.dialogx.dialogs.BottomMenu;
-import com.kongzue.dialogx.interfaces.BaseDialog;
-import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +68,7 @@ public class BookGroupDialog {
             mGroupNames[i] = groupName;
         }
         if (isAdd) {
-            mGroupNames[mBookGroups.size()] = "添加分组";
+            mGroupNames[mBookGroups.size()] = "+ 新建分组";
         }
     }
 
@@ -118,80 +116,35 @@ public class BookGroupDialog {
      * 添加/重命名分组对话框
      */
     public void showAddOrRenameGroupDia(boolean isRename, boolean isAddGroup, int groupNum, OnGroup onGroup) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.edit_dialog, null);
-        TextInputLayout textInputLayout = view.findViewById(R.id.text_input_lay);
-        int maxLen = 20;
-        textInputLayout.setCounterMaxLength(maxLen);
-        EditText editText = textInputLayout.getEditText();
-        editText.setHint("请输入分组名");
         BookGroup bookGroup = !isRename ? new BookGroup() : mBookGroups.get(groupNum);
         String oldName = bookGroup.getName();
-        if (isRename) {
-            editText.setText(oldName);
-        }
-        editText.requestFocus();
-        InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-        mHandler.postDelayed(() -> {
-            imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
-        }, 220);
-        AlertDialog newGroupDia = MyAlertDialog.build(mContext)
-                .setTitle(!isRename ? "新建分组" : "重命名分组")
-                .setView(view)
-                .setCancelable(false)
-                .setPositiveButton("确认", null)
-                .setNegativeButton("取消", null)
-                .show();
-        Button posBtn = newGroupDia.getButton(AlertDialog.BUTTON_POSITIVE);
-        posBtn.setEnabled(false);
-        posBtn.setOnClickListener(v1 -> {
-            CharSequence newGroupName = editText.getText().toString();
-            for (CharSequence oldGroupName : mGroupNames) {
-                if (oldGroupName.equals(newGroupName)) {
-                    ToastUtils.showWarring("分组[" + newGroupName + "]已存在，无法" + (!isRename ? "添加！" : "重命名！"));
-                    return;
-                }
-            }
-            bookGroup.setName(newGroupName.toString());
-            if (!isRename) {
-                mBookGroupService.addBookGroup(bookGroup);
-            } else {
-                mBookGroupService.updateEntity(bookGroup);
-                SharedPreUtils spu = SharedPreUtils.getInstance();
-                if (spu.getString(mContext.getString(R.string.curBookGroupName), "").equals(oldName)) {
-                    spu.putString(mContext.getString(R.string.curBookGroupName), newGroupName.toString());
-                    if (onGroup != null) onGroup.change();
-                }
-            }
-            ToastUtils.showSuccess("成功" +
-                    (!isRename ? "添加分组[" : "成功将[" + oldName + "]重命名为[")
-                    + bookGroup.getName() + "]");
-            imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
-            newGroupDia.dismiss();
-            if (isAddGroup) {
-                if (onGroup != null) onGroup.addGroup();
-            }
-        });
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String text = editText.getText().toString();
-                if (editText.getText().length() > 0 && editText.getText().length() <= maxLen && !text.equals(oldName)) {
-                    posBtn.setEnabled(true);
-                } else {
-                    posBtn.setEnabled(false);
-                }
-            }
-        });
+        int maxLen = 20;
+        MyAlertDialog.showFullScreenInputDia(mContext, !isRename ? "新建分组" : "重命名分组", "请输入分组名",
+                isRename ? oldName : "", null, true, maxLen, newGroupName -> {
+                    for (CharSequence oldGroupName : mGroupNames) {
+                        if (oldGroupName.equals(newGroupName)) {
+                            ToastUtils.showWarring("分组[" + newGroupName + "]已存在，无法" + (!isRename ? "添加！" : "重命名！"));
+                            return;
+                        }
+                    }
+                    bookGroup.setName(newGroupName);
+                    if (!isRename) {
+                        mBookGroupService.addBookGroup(bookGroup);
+                    } else {
+                        mBookGroupService.updateEntity(bookGroup);
+                        SharedPreUtils spu = SharedPreUtils.getInstance();
+                        if (spu.getString(mContext.getString(R.string.curBookGroupName), "").equals(oldName)) {
+                            spu.putString(mContext.getString(R.string.curBookGroupName), newGroupName.toString());
+                            if (onGroup != null) onGroup.change();
+                        }
+                    }
+                    ToastUtils.showSuccess("成功" +
+                            (!isRename ? "添加分组[" : "成功将[" + oldName + "]重命名为[")
+                            + bookGroup.getName() + "]");
+                    if (isAddGroup) {
+                        if (onGroup != null) onGroup.addGroup();
+                    }
+                });
     }
 
     /**

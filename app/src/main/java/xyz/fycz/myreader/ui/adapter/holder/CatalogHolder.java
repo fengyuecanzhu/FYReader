@@ -3,6 +3,7 @@ package xyz.fycz.myreader.ui.adapter.holder;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
@@ -26,7 +27,7 @@ public class CatalogHolder extends ViewHolderImpl<Chapter> {
     }
 
     @Override
-    public void onBind(Chapter data, int pos) {
+    public void onBind(RecyclerView.ViewHolder holder, Chapter data, int pos) {
         if (ChapterService.isChapterCached(data.getBookId(), data.getTitle()) || data.getEnd() > 0) {
             tvTitle.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(),R.drawable.selector_category_load), null, null, null);
         } else {

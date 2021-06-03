@@ -161,7 +161,7 @@ public class MaterialStyle implements DialogXStyle {
             
             @Override
             public int overrideMenuTextColor(boolean light) {
-                return light ? R.color.black90 : R.color.white90;
+                return light ? R.color.black90 : R.color.dialogxMIUITextDark;
             }
             
             @Override

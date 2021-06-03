@@ -3,6 +3,8 @@ package xyz.fycz.myreader.ui.adapter.holder;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.HashMap;
 
 import xyz.fycz.myreader.R;
@@ -40,7 +42,7 @@ public class LocalSourceHolder extends ViewHolderImpl<BookSource> {
     }
 
     @Override
-    public void onBind(BookSource data, int pos) {
+    public void onBind(RecyclerView.ViewHolder holder, BookSource data, int pos) {
         banOrUse(data);
         cbSource.setChecked(mCheckMap.get(data));
         tvEnable.setOnClickListener(v -> {

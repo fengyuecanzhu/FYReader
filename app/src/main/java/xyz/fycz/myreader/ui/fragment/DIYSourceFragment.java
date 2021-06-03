@@ -15,6 +15,7 @@ import android.widget.PopupMenu;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
@@ -41,6 +42,7 @@ import xyz.fycz.myreader.ui.activity.BookSourceActivity;
 import xyz.fycz.myreader.ui.activity.SourceEditActivity;
 import xyz.fycz.myreader.ui.adapter.BookSourceAdapter;
 import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
+import xyz.fycz.myreader.ui.adapter.helper.OnStartDragListener;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -70,6 +72,7 @@ public class DIYSourceFragment extends BaseFragment {
     private boolean isSearch;
     private PopupMenu featuresMenu;
     private ItemTouchCallback itemTouchCallback;
+    private ItemTouchHelper itemTouchHelper;
     private Disposable importSourceDis;
 
     public DIYSourceFragment() {
@@ -104,7 +107,7 @@ public class DIYSourceFragment extends BaseFragment {
                     mAdapter.toTop(which, bean);
                 }
             }
-        });
+        }, viewHolder -> itemTouchHelper.startDrag(viewHolder));
         refreshSources();
     }
 
@@ -118,9 +121,9 @@ public class DIYSourceFragment extends BaseFragment {
         //设置拖拽
         itemTouchCallback = new ItemTouchCallback();
         itemTouchCallback.setOnItemTouchListener(mAdapter.getItemTouchListener());
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
+        itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
         itemTouchHelper.attachToRecyclerView(binding.recyclerView);
-        itemTouchCallback.setDragEnable(false);
+        itemTouchCallback.setLongPressDragEnable(false);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -341,12 +344,10 @@ public class DIYSourceFragment extends BaseFragment {
                 featuresMenu.getMenu().setGroupVisible(R.id.edit_mode, true);
                 featuresMenu.getMenu().setGroupVisible(R.id.non_edit_mode, false);
                 mAdapter.setmEditState(true);
-                itemTouchCallback.setDragEnable(true);
             } else if (itemId == R.id.action_finish) {
                 featuresMenu.getMenu().setGroupVisible(R.id.edit_mode, false);
                 featuresMenu.getMenu().setGroupVisible(R.id.non_edit_mode, true);
                 mAdapter.setmEditState(false);
-                itemTouchCallback.setDragEnable(false);
             } else if (itemId == R.id.action_export) {
                 exportSources(mBookSources);
             } else if (itemId == R.id.action_share) {

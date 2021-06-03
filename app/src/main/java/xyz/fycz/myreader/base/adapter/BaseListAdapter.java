@@ -43,7 +43,7 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
             throw new IllegalArgumentException("The ViewHolder item must extend BaseViewHolder");
 
         IViewHolder<T> iHolder = ((BaseViewHolder) holder).holder;
-        iHolder.onBind(getItem(position),position);
+        iHolder.onBind(holder, getItem(position), position);
 
         //设置点击事件
         holder.itemView.setOnClickListener((v)->{

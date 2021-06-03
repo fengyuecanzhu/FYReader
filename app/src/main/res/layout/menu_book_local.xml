@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="10dp"
+    android:paddingHorizontal="10dp">
+
+    <RelativeLayout
+        android:id="@+id/rl_book_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingVertical="5dp">
+
+        <LinearLayout
+            android:id="@+id/ll_book_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <xyz.fycz.myreader.widget.CoverImageView
+                android:id="@+id/iv_book_img"
+                android:layout_width="40dp"
+                android:layout_height="55dp"
+                android:scaleType="fitXY"
+                app:srcCompat="@mipmap/default_cover" />
+
+            <LinearLayout
+                android:id="@+id/ll_book_read"
+                android:paddingHorizontal="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_book_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:padding="4dp"
+                    android:text="@string/app_name"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="@dimen/text_normal_size" />
+
+                <TextView
+                    android:id="@+id/tv_book_author"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:padding="4dp"
+                    android:text="@string/app_name"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_default_size" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/tv_theme_mode_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/menu_book_detail"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp"
+            android:text="详情"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_small_size" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/sys_window_back" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_marginVertical="5dp"
+        android:paddingVertical="5dp">
+
+        <TextView
+            android:id="@+id/tv_edit"
+            style="@style/MAppTheme.TextAppearance.BookMenu"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/menu_edit"
+            app:drawableTint="@color/textPrimary"
+            app:drawableTopCompat="@drawable/ic_edit" />
+
+        <TextView
+            android:id="@+id/tv_top"
+            style="@style/MAppTheme.TextAppearance.BookMenu"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/menu_book_Top"
+            app:drawableTint="@color/textPrimary"
+            app:drawableTopCompat="@drawable/ic_top" />
+
+        <TextView
+            android:id="@+id/tv_set_group"
+            style="@style/MAppTheme.TextAppearance.BookMenu"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/menu_group_setting"
+            app:drawableTint="@color/textPrimary"
+            app:drawableTopCompat="@drawable/ic_group" />
+
+        <TextView
+            android:id="@+id/tv_remove"
+            style="@style/MAppTheme.TextAppearance.BookMenu"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/menu_book_delete"
+            app:drawableTint="@color/textPrimary"
+            app:drawableTopCompat="@drawable/ic_delete" />
+    </LinearLayout>
+</LinearLayout>

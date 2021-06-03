@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.ViewPager;
+
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author fengyue
  * @date 2021/2/9 10:08
@@ -44,11 +47,11 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
     }
 
     /**
-     * 设置是否可以被拖拽
+     * 设置是否可以被长按拖拽
      *
      * @param canDrag 是true，否false
      */
-    public void setDragEnable(boolean canDrag) {
+    public void setLongPressDragEnable(boolean canDrag) {
         isCanDrag = canDrag;
     }
 
@@ -133,11 +136,39 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
+        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+            //不为空闲状态，即为拖拽或侧滑状态
+            if (viewHolder instanceof IItemTouchHelperViewHolder) {
+                IItemTouchHelperViewHolder itemTouchHelperViewHolder =
+                        (IItemTouchHelperViewHolder) viewHolder;
+                itemTouchHelperViewHolder.onItemSelected();
+            }
+        }
+        if (onItemTouchListener != null) {
+            if (viewHolder == null) {
+                onItemTouchListener.onEnd();
+            }
+        }
         super.onSelectedChanged(viewHolder, actionState);
         final boolean swiping = actionState == ItemTouchHelper.ACTION_STATE_DRAG;
         if (viewPager != null) {
             viewPager.requestDisallowInterceptTouchEvent(swiping);
         }
+    }
+
+    @Override
+    public void clearView(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder) {
+        super.clearView(recyclerView, viewHolder);
+        if (viewHolder instanceof IItemTouchHelperViewHolder) {
+            IItemTouchHelperViewHolder itemTouchHelperViewHolder =
+                    (IItemTouchHelperViewHolder) viewHolder;
+            itemTouchHelperViewHolder.onItemClear();
+        }
+    }
+
+    @Override
+    public void onMoved(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, int fromPos, @NonNull @NotNull RecyclerView.ViewHolder target, int toPos, int x, int y) {
+        super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y);
     }
 
     public interface OnItemTouchListener {
@@ -156,5 +187,10 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
          * @return 开发者处理了操作应该返回true，开发者没有处理就返回false
          */
         boolean onMove(int srcPosition, int targetPosition);
+
+        /**
+         * 当滑动删除或拖拽结束时调用
+         */
+        void onEnd();
     }
 }

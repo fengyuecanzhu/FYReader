@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.ui.dialog;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.Editable;
@@ -18,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.kongzue.dialogx.dialogs.BottomDialog;
+import com.kongzue.dialogx.dialogs.FullScreenDialog;
 import com.kongzue.dialogx.interfaces.OnBindView;
 
 import xyz.fycz.myreader.R;
@@ -26,6 +28,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.StatusBarUtil;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FingerprintUtils;
@@ -46,11 +49,17 @@ public class MyAlertDialog {
     }
 
     public static AlertDialog createInputDia(Context context, String title, String hint, String initText,
+                                             boolean cancelable, int maxLen, onInputChangeListener oic,
+                                             DialogInterface.OnClickListener posListener) {
+        return createInputDia(context, title, hint, initText, InputType.TYPE_CLASS_TEXT, cancelable, maxLen, oic, posListener);
+    }
+
+    public static AlertDialog createInputDia(Context context, String title, String hint, String initText,
                                              Integer inputType, boolean cancelable, int maxLen, onInputChangeListener oic,
                                              DialogInterface.OnClickListener posListener,
                                              DialogInterface.OnClickListener negListener, String neutralBtn,
                                              DialogInterface.OnClickListener neutralListener) {
-        View view = LayoutInflater.from(context).inflate(R.layout.edit_dialog, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.edit_text, null);
         TextInputLayout textInputLayout = view.findViewById(R.id.text_input_lay);
 
         textInputLayout.setCounterMaxLength(maxLen);
@@ -126,12 +135,62 @@ public class MyAlertDialog {
         return inputDia;
     }
 
-    public static AlertDialog createInputDia(Context context, String title, String hint, String initText,
-                                             boolean cancelable, int maxLen, onInputChangeListener oic,
-                                             DialogInterface.OnClickListener posListener) {
-        return createInputDia(context, title, hint, initText, InputType.TYPE_CLASS_TEXT, cancelable, maxLen, oic, posListener);
-    }
 
+    public static void showFullScreenInputDia(Context context, String title, String hint, String initText,
+                                              Integer inputType, boolean cancelable, int maxLen,
+                                              OnInputFinishListener posListener) {
+
+        FullScreenDialog.show(new OnBindView<FullScreenDialog>(R.layout.dialog_input) {
+            @Override
+            public void onBind(FullScreenDialog dialog, View view) {
+                TextView cancelBtn = view.findViewById(R.id.btn_cancel);
+                TextView finishBtn = view.findViewById(R.id.btn_finish);
+                TextView tvTitle = view.findViewById(R.id.tv_title);
+                TextInputLayout textInputLayout = view.findViewById(R.id.text_input_lay);
+                EditText editText = textInputLayout.getEditText();
+                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                tvTitle.setText(title);
+                cancelBtn.setOnClickListener(v -> {
+                    imm.hideSoftInputFromWindow(editText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    dialog.dismiss();
+                });
+                finishBtn.setOnClickListener(v -> {
+                    imm.hideSoftInputFromWindow(editText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    posListener.finish(editText.getText().toString());
+                    dialog.dismiss();
+                });
+                textInputLayout.setCounterMaxLength(maxLen);
+                editText.setHint(hint);
+                if (inputType != null) editText.setInputType(inputType);
+                if (!StringHelper.isEmpty(initText)) editText.setText(initText);
+                editText.requestFocus();
+                App.getHandler().postDelayed(() -> imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED), 220);
+                finishBtn.setEnabled(false);
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String text = editText.getText().toString();
+                        if (editText.getText().length() > 0 && editText.getText().length() <= maxLen && !text.equals(initText)) {
+                            finishBtn.setEnabled(true);
+                        } else {
+                            finishBtn.setEnabled(false);
+                        }
+                    }
+                });
+            }
+        }).setCancelable(cancelable);
+    }
 
     /**
      * 验证隐私密码对话框
@@ -142,6 +201,7 @@ public class MyAlertDialog {
     public static void showPrivateVerifyDia(AppCompatActivity activity, OnVerify onVerify) {
         showPrivateVerifyDia(activity, onVerify, null);
     }
+
     public static void showPrivateVerifyDia(AppCompatActivity activity, OnVerify onVerify, OnCancel onCancel) {
         boolean openPrivate = SharedPreUtils.getInstance().getBoolean("openPrivate");
         boolean openFingerprint = SharedPreUtils.getInstance().getBoolean("openFingerprint");
@@ -168,13 +228,15 @@ public class MyAlertDialog {
 
     /**
      * 输入隐私密码对话框
+     *
      * @param activity
      * @param onVerify
      */
-    public static void showPrivatePwdInputDia(AppCompatActivity activity, OnVerify onVerify){
+    public static void showPrivatePwdInputDia(AppCompatActivity activity, OnVerify onVerify) {
         showPrivatePwdInputDia(activity, onVerify, null);
     }
-    public static void showPrivatePwdInputDia(AppCompatActivity activity, OnVerify onVerify, OnCancel onCancel){
+
+    public static void showPrivatePwdInputDia(AppCompatActivity activity, OnVerify onVerify, OnCancel onCancel) {
         final String[] pwd = new String[1];
         String pwds = SharedPreUtils.getInstance().getString("privatePwd");
         MyAlertDialog.createInputDia(activity, activity.getString(R.string.input_private_pwd),
@@ -195,7 +257,7 @@ public class MyAlertDialog {
                     if (onCancel != null) {
                         onCancel.cancel();
                     }
-                },"忘记密码", (dialog, which) -> {
+                }, "忘记密码", (dialog, which) -> {
                     DialogCreator.createCommonDialog(activity, "忘记密码",
                             "忘记密码无法找回！\n您可点击确定按钮关闭私密书架并删除私密书架所有书籍，确定关闭吗？",
                             false, (dialog1, which1) -> {
@@ -213,15 +275,16 @@ public class MyAlertDialog {
                 });
     }
 
-    public static void showTipDialogWithLink(Context context, int msgId){
-        showTipDialogWithLink(context,"提示", msgId);
+    public static void showTipDialogWithLink(Context context, int msgId) {
+        showTipDialogWithLink(context, "提示", msgId);
     }
-    public static void showTipDialogWithLink(Context context, String title, int msgId){
+
+    public static void showTipDialogWithLink(Context context, String title, int msgId) {
         /*TextView view = (TextView) LayoutInflater.from(context).inflate(R.layout.dialog_textview, null);
         view.setText(msgId);
         view.setMovementMethod(LinkMovementMethod.getInstance());
         build(context).setTitle(title).setView(view).setPositiveButton("知道了", null).show();*/
-        BottomDialog.show(title, new OnBindView<BottomDialog>(R.layout.dialog_textview){
+        BottomDialog.show(title, new OnBindView<BottomDialog>(R.layout.dialog_textview) {
             @Override
             public void onBind(BottomDialog dialog, View v) {
                 TextView view = (TextView) v;
@@ -230,6 +293,7 @@ public class MyAlertDialog {
             }
         }).setCancelButton("知道了");
     }
+
 
     public interface OnVerify {
         void success(boolean needGoTo);
@@ -241,5 +305,9 @@ public class MyAlertDialog {
 
     public interface onInputChangeListener {
         void onChange(String text);
+    }
+
+    public interface OnInputFinishListener{
+        void finish(String text);
     }
 }

@@ -61,7 +61,7 @@
     <string name="menu_book_detail">书籍详情</string>
     <string name="menu_book_download">缓存书籍</string>
     <string name="menu_book_cache">导出缓存</string>
-    <string name="menu_book_delete">删除/移除书籍</string>
+    <string name="menu_book_delete">删除书籍</string>
 
     <string name="menu_bookcase_edit">编辑书架</string>
     <string name="menu_bookcase_style">切换布局</string>

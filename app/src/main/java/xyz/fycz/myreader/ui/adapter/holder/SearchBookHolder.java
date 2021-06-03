@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.util.Log;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.zhy.view.flowlayout.TagFlowLayout;
 
 import java.util.ArrayList;
@@ -75,7 +77,7 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBind(SearchBookBean data, int pos) {
+    public void onBind(RecyclerView.ViewHolder holder, SearchBookBean data, int pos) {
         List<Book> aBooks = mBooks.getValues(data);
         if (aBooks == null || aBooks.size() == 0){
             aBooks = new ArrayList<>();
