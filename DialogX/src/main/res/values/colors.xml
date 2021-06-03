@@ -37,4 +37,23 @@
     <color name="dialogxWaitBkgDark">#232323</color>
 
     <color name="dialogxPopButtonBlueDark">#86B3D6</color>
+
+
+
+    <color name="dialogxMIUIEditboxBkgDark">#222224</color>
+    <color name="dialogxMIUIEditboxBlue">#0C84FF</color>
+    <color name="dialogxMIUIEditboxBkg">#EDEDED</color>
+    <color name="dialogxMIUIEditboxBkgDeepDark">#141414</color>
+    <color name="dialogxMIUIButtonGrayNormal">#F0F0F0</color>
+    <color name="dialogxMIUIButtonGrayPress">#DCDCDC</color>
+    <color name="dialogxMIUIButtonBlueNormal">#0C84FF</color>
+    <color name="dialogxMIUIButtonBluePress">#096CD1</color>
+    <color name="dialogxMIUIButtonText">#606060</color>
+    <color name="dialogxMIUITextDark">#D3D3D3</color>
+    <color name="dialogxMIUIButtonBluePressDark">#0062BC</color>
+    <color name="dialogxMIUIButtonBlueNormalDark">#096CD1</color>
+    <color name="dialogxMIUIButtonGrayNormalDark">#333335</color>
+    <color name="dialogxMIUIButtonGrayPressDark">#29292B</color>
+    <color name="dialogxMIUIItemSelectionBkg">#1A0C84FF</color>
+    <color name="dialogxMIUIItemSelectionBkgDark">#6282BA</color>
 </resources>

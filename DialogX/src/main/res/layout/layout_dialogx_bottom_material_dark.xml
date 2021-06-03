@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="@drawable/rect_dialogx_material_bottom_bkg_night"
+            android:background="@drawable/rect_dialogx_miui_bkg_night"
             android:clickable="true"
             android:focusableInTouchMode="true">
 
@@ -44,8 +44,9 @@
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
                     android:paddingBottom="10dp"
+                    android:paddingTop="3dp"
                     android:text="Title"
-                    android:textColor="@color/white"
+                    android:textColor="@color/dialogxMIUITextDark"
                     android:textSize="21dp" />
 
                 <com.kongzue.dialogx.util.views.BottomDialogScrollView
@@ -72,7 +73,7 @@
                             android:layout_marginBottom="5dp"
                             android:paddingBottom="5dp"
                             android:text="This is content text."
-                            android:textColor="@color/white60"
+                            android:textColor="@color/dialogxMIUITextDark"
                             android:textSize="16dp" />
 
                         <RelativeLayout
@@ -89,68 +90,20 @@
 
                 </com.kongzue.dialogx.util.views.BottomDialogScrollView>
 
-                <LinearLayout
-                    android:id="@+id/box_button"
+                <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="right|center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:background="@drawable/button_dialogx_material_night"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:paddingLeft="15dp"
-                        android:paddingRight="15dp"
-                        android:text="Other"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="15dp"
-                        android:visibility="gone" />
-
-                    <Space
-                        android:id="@+id/space_other_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:background="@drawable/button_dialogx_material_night"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:paddingLeft="15dp"
-                        android:paddingRight="15dp"
-                        android:tag="cancel"
-                        android:text="Cancel"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="15dp" />
-
-                    <TextView
-                        android:id="@+id/btn_selectPositive"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:background="@drawable/button_dialogx_material_night"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:paddingLeft="15dp"
-                        android:paddingRight="15dp"
-                        android:text="OK"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="15dp" />
-
-                </LinearLayout>
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="26dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="26dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/button_dialogx_miui_gray_night"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:tag="cancel"
+                    android:text="取消"
+                    android:textColor="@color/dialogxMIUITextDark"
+                    android:textSize="16dp" />
 
             </LinearLayout>
 

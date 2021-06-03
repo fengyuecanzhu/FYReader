@@ -323,7 +323,7 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
                     public void onOneItemSelect(BottomMenu dialog, CharSequence text, int which) {
                         selectedIndex = which;
                     }
-                }).setOkButton("确定", (baseDialog, v) -> {
+                }).setCancelButton("确定", (baseDialog, v) -> {
             switch (selectedIndex) {
                 case 0:
                     begin[0] = book.getHisttoryChapterNum();
@@ -348,7 +348,7 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
             });
             mBookcasePresenter.getEs().submit(downloadThread);
             return false;
-        }).setCancelButton(R.string.cancel);
+        });
     }
 
     public void refreshBook(String chapterUrl){

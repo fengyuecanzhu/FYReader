@@ -501,11 +501,6 @@ public class BottomMenu extends BottomDialog {
                 public void down(MotionEvent event) {
                     curTouchY = dialog.bkg.getY();
                 }
-
-                @Override
-                public void move(MotionEvent event) {
-                    curTouchY = event.getRawY();
-                }
             });
             
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
