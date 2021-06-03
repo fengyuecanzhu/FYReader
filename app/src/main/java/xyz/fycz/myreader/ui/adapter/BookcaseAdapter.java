@@ -1,14 +1,20 @@
 package xyz.fycz.myreader.ui.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.*;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kongzue.dialogx.dialogs.BottomDialog;
 import com.kongzue.dialogx.dialogs.BottomMenu;
+import com.kongzue.dialogx.interfaces.OnBindView;
 import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
 import com.kongzue.dialogx.interfaces.OnMenuItemSelectListener;
 
@@ -22,12 +28,29 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.application.SysManager;
+import xyz.fycz.myreader.base.BitIntentDataManager;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
+import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
+import xyz.fycz.myreader.ui.activity.BookInfoEditActivity;
+import xyz.fycz.myreader.ui.activity.SourceEditActivity;
+import xyz.fycz.myreader.ui.adapter.helper.IItemTouchHelperViewHolder;
 import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
+import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
+import xyz.fycz.myreader.util.help.StringHelper;
+import xyz.fycz.myreader.util.utils.RxUtils;
+import xyz.fycz.myreader.util.utils.ShareBookUtil;
+import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.widget.CoverImageView;
 import xyz.fycz.myreader.widget.custom.DragAdapter;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -351,7 +374,7 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
         });
     }
 
-    public void refreshBook(String chapterUrl){
+    public void refreshBook(String chapterUrl) {
         for (int i = 0; i < list.size(); i++) {
             if (Objects.equals(list.get(i).getChapterUrl(), chapterUrl)) {
                 notifyItemChanged(i);
@@ -359,8 +382,211 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
         }
     }
 
+    public void showBookMenu(Book book, int pos) {
+        BottomDialog.show(new BookMenuDialog(book, pos));
+    }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+
+    class BookMenuDialog extends OnBindView<BottomDialog> {
+        private BottomDialog dialog;
+        private Book mBook;
+        private int pos;
+
+        private RelativeLayout rlBookDetail;
+        private CoverImageView ivBookImg;
+        private TextView tvBookName;
+        private TextView tvBookAuthor;
+        private TextView tvTop;
+        private SwitchCompat scIsUpdate;
+        private TextView tvDownload;
+        private TextView tvExport;
+        private TextView tvChangeSource;
+        private TextView tvSetGroup;
+        private TextView tvShare;
+        private TextView tvRemove;
+        private TextView tvEdit;
+        private TextView tvRefresh;
+        private TextView tvLink;
+        private TextView tvEditSource;
+
+        public BookMenuDialog(Book book, int pos) {
+            super("本地书籍".equals(book.getType()) ? R.layout.menu_book_local : R.layout.menu_book);
+            mBook = book;
+            this.pos = pos;
+        }
+
+        @Override
+        public void onBind(BottomDialog dialog, View v) {
+            this.dialog = dialog;
+            bindLocalView(v);
+            if (!"本地书籍".equals(mBook.getType())) {
+                bindView(v);
+            }
+        }
+
+        private void bindView(View v) {
+            scIsUpdate = v.findViewById(R.id.sc_is_update);
+            tvDownload = v.findViewById(R.id.tv_download);
+            tvExport = v.findViewById(R.id.tv_export_cathe);
+            tvChangeSource = v.findViewById(R.id.tv_change_source);
+            tvShare = v.findViewById(R.id.tv_share);
+            tvRefresh = v.findViewById(R.id.tv_refresh);
+            tvLink = v.findViewById(R.id.tv_link);
+            tvEditSource = v.findViewById(R.id.tv_edit_source);
+            bindEvent();
+        }
+
+        private void bindEvent() {
+            scIsUpdate.setChecked(!mBook.getIsCloseUpdate());
+            scIsUpdate.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                mBook.setIsCloseUpdate(!mBook.getIsCloseUpdate());
+                mBookService.updateEntity(mBook);
+            });
+            tvDownload.setOnClickListener(v -> {
+                dialog.dismiss();
+                downloadBook(mBook);
+            });
+            tvExport.setOnClickListener(v -> {
+                dialog.dismiss();
+                Single.create((SingleOnSubscribe<Boolean>) emitter -> {
+                    emitter.onSuccess(unionChapterCathe(mBook));
+                }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Boolean>() {
+                    @Override
+                    public void onSuccess(@NotNull Boolean aBoolean) {
+                        if (aBoolean) {
+                            DialogCreator.createTipDialog(mContext,
+                                    "缓存导出成功，导出目录："
+                                            + APPCONST.TXT_BOOK_DIR);
+                        } else {
+                            DialogCreator.createTipDialog(mContext,
+                                    "章节目录为空或未找到缓存文件，缓存导出失败！");
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        DialogCreator.createTipDialog(mContext,
+                                "章节目录为空或未找到缓存文件，缓存导出失败！");
+                    }
+                });
+            });
+            tvChangeSource.setOnClickListener(v -> {
+                this.dialog.dismiss();
+                SourceExchangeDialog dialog = new SourceExchangeDialog((Activity) mContext, mBook);
+                dialog.setOnSourceChangeListener((bean, pos) -> {
+                    Book bookTem = (Book) mBook.clone();
+                    bookTem.setChapterUrl(bean.getChapterUrl());
+                    bookTem.setInfoUrl(bean.getInfoUrl());
+                    if (!StringHelper.isEmpty(bean.getImgUrl())) {
+                        bookTem.setImgUrl(bean.getImgUrl());
+                    }
+                    if (!StringHelper.isEmpty(bean.getType())) {
+                        bookTem.setType(bean.getType());
+                    }
+                    if (!StringHelper.isEmpty(bean.getDesc())) {
+                        bookTem.setDesc(bean.getDesc());
+                    }
+                    if (!StringHelper.isEmpty(bean.getUpdateDate())) {
+                        bookTem.setUpdateDate(bean.getUpdateDate());
+                    }
+                    if (!StringHelper.isEmpty(bean.getWordCount())) {
+                        bookTem.setWordCount(bean.getWordCount());
+                    }
+                    if (!StringHelper.isEmpty(bean.getStatus())) {
+                        bookTem.setStatus(bean.getStatus());
+                    }
+                    bookTem.setSource(bean.getSource());
+                    mBookService.updateBook(mBook, bookTem);
+                    mBook = bookTem;
+                    list.set(this.pos, mBook);
+                    mBookcasePresenter.refreshBook(mBook, true);
+                });
+                dialog.show();
+            });
+            tvShare.setOnClickListener(v -> {
+                dialog.dismiss();
+                ShareBookUtil.shareBook(mContext, mBook, ivBookImg);
+            });
+            tvRefresh.setOnClickListener(v -> {
+                dialog.dismiss();
+                mBookcasePresenter.refreshBook(mBook, false);
+            });
+            tvLink.setOnClickListener(v -> {
+                ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
+                Uri uri = Uri.parse(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), mBook.getChapterUrl()));
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                App.getHandler().postDelayed(() -> mContext.startActivity(intent), 300);
+                dialog.dismiss();
+            });
+            tvEditSource.setOnClickListener(v -> {
+                BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
+                if (!TextUtils.isEmpty(source.getSourceEName())) {
+                    ToastUtils.showWarring("内置书源无法编辑！");
+                } else {
+                    Intent sourceIntent = new Intent(mContext, SourceEditActivity.class);
+                    sourceIntent.putExtra(APPCONST.BOOK_SOURCE, source);
+                    App.getHandler().postDelayed(() -> mContext.startActivity(sourceIntent), 300);
+                    dialog.dismiss();
+                }
+            });
+        }
+
+        private void bindLocalView(View v) {
+            rlBookDetail = v.findViewById(R.id.rl_book_detail);
+            ivBookImg = v.findViewById(R.id.iv_book_img);
+            tvBookName = v.findViewById(R.id.tv_book_name);
+            tvBookAuthor = v.findViewById(R.id.tv_book_author);
+            tvEdit = v.findViewById(R.id.tv_edit);
+            tvTop = v.findViewById(R.id.tv_top);
+            tvSetGroup = v.findViewById(R.id.tv_set_group);
+            tvRemove = v.findViewById(R.id.tv_remove);
+            bindLocalEvent();
+        }
+
+        private void bindLocalEvent() {
+            rlBookDetail.setOnClickListener(v -> {
+                Intent intent = new Intent(mContext, BookDetailedActivity.class);
+                BitIntentDataManager.getInstance().putData(intent, mBook);
+                App.getHandler().postDelayed(() -> mContext.startActivity(intent), 300);
+                dialog.dismiss();
+            });
+            if (!App.isDestroy((Activity) mContext)) {
+                ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(mBook.getSource());
+                ivBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), mBook.getImgUrl()), mBook.getName(), mBook.getAuthor());
+            }
+            tvBookName.setText(mBook.getName());
+            tvBookAuthor.setText(mBook.getAuthor());
+            tvEdit.setOnClickListener(v -> {
+                Intent editIntent = new Intent(mContext, BookInfoEditActivity.class);
+                BitIntentDataManager.getInstance().putData(editIntent, mBook);
+                App.getHandler().postDelayed(() -> mContext.startActivity(editIntent), 300);
+                dialog.dismiss();
+            });
+            tvTop.setOnClickListener(v -> {
+                if (!isGroup) {
+                    mBook.setSortCode(0);
+                } else {
+                    mBook.setGroupSort(0);
+                }
+                mBookService.updateEntity(mBook);
+                mBookcasePresenter.init();
+                ToastUtils.showSuccess("书籍《" + mBook.getName() + "》移至顶部成功！");
+                dialog.dismiss();
+            });
+            tvSetGroup.setOnClickListener(v -> {
+                dialog.dismiss();
+                mBookcasePresenter.addGroup(mBook);
+            });
+            tvRemove.setOnClickListener(v -> {
+                dialog.dismiss();
+                showDeleteBookDialog(mBook);
+            });
+        }
+
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder implements IItemTouchHelperViewHolder {
         CheckBox cbBookChecked;
         CoverImageView ivBookImg;
         TextView tvBookName;
@@ -369,6 +595,16 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
+        }
+
+        @Override
+        public void onItemSelected() {
+            itemView.setTranslationZ(10);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setTranslationZ(0);
         }
     }
 

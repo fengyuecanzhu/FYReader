@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.kongzue.dialogx.DialogX;
+import com.kongzue.dialogx.style.MaterialStyle;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
 
@@ -112,6 +113,7 @@ public class App extends Application {
     private void initDialogX() {
         DialogX.init(this);
         DialogX.DEBUGMODE = debug;
+        DialogX.globalStyle = MaterialStyle.style();
     }
 
     public void initNightTheme() {

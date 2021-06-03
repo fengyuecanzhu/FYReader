@@ -5,6 +5,9 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
 import xyz.fycz.myreader.common.APPCONST;
@@ -49,7 +52,7 @@ public class FileHolder extends ViewHolderImpl<File> {
     }
 
     @Override
-    public void onBind(File data, int pos) {
+    public void onBind(RecyclerView.ViewHolder holder, File data, int pos) {
         //判断是文件还是文件夹
         if (data.isDirectory()){
             setFolder(data);

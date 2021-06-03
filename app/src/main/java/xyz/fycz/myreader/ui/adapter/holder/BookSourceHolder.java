@@ -1,6 +1,8 @@
 package xyz.fycz.myreader.ui.adapter.holder;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -9,6 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.HashMap;
 
@@ -26,6 +29,8 @@ import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.SourceEditActivity;
 import xyz.fycz.myreader.ui.adapter.BookSourceAdapter;
+import xyz.fycz.myreader.ui.adapter.helper.IItemTouchHelperViewHolder;
+import xyz.fycz.myreader.ui.adapter.helper.OnStartDragListener;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -36,7 +41,7 @@ import xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout;
  * @author fengyue
  * @date 2021/2/10 16:52
  */
-public class BookSourceHolder extends ViewHolderImpl<BookSource> {
+public class BookSourceHolder extends ViewHolderImpl<BookSource> implements IItemTouchHelperViewHolder {
     private FragmentActivity activity;
     private BookSourceAdapter adapter;
     private HashMap<BookSource, Boolean> mCheckMap;
@@ -46,16 +51,22 @@ public class BookSourceHolder extends ViewHolderImpl<BookSource> {
     private CheckBox cbSourceSelect;
     private TextView tvSourceName;
     private ImageView ivSwipeLeft;
+    private ImageView ivMove;
     private Button btTop;
     private Button btBan;
     private Button btShare;
     private Button btDelete;
 
-    public BookSourceHolder(FragmentActivity activity, BookSourceAdapter adapter, BookSourceAdapter.OnSwipeListener onSwipeListener) {
+    private OnStartDragListener onStartDragListener;
+
+    public BookSourceHolder(FragmentActivity activity, BookSourceAdapter adapter,
+                            BookSourceAdapter.OnSwipeListener onSwipeListener,
+                            OnStartDragListener onStartDragListener) {
         this.activity = activity;
         this.adapter = adapter;
         this.onSwipeListener = onSwipeListener;
         mCheckMap = adapter.getCheckMap();
+        this.onStartDragListener = onStartDragListener;
     }
 
     @Override
@@ -70,25 +81,39 @@ public class BookSourceHolder extends ViewHolderImpl<BookSource> {
         cbSourceSelect = findById(R.id.cb_source_select);
         tvSourceName = findById(R.id.tv_source_name);
         ivSwipeLeft = findById(R.id.iv_swipe_left);
+        ivMove = findById(R.id.iv_move);
         btTop = findById(R.id.bt_top);
         btBan = findById(R.id.bt_ban);
         btShare = findById(R.id.bt_share);
         btDelete = findById(R.id.btnDelete);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
-    public void onBind(BookSource data, int pos) {
+    public void onBind(RecyclerView.ViewHolder holder, BookSource data, int pos) {
         banOrUse(data);
         initClick(data, pos);
         layout.setSwipeEnable(!adapter.ismEditState());
         if (adapter.ismEditState()) {
             cbSourceSelect.setVisibility(View.VISIBLE);
             ivSwipeLeft.setVisibility(View.GONE);
+            ivMove.setVisibility(View.VISIBLE);
         } else {
             cbSourceSelect.setVisibility(View.GONE);
             ivSwipeLeft.setVisibility(View.VISIBLE);
+            ivMove.setVisibility(View.GONE);
         }
         cbSourceSelect.setChecked(mCheckMap.get(data));
+        ivMove.setOnTouchListener((view, motionEvent) -> {
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        //通知ItemTouchHelper开始拖拽
+                        if (onStartDragListener != null) {
+                            onStartDragListener.onStartDrag(holder);
+                        }
+                    }
+                    return false;
+                }
+        );
     }
 
     private void initClick(BookSource data, int pos) {
@@ -174,5 +199,15 @@ public class BookSourceHolder extends ViewHolderImpl<BookSource> {
             }
             btBan.setText(R.string.enable_use);
         }
+    }
+
+    @Override
+    public void onItemSelected() {
+        getItemView().setTranslationZ(10);
+    }
+
+    @Override
+    public void onItemClear() {
+        getItemView().setTranslationZ(0);
     }
 }

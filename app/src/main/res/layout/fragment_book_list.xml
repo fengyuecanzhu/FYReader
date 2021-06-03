@@ -31,6 +31,7 @@
 
     <com.scwang.smartrefresh.layout.SmartRefreshLayout
         android:id="@+id/srl_book_list"
+        android:layout_above="@+id/rl_book_edit"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

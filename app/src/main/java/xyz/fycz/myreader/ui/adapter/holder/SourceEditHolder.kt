@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import xyz.fycz.myreader.R
@@ -30,7 +31,7 @@ class SourceEditHolder : ViewHolderImpl<EditEntity>() {
         tvTip = findById(R.id.tv_tip)
     }
 
-    override fun onBind(data: EditEntity, pos: Int) {
+    override fun onBind(holder: RecyclerView.ViewHolder, data: EditEntity, pos: Int) {
         if (editText?.getTag(R.id.tag1) == null) {
             val listener = object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) {

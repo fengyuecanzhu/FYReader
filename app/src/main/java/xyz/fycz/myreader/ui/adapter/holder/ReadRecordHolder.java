@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.kongzue.dialogx.dialogs.BottomMenu;
 import com.kongzue.dialogx.interfaces.OnMenuItemClickListener;
 
@@ -49,7 +51,7 @@ public class ReadRecordHolder extends ViewHolderImpl<ReadRecord> {
     }
 
     @Override
-    public void onBind(ReadRecord data, int pos) {
+    public void onBind(RecyclerView.ViewHolder holder, ReadRecord data, int pos) {
         if (!App.isDestroy((Activity) getContext())) {
             ivBookImg.load(data.getBookImg(), data.getBookName(), data.getBookAuthor());
         }

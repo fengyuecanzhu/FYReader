@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
+import xyz.fycz.myreader.ui.adapter.helper.IItemTouchHelperViewHolder;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -20,7 +23,7 @@ import xyz.fycz.myreader.widget.CoverImageView;
  * @author fengyue
  * @date 2020/9/7 7:35
  */
-public class BookStoreBookHolder extends ViewHolderImpl<Book> {
+public class BookStoreBookHolder extends ViewHolderImpl<Book> implements IItemTouchHelperViewHolder {
 
     private CoverImageView tvBookImg;
     private TextView tvBookName;
@@ -54,7 +57,7 @@ public class BookStoreBookHolder extends ViewHolderImpl<Book> {
     }
 
     @Override
-    public void onBind(Book data, int pos) {
+    public void onBind(RecyclerView.ViewHolder holder, Book data, int pos) {
         tvBookName.setText(data.getName());
         tvBookAuthor.setText(data.getAuthor());
         tvBookNewestChapter.setText(StringHelper.isEmpty(data.getNewestChapterTitle()) ?
@@ -75,4 +78,13 @@ public class BookStoreBookHolder extends ViewHolderImpl<Book> {
         }
     }
 
+    @Override
+    public void onItemSelected() {
+        getItemView().setTranslationZ(10);
+    }
+
+    @Override
+    public void onItemClear() {
+        getItemView().setTranslationZ(0);
+    }
 }

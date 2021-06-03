@@ -6,6 +6,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class ReplaceRuleHolder extends ViewHolderImpl<ReplaceRuleBean> {
     }
 
     @Override
-    public void onBind(ReplaceRuleBean data, int pos) {
+    public void onBind(RecyclerView.ViewHolder holder, ReplaceRuleBean data, int pos) {
         banOrUse(data);
 
         rlContent.setOnClickListener(v -> {

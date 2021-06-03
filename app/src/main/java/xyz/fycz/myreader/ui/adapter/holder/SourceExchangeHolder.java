@@ -3,6 +3,9 @@ package xyz.fycz.myreader.ui.adapter.holder;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -36,7 +39,7 @@ public class SourceExchangeHolder extends ViewHolderImpl<Book> {
     }
 
     @Override
-    public void onBind(Book data, int pos) {
+    public void onBind(RecyclerView.ViewHolder holder, Book data, int pos) {
         sourceTvTitle.setText(BookSourceManager.getSourceNameByStr(data.getSource()));
         sourceTvChapter.setText(data.getNewestChapterTitle());
         if (data.getSource() != null && data.getSource().equals(dialog.getmShelfBook().getSource()))

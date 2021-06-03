@@ -7,10 +7,12 @@ import androidx.fragment.app.FragmentActivity;
 
 import java.util.Collections;
 
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.adapter.IViewHolder;
 import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
+import xyz.fycz.myreader.ui.adapter.helper.OnStartDragListener;
 import xyz.fycz.myreader.ui.adapter.holder.BookSourceHolder;
 
 /**
@@ -21,6 +23,7 @@ import xyz.fycz.myreader.ui.adapter.holder.BookSourceHolder;
 public class BookSourceAdapter extends BaseSourceAdapter {
     private final FragmentActivity activity;
     private final OnSwipeListener onSwipeListener;
+    private  OnStartDragListener onStartDragListener;
     private boolean mEditState;
     private final ItemTouchCallback.OnItemTouchListener itemTouchListener = new ItemTouchCallback.OnItemTouchListener() {
         @Override
@@ -32,26 +35,41 @@ public class BookSourceAdapter extends BaseSourceAdapter {
         public boolean onMove(int srcPosition, int targetPosition) {
             Collections.swap(mList, srcPosition, targetPosition);
             notifyItemMoved(srcPosition, targetPosition);
-            notifyItemChanged(srcPosition);
+            /*notifyItemChanged(srcPosition);
             notifyItemChanged(targetPosition);
             AsyncTask.execute(() -> {
                 for (int i = 1; i <= mList.size(); i++) {
                     mList.get(i - 1).setOrderNum(i);
                 }
                 DbManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(mList);
-            });
+            });*/
             return true;
         }
+
+
+        @Override
+        public void onEnd() {
+            App.getHandler().postDelayed(() -> notifyDataSetChanged(), 500);
+            AsyncTask.execute(() -> {
+                for (int i = 1; i <= mList.size(); i++) {
+                    mList.get(i - 1).setOrderNum(i);
+                }
+                DbManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(mList);
+            });
+        }
+
     };
 
-    public BookSourceAdapter(FragmentActivity activity, OnSwipeListener onSwipeListener) {
+    public BookSourceAdapter(FragmentActivity activity, OnSwipeListener onSwipeListener,
+                             OnStartDragListener onStartDragListener) {
         this.activity = activity;
         this.onSwipeListener = onSwipeListener;
+        this.onStartDragListener = onStartDragListener;
     }
 
     @Override
     protected IViewHolder<BookSource> createViewHolder(int viewType) {
-        return new BookSourceHolder(activity, this, onSwipeListener);
+        return new BookSourceHolder(activity, this, onSwipeListener, onStartDragListener);
     }
 
     public ItemTouchCallback.OnItemTouchListener getItemTouchListener() {

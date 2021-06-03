@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -127,19 +128,6 @@ public class BookcasePresenter implements BasePresenter {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case 1:
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-                case 4:
-
-                    break;
-                case 5:
-                    break;
-                case 6:
-                    break;
                 case 7:
                     init();
                     break;
@@ -298,7 +286,7 @@ public class BookcasePresenter implements BasePresenter {
                 ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchCallback);
                 itemTouchHelper.attachToRecyclerView(mBookcaseFragment.getRvBook());
                 itemTouchCallback.setOnItemTouchListener(mBookcaseAdapter.getItemTouchCallbackListener());
-                itemTouchCallback.setDragEnable(false);
+                itemTouchCallback.setLongPressDragEnable(false);
                 isBookcaseStyleChange = false;
             } else {
                 mBookcaseAdapter.notifyDataSetChanged();
@@ -367,6 +355,43 @@ public class BookcasePresenter implements BasePresenter {
         }
     }
 
+
+    public void refreshBook(Book book, boolean isChangeSource){
+        mBookcaseAdapter.getIsLoading().put(book.getId(), true);
+        mBookcaseAdapter.refreshBook(book.getChapterUrl());
+        final ArrayList<Chapter> mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
+        final ReadCrawler mReadCrawler = ReadCrawlerUtil.getReadCrawler(book.getSource());
+        BookApi.getBookChapters(book, mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
+            int noReadNum = chapters.size() - book.getChapterTotalNum();
+            book.setNoReadNum(Math.max(noReadNum, 0));
+            book.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
+            mChapterService.updateAllOldChapterData(mChapters, chapters, book.getId());
+            mBookService.updateEntity(book);
+            if (isChangeSource){
+                if (mBookService.matchHistoryChapterPos(book, chapters)) {
+                    ToastUtils.showSuccess("历史阅读章节匹配成功！");
+                } else {
+                    ToastUtils.showError("历史阅读章节匹配失败！");
+                }
+            }
+            emitter.onNext(book);
+            emitter.onComplete();
+        })).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Object>() {
+            @Override
+            public void onNext(@NotNull Object o) {
+                mBookcaseAdapter.getIsLoading().put(book.getId(), false);
+                mBookcaseAdapter.refreshBook(book.getChapterUrl());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mBookcaseAdapter.getIsLoading().put(book.getId(), false);
+                mBookcaseAdapter.refreshBook(book.getChapterUrl());
+                ToastUtils.showError(String.format("《%s》目录刷新失败", book.getName()));
+                if (App.isDebug()) e.printStackTrace();
+            }
+        });
+    }
 
     private synchronized void refreshBookshelf() {
         refreshIndex++;
@@ -529,7 +554,7 @@ public class BookcasePresenter implements BasePresenter {
             if (canEditBookcase()) {
                 mMainActivity.getViewPagerMain().setEnableScroll(false);
                 mBookcaseFragment.getSrlContent().setEnableRefresh(false);
-                itemTouchCallback.setDragEnable(mSetting.getSortStyle() == 0);
+                itemTouchCallback.setLongPressDragEnable(mSetting.getSortStyle() == 0);
                 mBookcaseAdapter.setmEditState(true);
                 mBookcaseFragment.getRlBookEdit().setVisibility(View.VISIBLE);
                 mMainActivity.initMenuAnim();
@@ -543,7 +568,7 @@ public class BookcasePresenter implements BasePresenter {
         } else {
             mMainActivity.getViewPagerMain().setEnableScroll(true);
             mBookcaseFragment.getSrlContent().setEnableRefresh(true);
-            itemTouchCallback.setDragEnable(false);
+            itemTouchCallback.setLongPressDragEnable(false);
             mBookcaseAdapter.setmEditState(false);
             mBookcaseFragment.getRlBookEdit().setVisibility(View.GONE);
             mMainActivity.initMenuAnim();
@@ -659,6 +684,21 @@ public class BookcasePresenter implements BasePresenter {
     //是否有分组切换监听器
     public boolean hasOnGroupChangeListener() {
         return this.ogcl != null;
+    }
+
+    //加入分组
+    public void addGroup(Book book){
+        mBookGroupDia.addGroup(book, new BookGroupDialog.OnGroup() {
+            @Override
+            public void change() {
+                init();
+            }
+
+            @Override
+            public void addGroup() {
+                mBookcaseFragment.getmBtnAddGroup().performClick();
+            }
+        });
     }
 
 /**********************************************缓存书籍***************************************************************/
