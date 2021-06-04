@@ -4,15 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginBottom="10dp"
-    android:paddingHorizontal="10dp">
+    android:layout_marginBottom="15dp"
+    android:paddingHorizontal="15dp">
 
     <RelativeLayout
         android:id="@+id/rl_book_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingVertical="5dp">
+        android:paddingVertical="10dp">
 
         <LinearLayout
             android:id="@+id/ll_book_item"
@@ -99,10 +99,11 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/sc_is_update"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <xyz.fycz.myreader.widget.SwitchButton
+                android:id="@+id/sb_is_update"
+                android:layout_width="48dp"
+                android:layout_height="28dp"
+                app:sb_checked_color="@color/colorAccent"
                 android:layout_gravity="center_horizontal" />
 
             <TextView
