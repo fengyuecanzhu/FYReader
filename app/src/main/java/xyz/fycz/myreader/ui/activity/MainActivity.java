@@ -143,7 +143,10 @@ public class MainActivity extends BaseActivity {
         super.initClick();
 
         mToolbar.setOnLongClickListener(v -> {
-            if (binding.viewPagerMain.getCurrentItem() == 0 && !BookGroupService.getInstance().curGroupIsPrivate()) {
+            if (binding.viewPagerMain.getCurrentItem() == 0 &&
+                    !BookGroupService.getInstance().curGroupIsPrivate() &&
+                    (mBookcaseFragment.getmBookcasePresenter() != null &&
+                            !mBookcaseFragment.getmBookcasePresenter().ismEditState())) {
                 goPrivateBookcase();
                 return true;
             }

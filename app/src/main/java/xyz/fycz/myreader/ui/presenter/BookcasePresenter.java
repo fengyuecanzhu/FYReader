@@ -554,6 +554,9 @@ public class BookcasePresenter implements BasePresenter {
             if (canEditBookcase()) {
                 mMainActivity.getViewPagerMain().setEnableScroll(false);
                 mBookcaseFragment.getSrlContent().setEnableRefresh(false);
+                if (mSetting.getSortStyle() == 0){
+                    ToastUtils.showInfo("长按可移动书籍哦!");
+                }
                 itemTouchCallback.setLongPressDragEnable(mSetting.getSortStyle() == 0);
                 mBookcaseAdapter.setmEditState(true);
                 mBookcaseFragment.getRlBookEdit().setVisibility(View.VISIBLE);
