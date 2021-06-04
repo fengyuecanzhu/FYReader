@@ -4,15 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginBottom="10dp"
-    android:paddingHorizontal="10dp">
+    android:layout_marginBottom="15dp"
+    android:paddingHorizontal="15dp">
 
     <RelativeLayout
         android:id="@+id/rl_book_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingVertical="5dp">
+        android:paddingVertical="10dp">
 
         <LinearLayout
             android:id="@+id/ll_book_item"

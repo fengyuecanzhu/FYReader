@@ -696,7 +696,7 @@ public class BookcasePresenter implements BasePresenter {
 
             @Override
             public void addGroup() {
-                mBookcaseFragment.getmBtnAddGroup().performClick();
+                BookcasePresenter.this.addGroup(book);
             }
         });
     }

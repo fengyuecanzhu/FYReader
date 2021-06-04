@@ -52,6 +52,7 @@ import xyz.fycz.myreader.util.utils.ShareBookUtil;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.widget.CoverImageView;
+import xyz.fycz.myreader.widget.SwitchButton;
 import xyz.fycz.myreader.widget.custom.DragAdapter;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -397,7 +398,7 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
         private TextView tvBookName;
         private TextView tvBookAuthor;
         private TextView tvTop;
-        private SwitchCompat scIsUpdate;
+        private SwitchButton sbIsUpdate;
         private TextView tvDownload;
         private TextView tvExport;
         private TextView tvChangeSource;
@@ -425,7 +426,7 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
         }
 
         private void bindView(View v) {
-            scIsUpdate = v.findViewById(R.id.sc_is_update);
+            sbIsUpdate = v.findViewById(R.id.sb_is_update);
             tvDownload = v.findViewById(R.id.tv_download);
             tvExport = v.findViewById(R.id.tv_export_cathe);
             tvChangeSource = v.findViewById(R.id.tv_change_source);
@@ -437,8 +438,8 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
         }
 
         private void bindEvent() {
-            scIsUpdate.setChecked(!mBook.getIsCloseUpdate());
-            scIsUpdate.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            sbIsUpdate.setChecked(!mBook.getIsCloseUpdate());
+            sbIsUpdate.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 mBook.setIsCloseUpdate(!mBook.getIsCloseUpdate());
                 mBookService.updateEntity(mBook);
             });
