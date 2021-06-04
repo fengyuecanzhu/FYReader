@@ -14,6 +14,7 @@ import java.io.File;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
@@ -22,6 +23,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityAboutBinding;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -73,7 +75,9 @@ public class AboutActivity extends BaseActivity {
                 SharedPreUtils.getInstance().getString(getString(R.string.downloadLink), URLCONST.LAN_ZOUS_URL)));
         binding.il.vwUpdate.setOnClickListener(v -> App.checkVersionByServer(this, true));
         binding.il.vwUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));
-        binding.il.vwShareLog.setOnClickListener(v -> shareCrashLog());
+        binding.il.vwShareLog.setOnClickListener(v -> DialogCreator.createCommonDialog(this, "分享崩溃日志",
+                "你是希望将日志上传到服务器，还是直接分享给他人？", true,
+                "上传服务器", "直接分享", (dialog, which) -> uploadCrashLog(), (dialog, which) -> shareCrashLog()));
         binding.il.vwQq.setOnClickListener(v -> {
             if (!App.joinQQGroup(this, "8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")) {
                 //数据
@@ -99,16 +103,21 @@ public class AboutActivity extends BaseActivity {
     }
 
 
-    private void updateCrashLog() {
+    private void uploadCrashLog() {
         File logDir = new File(APPCONST.LOG_DIR);
         if (!logDir.exists() || logDir.listFiles() == null || logDir.listFiles().length == 0) {
             ToastUtils.showWarring("没有日志文件");
             return;
         }
+        final Disposable[] disposable = new Disposable[1];
+        LoadingDialog dialog = new LoadingDialog(this, "正在上传", () -> {
+            if (disposable[0] != null) disposable[0].dispose();
+        });
+        dialog.show();
+        String time = String.valueOf(System.currentTimeMillis());
+        String fileName = "log-" + time + ".zip";
+        String logZip = FileUtils.getCachePath() + File.separator + fileName;
         Observable.create((ObservableOnSubscribe<String>) emitter -> {
-            String time = String.valueOf(System.currentTimeMillis());
-            String fileName = "log-" + time + ".zip";
-            String logZip = FileUtils.getCachePath() + File.separator + fileName;
             File zipFile = FileUtils.getFile(logZip);
             if (ZipUtils.zipFile(logDir, zipFile)) {
                 emitter.onNext(OkHttpUtils.upload(URLCONST.LOG_UPLOAD_URL, logZip, fileName));
@@ -118,13 +127,23 @@ public class AboutActivity extends BaseActivity {
             emitter.onComplete();
         }).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<String>() {
             @Override
+            public void onSubscribe(Disposable d) {
+                disposable[0] = d;
+            }
+
+            @Override
             public void onNext(@NotNull String s) {
                 ToastUtils.showInfo(s);
+                FileUtils.deleteFile(APPCONST.LOG_DIR);
+                FileUtils.deleteFile(logZip);
+                dialog.dismiss();
             }
 
             @Override
             public void onError(Throwable e) {
                 ToastUtils.showError(e.getLocalizedMessage());
+                FileUtils.deleteFile(logZip);
+                dialog.dismiss();
             }
 
         });
@@ -150,7 +169,7 @@ public class AboutActivity extends BaseActivity {
         }).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<File>() {
             @Override
             public void onNext(@NotNull File file) {
-                ShareUtils.share(AboutActivity.this, file, file.getName(), "application/x-zip-compressed");
+                ShareUtils.share(AboutActivity.this, file, "分享日志文件", "application/x-zip-compressed");
             }
 
             @Override

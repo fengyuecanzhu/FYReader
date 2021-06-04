@@ -8,6 +8,8 @@ import android.view.MenuItem;
 
 import androidx.appcompat.widget.Toolbar;
 
+import java.util.Objects;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
@@ -154,9 +156,9 @@ public class BookInfoEditActivity extends BaseActivity {
     }
 
     private boolean hasChange() {
-        return !bookName.equals(binding.tieBookName.getText().toString()) ||
-                !author.equals(binding.tieBookAuthor.getText().toString()) ||
-                !imgUrl.equals(binding.tieCoverUrl.getText().toString()) ||
-                !desc.equals(binding.tieBookDesc.getText().toString());
+        return !Objects.equals(bookName, binding.tieBookName.getText().toString()) ||
+                !Objects.equals(author, binding.tieBookAuthor.getText().toString()) ||
+                !Objects.equals(imgUrl, binding.tieCoverUrl.getText().toString()) ||
+                !Objects.equals(desc, binding.tieBookDesc.getText().toString());
     }
 }
