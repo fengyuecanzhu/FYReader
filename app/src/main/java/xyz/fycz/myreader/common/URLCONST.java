@@ -2,6 +2,7 @@ package xyz.fycz.myreader.common;
 
 public class URLCONST {
 
+    public static final String OFFICIAL_WEB = "https://reader.fycz.tk/";
 
     public static String APP_DIR_UR = "https://www.lanzous.com/b00ngso7e";
 

@@ -2,7 +2,15 @@
 
 ## 一、概要
 
-风月读书，一款开源、免费的小说阅读软件。
+风月读书，是一款提供网络文学搜索和阅读的工具，为广大网络文学爱好者提供一种方便、快捷舒适的阅读体验。
+
+1.【免费阅读】百万小说，免费阅读。都市爽文、言情穿越、玄幻修仙、科幻悬疑...你想看的这里都有。
+
+2.【自定义书源】，自己动手，丰衣足食。支持多种书源类型，兼容第三方书源，再也不用担心书源不够了。
+
+3.【朗读听书】这里每一本书都能听，解放双眼，随时随地听小说。
+
+4.【私密书架】独立分组，特定入口，双重认证，全力保护您的阅读隐私。
 
 * 官网：[https://reader.fycz.tk](https://reader.fycz.tk)
 * 反馈交流群:
@@ -10,6 +18,15 @@
   * Telegram：[https://t.me/FYReader](https://t.me/FYReader)
 * [更新日志](./app/src/main/assets/updatelog.fy)
 * [免责声明](./app/src/main/assets/disclaimer.fy)
+
+<table>
+    <tr>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/p1.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/p2.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/p3.png" ></center></td>
+        <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/p4.png" ></center></td>
+    </tr>
+</table>
 
 ## 二、关于书源
 

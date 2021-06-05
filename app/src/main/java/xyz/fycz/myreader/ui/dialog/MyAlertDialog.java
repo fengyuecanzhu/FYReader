@@ -1,25 +1,43 @@
 package xyz.fycz.myreader.ui.dialog;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.kongzue.dialogx.dialogs.BottomDialog;
 import com.kongzue.dialogx.dialogs.FullScreenDialog;
+import com.kongzue.dialogx.interfaces.OnBackPressedListener;
 import com.kongzue.dialogx.interfaces.OnBindView;
 
 import xyz.fycz.myreader.R;
@@ -136,9 +154,9 @@ public class MyAlertDialog {
     }
 
 
-    public static void showFullScreenInputDia(Context context, String title, String hint, String initText,
-                                              Integer inputType, boolean cancelable, int maxLen,
-                                              OnInputFinishListener posListener) {
+    public static void showFullInputDia(Context context, String title, String hint, String initText,
+                                        Integer inputType, boolean cancelable, int maxLen,
+                                        OnInputFinishListener posListener) {
 
         FullScreenDialog.show(new OnBindView<FullScreenDialog>(R.layout.dialog_input) {
             @Override
@@ -294,6 +312,105 @@ public class MyAlertDialog {
         }).setCancelButton("知道了");
     }
 
+    public static void showPrivacyDialog(Context context, DialogInterface.OnClickListener pos, DialogInterface.OnClickListener neg) {
+        TextView view = (TextView) LayoutInflater.from(context).inflate(R.layout.dialog_textview, null);
+        String msg = context.getString(R.string.privacy_tip);
+        int start = msg.indexOf("《隐私政策》");
+        SpannableString span = new SpannableString(msg);
+        AlertDialog dialog = build(context).setTitle("风月读书APP隐私政策")
+                .setView(view)
+                .setCancelable(false)
+                .setPositiveButton("同意并继续", pos)
+                .setNegativeButton("不同意", neg)
+                .create();
+        span.setSpan(new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View widget) {
+                showFullWebViewDia(context, "file:///android_asset/PrivacyPolicy.html", false, () -> showPrivacyDialog(context, pos, neg));
+                dialog.dismiss();
+            }
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+            }
+        }, start, start + 6, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        view.setText(span);
+        view.setMovementMethod(LinkMovementMethod.getInstance());
+        dialog.show();
+    }
+
+    public static void showFullWebViewDia(Context context, String url, boolean outBrowser, OnCancel onCancel) {
+        FullScreenDialog.show(new OnBindView<FullScreenDialog>(R.layout.dialog_full_webview) {
+            @Override
+            public void onBind(final FullScreenDialog dialog, View v) {
+                TextView btnBrowser = v.findViewById(R.id.btn_browser);
+                TextView btnClose = v.findViewById(R.id.btn_close);
+                TextView tvTitle = v.findViewById(R.id.tv_title);
+                WebView webView = v.findViewById(R.id.webView);
+                ProgressBar pbLoad = v.findViewById(R.id.pb_load);
+                btnClose.setVisibility(outBrowser ? View.VISIBLE : View.GONE);
+                btnClose.setOnClickListener(v1 -> {
+                    if (onCancel != null) onCancel.cancel();
+                    dialog.dismiss();
+                });
+
+                btnBrowser.setText(outBrowser ? R.string.browser : R.string.close);
+                btnBrowser.setOnClickListener(v1 -> {
+                    if (outBrowser) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(webView.getUrl()));
+                        context.startActivity(intent);
+                    } else {
+                        if (onCancel != null) onCancel.cancel();
+                        dialog.dismiss();
+                    }
+                });
+
+                WebSettings webSettings = webView.getSettings();
+                webSettings.setJavaScriptEnabled(true);
+                webSettings.setLoadWithOverviewMode(true);
+                webSettings.setSupportZoom(true);
+                webSettings.setAllowFileAccess(true);
+                webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+                webSettings.setLoadsImagesAutomatically(true);
+                webSettings.setDefaultTextEncodingName("utf-8");
+
+                webView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                        view.loadUrl(url);
+                        return true;
+                    }
+                });
+
+                webView.setWebChromeClient(new WebChromeClient() {
+                    @Override
+                    public void onProgressChanged(WebView view, int newProgress) {
+                        if (newProgress < 100) {
+                            pbLoad.setVisibility(View.VISIBLE);
+                            pbLoad.setProgress(newProgress);
+                        } else {
+                            pbLoad.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onReceivedTitle(WebView view, String title) {
+                        tvTitle.setText(title);
+                    }
+
+                });
+
+                webView.loadUrl(url);
+            }
+        }).setOnBackPressedListener(() -> {
+            if (onCancel != null) onCancel.cancel();
+            return false;
+        });
+    }
+
 
     public interface OnVerify {
         void success(boolean needGoTo);
@@ -307,7 +424,7 @@ public class MyAlertDialog {
         void onChange(String text);
     }
 
-    public interface OnInputFinishListener{
+    public interface OnInputFinishListener {
         void finish(String text);
     }
 }

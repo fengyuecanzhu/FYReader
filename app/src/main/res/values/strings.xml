@@ -492,6 +492,12 @@
     <string name="dyys">段友影视，超清无水印广告视频站</string>
     <string name="all_read_time">总阅读时间：%s</string>
     <string name="read_record">阅读记录</string>
+    <string name="privacy_tip">\n感谢您使用风月读书APP！\n我们非常重视您的个人信息和隐私保护。为了更好地保障您的个人权益，在您使用我们的产品前，请务必审慎阅读《隐私政策》内的所有条款，当您点击“同意并继续”即表示您己阅读完毕并同意以上协议的全部内容，开始使用我们的产品和服务。</string>
+    <string name="close">关闭</string>
+    <string name="official_web">官网</string>
+    <string name="privacy_policy">隐私政策</string>
+    <string name="contact_author">联系作者</string>
+    <string name="browser">浏览器</string>
 
 
     <string-array name="reset_screen_time">

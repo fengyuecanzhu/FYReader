@@ -34,20 +34,6 @@ public class FindFragment extends BaseFragment {
     }
 
     @Override
-    protected void initWidget(Bundle savedInstanceState) {
-        super.initWidget(savedInstanceState);
-        if (!App.isDestroy(getActivity())) {
-            ImageLoader.INSTANCE.load(getContext(), "http://yunjuw.cn/template/mytheme/statics/img/logo.png")
-                    .into(binding.ivDyys);
-        }
-        binding.mineRlDyys.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("http://yunjuw.cn/"));
-            startActivity(intent);
-        });
-    }
-
-    @Override
     protected void initClick() {
         super.initClick();
         binding.findRlQidianTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false)));

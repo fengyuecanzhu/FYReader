@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
+import xyz.fycz.myreader.util.utils.MeUtils;
 
 public class DialogCreator {
 
@@ -221,22 +222,9 @@ public class DialogCreator {
      * @param assetName 需要后缀名
      */
     public static void createAssetTipDialog(Context mContext, String title, String assetName) {
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(mContext.getAssets().open(assetName)));
-            StringBuilder assetText = new StringBuilder();
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                assetText.append(line);
-                assetText.append("\r\n");
-            }
-            DialogCreator.createTipDialog(mContext, title, assetText.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            IOUtils.close(br);
-        }
+        DialogCreator.createTipDialog(mContext, title, MeUtils.getAssetStr(mContext.getAssets(), assetName));
     }
+
 
     public interface OnClickPositiveListener {
         void onClick(Dialog dialog, View view);

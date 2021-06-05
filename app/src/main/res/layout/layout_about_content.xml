@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
     android:scrollbars="vertical">
 
     <LinearLayout
@@ -15,8 +14,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
-            android:orientation="vertical">
+            android:background="@color/colorForeground"
+            android:orientation="vertical"
+            >
 
             <ImageView
                 android:layout_width="match_parent"
@@ -32,324 +32,334 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="4dp"
-                android:textColor="@color/textSecondary"
+                android:textColor="@color/textPrimary"
                 android:textSize="16sp"
                 tools:text="风月读书" />
 
         </LinearLayout>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/vm_author"
+
+        <RelativeLayout
+            android:id="@+id/rl_update"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="6dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardBackgroundColor="@color/background_card">
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="5dp">
+                android:layout_centerVertical="true"
+                android:text="@string/update"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:text="开发者"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="16sp" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_right_arrow"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="6dp">
-
-                    <xyz.fycz.myreader.widget.custom.CircleImageView
-                        android:id="@+id/ig_avatar_fycz"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginRight="16dp"
-                        android:src="@mipmap/ic_avatar_fycz" />
-
-                    <TextView
-                        android:id="@+id/fycz"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignTop="@id/ig_avatar_fycz"
-                        android:layout_toEndOf="@id/ig_avatar_fycz"
-                        android:text="ヅ风月の残烛"
-                        android:textColor="@color/textSecondary"
-                        tools:ignore="HardcodedText" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/fycz"
-                        android:layout_toEndOf="@id/ig_avatar_fycz"
-                        android:text="@string/email"
-                        android:textColor="@color/textSecondary" />
-
-                </RelativeLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/vw_share"
+        <RelativeLayout
+            android:id="@+id/rl_update_log"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="6dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardBackgroundColor="@color/background_card">
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="5dp">
+                android:layout_centerVertical="true"
+                android:text="@string/update_log"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:padding="2dp"
-                    android:src="@drawable/ic_share"
-                    app:tint="@color/textSecondary" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_right_arrow"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/tv_share"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/share_app"
-                    android:textColor="@color/textSecondary" />
-            </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/vw_update"
+        <RelativeLayout
+            android:id="@+id/rl_official_web"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="6dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardBackgroundColor="@color/background_card">
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="5dp">
+                android:layout_centerVertical="true"
+                android:text="@string/official_web"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_update"
-                    app:tint="@color/textSecondary" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_right_arrow"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/tv_update"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/update"
-                    android:textColor="@color/textSecondary" />
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/vw_update_log"
+        <RelativeLayout
+            android:id="@+id/rl_git"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="6dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardBackgroundColor="@color/background_card">
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="5dp">
+                android:layout_centerVertical="true"
+                android:text="@string/git_hub"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_list"
-                    app:tint="@color/textSecondary" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_right_arrow"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/tv_update_log"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/update_log"
-                    android:textColor="@color/textSecondary" />
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/vw_qq"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="6dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardBackgroundColor="@color/background_card">
+            android:layout_height="10dp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_qq_group"
-                    app:tint="@color/textSecondary" />
-
-                <TextView
-                    android:id="@+id/tv_qq"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/join_qq_group"
-                    android:textColor="@color/textSecondary" />
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/vw_git"
+        <RelativeLayout
+            android:id="@+id/rl_share"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="6dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardBackgroundColor="@color/background_card">
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="5dp">
+                android:layout_centerVertical="true"
+                android:text="@string/share_app"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_social_github"
-                    app:tint="@color/textSecondary" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_right_arrow"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/tv_git"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/git_hub"
-                    android:textColor="@color/textSecondary" />
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/vw_share_log"
+        <RelativeLayout
+            android:id="@+id/rl_qq"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="6dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardBackgroundColor="@color/background_card">
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="5dp">
+                android:layout_centerVertical="true"
+                android:text="@string/join_qq_group"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_upload"
-                    app:tint="@color/textSecondary" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_right_arrow"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/tv_share_log"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/share_log"
-                    android:textColor="@color/textSecondary" />
-            </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/vw_disclaimer"
+        <RelativeLayout
+            android:id="@+id/rl_contact_author"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="6dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardBackgroundColor="@color/background_card">
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="5dp">
+                android:layout_centerVertical="true"
+                android:text="@string/contact_author"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_disclaimer"
-                    app:tint="@color/textSecondary" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_right_arrow"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/tv_disclaimer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/disclaimer"
-                    android:textColor="@color/textSecondary" />
-            </LinearLayout>
+        <RelativeLayout
+            android:id="@+id/rl_share_log"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp">
 
-        </androidx.cardview.widget.CardView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/share_log"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_right_arrow"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <RelativeLayout
+            android:id="@+id/rl_privacy_policy"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/privacy_policy"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_right_arrow"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_disclaimer"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/disclaimer"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_right_arrow"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:clickable="false">
+
+            <ImageView
+                android:id="@+id/iv_links"
+                android:layout_alignParentStart="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_link"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/iv_links"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_small_size"
+                android:text="友情链接"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/rl_dyys"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/selector_common_bg"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <ImageView
+                android:id="@+id/iv_dyys"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true" />
+
+            <TextView
+                android:id="@+id/tv_dyys"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/iv_dyys"
+                android:text="@string/dyys"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
+
+        </RelativeLayout>
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

@@ -113,11 +113,24 @@ public class SplashActivity extends BaseActivity {
                 .init();
         SystemBarUtils.hideStableStatusBar(this);
         //loadImage();
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-            mPermissionsChecker = new PermissionsChecker(this);
-            requestPermission();
+        boolean agreePrivacyPolicy = SharedPreUtils.getInstance().getBoolean("agreePrivacyPolicy");
+        if (agreePrivacyPolicy) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                mPermissionsChecker = new PermissionsChecker(this);
+                requestPermission();
+            } else {
+                start();
+            }
         } else {
-            start();
+            MyAlertDialog.showPrivacyDialog(this, (dialog, which) -> {
+                SharedPreUtils.getInstance().putBoolean("agreePrivacyPolicy", true);
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                    mPermissionsChecker = new PermissionsChecker(this);
+                    requestPermission();
+                } else {
+                    start();
+                }
+            }, (dialog, which) -> finish());
         }
     }
 
