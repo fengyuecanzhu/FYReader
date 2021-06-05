@@ -12,13 +12,6 @@
 
 4.【私密书架】独立分组，特定入口，双重认证，全力保护您的阅读隐私。
 
-* 官网：[https://reader.fycz.tk](https://reader.fycz.tk)
-* 反馈交流群:
-  * QQ群：[1085028304](https://jq.qq.com/?_wv=1027&k=6pcq8YBk)
-  * Telegram：[https://t.me/FYReader](https://t.me/FYReader)
-* [更新日志](./app/src/main/assets/updatelog.fy)
-* [免责声明](./app/src/main/assets/disclaimer.fy)
-
 <table>
     <tr>
         <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/p1.png" ></center></td>
@@ -27,6 +20,13 @@
         <td ><center><img src="https://gitee.com/fengyuecanzhu/img/raw/master/FYReader/p4.png" ></center></td>
     </tr>
 </table>
+
+* 官网：[https://reader.fycz.tk](https://reader.fycz.tk)
+* 反馈交流群:
+  * QQ群：[1085028304](https://jq.qq.com/?_wv=1027&k=6pcq8YBk)
+  * Telegram：[https://t.me/FYReader](https://t.me/FYReader)
+* [更新日志](./app/src/main/assets/updatelog.fy)
+* [免责声明](./app/src/main/assets/disclaimer.fy)
 
 ## 二、关于书源
 
