@@ -358,7 +358,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             mSourceDialog.setABooks(aBooks);
         }
         String privateGroupId = SharedPreUtils.getInstance().getString("privateGroupId");
-        isPrivate = privateGroupId.equals(mBook.getGroupId());
+        isPrivate = !TextUtils.isEmpty(mBook.getGroupId()) && privateGroupId.equals(mBook.getGroupId());
     }
 
     @Override

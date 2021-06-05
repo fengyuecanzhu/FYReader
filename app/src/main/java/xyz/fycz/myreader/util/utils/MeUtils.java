@@ -1,12 +1,17 @@
 package xyz.fycz.myreader.util.utils;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Scanner;
+
+import xyz.fycz.myreader.util.IOUtils;
 
 /**
  * by yangyxd
@@ -89,5 +94,30 @@ public class MeUtils {
             inSampleSize = Math.min(widthRatio, heightRatio);
         }
         return inSampleSize;
+    }
+
+    /**
+     * 从assets文件夹之中读取文件
+     *
+     * @param am
+     * @param assetName 需要后缀名
+     */
+    public static String getAssetStr(AssetManager am, String assetName) {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(am.open(assetName)));
+            StringBuilder assetText = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                assetText.append(line);
+                assetText.append("\r\n");
+            }
+            return assetText.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            IOUtils.close(br);
+        }
+        return "";
     }
 }

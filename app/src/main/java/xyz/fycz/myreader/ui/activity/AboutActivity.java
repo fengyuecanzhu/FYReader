@@ -24,11 +24,13 @@ import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityAboutBinding;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.ZipUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 
@@ -56,40 +58,62 @@ public class AboutActivity extends BaseActivity {
     @Override
     protected void initWidget() {
         super.initWidget();
-        binding.il.tvVersionName.setText("风月读书v" + App.getStrVersionName());
+        binding.il.tvVersionName.setText(String.format("风月读书v%s", App.getStrVersionName()));
+        if (!App.isDestroy(this)) {
+            ImageLoader.INSTANCE.load(this, "http://yunjuw.cn/template/mytheme/statics/img/logo.png")
+                    .into(binding.il.ivDyys);
+        }
     }
 
     @Override
     protected void initClick() {
         super.initClick();
         ClipboardManager mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        binding.il.vmAuthor.setOnClickListener(v -> {
-            //数据
-            ClipData mClipData = ClipData.newPlainText("Label", "fy@fycz.xyz");
-            //把数据设置到剪切板上
-            assert mClipboardManager != null;
-            mClipboardManager.setPrimaryClip(mClipData);
-            ToastUtils.showSuccess("邮箱复制成功！");
-        });
-        binding.il.vwShare.setOnClickListener(v -> ShareUtils.share(this, getString(R.string.share_text) +
+        binding.il.rlUpdate.setOnClickListener(v -> App.checkVersionByServer(this, true));
+        binding.il.rlUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));
+
+        binding.il.rlShare.setOnClickListener(v -> ShareUtils.share(this, getString(R.string.share_text) +
                 SharedPreUtils.getInstance().getString(getString(R.string.downloadLink), URLCONST.LAN_ZOUS_URL)));
-        binding.il.vwUpdate.setOnClickListener(v -> App.checkVersionByServer(this, true));
-        binding.il.vwUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));
-        binding.il.vwShareLog.setOnClickListener(v -> DialogCreator.createCommonDialog(this, "分享崩溃日志",
-                "你是希望将日志上传到服务器，还是直接分享给他人？", true,
-                "上传服务器", "直接分享", (dialog, which) -> uploadCrashLog(), (dialog, which) -> shareCrashLog()));
-        binding.il.vwQq.setOnClickListener(v -> {
+        binding.il.rlQq.setOnClickListener(v -> {
             if (!App.joinQQGroup(this, "8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")) {
                 //数据
                 ClipData mClipData = ClipData.newPlainText("Label", "1085028304");
                 //把数据设置到剪切板上
-                assert mClipboardManager != null;
                 mClipboardManager.setPrimaryClip(mClipData);
                 ToastUtils.showError("未安装手Q或安装的版本不支持！\n已复制QQ群号，您可自行前往QQ添加！");
             }
         });
-        binding.il.vwGit.setOnClickListener(v -> openIntent(Intent.ACTION_VIEW, getString(R.string.this_github_url)));
-        binding.il.vwDisclaimer.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "免责声明", "disclaimer.fy"));
+
+        binding.il.rlOfficialWeb.setOnClickListener(v -> {
+            MyAlertDialog.showFullWebViewDia(this, URLCONST.OFFICIAL_WEB,
+                            true, null);
+        });
+        binding.il.rlGit.setOnClickListener(v -> {
+            MyAlertDialog.showFullWebViewDia(this, getString(R.string.this_github_url),
+                    true, null);
+        });
+
+        binding.il.rlContactAuthor.setOnClickListener(v -> {
+            //数据
+            ClipData mClipData = ClipData.newPlainText("Label", "fengyuecanzhu@gmail.com");
+            //把数据设置到剪切板上
+            mClipboardManager.setPrimaryClip(mClipData);
+            ToastUtils.showSuccess("邮箱\"fengyuecanzhu@gmail.com\"已复制到剪切板");
+        });
+        binding.il.rlShareLog.setOnClickListener(v -> DialogCreator.createCommonDialog(this, "分享崩溃日志",
+                "你是希望将日志上传到服务器，还是直接分享给他人？", true,
+                "上传服务器", "直接分享", (dialog, which) -> uploadCrashLog(), (dialog, which) -> shareCrashLog()));
+
+        binding.il.rlPrivacyPolicy.setOnClickListener(v -> MyAlertDialog
+                .showFullWebViewDia(this, "file:///android_asset/PrivacyPolicy.html",
+                        false, null));
+        binding.il.rlDisclaimer.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "免责声明", "disclaimer.fy"));
+
+        binding.il.rlDyys.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("http://yunjuw.cn/"));
+            startActivity(intent);
+        });
     }
 
     void openIntent(String intentName, String address) {

@@ -119,7 +119,7 @@ public class BookGroupDialog {
         BookGroup bookGroup = !isRename ? new BookGroup() : mBookGroups.get(groupNum);
         String oldName = bookGroup.getName();
         int maxLen = 20;
-        MyAlertDialog.showFullScreenInputDia(mContext, !isRename ? "新建分组" : "重命名分组", "请输入分组名",
+        MyAlertDialog.showFullInputDia(mContext, !isRename ? "新建分组" : "重命名分组", "请输入分组名",
                 isRename ? oldName : "", null, true, maxLen, newGroupName -> {
                     for (CharSequence oldGroupName : mGroupNames) {
                         if (oldGroupName.equals(newGroupName)) {
