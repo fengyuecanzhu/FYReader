@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.kongzue.dialogx.dialogs.BottomDialog;
 import com.kongzue.dialogx.dialogs.BottomMenu;
 import com.kongzue.dialogx.interfaces.OnBindView;
@@ -450,7 +452,23 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
             tvExport.setOnClickListener(v -> {
                 dialog.dismiss();
                 Single.create((SingleOnSubscribe<Boolean>) emitter -> {
-                    emitter.onSuccess(unionChapterCathe(mBook));
+                    XXPermissions.with(mContext)
+                            .permission(APPCONST.STORAGE_PERMISSIONS)
+                            .request(new OnPermissionCallback() {
+                                @Override
+                                public void onGranted(List<String> permissions, boolean all) {
+                                    try {
+                                        emitter.onSuccess(unionChapterCathe(mBook));
+                                    } catch (IOException e) {
+                                        emitter.onError(e);
+                                    }
+                                }
+
+                                @Override
+                                public void onDenied(List<String> permissions, boolean never) {
+                                    ToastUtils.showWarring("没有储存权限！");
+                                }
+                            });
                 }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Boolean>() {
                     @Override
                     public void onSuccess(@NotNull Boolean aBoolean) {

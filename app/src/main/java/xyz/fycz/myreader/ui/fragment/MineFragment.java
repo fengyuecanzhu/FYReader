@@ -390,7 +390,7 @@ public class MineFragment extends BaseFragment {
 
                         @Override
                         public void backupError(@io.reactivex.annotations.NonNull String msg) {
-                            DialogCreator.createTipDialog(getContext(), "未给予储存权限，备份失败！");
+                            DialogCreator.createTipDialog(getContext(), "未给予储存权限，备份失败！\n" + msg);
                         }
                     }, false);
                 }, (dialogInterface, i) -> dialogInterface.dismiss());

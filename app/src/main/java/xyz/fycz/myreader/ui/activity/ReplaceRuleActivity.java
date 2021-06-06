@@ -17,6 +17,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
 import java.util.ArrayList;
@@ -244,11 +246,23 @@ public class ReplaceRuleActivity extends BaseActivity {
                 ToastUtils.showWarring("当前没有任何规则，无法导出！");
                 return true;
             }
-            if (FileUtils.writeText(GsonExtensionsKt.getGSON().toJson(mReplaceRules),
-                    FileUtils.getFile(APPCONST.FILE_DIR + "ReplaceRule.json"))) {
-                DialogCreator.createTipDialog(this,
-                        "内容替换规则导出成功，导出位置：" + APPCONST.FILE_DIR + "ReplaceRule.json");
-            }
+            XXPermissions.with(this)
+                    .permission(APPCONST.STORAGE_PERMISSIONS)
+                    .request(new OnPermissionCallback() {
+                        @Override
+                        public void onGranted(List<String> permissions, boolean all) {
+                            if (FileUtils.writeText(GsonExtensionsKt.getGSON().toJson(mReplaceRules),
+                                    FileUtils.getFile(APPCONST.FILE_DIR + "ReplaceRule.json"))) {
+                                DialogCreator.createTipDialog(ReplaceRuleActivity.this,
+                                        "内容替换规则导出成功，导出位置：" + APPCONST.FILE_DIR + "ReplaceRule.json");
+                            }
+                        }
+
+                        @Override
+                        public void onDenied(List<String> permissions, boolean never) {
+                            ToastUtils.showWarring("没有储存权限！");
+                        }
+                    });
         } else if (itemId == R.id.action_reverse) {
             for (ReplaceRuleBean ruleBean : mReplaceRules) {
                 ruleBean.setEnable(!ruleBean.getEnable());

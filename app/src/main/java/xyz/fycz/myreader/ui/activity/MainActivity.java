@@ -386,24 +386,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case APPCONST.PERMISSIONS_REQUEST_STORAGE: {
-                // 如果取消权限，则返回的值为0
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //跳转到 FileSystemActivity
-                    Intent intent = new Intent(this, FileSystemActivity.class);
-                    startActivity(intent);
-
-                } else {
-                    ToastUtils.showWarring("用户拒绝开启读写权限");
-                }
-            }
-        }
-    }
 
     @Override
     protected void onDestroy() {

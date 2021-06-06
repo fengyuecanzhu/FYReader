@@ -25,6 +25,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadLargeFileListener;
 import com.liulishuo.filedownloader.FileDownloader;
@@ -35,9 +38,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.List;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentUpdateBinding;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.LanZousApi;
@@ -91,11 +96,19 @@ public class UpdateDialog extends Fragment {
 //            if (listener != null) {
 //                listener.onConfirm(v);
 //            } else {
-            if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE_EXTERNAL_STORAGE);
-            } else {
-                downloadApk(appUrl);
-            }
+            XXPermissions.with(mActivity)
+                    .permission(APPCONST.STORAGE_PERMISSIONS)
+                    .request(new OnPermissionCallback() {
+                        @Override
+                        public void onGranted(List<String> permissions, boolean all) {
+                            downloadApk(appUrl);
+                        }
+
+                        @Override
+                        public void onDenied(List<String> permissions, boolean never) {
+                            ToastUtils.showWarring("请勿拒绝储存权限，否则无法更新应用！");
+                        }
+                    });
 //            }
         });
         binding.btBrowser.setOnClickListener(v -> {
@@ -255,7 +268,7 @@ public class UpdateDialog extends Fragment {
         baseDownloadTask = FileDownloader.getImpl()
                 .create(decodeUrl)
                 .setPath(path, new File(path).isDirectory())
-                .setCallbackProgressMinInterval(100)
+                .setCallbackProgressMinInterval(30)
                 .setListener(new FileDownloadLargeFileListener() {
                     @Override
                     protected void pending(BaseDownloadTask task, long soFarBytes, long totalBytes) {
@@ -300,30 +313,6 @@ public class UpdateDialog extends Fragment {
         baseDownloadTask.start();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_WRITE_EXTERNAL_STORAGE) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // 权限被用户同意，可以去放肆了。
-                if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                } else {
-                    downloadApk(appUrl);
-                }
-            } else {
-                // 权限被用户拒绝了，洗洗睡吧。
-            }
-        }
-    }
 
     /**
      * 安装
