@@ -6,7 +6,7 @@ public enum Font {
 
     默认字体( "默认字体"),
     本地字体( "默认字体"),
-    方正楷体( URLCONST.LAN_ZOUS_URL + " /ilLFMe6kefe"),
+    方正楷体( URLCONST.LAN_ZOUS_URL + "/ilLFMe6kefe"),
     方正行楷( URLCONST.LAN_ZOUS_URL + "/imFvne6keji"),
     经典宋体(URLCONST.LAN_ZOUS_URL + "/idhI5e6keqf"),
     方正硬笔行书(URLCONST.LAN_ZOUS_URL + "/ilVh6ep9xja"),

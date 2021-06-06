@@ -2,7 +2,6 @@ package xyz.fycz.myreader.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -11,9 +10,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
+
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
+
+import java.util.List;
 
 import cn.bingoogolapple.qrcode.core.QRCodeView;
 import io.reactivex.Single;
@@ -22,7 +25,6 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.databinding.ActivityQrcodeCaptureBinding;
-import xyz.fycz.myreader.util.PermissionsChecker;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
@@ -40,8 +42,6 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
     private ActivityQrcodeCaptureBinding binding;
 
     private final int REQUEST_QR_IMAGE = 202;
-    private static final String CAMERA = "android.permission.CAMERA";
-    private static final int PERMISSIONS_REQUEST_CAMERA = 101;
     private boolean flashlightIsOpen;
     private boolean needScale = true;
     private String picPath;
@@ -104,16 +104,16 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
     public void onScanQRCodeSuccess(String result) {
         Log.d("onScanQRCodeSuccess", needScale + "");
         if (result == null) {
-            if (!needScale){
+            if (!needScale) {
                 needScale = true;
                 if (StringHelper.isEmpty(picPath)) {
                     return;
                 }
                 scanFromPath(picPath);
-            }else {
+            } else {
                 ToastUtils.showError("二维码扫描失败");
             }
-        }else {
+        } else {
             Intent intent = new Intent();
             Log.d("result", result);
             intent.putExtra("result", result);
@@ -124,9 +124,9 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
 
     @Override
     public void onCameraAmbientBrightnessChanged(boolean isDark) {
-        if (isDark){
+        if (isDark) {
             binding.llFlashlight.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             if (!flashlightIsOpen) {
                 binding.llFlashlight.setVisibility(View.GONE);
             }
@@ -144,32 +144,23 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
     }
 
     private void requestPermission() {
-        //获取读取和写入SD卡的权限
-        if (new PermissionsChecker(this).lacksPermissions(CAMERA)) {
-            ActivityCompat.requestPermissions(this, new String[]{CAMERA}, PERMISSIONS_REQUEST_CAMERA);
-        } else {
-            startScan();
-        }
-    }
+        //获取相机权限
+        XXPermissions.with(this)
+                .permission(Permission.CAMERA)
+                .request(new OnPermissionCallback() {
+                    @Override
+                    public void onGranted(List<String> permissions, boolean all) {
+                        //申请权限成功
+                        startScan();
+                    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CAMERA: {
-                // 如果取消权限，则返回的值为0
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //申请权限成功
-                    startScan();
-                } else {
-                    //申请权限失败
-                    finish();
-                    ToastUtils.showWarring("请给予相机权限，否则无法进行扫码！");
-                }
-                return;
-            }
-        }
+                    @Override
+                    public void onDenied(List<String> permissions, boolean never) {
+                        //申请权限失败
+                        finish();
+                        ToastUtils.showWarring("请给予相机权限，否则无法进行扫码！");
+                    }
+                });
     }
 
     // 添加菜单
@@ -206,7 +197,7 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
         }
     }
 
-    private void scanFromPath(String path){
+    private void scanFromPath(String path) {
         // 本来就用到 QRCodeView 时可直接调 QRCodeView 的方法，走通用的回调
         Single.create((SingleOnSubscribe<Bitmap>) emitter -> {
             Bitmap bitmap = BitmapFactory.decodeFile(path);
@@ -228,7 +219,7 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
 
     private void chooseFromGallery() {
         try {
-            if (needScale){
+            if (needScale) {
                 ToastUtils.showInfo("选择图片仅支持扫描书籍分享图片");
             }
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);

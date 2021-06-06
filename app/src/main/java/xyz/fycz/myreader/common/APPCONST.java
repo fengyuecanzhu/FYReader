@@ -3,8 +3,11 @@ package xyz.fycz.myreader.common;
 import android.os.Environment;
 
 import com.google.gson.reflect.TypeToken;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
 
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.util.utils.FileUtils;
 
 import java.io.File;
@@ -22,21 +25,34 @@ public class APPCONST {
     public static String privateKey;//app私钥
     public static final String KEY = "";
 
-    public static final String FILE_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/";
-    public static final String SHARE_FILE_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/share/";
-    public static final String LOG_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/log/";
-    public static final String BG_FILE_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/bg/";
-    public static final String TEM_FILE_DIR = Environment.getExternalStorageDirectory() + "/FYReader/tem/";
-    public static final String BACKUP_FILE_DIR = Environment.getExternalStorageDirectory() + "/FYReader/backup/";
-    public static final String TXT_BOOK_DIR = Environment.getExternalStorageDirectory() + "/FYReader/noveltxt/";
-    public static final String FONT_BOOK_DIR = Environment.getExternalStorageDirectory() + "/FYReader/font/";
-    public static final String UPDATE_APK_FILE_DIR = Environment.getExternalStorageDirectory() + "/FYReader/apk/";
-    public static final String QQ_DATA_DIR = Environment.getExternalStorageDirectory() + "/tencent/MobileQQ/data/";
+    public static final String[] STORAGE_PERMISSIONS = new String[]{Permission.WRITE_EXTERNAL_STORAGE,
+            Permission.READ_EXTERNAL_STORAGE};
+
+    public static final String FILE_DIR = Environment.getExternalStorageDirectory() + "/FYReader/";
+    public static String TXT_BOOK_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + "/FYReader/noveltxt/";
+
+    public static String SHARE_FILE_DIR = (hasStoragePermission() ?
+            Environment.getExternalStorageDirectory().getAbsolutePath() :
+            FileUtils.getDataDir()) + "/FYReader/share/";
+    public static String LOG_DIR = (hasStoragePermission() ?
+            Environment.getExternalStorageDirectory().getAbsolutePath() :
+            FileUtils.getDataDir()) + "/FYReader/log/";
+    public static String BG_FILE_DIR = (hasStoragePermission() ?
+            Environment.getExternalStorageDirectory().getAbsolutePath() :
+            FileUtils.getDataDir()) + "/FYReader/bg/";
+    public static String TEM_FILE_DIR = (hasStoragePermission() ?
+            Environment.getExternalStorageDirectory().getAbsolutePath() :
+            FileUtils.getDataDir()) + "/FYReader/tem/";
+    public static String BACKUP_FILE_DIR = (hasStoragePermission() ?
+            Environment.getExternalStorageDirectory().getAbsolutePath() :
+            FileUtils.getDataDir()) + "/FYReader/backup/";
+    public static String FONT_BOOK_DIR = (hasStoragePermission() ?
+            Environment.getExternalStorageDirectory().getAbsolutePath() :
+            FileUtils.getDataDir()) + "/FYReader/font/";
+    public static String QQ_DATA_DIR = Environment.getExternalStorageDirectory() + "/tencent/MobileQQ/data/";
     //BookCachePath (因为getCachePath引用了Context，所以必须是静态变量，不能够是静态常量)
     public static String BOOK_CACHE_PATH = FileUtils.getCachePath() + File.separator
-            + "book_cache"+ File.separator ;
-    public static String HTML_CACHE_PATH = FileUtils.getCachePath() + File.separator
-            + "html_cache"+ File.separator ;
+            + "book_cache" + File.separator;
 
     public static long exitTime;
     public static final int exitConfirmTime = 2000;
@@ -94,8 +110,6 @@ public class APPCONST {
 
     public static final int SELECT_FILE_CODE = 10000;
 
-    public static final int PERMISSIONS_REQUEST_STORAGE = 10001;
-
     //设置版本号
     public static final int SETTING_VERSION = 11;
 
@@ -120,4 +134,12 @@ public class APPCONST {
 
     public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36";
 
+    private static Boolean hasStoragePermission = null;
+
+    public static boolean hasStoragePermission() {
+        if (hasStoragePermission == null) {
+            hasStoragePermission = XXPermissions.isGranted(App.getmContext(), STORAGE_PERMISSIONS);
+        }
+        return hasStoragePermission;
+    }
 }

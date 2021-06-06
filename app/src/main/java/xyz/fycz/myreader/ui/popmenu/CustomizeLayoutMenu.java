@@ -22,6 +22,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
@@ -95,7 +97,7 @@ public class CustomizeLayoutMenu extends FrameLayout {
 
     public void upColor() {
         int curStyleIndex = setting.getCurReadStyleIndex();
-        if (!setting.isDayStyle()){
+        if (!setting.isDayStyle()) {
             ToastUtils.showInfo("当前正在编辑夜间模式");
             curStyleIndex = 6;
         }
@@ -237,10 +239,22 @@ public class CustomizeLayoutMenu extends FrameLayout {
                 }).show();*/
         BottomMenu.show("选择需要导出的布局", items)
                 .setOnMenuItemClickListener((dialog, text, which) -> {
-                    if (setting.exportLayout(which)){
-                        DialogCreator.createTipDialog(context,
-                                "布局配置导出成功，导出位置：" + APPCONST.FILE_DIR + "readConfig.zip");
-                    }
+                    XXPermissions.with(context)
+                            .permission(APPCONST.STORAGE_PERMISSIONS)
+                            .request(new OnPermissionCallback() {
+                                @Override
+                                public void onGranted(List<String> permissions, boolean all) {
+                                    if (setting.exportLayout(which)) {
+                                        DialogCreator.createTipDialog(context,
+                                                "布局配置导出成功，导出位置：" + APPCONST.FILE_DIR + "readConfig.zip");
+                                    }
+                                }
+
+                                @Override
+                                public void onDenied(List<String> permissions, boolean never) {
+                                    ToastUtils.showWarring("没有储存权限！");
+                                }
+                            });
                     return false;
                 });
     }
@@ -274,8 +288,8 @@ public class CustomizeLayoutMenu extends FrameLayout {
             BottomMenu.show("选择要覆盖的布局", items)
                     .setOnMenuItemClickListener((dialog, text, which) -> {
                         setting.importLayout(which, readStyle);
-                        if (!readStyle.bgIsColor() && !readStyle.bgIsAssert()){
-                            FileUtils.copy(APPCONST.TEM_FILE_DIR + "bg.fyl",APPCONST.BG_FILE_DIR + "bg" + which + ".fyl");
+                        if (!readStyle.bgIsColor() && !readStyle.bgIsAssert()) {
+                            FileUtils.copy(APPCONST.TEM_FILE_DIR + "bg.fyl", APPCONST.BG_FILE_DIR + "bg" + which + ".fyl");
                             readStyle.setBgPath(APPCONST.BG_FILE_DIR + "bg" + which + ".fyl");
                         }
                         FileUtils.deleteFile(APPCONST.TEM_FILE_DIR + "readConfig.fyl");
@@ -292,6 +306,7 @@ public class CustomizeLayoutMenu extends FrameLayout {
 
     public interface Callback {
         void upBg();
+
         void upStyle();
     }
 

@@ -72,6 +72,10 @@ public class FileUtils {
         return file;
     }
 
+    public static String getDataDir(){
+        return getFileDir().getParent();
+    }
+
     //获取Cache文件夹
     public static String getCachePath(){
         if (isSdCardExist()){

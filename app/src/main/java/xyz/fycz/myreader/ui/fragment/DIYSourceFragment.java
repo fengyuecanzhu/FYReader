@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
 import java.io.File;
@@ -197,7 +199,7 @@ public class DIYSourceFragment extends BaseFragment {
         });
 
         binding.tvSourceTip.setOnClickListener(v -> {
-            MyAlertDialog.showTipDialogWithLink(getContext(), "书源说明",R.string.DIY_source_tip);
+            MyAlertDialog.showTipDialogWithLink(getContext(), "书源说明", R.string.DIY_source_tip);
         });
 
         binding.ivGroup.setOnClickListener(this::showSourceGroupMenu);
@@ -383,20 +385,32 @@ public class DIYSourceFragment extends BaseFragment {
             ToastUtils.showWarring("当前没有选择任何书源，无法导出！");
             return;
         }
-        Single.create((SingleOnSubscribe<Boolean>) emitter -> {
-            emitter.onSuccess(FileUtils.writeText(GsonExtensionsKt.getGSON().toJson(sources),
-                    FileUtils.getFile(APPCONST.FILE_DIR + "BookSources.json")));
-        }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Boolean>() {
-            @Override
-            public void onSuccess(@NonNull Boolean aBoolean) {
-                if (aBoolean) {
-                    DialogCreator.createTipDialog(sourceActivity,
-                            "书源导出成功，导出位置：" + APPCONST.FILE_DIR + "BookSources.json");
-                } else {
-                    ToastUtils.showError("书源导出失败");
-                }
-            }
-        });
+        XXPermissions.with(this)
+                .permission(APPCONST.STORAGE_PERMISSIONS)
+                .request(new OnPermissionCallback() {
+                    @Override
+                    public void onGranted(List<String> permissions, boolean all) {
+                        Single.create((SingleOnSubscribe<Boolean>) emitter -> {
+                            emitter.onSuccess(FileUtils.writeText(GsonExtensionsKt.getGSON().toJson(sources),
+                                    FileUtils.getFile(APPCONST.FILE_DIR + "BookSources.json")));
+                        }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Boolean>() {
+                            @Override
+                            public void onSuccess(@NonNull Boolean aBoolean) {
+                                if (aBoolean) {
+                                    DialogCreator.createTipDialog(sourceActivity,
+                                            "书源导出成功，导出位置：" + APPCONST.FILE_DIR + "BookSources.json");
+                                } else {
+                                    ToastUtils.showError("书源导出失败");
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onDenied(List<String> permissions, boolean never) {
+                        ToastUtils.showWarring("没有储存权限！");
+                    }
+                });
     }
 
     private void shareSources(List<BookSource> bookSources) {
@@ -406,9 +420,9 @@ public class DIYSourceFragment extends BaseFragment {
         }
         Single.create((SingleOnSubscribe<File>) emitter -> {
             File share = FileUtils.getFile(APPCONST.SHARE_FILE_DIR + "ShareBookSources.json");
-            if (FileUtils.writeText(GsonExtensionsKt.getGSON().toJson(bookSources), share)){
+            if (FileUtils.writeText(GsonExtensionsKt.getGSON().toJson(bookSources), share)) {
                 emitter.onSuccess(share);
-            }else {
+            } else {
                 emitter.onError(new Exception("书源文件写出失败"));
             }
         }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<File>() {

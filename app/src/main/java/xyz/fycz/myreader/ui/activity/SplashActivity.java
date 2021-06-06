@@ -17,11 +17,15 @@ import androidx.core.app.ActivityCompat;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.signature.ObjectKey;
 import com.gyf.immersionbar.ImmersionBar;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
 import com.weaction.ddsdk.ad.DdSdkSplashAd;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.List;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
@@ -33,7 +37,6 @@ import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.help.DateHelper;
 import xyz.fycz.myreader.util.IOUtils;
-import xyz.fycz.myreader.util.PermissionsChecker;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.AdUtils;
@@ -46,12 +49,6 @@ public class SplashActivity extends BaseActivity {
     /*************Constant**********/
     public static final String TAG = SplashActivity.class.getSimpleName();
     public static int WAIT_INTERVAL = 0;
-    private static final int PERMISSIONS_REQUEST_STORAGE = 1;
-
-    static final String[] PERMISSIONS = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
 
     private ActivitySplashBinding binding;
     private SharedPreUtils spu;
@@ -59,7 +56,6 @@ public class SplashActivity extends BaseActivity {
     private int adTimes;
     private boolean hasStart = false;
 
-    private PermissionsChecker mPermissionsChecker;
     //创建子线程
     private Runnable start = () -> {
         if (!hasStart && !App.isDestroy(SplashActivity.this)) {
@@ -115,22 +111,12 @@ public class SplashActivity extends BaseActivity {
         //loadImage();
         boolean agreePrivacyPolicy = SharedPreUtils.getInstance().getBoolean("agreePrivacyPolicy");
         if (agreePrivacyPolicy) {
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                mPermissionsChecker = new PermissionsChecker(this);
-                requestPermission();
-            } else {
-                start();
-            }
+            requestPermission();
         } else {
             MyAlertDialog.showPrivacyDialog(this, (dialog, which) -> {
                 SharedPreUtils.getInstance().putBoolean("agreePrivacyPolicy", true);
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                    mPermissionsChecker = new PermissionsChecker(this);
-                    requestPermission();
-                } else {
-                    start();
-                }
-            }, (dialog, which) -> finish());
+                requestPermission();
+            }, (dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid()));
         }
     }
 
@@ -348,32 +334,22 @@ public class SplashActivity extends BaseActivity {
 
     private void requestPermission() {
         //获取读取和写入SD卡的权限
-        if (mPermissionsChecker.lacksPermissions(PERMISSIONS)) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONS_REQUEST_STORAGE);
-        } else {
-            start();
-        }
+        XXPermissions.with(this)
+                .permission(APPCONST.STORAGE_PERMISSIONS)
+                .request(new OnPermissionCallback() {
+                    @Override
+                    public void onGranted(List<String> permissions, boolean all) {
+                        start();
+                    }
+
+                    @Override
+                    public void onDenied(List<String> permissions, boolean never) {
+                        ToastUtils.showWarring("储存权限被拒绝，部分功能可能无法正常运行！");
+                        start();
+                    }
+                });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_STORAGE: {
-                // 如果取消权限，则返回的值为0
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //申请权限成功
-                    start();
-                } else {
-                    //申请权限失败
-                    finish();
-                    ToastUtils.showWarring("请给予储存权限，否则程序无法正常运行！");
-                }
-                return;
-            }
-        }
-    }
 
     private void countTodayAd() {
         String today = DateHelper.getYearMonthDay1();

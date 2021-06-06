@@ -21,6 +21,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
 import org.jetbrains.annotations.NotNull;
@@ -85,7 +88,6 @@ public class BookcasePresenter implements BasePresenter {
     private final ChapterService mChapterService;
     private final BookGroupService mBookGroupService;
     private final MainActivity mMainActivity;
-    private PermissionsChecker mPermissionsChecker;
     private boolean isBookcaseStyleChange;
     private Setting mSetting;
     private final List<Book> errorLoadingBooks = new ArrayList<>();
@@ -356,7 +358,7 @@ public class BookcasePresenter implements BasePresenter {
     }
 
 
-    public void refreshBook(Book book, boolean isChangeSource){
+    public void refreshBook(Book book, boolean isChangeSource) {
         mBookcaseAdapter.getIsLoading().put(book.getId(), true);
         mBookcaseAdapter.refreshBook(book.getChapterUrl());
         final ArrayList<Chapter> mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
@@ -367,7 +369,7 @@ public class BookcasePresenter implements BasePresenter {
             book.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
             mChapterService.updateAllOldChapterData(mChapters, chapters, book.getId());
             mBookService.updateEntity(book);
-            if (isChangeSource){
+            if (isChangeSource) {
                 if (mBookService.matchHistoryChapterPos(book, chapters)) {
                     ToastUtils.showSuccess("历史阅读章节匹配成功！");
                 } else {
@@ -487,19 +489,7 @@ public class BookcasePresenter implements BasePresenter {
                 showGroupManDia();
                 return true;
             case R.id.action_addLocalBook:
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                    if (mPermissionsChecker == null) {
-                        mPermissionsChecker = new PermissionsChecker(mMainActivity);
-                    }
-                    //获取读取和写入SD卡的权限
-                    if (mPermissionsChecker.lacksPermissions(PERMISSIONS)) {
-                        //请求权限
-                        ActivityCompat.requestPermissions(mMainActivity, PERMISSIONS, APPCONST.PERMISSIONS_REQUEST_STORAGE);
-                        return true;
-                    }
-                }
-                Intent fileSystemIntent = new Intent(mMainActivity, FileSystemActivity.class);
-                mMainActivity.startActivity(fileSystemIntent);
+                addLocalBook();
                 break;
             case R.id.action_download_all:
                 if (!SharedPreUtils.getInstance().getBoolean(mMainActivity.getString(R.string.isReadDownloadAllTip), false)) {
@@ -516,6 +506,23 @@ public class BookcasePresenter implements BasePresenter {
 
         }
         return false;
+    }
+
+    private void addLocalBook() {
+        XXPermissions.with(mMainActivity)
+                .permission(APPCONST.STORAGE_PERMISSIONS)
+                .request(new OnPermissionCallback() {
+                    @Override
+                    public void onGranted(List<String> permissions, boolean all) {
+                        Intent fileSystemIntent = new Intent(mMainActivity, FileSystemActivity.class);
+                        mMainActivity.startActivity(fileSystemIntent);
+                    }
+
+                    @Override
+                    public void onDenied(List<String> permissions, boolean never) {
+                        ToastUtils.showWarring("储存权限被拒绝，无法添加本地书籍！");
+                    }
+                });
     }
 
     /**
@@ -554,7 +561,7 @@ public class BookcasePresenter implements BasePresenter {
             if (canEditBookcase()) {
                 mMainActivity.getViewPagerMain().setEnableScroll(false);
                 mBookcaseFragment.getSrlContent().setEnableRefresh(false);
-                if (mSetting.getSortStyle() == 0){
+                if (mSetting.getSortStyle() == 0) {
                     ToastUtils.showInfo("长按可移动书籍哦!");
                 }
                 itemTouchCallback.setLongPressDragEnable(mSetting.getSortStyle() == 0);
@@ -690,7 +697,7 @@ public class BookcasePresenter implements BasePresenter {
     }
 
     //加入分组
-    public void addGroup(Book book){
+    public void addGroup(Book book) {
         mBookGroupDia.addGroup(book, new BookGroupDialog.OnGroup() {
             @Override
             public void change() {
@@ -882,7 +889,6 @@ public class BookcasePresenter implements BasePresenter {
             }
         }
     }
-
 
 
     /**
