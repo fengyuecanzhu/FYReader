@@ -1475,7 +1475,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         SysManager.saveSetting(mSetting);
         App.getApplication().setNightTheme(isNight);
         mHandler.postDelayed(() -> {
-            BaseDialog.initActivityContext(ActivityManage.getByClass(this.getClass()));
+            AppCompatActivity activity = ActivityManage.getByClass(this.getClass());
+            if (activity != null) {
+                BaseDialog.initActivityContext(activity);
+            }
         }, 1000);
         //mPageLoader.setPageStyle(!isCurDayStyle);
     }

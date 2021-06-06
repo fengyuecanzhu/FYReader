@@ -39,10 +39,16 @@ import xyz.fycz.myreader.util.ToastUtils;
  * @date 2021/6/3 21:46
  */
 public class ShareBookUtil {
+    public static void shareBook(Context context, Book mBook, ImageView cover) {
+        StoragePermissionUtils.request(context, (permissions, all) -> {
+            shareBook2(context, mBook, cover);
+        });
+    }
+
     /**
      * 分享书籍
      */
-    public static void shareBook(Context context, Book mBook, ImageView cover) {
+    public static void shareBook2(Context context, Book mBook, ImageView cover) {
         if ("本地书籍".equals(mBook.getType())) {
             File file = new File(mBook.getChapterUrl());
             if (!file.exists()) {

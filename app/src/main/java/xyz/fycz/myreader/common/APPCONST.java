@@ -28,31 +28,21 @@ public class APPCONST {
     public static final String[] STORAGE_PERMISSIONS = new String[]{Permission.WRITE_EXTERNAL_STORAGE,
             Permission.READ_EXTERNAL_STORAGE};
 
-    public static final String FILE_DIR = Environment.getExternalStorageDirectory() + "/FYReader/";
-    public static String TXT_BOOK_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + "/FYReader/noveltxt/";
-
-    public static String SHARE_FILE_DIR = (hasStoragePermission() ?
-            Environment.getExternalStorageDirectory().getAbsolutePath() :
-            FileUtils.getDataDir()) + "/FYReader/share/";
-    public static String LOG_DIR = (hasStoragePermission() ?
-            Environment.getExternalStorageDirectory().getAbsolutePath() :
-            FileUtils.getDataDir()) + "/FYReader/log/";
-    public static String BG_FILE_DIR = (hasStoragePermission() ?
-            Environment.getExternalStorageDirectory().getAbsolutePath() :
-            FileUtils.getDataDir()) + "/FYReader/bg/";
-    public static String TEM_FILE_DIR = (hasStoragePermission() ?
-            Environment.getExternalStorageDirectory().getAbsolutePath() :
-            FileUtils.getDataDir()) + "/FYReader/tem/";
-    public static String BACKUP_FILE_DIR = (hasStoragePermission() ?
-            Environment.getExternalStorageDirectory().getAbsolutePath() :
-            FileUtils.getDataDir()) + "/FYReader/backup/";
-    public static String FONT_BOOK_DIR = (hasStoragePermission() ?
-            Environment.getExternalStorageDirectory().getAbsolutePath() :
-            FileUtils.getDataDir()) + "/FYReader/font/";
-    public static String QQ_DATA_DIR = Environment.getExternalStorageDirectory() + "/tencent/MobileQQ/data/";
+    public static final String FILE_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/";
+    public static final String SHARE_FILE_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/share/";
+    public static String LOG_DIR =  FileUtils.getCachePath() + "/log/";
+    public static final String BG_FILE_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/bg/";
+    public static String TEM_FILE_DIR = FileUtils.getCachePath()  + "/tem/";
+    public static final String BACKUP_FILE_DIR = Environment.getExternalStorageDirectory() + "/FYReader/backup/";
+    public static final String TXT_BOOK_DIR = Environment.getExternalStorageDirectory() + "/FYReader/noveltxt/";
+    public static final String FONT_BOOK_DIR = Environment.getExternalStorageDirectory() + "/FYReader/font/";
+    public static final String UPDATE_APK_FILE_DIR = Environment.getExternalStorageDirectory() + "/FYReader/apk/";
+    public static final String QQ_DATA_DIR = Environment.getExternalStorageDirectory() + "/tencent/MobileQQ/data/";
     //BookCachePath (因为getCachePath引用了Context，所以必须是静态变量，不能够是静态常量)
     public static String BOOK_CACHE_PATH = FileUtils.getCachePath() + File.separator
-            + "book_cache" + File.separator;
+            + "book_cache"+ File.separator ;
+    public static String HTML_CACHE_PATH = FileUtils.getCachePath() + File.separator
+            + "html_cache"+ File.separator ;
 
     public static long exitTime;
     public static final int exitConfirmTime = 2000;
