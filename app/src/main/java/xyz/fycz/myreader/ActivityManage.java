@@ -3,6 +3,8 @@ package xyz.fycz.myreader;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
+import xyz.fycz.myreader.base.BaseActivity;
+
 public class ActivityManage {
 
     private static ArrayList<AppCompatActivity> activities = new ArrayList<>();
@@ -15,7 +17,7 @@ public class ActivityManage {
         activities.remove(activity);
     }
 
-    public static void finishAllActivites() {
+    public static void finishAllActivities() {
         for (AppCompatActivity activity : activities) {
             if (!activity.isFinishing()) {
                 activity.finish();
@@ -23,7 +25,7 @@ public class ActivityManage {
         }
     }
 
-    public static AppCompatActivity getActivityByCurrenlyRun(){
+    public static AppCompatActivity getActivityByCurrentlyRun(){
         if(activities.size() <= 0){
             return null;
         }
@@ -44,4 +46,12 @@ public class ActivityManage {
         return result;
     }
 
+    public static AppCompatActivity getByClass(Class<?> activity){
+        for (AppCompatActivity item : activities) {
+            if (null != item && item.getClass() == activity) {
+                return item;
+            }
+        }
+        return null;
+    }
 }

@@ -40,6 +40,7 @@ import androidx.core.content.ContextCompat;
 import com.gyf.immersionbar.ImmersionBar;
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
 import com.kongzue.dialogx.dialogs.BottomMenu;
+import com.kongzue.dialogx.interfaces.BaseDialog;
 import com.kongzue.dialogx.interfaces.OnMenuItemSelectListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -1473,6 +1474,9 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         mSetting.setDayStyle(!isNight);
         SysManager.saveSetting(mSetting);
         App.getApplication().setNightTheme(isNight);
+        mHandler.postDelayed(() -> {
+            BaseDialog.initActivityContext(ActivityManage.getByClass(this.getClass()));
+        }, 1000);
         //mPageLoader.setPageStyle(!isCurDayStyle);
     }
 

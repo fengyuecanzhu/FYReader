@@ -62,7 +62,7 @@ public abstract class BaseDialog {
         });
     }
     
-    private static void initActivityContext(Activity activity) {
+    public static void initActivityContext(Activity activity) {
         try {
             contextWeakReference = new WeakReference<>(activity);
             rootFrameLayout = new WeakReference<>((FrameLayout) activity.getWindow().getDecorView());
@@ -91,6 +91,7 @@ public abstract class BaseDialog {
         addDialogToRunningList(baseDialog);
         if (DialogX.implIMPLMode == DialogX.IMPL_MODE.VIEW) {
             if (rootFrameLayout == null || rootFrameLayout.get() == null) return;
+            log(rootFrameLayout.get());
             runOnMain(new Runnable() {
                 @Override
                 public void run() {
