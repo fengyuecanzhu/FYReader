@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
+import xyz.fycz.myreader.util.utils.StoragePermissionUtils;
 import xyz.fycz.myreader.webapi.LanZousApi;
 import xyz.fycz.myreader.webapi.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
@@ -165,11 +166,13 @@ public class FontsAdapter extends ArrayAdapter<Font> {
                             }
                         }).create();
                 dialog.show();*/
-                ToastUtils.showInfo("请选择一个ttf格式的字体文件");
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*");
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                mFontsActivity.startActivityForResult(intent, APPCONST.SELECT_FILE_CODE);
+                StoragePermissionUtils.request(mFontsActivity, (permissions, all) -> {
+                    ToastUtils.showInfo("请选择一个ttf格式的字体文件");
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("*/*");
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    mFontsActivity.startActivityForResult(intent, APPCONST.SELECT_FILE_CODE);
+                });
             });
             return;
         }
@@ -178,8 +181,10 @@ public class FontsAdapter extends ArrayAdapter<Font> {
             viewHolder.btnFontUse.setButtonColor(mFontsActivity.getResources().getColor(R.color.sys_blue_littler));
             viewHolder.btnFontUse.setText(getContext().getString(R.string.font_download));
             viewHolder.btnFontUse.setOnClickListener(v -> {
-                viewHolder.btnFontUse.setEnabled(false);
-                addDownloadFont(font, viewHolder);
+                StoragePermissionUtils.request(mFontsActivity, (permissions, all) -> {
+                    viewHolder.btnFontUse.setEnabled(false);
+                    addDownloadFont(font, viewHolder);
+                });
             });
         } else if (setting.getFont() == font) {
             viewHolder.btnFontUse.setText(getContext().getString(R.string.font_using));
@@ -206,6 +211,7 @@ public class FontsAdapter extends ArrayAdapter<Font> {
             mHandler.sendMessage(mHandler.obtainMessage(3));
             return;
         }
+
         final String[] url = {URLCONST.FONT_DOWNLOAD_URL + font.toString() + ".ttf"};
         viewHolder.btnFontUse.setText("获取连接...");
         LanZousApi.getUrl(font.downloadPath, new ResultCallback() {

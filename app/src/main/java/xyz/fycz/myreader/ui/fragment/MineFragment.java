@@ -58,6 +58,7 @@ import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.util.utils.StoragePermissionUtils;
 import xyz.fycz.myreader.webapi.ResultCallback;
 
 import static android.app.Activity.RESULT_OK;
@@ -374,35 +375,38 @@ public class MineFragment extends BaseFragment {
             ToastUtils.showWarring("当前书架无任何书籍，无法备份！");
             return;
         }
-        DialogCreator.createCommonDialog(getContext(), "确认备份吗?", "新备份会替换原有备份！", true,
-                (dialogInterface, i) -> {
-                    dialogInterface.dismiss();
+        StoragePermissionUtils.request(this, (permissions, all) -> {
+            DialogCreator.createCommonDialog(getContext(), "确认备份吗?", "新备份会替换原有备份！", true,
+                    (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
                     /*if (mBackupAndRestore.backup("localBackup")) {
                         DialogCreator.createTipDialog(getContext(), "备份成功，备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
                     } else {
                         DialogCreator.createTipDialog(getContext(), "未给予储存权限，备份失败！");
                     }*/
-                    Backup.INSTANCE.backup(App.getmContext(), APPCONST.BACKUP_FILE_DIR, new Backup.CallBack() {
-                        @Override
-                        public void backupSuccess() {
-                            DialogCreator.createTipDialog(getContext(), "备份成功，备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
-                        }
+                        Backup.INSTANCE.backup(App.getmContext(), APPCONST.BACKUP_FILE_DIR, new Backup.CallBack() {
+                            @Override
+                            public void backupSuccess() {
+                                DialogCreator.createTipDialog(getContext(), "备份成功，备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
+                            }
 
-                        @Override
-                        public void backupError(@io.reactivex.annotations.NonNull String msg) {
-                            DialogCreator.createTipDialog(getContext(), "未给予储存权限，备份失败！\n" + msg);
-                        }
-                    }, false);
-                }, (dialogInterface, i) -> dialogInterface.dismiss());
+                            @Override
+                            public void backupError(@io.reactivex.annotations.NonNull String msg) {
+                                DialogCreator.createTipDialog(getContext(), "未给予储存权限，备份失败！\n" + msg);
+                            }
+                        }, false);
+                    }, (dialogInterface, i) -> dialogInterface.dismiss());
+        });
     }
 
     /**
      * 恢复
      */
     private void restore() {
-        DialogCreator.createCommonDialog(getContext(), "确认恢复吗?", "恢复书架会覆盖原有书架！", true,
-                (dialogInterface, i) -> {
-                    dialogInterface.dismiss();
+        StoragePermissionUtils.request(this, (permissions, all) -> {
+            DialogCreator.createCommonDialog(getContext(), "确认恢复吗?", "恢复书架会覆盖原有书架！", true,
+                    (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
                     /*if (mBackupAndRestore.restore("localBackup")) {
                         mHandler.sendMessage(mHandler.obtainMessage(7));
 //                            DialogCreator.createTipDialog(mMainActivity,
@@ -412,26 +416,27 @@ public class MineFragment extends BaseFragment {
                     } else {
                         DialogCreator.createTipDialog(getContext(), "未找到备份文件或未给予储存权限，恢复失败！");
                     }*/
-                    Restore.INSTANCE.restore(APPCONST.BACKUP_FILE_DIR, new Restore.CallBack() {
-                        @Override
-                        public void restoreSuccess() {
-                            mHandler.sendMessage(mHandler.obtainMessage(7));
+                        Restore.INSTANCE.restore(APPCONST.BACKUP_FILE_DIR, new Restore.CallBack() {
+                            @Override
+                            public void restoreSuccess() {
+                                mHandler.sendMessage(mHandler.obtainMessage(7));
 //                            DialogCreator.createTipDialog(mMainActivity,
 //                                    "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");
-                            SysManager.regetmSetting();
-                            ToastUtils.showSuccess("书架恢复成功！");
-                            if (getActivity() != null) {
-                                getActivity().finish();
+                                SysManager.regetmSetting();
+                                ToastUtils.showSuccess("书架恢复成功！");
+                                if (getActivity() != null) {
+                                    getActivity().finish();
+                                }
+                                startActivity(new Intent(getContext(), MainActivity.class));
                             }
-                            startActivity(new Intent(getContext(), MainActivity.class));
-                        }
 
-                        @Override
-                        public void restoreError(@io.reactivex.annotations.NonNull String msg) {
-                            DialogCreator.createTipDialog(getContext(), "未找到备份文件或未给予储存权限，恢复失败！");
-                        }
-                    });
-                }, (dialogInterface, i) -> dialogInterface.dismiss());
+                            @Override
+                            public void restoreError(@io.reactivex.annotations.NonNull String msg) {
+                                DialogCreator.createTipDialog(getContext(), "未找到备份文件或未给予储存权限，恢复失败！");
+                            }
+                        });
+                    }, (dialogInterface, i) -> dialogInterface.dismiss());
+        });
     }
 
     /**

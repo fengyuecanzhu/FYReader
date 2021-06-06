@@ -47,6 +47,7 @@ import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.ClipBoardUtil;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
+import xyz.fycz.myreader.util.utils.StoragePermissionUtils;
 import xyz.fycz.myreader.widget.DividerItemDecoration;
 import xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout;
 
@@ -246,23 +247,13 @@ public class ReplaceRuleActivity extends BaseActivity {
                 ToastUtils.showWarring("当前没有任何规则，无法导出！");
                 return true;
             }
-            XXPermissions.with(this)
-                    .permission(APPCONST.STORAGE_PERMISSIONS)
-                    .request(new OnPermissionCallback() {
-                        @Override
-                        public void onGranted(List<String> permissions, boolean all) {
-                            if (FileUtils.writeText(GsonExtensionsKt.getGSON().toJson(mReplaceRules),
-                                    FileUtils.getFile(APPCONST.FILE_DIR + "ReplaceRule.json"))) {
-                                DialogCreator.createTipDialog(ReplaceRuleActivity.this,
-                                        "内容替换规则导出成功，导出位置：" + APPCONST.FILE_DIR + "ReplaceRule.json");
-                            }
-                        }
-
-                        @Override
-                        public void onDenied(List<String> permissions, boolean never) {
-                            ToastUtils.showWarring("没有储存权限！");
-                        }
-                    });
+            StoragePermissionUtils.request(this, (permissions, all) -> {
+                if (FileUtils.writeText(GsonExtensionsKt.getGSON().toJson(mReplaceRules),
+                        FileUtils.getFile(APPCONST.FILE_DIR + "ReplaceRule.json"))) {
+                    DialogCreator.createTipDialog(ReplaceRuleActivity.this,
+                            "内容替换规则导出成功，导出位置：" + APPCONST.FILE_DIR + "ReplaceRule.json");
+                }
+            });
         } else if (itemId == R.id.action_reverse) {
             for (ReplaceRuleBean ruleBean : mReplaceRules) {
                 ruleBean.setEnable(!ruleBean.getEnable());

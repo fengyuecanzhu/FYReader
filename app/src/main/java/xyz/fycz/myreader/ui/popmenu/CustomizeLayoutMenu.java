@@ -45,6 +45,7 @@ import xyz.fycz.myreader.util.ZipUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.MeUtils;
+import xyz.fycz.myreader.util.utils.StoragePermissionUtils;
 
 public class CustomizeLayoutMenu extends FrameLayout {
 
@@ -217,11 +218,13 @@ public class CustomizeLayoutMenu extends FrameLayout {
     }
 
     private void importLayout() {
-        ToastUtils.showInfo("请选择布局配置压缩文件");
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("application/zip");
-        context.startActivityForResult(intent, APPCONST.REQUEST_IMPORT_LAYOUT);
+        StoragePermissionUtils.request(context, (permissions, all) -> {
+            ToastUtils.showInfo("请选择布局配置压缩文件");
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("application/zip");
+            context.startActivityForResult(intent, APPCONST.REQUEST_IMPORT_LAYOUT);
+        });
     }
 
     private void exportLayout() {
@@ -237,26 +240,17 @@ public class CustomizeLayoutMenu extends FrameLayout {
                                 "布局配置导出成功，导出位置：" + APPCONST.FILE_DIR + "readConfig.zip");
                     }
                 }).show();*/
-        BottomMenu.show("选择需要导出的布局", items)
-                .setOnMenuItemClickListener((dialog, text, which) -> {
-                    XXPermissions.with(context)
-                            .permission(APPCONST.STORAGE_PERMISSIONS)
-                            .request(new OnPermissionCallback() {
-                                @Override
-                                public void onGranted(List<String> permissions, boolean all) {
-                                    if (setting.exportLayout(which)) {
-                                        DialogCreator.createTipDialog(context,
-                                                "布局配置导出成功，导出位置：" + APPCONST.FILE_DIR + "readConfig.zip");
-                                    }
-                                }
+        StoragePermissionUtils.request(context, (permissions, all) -> {
+            BottomMenu.show("选择需要导出的布局", items)
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        if (setting.exportLayout(which)) {
+                            DialogCreator.createTipDialog(context,
+                                    "布局配置导出成功，导出位置：" + APPCONST.FILE_DIR + "readConfig.zip");
+                        }
+                        return false;
+                    });
+        });
 
-                                @Override
-                                public void onDenied(List<String> permissions, boolean never) {
-                                    ToastUtils.showWarring("没有储存权限！");
-                                }
-                            });
-                    return false;
-                });
     }
 
     public void zip2Layout(String zipPath) {

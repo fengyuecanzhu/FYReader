@@ -51,6 +51,7 @@ import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.ShareBookUtil;
+import xyz.fycz.myreader.util.utils.StoragePermissionUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.widget.CoverImageView;
@@ -452,23 +453,13 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
             tvExport.setOnClickListener(v -> {
                 dialog.dismiss();
                 Single.create((SingleOnSubscribe<Boolean>) emitter -> {
-                    XXPermissions.with(mContext)
-                            .permission(APPCONST.STORAGE_PERMISSIONS)
-                            .request(new OnPermissionCallback() {
-                                @Override
-                                public void onGranted(List<String> permissions, boolean all) {
-                                    try {
-                                        emitter.onSuccess(unionChapterCathe(mBook));
-                                    } catch (IOException e) {
-                                        emitter.onError(e);
-                                    }
-                                }
-
-                                @Override
-                                public void onDenied(List<String> permissions, boolean never) {
-                                    ToastUtils.showWarring("没有储存权限！");
-                                }
-                            });
+                    StoragePermissionUtils.request(mContext, (permissions, all) -> {
+                        try {
+                            emitter.onSuccess(unionChapterCathe(mBook));
+                        } catch (IOException e) {
+                            emitter.onError(e);
+                        }
+                    });
                 }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Boolean>() {
                     @Override
                     public void onSuccess(@NotNull Boolean aBoolean) {
