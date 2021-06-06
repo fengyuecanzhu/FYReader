@@ -150,7 +150,7 @@ object Restore {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : MySingleObserver<Boolean>() {
                     override fun onSuccess(t: Boolean) {
-                        App.getApplication().initNightTheme()
+                        //App.getApplication().initNightTheme()
                         callBack?.restoreSuccess()
                     }
 
