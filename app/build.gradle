@@ -213,6 +213,11 @@ dependencies {
     //XXPermissions
     implementation 'com.github.getActivity:XXPermissions:11.2'
 
+    //epub
+    implementation('com.positiondev.epublib:epublib-core:3.1') {
+        exclude group: 'org.slf4j'
+        exclude group: 'xmlpull'
+    }
 }
 
 greendao {

@@ -66,7 +66,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="5dp"
-            android:background="@drawable/menu_book_detail"
+            android:background="@drawable/shape_runway"
             android:paddingHorizontal="10dp"
             android:paddingVertical="5dp"
             android:text="详情"

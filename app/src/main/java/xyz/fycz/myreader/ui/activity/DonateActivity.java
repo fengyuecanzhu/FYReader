@@ -16,10 +16,12 @@ import java.util.List;
 
 import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityDonateBinding;
+import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.AdUtils;
 
@@ -60,25 +62,30 @@ public class DonateActivity extends BaseActivity {
 
     private void initAd() {
         binding.llAdSupport.setVisibility(View.VISIBLE);
-        new DdSdkFlowAd().getFlowViews(DonateActivity.this, 6, 1, new DdSdkFlowAd.FlowCallback() {
+        int flowAdCount = SharedPreUtils.getInstance().getInt("flowAdCount", 2);
+        int count = App.isDebug() ? flowAdCount : 1;
+        new DdSdkFlowAd().getFlowViews(DonateActivity.this, 6, count, new DdSdkFlowAd.FlowCallback() {
             // 信息流广告拉取完毕后返回的 views
             @Override
             public void getFlowViews(List<View> views) {
-                Log.i(TAG, "信息流广告拉取完毕后返回了" + views.size() + "个view");
-                binding.llAdSupport.addView(views.get(0), 2);
+                Log.d(TAG, "信息流广告拉取完毕后返回了" + views.size() + "个view");
+                for (int i = 0; i < views.size(); i++) {
+                    View view = views.get(i);
+                    binding.llAdSupport.addView(view, i + 2);
+                }
             }
 
             // 信息流广告展示后调用
             @Override
             public void show() {
                 AdUtils.adRecord("flow","adShow");
-                Log.i(TAG, "信息流广告展示成功");
+                Log.d(TAG, "信息流广告展示成功");
             }
 
             // 广告拉取失败调用
             @Override
             public void error(String msg) {
-                Log.i(TAG, "广告拉取失败\n" + msg);
+                Log.d(TAG, "广告拉取失败\n" + msg);
             }
         });
     }
@@ -92,13 +99,13 @@ public class DonateActivity extends BaseActivity {
             DdSdkRewardAd.show(this, new DdSdkRewardAd.DdSdkRewardCallback() {
                 @Override
                 public void show() {
-                    Log.i(TAG, "激励视频展示成功");
+                    Log.d(TAG, "激励视频展示成功");
                     AdUtils.adRecord("rewardVideo","adShow");
                 }
 
                 @Override
                 public void click() {
-                    Log.i(TAG, "激励视频被点击");
+                    Log.d(TAG, "激励视频被点击");
                     AdUtils.adRecord("rewardVideo","adClick");
                 }
 
@@ -108,13 +115,13 @@ public class DonateActivity extends BaseActivity {
 
                 @Override
                 public void skip() {
-                    Log.i(TAG, "激励视频被跳过");
+                    Log.d(TAG, "激励视频被跳过");
                     AdUtils.adRecord("rewardVideo","adSkip");
                 }
 
                 @Override
                 public void finishCountdown() {
-                    Log.i(TAG, "激励视频计时完成");
+                    Log.d(TAG, "激励视频计时完成");
                     AdUtils.adRecord("rewardVideo","adFinishCount");
                 }
             });

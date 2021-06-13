@@ -21,6 +21,7 @@ import xyz.fycz.myreader.ui.fragment.BaseFileFragment;
 import xyz.fycz.myreader.ui.fragment.FileCategoryFragment;
 import xyz.fycz.myreader.ui.fragment.LocalBookFragment;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.FileUtils;
 
 
 /**
@@ -187,7 +188,7 @@ public class FileSystemActivity extends BaseTabActivity {
             if (!file.exists()) continue;
 
             Book book = new Book();
-            book.setName(file.getName().replace(".txt", ""));
+            book.setName(file.getName().replace(FileUtils.SUFFIX_EPUB, "").replace(FileUtils.SUFFIX_TXT, ""));
             book.setChapterUrl(file.getAbsolutePath());
             book.setType("本地书籍");
             book.setHistoryChapterId("未开始阅读");

@@ -72,7 +72,7 @@ public class LocalBookFragment extends BaseFileFragment {
         //更新媒体库
         try {
             MediaScannerConnection.scanFile(getContext(), new String[]{Environment
-                    .getExternalStorageDirectory().getAbsolutePath()}, new String[]{"text/plain"}, null);
+                    .getExternalStorageDirectory().getAbsolutePath()}, new String[]{"text/plain", "application/epub+zip"}, null);
         }catch (Exception e){
             e.printStackTrace();
         }

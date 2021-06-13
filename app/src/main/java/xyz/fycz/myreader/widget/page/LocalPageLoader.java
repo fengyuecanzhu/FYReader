@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.widget.page;
 
 import android.util.Log;
+
 import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.webapi.ResultCallback;
@@ -55,14 +56,67 @@ public class LocalPageLoader extends PageLoader {
     //编码类型
     private String mCharset;
 
-    private Disposable mChapterDisp = null;
-
     private ChapterService mChapterService;
 
     public LocalPageLoader(PageView pageView, Book collBook, ChapterService mChapterService, Setting setting) {
         super(pageView, collBook, setting);
         mStatus = STATUS_PARING;
         this.mChapterService = mChapterService;
+    }
+
+    @Override
+    public void refreshChapterList() {
+        // 对于文件是否存在，或者为空的判断，不作处理。 ==> 在文件打开前处理过了。
+        mBookFile = new File(mCollBook.getChapterUrl());
+
+        mCharset = mCollBook.getInfoUrl();
+
+        // 判断文件是否已经加载过，并具有缓存
+        if (mCollBook.getChapterTotalNum() != 0) {
+
+            mChapterList = mChapterService.findBookAllChapterByBookId(mCollBook.getId());
+            isChapterListPrepare = true;
+
+            //提示目录加载完成
+            if (mPageChangeListener != null) {
+                mPageChangeListener.onCategoryFinish(mChapterList);
+            }
+
+            // 加载并显示当前章节
+            openChapter();
+
+            return;
+        }
+        // 通过RxJava异步处理分章事件
+        Single.create((SingleOnSubscribe<List<Chapter>>) e -> {
+            e.onSuccess(loadChapters());
+        }).compose(RxUtils::toSimpleSingle).subscribe(new SingleObserver<List<Chapter>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                mChapterDis = d;
+            }
+
+            @Override
+            public void onSuccess(List<Chapter> chapters) {
+                mChapterDis = null;
+                isChapterListPrepare = true;
+                mCollBook.setInfoUrl(mCharset);
+                mChapterList = chapters;
+                mChapterService.addChapters(mChapterList);
+                //提示目录加载完成
+                if (mPageChangeListener != null) {
+                    mPageChangeListener.onCategoryFinish(mChapterList);
+                }
+                // 加载并显示当前章节
+                openChapter();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                chapterError(e.getLocalizedMessage());
+                Log.d(TAG, "file load error:" + e.toString());
+            }
+        });
     }
 
     /**
@@ -135,7 +189,7 @@ public class LocalPageLoader extends PageLoader {
                             //如果序章大小大于500才添加进去
                             if (preChapter.getEnd() - preChapter.getStart() > 500) {
                                 mChapterList.add(preChapter);
-                            }else {
+                            } else {
                                 //加入简介
                                 mCollBook.setDesc(chapterContent);
                             }
@@ -259,35 +313,6 @@ public class LocalPageLoader extends PageLoader {
         return mChapterList;
     }
 
-    public void loadChapters(final ResultCallback resultCallback) {
-        // 通过RxJava异步处理分章事件
-        Single.create((SingleOnSubscribe<List<Chapter>>) e -> {
-            e.onSuccess(loadChapters());
-        }).compose(RxUtils::toSimpleSingle).subscribe(new SingleObserver<List<Chapter>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                mChapterDisp = d;
-            }
-
-            @Override
-            public void onSuccess(List<Chapter> chapters) {
-                mChapterDisp = null;
-                isChapterListPrepare = true;
-                mCollBook.setInfoUrl(mCharset);
-                if (resultCallback != null) {
-                    resultCallback.onFinish(chapters, 1);
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                resultCallback.onError((Exception) e);
-                chapterError(e.getLocalizedMessage());
-                Log.d(TAG, "file load error:" + e.toString());
-            }
-        });
-
-    }
 
     /**
      * 从文件中提取一章的内容
@@ -341,39 +366,6 @@ public class LocalPageLoader extends PageLoader {
     }
 
 
-    @Override
-    public void closeBook() {
-        super.closeBook();
-        if (mChapterDisp != null) {
-            mChapterDisp.dispose();
-            mChapterDisp = null;
-        }
-    }
-
-    @Override
-    public void refreshChapterList() {
-        // 对于文件是否存在，或者为空的判断，不作处理。 ==> 在文件打开前处理过了。
-        mBookFile = new File(mCollBook.getChapterUrl());
-
-        mCharset = mCollBook.getInfoUrl();
-
-        // 判断文件是否已经加载过，并具有缓存
-        if (mCollBook.getChapterTotalNum() != 0) {
-
-            mChapterList = mChapterService.findBookAllChapterByBookId(mCollBook.getId());
-            isChapterListPrepare = true;
-
-            //提示目录加载完成
-            if (mPageChangeListener != null) {
-                mPageChangeListener.onCategoryFinish(mChapterList);
-            }
-
-            // 加载并显示当前章节
-            openChapter();
-
-            return;
-        }
-    }
 
     @Override
     protected BufferedReader getChapterReader(Chapter chapter) throws Exception {

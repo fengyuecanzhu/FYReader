@@ -427,7 +427,7 @@ public class SearchBookActivity extends BaseActivity {
                 public void onSuccess(@NotNull String s) {
                     parseSuggestionList(s);
                     if (mSuggestions.size() > 0) {
-                        binding.tgSuggestBook.setTags(mSuggestions.subList(0, 5));
+                        binding.tgSuggestBook.setTags(mSuggestions.subList(0, mSuggestions.size() / 2));
                     } else {
                         binding.llSuggestBooksView.setVisibility(View.GONE);
                     }
@@ -467,9 +467,9 @@ public class SearchBookActivity extends BaseActivity {
                 if (mSuggestions.size() > 0) {
                     String[] s = binding.tgSuggestBook.getTags();
                     if (s[0].equals(mSuggestions.get(0))) {
-                        binding.tgSuggestBook.setTags(mSuggestions.subList(5, 10));
+                        binding.tgSuggestBook.setTags(mSuggestions.subList(mSuggestions.size() / 2, mSuggestions.size()));
                     } else {
-                        binding.tgSuggestBook.setTags(mSuggestions.subList(0, 5));
+                        binding.tgSuggestBook.setTags(mSuggestions.subList(0, mSuggestions.size() / 2));
                     }
                 }
             }

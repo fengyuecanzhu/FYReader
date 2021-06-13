@@ -1,77 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:background="@color/colorBackground"
-        android:scrollbars="vertical">
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:scrollbars="vertical">
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:clickable="false">
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:clickable="false"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
 
             <ImageView
-                    android:id="@+id/iv_top"
-                    android:layout_alignParentStart="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_leaderboard"
-            />
+                android:id="@+id/iv_quotation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_quotations" />
+
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="15dp"
-                    android:layout_toEndOf="@id/iv_top"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="@dimen/text_small_size"
-                    android:text="排行榜"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/iv_quotation"
+                android:text="语录"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_small_size" />
+        </RelativeLayout>
+        <LinearLayout
+            android:id="@+id/find_rl_quotation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_common_bg"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="20dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_quotation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="恰沐春风共同游，终只叹，木已舟。"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_small_size" />
+
+            <TextView
+                android:id="@+id/tv_from"
+                android:paddingTop="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="--- 网易云"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_small_size" />
+
+        </LinearLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:clickable="false"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <ImageView
+                android:id="@+id/iv_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_leaderboard" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/iv_top"
+                android:text="排行榜"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_small_size" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/find_rl_qidian_top"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/find_qidian"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
+
         </RelativeLayout>
 
         <RelativeLayout
-                android:id="@+id/find_rl_qidian_top"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:background="@drawable/selector_common_bg">
+            android:id="@+id/find_rl_qidian_ns_top"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
 
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="@dimen/text_normal_size"
-                    android:text="@string/find_qidian"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-                android:id="@+id/find_rl_qidian_ns_top"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:background="@drawable/selector_common_bg">
-
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="@dimen/text_normal_size"
-                    android:text="@string/find_qidian_ns"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/find_qidian_ns"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
 
         </RelativeLayout>
 
@@ -94,142 +149,145 @@
         </RelativeLayout>-->
 
         <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:clickable="false">
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:clickable="false"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
 
             <ImageView
-                    android:id="@+id/iv_sort"
-                    android:layout_alignParentStart="true"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_sort"
-            />
+                android:id="@+id/iv_sort"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_sort" />
+
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="15dp"
-                    android:layout_toEndOf="@id/iv_sort"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="@dimen/text_small_size"
-                    android:text="分类"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/iv_sort"
+                android:text="分类"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_small_size" />
         </RelativeLayout>
 
         <RelativeLayout
-                android:id="@+id/find_rl_qidian_sort"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:background="@drawable/selector_common_bg">
+            android:id="@+id/find_rl_qidian_sort"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
 
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="@dimen/text_normal_size"
-                    android:text="@string/find_qidian"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-                android:id="@+id/find_rl_qidian_ns_sort"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:background="@drawable/selector_common_bg">
-
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="@dimen/text_normal_size"
-                    android:text="@string/find_qidian_ns"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/find_qidian"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
 
         </RelativeLayout>
 
         <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:clickable="false">
+            android:id="@+id/find_rl_qidian_ns_sort"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/find_qidian_ns"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:clickable="false"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
 
             <ImageView
-                    android:id="@+id/iv_store"
-                    android:layout_alignParentStart="true"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_bookstore"
-            />
+                android:id="@+id/iv_store"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_bookstore" />
+
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="15dp"
-                    android:layout_toEndOf="@id/iv_store"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="@dimen/text_small_size"
-                    android:text="书城"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/iv_store"
+                android:text="书城"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_small_size" />
         </RelativeLayout>
+
         <RelativeLayout
             android:id="@+id/find_rl_ben100_store"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:background="@drawable/selector_common_bg"
             android:visibility="visible">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
+                android:text="@string/read_ben100"
                 android:textColor="@color/textSecondary"
-                android:textSize="@dimen/text_normal_size"
-                android:text="@string/read_ben100"/>
+                android:textSize="@dimen/text_normal_size" />
 
         </RelativeLayout>
-        <RelativeLayout
-                android:id="@+id/find_rl_qb5_store"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:background="@drawable/selector_common_bg">
 
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="@dimen/text_normal_size"
-                    android:text="@string/read_qb5"/>
-
-        </RelativeLayout>
         <RelativeLayout
-            android:id="@+id/find_rl_miaoqu_store"
+            android:id="@+id/find_rl_qb5_store"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:background="@drawable/selector_common_bg">
+            android:paddingRight="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
+                android:text="@string/read_qb5"
                 android:textColor="@color/textSecondary"
-                android:textSize="@dimen/text_normal_size"
-                android:text="@string/read_miaobi"/>
+                android:textSize="@dimen/text_normal_size" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/find_rl_miaoqu_store"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/read_miaobi"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
 
         </RelativeLayout>
 
