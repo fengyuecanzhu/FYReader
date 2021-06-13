@@ -60,7 +60,8 @@ public class JiuTaoReadCrawler extends BaseReadCrawler {
         String content = Html.fromHtml(divContent.html()).toString();
         char c = 160;
         String spaec = "" + c;
-        content = content.replace(spaec, "  ").replaceAll("您可以在.*最新章节！|\\\\", "");
+        content = content.replace(spaec, "  ")
+                .replaceAll("您可以在.*最新章节！|\\\\", "");
         return content;
     }
 

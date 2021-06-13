@@ -40,7 +40,6 @@ import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
 public class FindFragment extends BaseFragment {
 
     private FragmentFindBinding binding;
-    private Quotation quotation;
 
     @Override
     protected View bindView(LayoutInflater inflater, ViewGroup container) {
@@ -49,23 +48,14 @@ public class FindFragment extends BaseFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    protected void initWidget(Bundle savedInstanceState) {
         getQuotation();
     }
 
     @Override
     protected void initClick() {
         super.initClick();
-        binding.findRlQuotation.setOnClickListener(v -> {
-            if (quotation == null) return;
-            ClipboardManager mClipboardManager = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-            //数据
-            ClipData mClipData = ClipData.newPlainText("Label", quotation.toString());
-            //把数据设置到剪切板上
-            mClipboardManager.setPrimaryClip(mClipData);
-            ToastUtils.showSuccess("语录已复制到剪切板");
-        });
+        binding.findRlQuotation.setOnClickListener(v -> getQuotation());
         binding.findRlQidianTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false)));
         binding.findRlQidianNsTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(true)));
         //binding.findRlXs7Top.setOnClickListener(v -> comeToBookstore(new XS7Rank()));
@@ -91,7 +81,6 @@ public class FindFragment extends BaseFragment {
         }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Quotation>() {
             @Override
             public void onSuccess(@NotNull Quotation q) {
-                quotation = q;
                 binding.tvQuotation.setText(q.getHitokoto());
                 binding.tvFrom.setText(String.format("--- %s", q.getFrom()));
             }
