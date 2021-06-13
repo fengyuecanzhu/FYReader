@@ -99,6 +99,7 @@ import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
 import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.ColorUtil;
+import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.ScreenUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
@@ -1022,7 +1023,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private void skipToChapterAndPage(int chapterPos, int pagePos) {
         mPageLoader.setPrev(false);
         if (StringHelper.isEmpty(mChapters.get(chapterPos).getContent())) {
-            if ("本地书籍".equals(mBook.getType())) {
+            if ("本地书籍".equals(mBook.getType()) &&
+                    !mBook.getChapterUrl().endsWith(FileUtils.SUFFIX_EPUB)) {
                 ToastUtils.showWarring("该章节无内容！");
                 return;
             }
