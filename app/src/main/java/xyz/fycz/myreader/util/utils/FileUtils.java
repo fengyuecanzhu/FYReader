@@ -451,11 +451,7 @@ public class FileUtils {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            IOUtils.close(out);
         }
 
         return writeSucc;

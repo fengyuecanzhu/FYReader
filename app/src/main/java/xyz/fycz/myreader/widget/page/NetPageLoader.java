@@ -1,6 +1,8 @@
 package xyz.fycz.myreader.widget.page;
 
 
+import android.util.Log;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -12,6 +14,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.common.APPCONST;
@@ -38,38 +43,61 @@ public class NetPageLoader extends PageLoader {
         this.mReadCrawler = mReadCrawler;
     }
 
-    /*private List<BookChapterBean> convertTxtChapter(List<Chapter> bookChapters) {
-        List<BookChapterBean> txtChapters = new ArrayList<>(bookChapters.size());
-        for (Chapter bean : bookChapters) {
-            BookChapterBean chapter = new BookChapterBean();
-            chapter.setBookId(bean.getBookId());
-            chapter.setTitle(bean.getTitle());
-            chapter.setLink(bean.getUrl());
-            txtChapters.add(chapter);
-        }
-        return txtChapters;
-    }*/
 
     @Override
     public void refreshChapterList() {
         List<Chapter> chapters = mChapterService.findBookAllChapterByBookId(mCollBook.getId());
-        if (chapters == null) return;
+        if (chapters != null && !chapters.isEmpty()) {
+            mChapterList = chapters;
+            isChapterListPrepare = true;
 
-        // 将 BookChapter 转换成当前可用的 Chapter
-//        mChapterList = convertTxtChapter(chapters);
-        mChapterList = chapters;
-        isChapterListPrepare = true;
+            // 目录加载完成，执行回调操作。
+            if (mPageChangeListener != null) {
+                mPageChangeListener.onCategoryFinish(mChapterList);
+            }
 
-        // 目录加载完成，执行回调操作。
-        if (mPageChangeListener != null) {
-            mPageChangeListener.onCategoryFinish(mChapterList);
+            // 如果章节未打开
+            if (!isChapterOpen()) {
+                // 打开章节
+                openChapter();
+            }
+            return;
         }
+        mStatus = STATUS_LOADING_CHAPTER;
+        BookApi.getBookChapters(mCollBook, mReadCrawler)
+                .flatMap((Function<List<Chapter>, ObservableSource<List<Chapter>>>) newChapters -> Observable.create(emitter -> {
+                   for (Chapter chapter : newChapters){
+                       chapter.setId(StringHelper.getStringRandom(25));
+                       chapter.setBookId(mCollBook.getId());
+                   }
+                   emitter.onNext(newChapters);
+                }))
+                .compose(RxUtils::toSimpleSingle)
+                .subscribe(new MyObserver<List<Chapter>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        mChapterDis = d;
+                    }
 
-        // 如果章节未打开
-        if (!isChapterOpen()) {
-            // 打开章节
-            openChapter();
-        }
+                    @Override
+                    public void onNext(@NotNull List<Chapter> chapters) {
+                        mChapterDis = null;
+                        isChapterListPrepare = true;
+                        mChapterList = chapters;
+                        //提示目录加载完成
+                        if (mPageChangeListener != null) {
+                            mPageChangeListener.onCategoryFinish(mChapterList);
+                        }
+                        // 加载并显示当前章节
+                        openChapter();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        chapterError(e.getLocalizedMessage());
+                        Log.d(TAG, "file load error:" + e.toString());
+                    }
+                });
     }
 
     @Override

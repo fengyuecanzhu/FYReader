@@ -15,7 +15,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 import android.util.Log;
@@ -50,7 +49,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.ActivityManage;
@@ -64,8 +62,8 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityReadBinding;
 import xyz.fycz.myreader.entity.Setting;
-import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.enums.Font;
+import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookMark;
@@ -92,26 +90,23 @@ import xyz.fycz.myreader.ui.popmenu.CustomizeComMenu;
 import xyz.fycz.myreader.ui.popmenu.CustomizeLayoutMenu;
 import xyz.fycz.myreader.ui.popmenu.ReadSettingMenu;
 import xyz.fycz.myreader.util.BrightUtil;
-import xyz.fycz.myreader.util.help.DateHelper;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.SystemUtil;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.help.DateHelper;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
 import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.ColorUtil;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.ScreenUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.util.utils.SystemBarUtils;
 import xyz.fycz.myreader.webapi.BookApi;
-import xyz.fycz.myreader.webapi.ResultCallback;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.widget.BubblePopupView;
-import xyz.fycz.myreader.widget.page.LocalPageLoader;
 import xyz.fycz.myreader.widget.page.PageLoader;
 import xyz.fycz.myreader.widget.page.PageMode;
 import xyz.fycz.myreader.widget.page.PageView;
@@ -133,7 +128,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     /***************************variable*****************************/
     private Book mBook;
     private List<Book> aBooks;
-    private ArrayList<Chapter> mChapters = new ArrayList<>();
+    private List<Chapter> mChapters = new ArrayList<>();
     private ChapterService mChapterService;
     private BookService mBookService;
     private BookMarkService mBookMarkService;
@@ -212,55 +207,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         }
     };
 
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-                    init();
-                    break;
-                case 2:
-                    try {
-                        int chapterPos = msg.arg1;
-                        int pagePos = msg.arg2;
-                        mPageLoader.skipToChapter(chapterPos);
-                        mPageLoader.skipToPage(pagePos);
-                    } catch (Exception e) {
-                        //ToastUtils.showError("章节跳转失败，请截图联系作者。\n" + e.getMessage());
-                        e.printStackTrace();
-                    }
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    saveLastChapterReadPosition();
-                    screenOffTimerStart();
-                    initMenu();
-                    break;
-                case 5:
-                    if (mPageLoader != null) {
-                        mPageLoader.refreshUi();
-                    }
-                    break;
-                case 6:
-                    mPageLoader.setmStatus(PageLoader.STATUS_LOADING);
-                    break;
-                case 7:
-                    ToastUtils.showWarring("无网络连接！");
-                    mPageLoader.chapterError("无网络连接！");
-                    break;
-                case 8:
-                    binding.pbLoading.setVisibility(View.GONE);
-                    break;
-                case 9:
-                    ToastUtils.showInfo("正在后台缓存书籍，具体进度可查看通知栏！");
-                    notificationUtil.requestNotificationPermissionDialog(ReadActivity.this);
-                    break;
-            }
-        }
-    };
-
+    private Handler mHandler = new Handler();
 
     @Override
     protected void bindView() {
@@ -335,6 +282,9 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         if (pagePos != -1 && chapterPos != -1) {
             mBook.setHisttoryChapterNum(chapterPos);
             mBook.setLastReadPosition(pagePos);
+        } else {
+            pagePos = mBook.getLastReadPosition();
+            chapterPos = mBook.getHisttoryChapterNum();
         }
         if (SharedPreUtils.getInstance().getBoolean(getString(R.string.isNightFS), false)) {
             mSetting.setDayStyle(!ColorUtil.isColorLight(getResources().getColor(R.color.textPrimary)));
@@ -373,7 +323,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         if (!mSetting.isBrightFollowSystem()) {
             BrightUtil.setBrightness(this, mSetting.getBrightProgress());
         }
-        binding.pbLoading.setVisibility(View.VISIBLE);
         initEyeView();
         initSettingListener();
         initTopMenu();
@@ -437,12 +386,26 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 new PageLoader.OnPageChangeListener() {
                     @Override
                     public void onChapterChange(int pos) {
+                        chapterPos = pos;
                         mBook.setHistoryChapterId(mChapters.get(pos).getTitle());
                         recordReadTime();
                     }
 
                     @Override
                     public void onCategoryFinish(List<Chapter> chapters) {
+                        mChapters = chapters;
+                        mBook.setNoReadNum(0);
+                        mBook.setChapterTotalNum(chapters.size());
+                        mBook.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
+                        if (hasChangeSource) {
+                            mBookService.matchHistoryChapterPos(mBook, mChapters);
+                            skipToChapterAndPage(mBook.getHisttoryChapterNum(), mBook.getLastReadPosition());
+                            hasChangeSource = false;
+                            mChapterService.addChapters(chapters);
+                        }
+                        mBookService.updateEntity(mBook);
+                        loadFinish = true;
+                        invalidateOptionsMenu();
                     }
 
                     @Override
@@ -452,7 +415,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
                     @Override
                     public void onPageChange(int pos, boolean resetRead) {
-                        mHandler.sendMessage(mHandler.obtainMessage(4));
+                        pagePos = pos;
+                        saveLastChapterReadPosition();
+                        screenOffTimerStart();
+                        initMenu();
                         recordReadTime();
                         if (ReadAloudService.running) {
                             if (mPageLoader.hasChapterData(mChapters.get(mPageLoader.getChapterPos()))) {
@@ -617,7 +583,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         }
         //保存最近阅读时间
         mBook.setLastReadTime(DateHelper.getLongDate());
-        getData();
+        init();
     }
 
 
@@ -723,9 +689,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             autoPageStop();
         }
         ReadAloudService.stop(this);
-        for (int i = 0; i < 9; i++) {
-            mHandler.removeMessages(i + 1);
-        }
         if (mPageLoader != null) {
             mPageLoader.closeBook();
             mPageLoader = null;
@@ -843,7 +806,9 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     boolean needRefresh = data.getBooleanExtra(APPCONST.RESULT_NEED_REFRESH, false);
                     boolean upMenu = data.getBooleanExtra(APPCONST.RESULT_UP_MENU, false);
                     if (needRefresh) {
-                        mHandler.sendEmptyMessage(5);
+                        if (mPageLoader != null) {
+                            mPageLoader.refreshUi();
+                        }
                     }
                     if (upMenu) {
                         initTopMenu();
@@ -904,19 +869,16 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         screenOffTimerStart();
         mPageLoader.init();
         mPageLoader.refreshChapterList();
-        loadFinish = true;
-        invalidateOptionsMenu();
-        mHandler.sendMessage(mHandler.obtainMessage(8));
     }
 
     private void initMenu() {
         if (mChapters != null && mChapters.size() != 0) {
-            Chapter curChapter = mChapters.get(mPageLoader.getChapterPos());
+            Chapter curChapter = mChapters.get(chapterPos);
             String url = curChapter.getUrl();
             binding.tvChapterTitleTop.setText(curChapter.getTitle());
             binding.tvChapterUrl.setText(StringHelper.isEmpty(url) ? curChapter.getId() :
                     NetworkUtils.getAbsoluteURL(mReadCrawler.getNameSpace(), url));
-            binding.readSbChapterProgress.setProgress(mPageLoader.getPagePos());
+            binding.readSbChapterProgress.setProgress(pagePos);
             binding.readSbChapterProgress.setMax(mPageLoader.getAllPagePos() - 1);
             binding.readTvPageTip.setText(String.format("%s/%s",
                     binding.readSbChapterProgress.getProgress() + 1, binding.readSbChapterProgress.getMax() + 1));
@@ -1023,85 +985,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         }, (dialog, which) -> dialog.dismiss());
     }
     /************************章节相关*************************/
-    /**
-     * 章节数据网络同步
-     */
-    private void getData() {
-        mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
-        if (!isCollected || mChapters.size() == 0 || ("本地书籍".equals(mBook.getType()) && !ChapterService.isChapterCached(mBook.getId(), mChapters.get(0).getTitle())
-        )) {
-            if ("本地书籍".equals(mBook.getType())) {
-                if (!new File(mBook.getChapterUrl()).exists()) {
-                    ToastUtils.showWarring("书籍缓存为空且源文件不存在，书籍加载失败！");
-                    finish();
-                    return;
-                }
-                if (mChapters.size() != 0 && mChapters.get(0).getEnd() > 0) {
-                    initChapters();
-                    return;
-                }
-                ((LocalPageLoader) mPageLoader).loadChapters(new ResultCallback() {
-                    @Override
-                    public void onFinish(Object o, int code) {
-                        ArrayList<Chapter> chapters = (ArrayList<Chapter>) o;
-                        mBook.setChapterTotalNum(chapters.size());
-                        mBook.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
-                        mBookService.updateEntity(mBook);
-                        if (mChapters.size() == 0) {
-                            updateAllOldChapterData(chapters);
-                        }
-                        initChapters();
-                        mHandler.sendMessage(mHandler.obtainMessage(1));
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        e.printStackTrace();
-                        mChapters.clear();
-                        initChapters();
-                        mHandler.sendMessage(mHandler.obtainMessage(1));
-                    }
-                });
-            } else {
-                mPageLoader.setmStatus(PageLoader.STATUS_LOADING_CHAPTER);
-                BookApi.getBookChapters(mBook, mReadCrawler).flatMap(chapters -> Observable.create(emitter -> {
-                    updateAllOldChapterData(chapters);
-                    initChapters();
-                    emitter.onNext(chapters);
-                    emitter.onComplete();
-                })).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Object>() {
-
-                    @Override
-                    public void onNext(@NotNull Object o) {
-                        mPageLoader.setmStatus(PageLoader.STATUS_LOADING);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mHandler.sendMessage(mHandler.obtainMessage(1));
-                        if (App.isDebug()) e.printStackTrace();
-                    }
-                });
-            }
-        } else {
-            initChapters();
-        }
-    }
-
-    /**
-     * 更新所有章节
-     *
-     * @param newChapters
-     */
-    private void updateAllOldChapterData(List<Chapter> newChapters) {
-        for (Chapter newChapter : newChapters) {
-            newChapter.setId(StringHelper.getStringRandom(25));
-            newChapter.setBookId(mBook.getId());
-            mChapters.add(newChapter);
-//                mChapterService.addChapter(newChapters.get(j));
-        }
-        mChapterService.addChapters(mChapters);
-    }
 
     /**
      * 初始化章节
@@ -1114,7 +997,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         }
         if (mChapters.size() == 0) {
             ToastUtils.showWarring("该书查询不到任何章节");
-            mHandler.sendMessage(mHandler.obtainMessage(8));
         } else {
             if (mBook.getHisttoryChapterNum() < 0) {
                 mBook.setHisttoryChapterNum(0);
@@ -1122,14 +1004,11 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 mBook.setHisttoryChapterNum(mChapters.size() - 1);
             }
             if ("本地书籍".equals(mBook.getType())) {
-                mHandler.sendMessage(mHandler.obtainMessage(1));
                 return;
             }
             if (hasChangeSource) {
                 mBookService.matchHistoryChapterPos(mBook, mChapters);
             }
-            mHandler.sendMessage(mHandler.obtainMessage(1));
-            mHandler.sendMessage(mHandler.obtainMessage(4));
         }
     }
 
@@ -1140,7 +1019,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * @param chapterPos
      * @param pagePos
      */
-    private void skipToChapterAndPage(final int chapterPos, final int pagePos) {
+    private void skipToChapterAndPage(int chapterPos, int pagePos) {
         mPageLoader.setPrev(false);
         if (StringHelper.isEmpty(mChapters.get(chapterPos).getContent())) {
             if ("本地书籍".equals(mBook.getType())) {
@@ -1148,7 +1027,13 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 return;
             }
         }
-        mHandler.sendMessage(mHandler.obtainMessage(2, chapterPos, pagePos));
+        try {
+            mPageLoader.skipToChapter(chapterPos);
+            mPageLoader.skipToPage(pagePos);
+        } catch (Exception e) {
+            //ToastUtils.showError("章节跳转失败，请截图联系作者。\n" + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -1156,11 +1041,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      */
     public void saveLastChapterReadPosition() {
         if (!StringHelper.isEmpty(mBook.getId()) && mPageLoader.getPageStatus() == PageLoader.STATUS_FINISH) {
-            mBook.setLastReadPosition(mPageLoader.getPagePos());
-            mBook.setHisttoryChapterNum(mPageLoader.getChapterPos());
+            mBook.setLastReadPosition(pagePos);
+            mBook.setHisttoryChapterNum(chapterPos);
             mBookService.updateEntity(mBook);
         }
     }
+
     /********************菜单相关*************************/
     /**
      * 初始化顶部菜单
@@ -1663,7 +1549,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         }
         needCacheChapterNum = needDownloadChapters.size();
         if (needCacheChapterNum > 0) {
-            mHandler.sendEmptyMessage(9);
+            ToastUtils.showInfo("正在后台缓存书籍，具体进度可查看通知栏！");
+            notificationUtil.requestNotificationPermissionDialog(ReadActivity.this);
             mHandler.postDelayed(sendDownloadNotification, 2 * downloadInterval);
         }
         App.getApplication().newThread(() -> {

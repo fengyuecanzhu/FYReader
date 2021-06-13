@@ -127,11 +127,11 @@ public abstract class PageLoader {
     // 加载器的颜色主题
 //    private PageStyle mPageStyle;
     //书籍绘制区域的宽高
-    private int mVisibleWidth;
-    private int mVisibleHeight;
+    protected int mVisibleWidth;
+    protected int mVisibleHeight;
     //应用的宽高
-    private int mDisplayWidth;
-    private int mDisplayHeight;
+    protected int mDisplayWidth;
+    protected int mDisplayHeight;
     //间距
     private int mMarginTop;
     private int mMarginBottom;
@@ -168,6 +168,8 @@ public abstract class PageLoader {
 
     private Bitmap bgBitmap;
     private ChapterContentHelp contentHelper = new ChapterContentHelp();
+
+    protected Disposable mChapterDis = null;
 
     public void resetReadAloudParagraph() {
         readAloudParagraph = -1;
@@ -806,6 +808,10 @@ public abstract class PageLoader {
         mNextChapter = null;
         mPageView = null;
         mCurPage = null;
+        if (mChapterDis != null) {
+            mChapterDis.dispose();
+            mChapterDis = null;
+        }
     }
 
     private void clearList(List list) {
@@ -1503,7 +1509,7 @@ public abstract class PageLoader {
         if (mPageChangeListener != null) {
             readAloudParagraph = -1;
             mPageChangeListener.onChapterChange(mCurChapterPos);
-            mPageChangeListener.onPageChange(0, resetReadAloud);
+            mPageChangeListener.onPageChange(mCollBook.getLastReadPosition(), resetReadAloud);
             resetReadAloud = true;
             mPageChangeListener.onPageCountChange(mCurChapter != null ? mCurChapter.getPageSize() : 0);
         }

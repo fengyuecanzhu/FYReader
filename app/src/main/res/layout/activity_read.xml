@@ -80,14 +80,6 @@
         tools:visibility="gone"
         android:focusable="true" />
 
-    <ProgressBar
-        android:id="@+id/pb_loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cursor_left"
         android:layout_width="wrap_content"

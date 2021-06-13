@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.ui.activity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 
@@ -10,10 +11,12 @@ import com.kongzue.dialogx.dialogs.BottomMenu;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.databinding.ActivityAdSettingBinding;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.help.DateHelper;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -81,6 +84,7 @@ public class AdSettingActivity extends BaseActivity {
                 binding.scAd.setChecked(aBoolean);
                 if (aBoolean) {
                     binding.llAdSetting.setVisibility(View.VISIBLE);
+                    binding.rlFlowAdCount.setVisibility(App.isDebug() ? View.VISIBLE : View.GONE);
                 }
                 loadingDialog.dismiss();
             }
@@ -93,6 +97,15 @@ public class AdSettingActivity extends BaseActivity {
         String curAdTimesStr = getAdTimesStr(curAdTimes);
         binding.tvSplashCurAdTimes.setText(getString(R.string.splash_cur_ad_times, curAdTimesStr, curAdCount + "次"));
         binding.scBookDetailAd.setChecked(bookDetailAd);
+        binding.rlFlowAdCount.setOnClickListener(v -> {
+            int[] n = new int[1];
+            MyAlertDialog.createInputDia(this, "", "", "",
+                    true, 1, (MyAlertDialog.onInputChangeListener) text -> {
+                        n[0] = Integer.parseInt(text);
+                    }, (dialog, which) -> {
+                        SharedPreUtils.getInstance().putInt("flowAdCount", n[0]);
+                    });
+        });
     }
 
     @Override

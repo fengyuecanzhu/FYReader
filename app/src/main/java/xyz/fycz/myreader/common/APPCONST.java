@@ -31,6 +31,7 @@ public class APPCONST {
     public static final String FILE_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/";
     public static final String SHARE_FILE_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/share/";
     public static String LOG_DIR =  FileUtils.getCachePath() + "/log/";
+    public static String COVER_DIR =  FileUtils.getCachePath() + "/covers/";
     public static final String BG_FILE_DIR =  Environment.getExternalStorageDirectory() + "/FYReader/bg/";
     public static String TEM_FILE_DIR = FileUtils.getCachePath()  + "/tem/";
     public static final String BACKUP_FILE_DIR = Environment.getExternalStorageDirectory() + "/FYReader/backup/";
@@ -124,12 +125,4 @@ public class APPCONST {
 
     public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36";
 
-    private static Boolean hasStoragePermission = null;
-
-    public static boolean hasStoragePermission() {
-        if (hasStoragePermission == null) {
-            hasStoragePermission = XXPermissions.isGranted(App.getmContext(), STORAGE_PERMISSIONS);
-        }
-        return hasStoragePermission;
-    }
 }

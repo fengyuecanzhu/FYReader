@@ -22,6 +22,7 @@ import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.ChapterService;
+import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.SnackbarUtils;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.widget.animation.*;
@@ -493,7 +494,11 @@ public class PageView extends View {
         }
         // 获取具体的加载器
         if ("本地书籍".equals(collBook.getType())) {
-            mPageLoader = new LocalPageLoader(this, collBook, ChapterService.getInstance(), setting);
+            if (collBook.getChapterUrl().endsWith(FileUtils.SUFFIX_EPUB)){
+                mPageLoader = new EpubPageLoader(this, collBook, setting);
+            }else {
+                mPageLoader = new LocalPageLoader(this, collBook, ChapterService.getInstance(), setting);
+            }
         } else {
             mPageLoader = new NetPageLoader(this, collBook, ChapterService.getInstance(), mReadCrawler, setting);
         }

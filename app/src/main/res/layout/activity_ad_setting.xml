@@ -145,6 +145,16 @@
                 android:text="@string/book_detail_ad"
                 android:textColor="@color/textPrimary" />
         </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_flow_ad_count"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:visibility="gone"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"/>
+
     </LinearLayout>
 
     <RelativeLayout

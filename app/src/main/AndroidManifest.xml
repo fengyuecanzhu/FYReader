@@ -109,6 +109,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
+                <data android:mimeType="application/epub+zip"/>
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.FontsActivity" />

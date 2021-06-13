@@ -1,5 +1,8 @@
 package xyz.fycz.myreader.ui.fragment;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,12 +10,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.jetbrains.annotations.NotNull;
+
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseFragment;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.FragmentFindBinding;
+import xyz.fycz.myreader.entity.Quotation;
 import xyz.fycz.myreader.ui.activity.BookstoreActivity;
+import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.ImageLoader;
+import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 import xyz.fycz.myreader.webapi.crawler.find.Ben100FindCrawler;
 import xyz.fycz.myreader.webapi.crawler.find.MiaoBiFindCrawler;
@@ -26,6 +40,7 @@ import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
 public class FindFragment extends BaseFragment {
 
     private FragmentFindBinding binding;
+    private Quotation quotation;
 
     @Override
     protected View bindView(LayoutInflater inflater, ViewGroup container) {
@@ -34,8 +49,23 @@ public class FindFragment extends BaseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getQuotation();
+    }
+
+    @Override
     protected void initClick() {
         super.initClick();
+        binding.findRlQuotation.setOnClickListener(v -> {
+            if (quotation == null) return;
+            ClipboardManager mClipboardManager = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+            //数据
+            ClipData mClipData = ClipData.newPlainText("Label", quotation.toString());
+            //把数据设置到剪切板上
+            mClipboardManager.setPrimaryClip(mClipData);
+            ToastUtils.showSuccess("语录已复制到剪切板");
+        });
         binding.findRlQidianTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(false)));
         binding.findRlQidianNsTop.setOnClickListener(v -> comeToBookstore(new QiDianMobileRank(true)));
         //binding.findRlXs7Top.setOnClickListener(v -> comeToBookstore(new XS7Rank()));
@@ -48,10 +78,24 @@ public class FindFragment extends BaseFragment {
     }
 
 
-    private void comeToBookstore(FindCrawler findCrawler){
+    private void comeToBookstore(FindCrawler findCrawler) {
         Intent intent = new Intent(getContext(), BookstoreActivity.class);
         intent.putExtra(APPCONST.FIND_CRAWLER, findCrawler);
         startActivity(intent);
+    }
+
+    private void getQuotation() {
+        Single.create((SingleOnSubscribe<Quotation>) emitter -> {
+            String json = OkHttpUtils.getHtml(URLCONST.QUOTATION);
+            emitter.onSuccess(GsonExtensionsKt.getGSON().fromJson(json, Quotation.class));
+        }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Quotation>() {
+            @Override
+            public void onSuccess(@NotNull Quotation q) {
+                quotation = q;
+                binding.tvQuotation.setText(q.getHitokoto());
+                binding.tvFrom.setText(String.format("--- %s", q.getFrom()));
+            }
+        });
     }
 
     public boolean isRecreate() {
