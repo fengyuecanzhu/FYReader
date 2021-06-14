@@ -1,11 +1,7 @@
 package xyz.fycz.myreader.widget.page;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.text.TextUtils;
 import android.util.Log;
-
 
 import net.sf.jazzlib.ZipFile;
 
@@ -18,6 +14,7 @@ import org.jsoup.select.Elements;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -27,7 +24,6 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -65,6 +61,8 @@ public class EpubPageLoader extends PageLoader {
 
         Observable.create((ObservableOnSubscribe<xyz.fycz.myreader.greendao.entity.Book>) e -> {
             File bookFile = new File(mCollBook.getChapterUrl());
+            if (!bookFile.exists())
+                e.onError(new FileNotFoundException("书籍源文件不存在\n" + mCollBook.getChapterUrl()));
             epubBook = readBook(bookFile);
 
             if (epubBook == null) {
@@ -76,7 +74,7 @@ public class EpubPageLoader extends PageLoader {
             }
             mCharset = Charset.forName(mCollBook.getInfoUrl());
 
-            if (TextUtils.isEmpty(mCollBook.getImgUrl())){
+            if (TextUtils.isEmpty(mCollBook.getImgUrl())) {
                 saveCover();
             }
             e.onNext(mCollBook);
@@ -99,7 +97,7 @@ public class EpubPageLoader extends PageLoader {
 
                     @Override
                     public void onError(Throwable e) {
-                        chapterError(e.getMessage());
+                        error(STATUS_CATEGORY_ERROR, e.getMessage());
                     }
                 });
     }
@@ -157,7 +155,9 @@ public class EpubPageLoader extends PageLoader {
 
     private List<Chapter> loadChapters() {
         Metadata metadata = epubBook.getMetadata();
-        mCollBook.setName(metadata.getFirstTitle());
+        if (!TextUtils.isEmpty(metadata.getFirstTitle())) {
+            mCollBook.setName(metadata.getFirstTitle());
+        }
         if (metadata.getAuthors().size() > 0) {
             String author = metadata.getAuthors().get(0).toString().replaceAll("^, |, $", "");
             mCollBook.setAuthor(author);
@@ -192,12 +192,14 @@ public class EpubPageLoader extends PageLoader {
                 } else {
                     bean.setTitle(title);
                 }
+                bean.setEnd(1);
                 mChapterList.add(bean);
             }
         } else {
             parseMenu(refs, 0);
             for (int i = 0; i < mChapterList.size(); i++) {
                 mChapterList.get(i).setNumber(i);
+                mChapterList.get(i).setEnd(1);
             }
         }
 
