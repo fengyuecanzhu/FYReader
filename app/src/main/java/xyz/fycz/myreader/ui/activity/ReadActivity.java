@@ -28,6 +28,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
@@ -111,6 +112,7 @@ import xyz.fycz.myreader.widget.BubblePopupView;
 import xyz.fycz.myreader.widget.page.PageLoader;
 import xyz.fycz.myreader.widget.page.PageMode;
 import xyz.fycz.myreader.widget.page.PageView;
+import xyz.fycz.myreader.widget.page.TxtChar;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -1741,6 +1743,9 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     longPressMenu.hidePopupListWindow();
                     break;
                 case MotionEvent.ACTION_MOVE:
+                    ImageView left = binding.getRoot().findViewWithTag("left");
+                    ImageView right = binding.getRoot().findViewWithTag("right");
+
                     int dx = (int) event.getRawX() - lastX;
                     int dy = (int) event.getRawY() - lastY;
                     int l = v.getLeft() + dx;
@@ -1759,17 +1764,52 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     int hh = binding.cursorLeft.getHeight();
                     int ww = binding.cursorLeft.getWidth();
 
-                    if (v.getId() == R.id.cursor_left) {
-                        binding.readPvContent.setFirstSelectTxtChar(binding.readPvContent.getCurrentTxtChar(lastX + ww, lastY - hh));
-                        if (binding.readPvContent.getFirstSelectTxtChar() != null) {
-                            binding.cursorLeft.setX(binding.readPvContent.getFirstSelectTxtChar().getTopLeftPosition().x - ww);
-                            binding.cursorLeft.setY(binding.readPvContent.getFirstSelectTxtChar().getBottomLeftPosition().y);
+                    if (v.getId() == left.getId()) {
+                        TxtChar first = binding.readPvContent.getCurrentTxtChar(lastX + ww, lastY - hh, true);
+                        if (first != null) {
+                            binding.readPvContent.setFirstSelectTxtChar(first);
                         }
+                        left.setX(binding.readPvContent.getFirstSelectTxtChar().getBottomLeftPosition().x - ww);
+                        left.setY(binding.readPvContent.getFirstSelectTxtChar().getBottomLeftPosition().y);
                     } else {
-                        binding.readPvContent.setLastSelectTxtChar(binding.readPvContent.getCurrentTxtChar(lastX - ww, lastY - hh));
-                        if (binding.readPvContent.getLastSelectTxtChar() != null) {
-                            binding.cursorRight.setX(binding.readPvContent.getLastSelectTxtChar().getBottomRightPosition().x);
-                            binding.cursorRight.setY(binding.readPvContent.getLastSelectTxtChar().getBottomRightPosition().y);
+                        TxtChar last = binding.readPvContent.getCurrentTxtChar(lastX - ww, lastY - hh, false);
+                        if (last != null) {
+                            binding.readPvContent.setLastSelectTxtChar(last);
+                        }
+                        right.setX(binding.readPvContent.getLastSelectTxtChar().getBottomRightPosition().x);
+                        right.setY(binding.readPvContent.getLastSelectTxtChar().getBottomRightPosition().y);
+                    }
+
+
+                    float leftX = left.getX();
+                    float leftY = left.getY();
+                    float rightX = right.getX();
+                    float rightY = right.getY();
+
+                    if ((leftY == rightY && leftX > rightX) || leftY > rightY) {
+                        left.setTag("right");
+                        left.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_cursor_right));
+                        right.setTag("left");
+                        right.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_cursor_left));
+
+                        if (v.getId() == left.getId()) {
+                            TxtChar last = binding.readPvContent.getLastSelectTxtChar();
+                            last = binding.readPvContent.getNextTxtChar(last);
+                            binding.readPvContent.setFirstSelectTxtChar(last);
+                            if (last != null) {
+                                right.setX(last.getBottomLeftPosition().x - ww);
+                                right.setY(last.getBottomLeftPosition().y);
+                            } else {
+                                return true;
+                            }
+                        } else {
+                            TxtChar first = binding.readPvContent.getFirstSelectTxtChar();
+                            first = binding.readPvContent.getLastTxtChar(first);
+                            binding.readPvContent.setLastSelectTxtChar(first);
+                            if (first != null) {
+                                left.setX(first.getBottomRightPosition().x);
+                                left.setY(first.getBottomRightPosition().y);
+                            }
                         }
                     }
 
@@ -1826,15 +1866,17 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 显示选择
      */
     private void cursorShow() {
-        binding.cursorLeft.setVisibility(View.VISIBLE);
-        binding.cursorRight.setVisibility(View.VISIBLE);
+        ImageView left = binding.getRoot().findViewWithTag("left");
+        ImageView right = binding.getRoot().findViewWithTag("right");
+        left.setVisibility(View.VISIBLE);
+        right.setVisibility(View.VISIBLE);
         int hh = binding.cursorLeft.getHeight();
         int ww = binding.cursorLeft.getWidth();
         if (binding.readPvContent.getFirstSelectTxtChar() != null) {
-            binding.cursorLeft.setX(binding.readPvContent.getFirstSelectTxtChar().getTopLeftPosition().x - ww);
-            binding.cursorLeft.setY(binding.readPvContent.getFirstSelectTxtChar().getBottomLeftPosition().y);
-            binding.cursorRight.setX(binding.readPvContent.getFirstSelectTxtChar().getBottomRightPosition().x);
-            binding.cursorRight.setY(binding.readPvContent.getFirstSelectTxtChar().getBottomRightPosition().y);
+            left.setX(binding.readPvContent.getFirstSelectTxtChar().getTopLeftPosition().x - ww);
+            left.setY(binding.readPvContent.getFirstSelectTxtChar().getBottomLeftPosition().y);
+            right.setX(binding.readPvContent.getFirstSelectTxtChar().getBottomRightPosition().x);
+            right.setY(binding.readPvContent.getFirstSelectTxtChar().getBottomRightPosition().y);
         }
     }
 

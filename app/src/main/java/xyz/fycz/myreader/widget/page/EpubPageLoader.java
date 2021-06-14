@@ -53,6 +53,7 @@ public class EpubPageLoader extends PageLoader {
 
     EpubPageLoader(PageView pageView, xyz.fycz.myreader.greendao.entity.Book bookShelfBean, Setting setting) {
         super(pageView, bookShelfBean, setting);
+        mStatus = STATUS_PARING;
     }
 
     @Override
@@ -91,13 +92,17 @@ public class EpubPageLoader extends PageLoader {
                     @Override
                     public void onNext(xyz.fycz.myreader.greendao.entity.Book bookShelfBean) {
                         isChapterListPrepare = true;
+                        //提示目录加载完成
+                        if (mPageChangeListener != null) {
+                            mPageChangeListener.onCategoryFinish(mChapterList);
+                        }
                         // 加载并显示当前章节
                         openChapter();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        error(STATUS_CATEGORY_ERROR, e.getMessage());
+                        error(STATUS_PARSE_ERROR, e.getMessage());
                     }
                 });
     }
@@ -249,9 +254,8 @@ public class EpubPageLoader extends PageLoader {
     }
 
     private Observable<xyz.fycz.myreader.greendao.entity.Book> checkChapterList(xyz.fycz.myreader.greendao.entity.Book collBook) {
-        if (mCollBook.getChapterTotalNum() != 0) {
-            mChapterList = ChapterService.getInstance().findBookAllChapterByBookId(mCollBook.getId());
-            mPageChangeListener.onCategoryFinish(mChapterList);
+        mChapterList = ChapterService.getInstance().findBookAllChapterByBookId(mCollBook.getId());
+        if (!mChapterList.isEmpty()) {
             return Observable.just(collBook);
         } else {
             return Observable.create((ObservableOnSubscribe<List<Chapter>>) e -> {

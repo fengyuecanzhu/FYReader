@@ -26,7 +26,6 @@ import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.SnackbarUtils;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.widget.animation.*;
-import xyz.fycz.myreader.widget.page2.TxtLine;
 
 /**
  * Created by Administrator on 2016/8/29 0029.
@@ -125,7 +124,7 @@ public class PageView extends View {
             performLongClick();
             if (mStartX > 0 && mStartY > 0) {// 说明还没释放，是长按事件
                 isLongPress = true;//长按
-                TxtChar p = mPageLoader.detectPressTxtChar(mStartX, mStartY);//找到长按的点
+                TxtChar p = mPageLoader.detectPressTxtChar(mStartX, mStartY, PageLoader.Detect.None);//找到长按的点
                 firstSelectTxtChar = p;//设置开始位置字符
                 lastSelectTxtChar = p;//设置结束位置字符
                 selectMode = SelectMode.PressSelectText;//设置模式为长按选择
@@ -628,8 +627,16 @@ public class PageView extends View {
     }
 
     //根据当前坐标返回文字
-    public TxtChar getCurrentTxtChar(float x, float y) {
-        return mPageLoader.detectPressTxtChar(x, y);
+    public TxtChar getCurrentTxtChar(float x, float y, boolean left) {
+        return mPageLoader.detectPressTxtChar(x, y, left ? PageLoader.Detect.Left : PageLoader.Detect.Right);
+    }
+
+    public TxtChar getLastTxtChar(TxtChar txtChar){
+        return mPageLoader.detectLastTxtChar(txtChar);
+    }
+
+    public TxtChar getNextTxtChar(TxtChar txtChar){
+        return mPageLoader.detectNextTxtChar(txtChar);
     }
 
     private void drawOaleSeletLinesBg(Canvas canvas) {// 绘制选中背景
