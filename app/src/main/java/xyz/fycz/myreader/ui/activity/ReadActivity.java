@@ -796,7 +796,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     try {
                         skipToChapterAndPage(chapterAndPage[0], chapterAndPage[1]);
                     } catch (Exception e) {
-                        ToastUtils.showError("章节跳转失败，请截图联系作者。\n" +
+                        ToastUtils.showError("章节跳转失败\n" +
                                 e.getMessage());
                         e.printStackTrace();
                     }

@@ -68,7 +68,10 @@ public class LocalPageLoader extends PageLoader {
     public void refreshChapterList() {
         // 对于文件是否存在，或者为空的判断，不作处理。 ==> 在文件打开前处理过了。
         mBookFile = new File(mCollBook.getChapterUrl());
-
+        if (!mBookFile.exists()) {
+            error(STATUS_CATEGORY_ERROR, "书籍源文件不存在\n" + mCollBook.getChapterUrl());
+            return;
+        }
         mCharset = mCollBook.getInfoUrl();
 
         // 判断文件是否已经加载过，并具有缓存
@@ -113,7 +116,7 @@ public class LocalPageLoader extends PageLoader {
 
             @Override
             public void onError(Throwable e) {
-                chapterError(e.getLocalizedMessage());
+                error(STATUS_CATEGORY_ERROR, e.getLocalizedMessage());
                 Log.d(TAG, "file load error:" + e.toString());
             }
         });
@@ -364,7 +367,6 @@ public class LocalPageLoader extends PageLoader {
         bookStream.seek(0);
         return false;
     }
-
 
 
     @Override

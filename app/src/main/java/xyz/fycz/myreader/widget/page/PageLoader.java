@@ -32,6 +32,7 @@ import xyz.fycz.myreader.model.audio.ReadAloudService;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.ChapterContentHelp;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.BitmapUtil;
 import xyz.fycz.myreader.util.utils.MeUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
@@ -62,6 +63,7 @@ public abstract class PageLoader {
     public static final int STATUS_PARING = 6;          // 正在解析 (装载本地数据)
     public static final int STATUS_PARSE_ERROR = 7;     // 本地文件解析错误(暂未被使用)
     public static final int STATUS_CATEGORY_EMPTY = 8;  // 获取到的目录为空
+    public static final int STATUS_CATEGORY_ERROR = 9;  // 获取目录失败
 
     private String errorMsg = "";
     // 默认的显示参数配置
@@ -780,8 +782,12 @@ public abstract class PageLoader {
     }
 
     public void chapterError(String msg) {
+        error(STATUS_ERROR, msg);
+    }
+
+    public void error(int status, String msg){
         //加载错误
-        mStatus = STATUS_ERROR;
+        mStatus = status;
         errorMsg = msg;
         mPageView.drawCurPage(false);
     }
@@ -1046,8 +1052,11 @@ public abstract class PageLoader {
                 case STATUS_CATEGORY_EMPTY:
                     tip = "目录列表为空";
                     break;
+                case STATUS_CATEGORY_ERROR:
+                    tip = "目录加载失败\n" + errorMsg;
+                    break;
             }
-            if (mStatus == STATUS_ERROR) {
+            if (mStatus == STATUS_ERROR || mStatus == STATUS_CATEGORY_ERROR) {
                 drawErrorMsg(canvas, tip, 0);
             } else {
                 //将提示语句放到正中间

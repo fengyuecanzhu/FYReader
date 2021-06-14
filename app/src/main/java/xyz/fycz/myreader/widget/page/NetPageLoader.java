@@ -70,6 +70,7 @@ public class NetPageLoader extends PageLoader {
                        chapter.setId(StringHelper.getStringRandom(25));
                        chapter.setBookId(mCollBook.getId());
                    }
+                   mChapterService.addChapters(newChapters);
                    emitter.onNext(newChapters);
                 }))
                 .compose(RxUtils::toSimpleSingle)
@@ -94,7 +95,7 @@ public class NetPageLoader extends PageLoader {
 
                     @Override
                     public void onError(Throwable e) {
-                        chapterError(e.getLocalizedMessage());
+                        error(STATUS_CATEGORY_ERROR, e.getLocalizedMessage());
                         Log.d(TAG, "file load error:" + e.toString());
                     }
                 });
