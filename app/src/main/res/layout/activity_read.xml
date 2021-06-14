@@ -82,6 +82,7 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cursor_left"
+        android:tag="left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@null"
@@ -91,6 +92,7 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cursor_right"
+        android:tag="right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@null"

@@ -2,8 +2,6 @@ package xyz.fycz.myreader.widget.page;
 
 import java.util.List;
 
-import xyz.fycz.myreader.widget.page2.TxtLine;
-
 public class TxtPage {
     int position;
     String title;

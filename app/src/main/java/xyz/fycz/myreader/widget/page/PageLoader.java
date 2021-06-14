@@ -32,13 +32,11 @@ import xyz.fycz.myreader.model.audio.ReadAloudService;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.ChapterContentHelp;
-import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.BitmapUtil;
 import xyz.fycz.myreader.util.utils.MeUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.ScreenUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
-import xyz.fycz.myreader.widget.page2.TxtLine;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,6 +44,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by fengyue on 20-11-21
@@ -785,7 +784,7 @@ public abstract class PageLoader {
         error(STATUS_ERROR, msg);
     }
 
-    public void error(int status, String msg){
+    public void error(int status, String msg) {
         //加载错误
         mStatus = status;
         errorMsg = msg;
@@ -1044,10 +1043,10 @@ public abstract class PageLoader {
                     tip = "章节内容为空";
                     break;
                 case STATUS_PARING:
-                    tip = "正在拆分章节请等待...";
+                    tip = "正在解析文件请等待...";
                     break;
                 case STATUS_PARSE_ERROR:
-                    tip = "文件解析错误";
+                    tip = "文件解析错误\n" + errorMsg;
                     break;
                 case STATUS_CATEGORY_EMPTY:
                     tip = "目录列表为空";
@@ -1056,7 +1055,8 @@ public abstract class PageLoader {
                     tip = "目录加载失败\n" + errorMsg;
                     break;
             }
-            if (mStatus == STATUS_ERROR || mStatus == STATUS_CATEGORY_ERROR) {
+            if (mStatus == STATUS_ERROR || mStatus == STATUS_CATEGORY_ERROR
+                    || mStatus == STATUS_PARSE_ERROR) {
                 drawErrorMsg(canvas, tip, 0);
             } else {
                 //将提示语句放到正中间
@@ -2061,6 +2061,10 @@ public abstract class PageLoader {
         }
     }
 
+    enum Detect {
+        None, Left, Right
+    }
+
     /**
      * --------------------
      * 检测获取按压坐标所在位置的字符，没有的话返回null
@@ -2068,7 +2072,7 @@ public abstract class PageLoader {
      * author: huangwei
      * 2017年7月4日上午10:23:19
      */
-    TxtChar detectPressTxtChar(float down_X2, float down_Y2) {
+    TxtChar detectPressTxtChar(float down_X2, float down_Y2, Detect detect) {
         TxtPage txtPage = mCurPage;
         if (txtPage == null) return null;
         List<TxtLine> txtLines = txtPage.txtLists;
@@ -2076,20 +2080,66 @@ public abstract class PageLoader {
         for (TxtLine l : txtLines) {
             List<TxtChar> txtChars = l.getCharsData();
             if (txtChars != null) {
-                for (TxtChar c : txtChars) {
+                for (int i = 0; i < txtChars.size(); i++) {
+                    TxtChar c = txtChars.get(i);
                     Point leftPoint = c.getBottomLeftPosition();
                     Point rightPoint = c.getBottomRightPosition();
                     if (leftPoint != null && down_Y2 > leftPoint.y) {
                         break;// 说明是在下一行
                     }
-                    if (leftPoint != null && rightPoint != null && down_X2 >= leftPoint.x && down_X2 <= rightPoint.x) {
-                        return c;
+                    if (leftPoint != null && rightPoint != null) {
+                        boolean flag = down_X2 >= leftPoint.x && down_X2 <= rightPoint.x;
+                        switch (detect) {
+                            case Left:
+                                flag = flag || (i == 0 && down_X2 < leftPoint.x);
+                                break;
+                            case Right:
+                                flag = flag || (i == txtChars.size() - 1 && down_X2 > rightPoint.x);
+                                break;
+                        }
+                        if (flag) return c;
                     }
 
                 }
             }
         }
         return null;
+    }
+
+    TxtChar detectLastTxtChar(TxtChar txtChar) {
+        TxtChar last = txtChar;
+        TxtPage txtPage = mCurPage;
+        if (txtPage == null) return txtChar;
+        List<TxtLine> txtLines = txtPage.txtLists;
+        if (txtLines == null) return txtChar;
+        for (TxtLine l : txtLines) {
+            List<TxtChar> txtChars = l.getCharsData();
+            if (txtChars != null) {
+                for (TxtChar c : txtChars) {
+                    if (c != null && c.getIndex() == txtChar.getIndex()) return last;
+                    last = c;
+                }
+            }
+        }
+        return txtChar;
+    }
+
+    TxtChar detectNextTxtChar(TxtChar txtChar) {
+        TxtPage txtPage = mCurPage;
+        boolean isNext = false;
+        if (txtPage == null) return txtChar;
+        List<TxtLine> txtLines = txtPage.txtLists;
+        if (txtLines == null) return txtChar;
+        for (TxtLine l : txtLines) {
+            List<TxtChar> txtChars = l.getCharsData();
+            if (txtChars != null) {
+                for (TxtChar c : txtChars) {
+                    if (isNext) return c;
+                    if (c != null && c.getIndex() == txtChar.getIndex()) isNext = true;
+                }
+            }
+        }
+        return txtChar;
     }
 
     public boolean isPrev() {

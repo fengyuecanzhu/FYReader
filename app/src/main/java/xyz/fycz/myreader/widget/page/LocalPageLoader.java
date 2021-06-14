@@ -69,15 +69,15 @@ public class LocalPageLoader extends PageLoader {
         // 对于文件是否存在，或者为空的判断，不作处理。 ==> 在文件打开前处理过了。
         mBookFile = new File(mCollBook.getChapterUrl());
         if (!mBookFile.exists()) {
-            error(STATUS_CATEGORY_ERROR, "书籍源文件不存在\n" + mCollBook.getChapterUrl());
+            error(STATUS_PARSE_ERROR, "书籍源文件不存在\n" + mCollBook.getChapterUrl());
             return;
         }
         mCharset = mCollBook.getInfoUrl();
 
         // 判断文件是否已经加载过，并具有缓存
-        if (mCollBook.getChapterTotalNum() != 0) {
+        mChapterList = mChapterService.findBookAllChapterByBookId(mCollBook.getId());
+        if (!mChapterList.isEmpty()) {
 
-            mChapterList = mChapterService.findBookAllChapterByBookId(mCollBook.getId());
             isChapterListPrepare = true;
 
             //提示目录加载完成

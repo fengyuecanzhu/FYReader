@@ -1,6 +1,4 @@
-package xyz.fycz.myreader.widget.page2
-
-import xyz.fycz.myreader.widget.page.TxtChar
+package xyz.fycz.myreader.widget.page
 
 class TxtLine {
 
