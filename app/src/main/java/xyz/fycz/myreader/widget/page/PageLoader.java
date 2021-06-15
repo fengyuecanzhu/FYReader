@@ -917,48 +917,44 @@ public abstract class PageLoader {
                 : getReadProgress(getChapterPos(), mChapterList.size(), getPagePos(), getAllPagePos());
         /****绘制背景****/
         if (!mSettingManager.isShowStatusBar()) {
-            if (!mChapterList.isEmpty()) {
+            //需要注意的是:绘制text的y的起始点是text的基准线的位置，而不是从text的头部的位置
+            float tipTop = tipMarginHeight - mTipPaint.getFontMetrics().top;
+            if (!mChapterList.isEmpty() && mStatus == STATUS_FINISH) {
                 /*****初始化标题的参数********/
-                //需要注意的是:绘制text的y的起始点是text的基准线的位置，而不是从text的头部的位置
-                float tipTop = tipMarginHeight - mTipPaint.getFontMetrics().top;
-                //根据状态不一样，数据不一样
-                if (mStatus != STATUS_FINISH) {
-                    if (isChapterListPrepare) {
-                        String title = mChapterList.get(mCurChapterPos).getTitle();
-                        title = contentHelper.replaceContent(mCollBook.getName() + "-" + mCollBook.getAuthor(), mCollBook.getSource(), title, true);
-                        canvas.drawText(title, mMarginLeft, tipTop, mTipPaint);
-                    }
-                } else {
-                    String title = contentHelper.replaceContent(mCollBook.getName() + "-" + mCollBook.getAuthor(), mCollBook.getSource(), mCurPage.title, true);
-                    title = TextUtils.ellipsize(title, mTipPaint, mDisplayWidth - mMarginLeft - mMarginRight - mTipPaint.measureText(progress), TextUtils.TruncateAt.END).toString();
-                    canvas.drawText(title, mMarginLeft, tipTop, mTipPaint);
-                    /******绘制页码********/
-                    // 底部的字显示的位置Y
-                    float y = mDisplayHeight - mTipPaint.getFontMetrics().bottom - tipMarginHeight;
-                    String percent = (mCurPage.position + 1) + "/" + mCurChapter.getPageSize();
-                    canvas.drawText(percent, mMarginLeft, y, mTipPaint);
-                }
-
-                /*******绘制进度*******/
-                float progressTipLeft = mDisplayWidth - mMarginRight - mTipPaint.measureText(progress);
-                canvas.drawText(progress, progressTipLeft, tipTop, mTipPaint);
+                String title = getPagePos() == 0 ? mCollBook.getName() : mCurPage.title;
+                title = contentHelper.replaceContent(mCollBook.getName() + "-" + mCollBook.getAuthor(), mCollBook.getSource(), title, true);
+                title = TextUtils.ellipsize(title, mTipPaint, mDisplayWidth - mMarginLeft - mMarginRight - mTipPaint.measureText(progress), TextUtils.TruncateAt.END).toString();
+                canvas.drawText(title, mMarginLeft, tipTop, mTipPaint);
+                /******绘制页码********/
+                // 底部的字显示的位置Y
+                float y = mDisplayHeight - mTipPaint.getFontMetrics().bottom - tipMarginHeight;
+                String percent = (mCurPage.position + 1) + "/" + mCurChapter.getPageSize();
+                canvas.drawText(percent, mMarginLeft, y, mTipPaint);
+            } else {
+                String title = mCollBook.getName();
+                title = contentHelper.replaceContent(mCollBook.getName() + "-" + mCollBook.getAuthor(), mCollBook.getSource(), title, true);
+                canvas.drawText(title, mMarginLeft, tipTop, mTipPaint);
             }
+            /*******绘制进度*******/
+            float progressTipLeft = mDisplayWidth - mMarginRight - mTipPaint.measureText(progress);
+            canvas.drawText(progress, progressTipLeft, tipTop, mTipPaint);
         } else {
             float tipBottom = mDisplayHeight - mTipPaint.getFontMetrics().bottom - tipMarginHeight;
-            //根据状态不一样，数据不一样
-            if (mStatus != STATUS_FINISH) {
-                if (isChapterListPrepare) {
-                    canvas.drawText(mChapterList.get(mCurChapterPos).getTitle()
-                            , mMarginLeft, tipBottom, mTipPaint);
-                }
-            } else {
+            if (!mChapterList.isEmpty() && mStatus == STATUS_FINISH) {
+
                 /******绘制页码********/
                 String percent = (mCurPage.position + 1) + "/" + mCurChapter.getPageSize();
                 //页码的x坐标
                 float tipLeft = mDisplayWidth - 2 * mMarginRight - mTipPaint.measureText(percent + progress);
                 canvas.drawText(percent, tipLeft, tipBottom, mTipPaint);
 
-                String title = TextUtils.ellipsize(mCurPage.title, mTipPaint, tipLeft - 2 * mMarginRight, TextUtils.TruncateAt.END).toString();
+                String title = getPagePos() == 0 ? mCollBook.getName() : mCurPage.title;
+                title = contentHelper.replaceContent(mCollBook.getName() + "-" + mCollBook.getAuthor(), mCollBook.getSource(), title, true);
+                title = TextUtils.ellipsize(title, mTipPaint, tipLeft - 2 * mMarginRight, TextUtils.TruncateAt.END).toString();
+                canvas.drawText(title, mMarginLeft, tipBottom, mTipPaint);
+            } else {
+                String title = mCollBook.getName();
+                title = contentHelper.replaceContent(mCollBook.getName() + "-" + mCollBook.getAuthor(), mCollBook.getSource(), title, true);
                 canvas.drawText(title, mMarginLeft, tipBottom, mTipPaint);
             }
             /*******绘制进度*******/
@@ -1031,7 +1027,10 @@ public abstract class PageLoader {
             String tip = "";
             switch (mStatus) {
                 case STATUS_LOADING:
-                    tip = "正在加载章节内容...";
+                    if (isChapterListPrepare) {
+                        tip = mChapterList.get(mCurChapterPos).getTitle();
+                    }
+                    tip += "\n正在加载章节内容...";
                     break;
                 case STATUS_LOADING_CHAPTER:
                     tip = "正在加载目录列表...";
@@ -1056,7 +1055,8 @@ public abstract class PageLoader {
                     break;
             }
             if (mStatus == STATUS_ERROR || mStatus == STATUS_CATEGORY_ERROR
-                    || mStatus == STATUS_PARSE_ERROR) {
+                    || mStatus == STATUS_PARSE_ERROR
+                    || (isChapterListPrepare && mStatus == STATUS_LOADING)) {
                 drawErrorMsg(canvas, tip, 0);
             } else {
                 //将提示语句放到正中间
@@ -1517,8 +1517,8 @@ public abstract class PageLoader {
     private void chapterChangeCallback() {
         if (mPageChangeListener != null) {
             readAloudParagraph = -1;
+            mPageChangeListener.onPageChange(0, resetReadAloud);
             mPageChangeListener.onChapterChange(mCurChapterPos);
-            mPageChangeListener.onPageChange(mCollBook.getLastReadPosition(), resetReadAloud);
             resetReadAloud = true;
             mPageChangeListener.onPageCountChange(mCurChapter != null ? mCurChapter.getPageSize() : 0);
         }

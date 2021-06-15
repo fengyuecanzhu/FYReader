@@ -186,6 +186,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
     private boolean isPrivate;//是否私密书籍
 
+    private boolean isFirstLoad = true;
+
 
     // 接收电池信息和时间更新的广播
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -391,7 +393,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                     public void onChapterChange(int pos) {
                         chapterPos = pos;
                         mBook.setHistoryChapterId(mChapters.get(pos).getTitle());
-                        recordReadTime();
                     }
 
                     @Override
@@ -420,8 +421,13 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
                     @Override
                     public void onPageChange(int pos, boolean resetRead) {
-                        pagePos = pos;
-                        saveLastChapterReadPosition();
+                        if (isFirstLoad) {
+                            pagePos = mBook.getLastReadPosition();
+                            isFirstLoad = false;
+                        } else {
+                            pagePos = pos;
+                            saveLastChapterReadPosition();
+                        }
                         screenOffTimerStart();
                         initMenu();
                         recordReadTime();
@@ -443,6 +449,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                             }
                         }
                     }
+
                 }
         );
 
