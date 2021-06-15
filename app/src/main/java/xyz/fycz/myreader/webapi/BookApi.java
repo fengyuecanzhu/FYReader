@@ -1,5 +1,7 @@
 package xyz.fycz.myreader.webapi;
 
+import android.util.Log;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -101,7 +103,12 @@ public class BookApi {
      */
     public static Observable<List<Chapter>> getBookChapters(Book book, final ReadCrawler rc) {
         if (rc instanceof ThirdCrawler) {
-            return ThirdSourceApi.getBookChaptersByTC(book, (ThirdCrawler) rc);
+            if (StringHelper.isEmpty(book.getChapterUrl())) {
+                return ThirdSourceApi.getBookInfoByTC(book, (ThirdCrawler) rc)
+                        .flatMap(book1 -> ThirdSourceApi.getBookChaptersByTC(book, (ThirdCrawler) rc));
+            } else {
+                return ThirdSourceApi.getBookChaptersByTC(book, (ThirdCrawler) rc);
+            }
         }
         String url = book.getChapterUrl();
         if (StringHelper.isEmpty(url)) url = book.getInfoUrl();

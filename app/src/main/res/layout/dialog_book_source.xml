@@ -29,8 +29,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
-            android:padding="8dp"
             android:background="?android:attr/selectableItemBackground"
+            android:padding="8dp"
             app:srcCompat="@drawable/ic_refresh" />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -38,11 +38,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:background="?android:attr/selectableItemBackground"
             android:layout_toStartOf="@+id/iv_refresh_search"
+            android:background="?android:attr/selectableItemBackground"
             android:padding="8dp"
             app:srcCompat="@drawable/ic_stop_black_24dp" />
     </RelativeLayout>
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:queryHint="@string/search" />
 
     <xyz.fycz.myreader.widget.RefreshProgressBar
         android:id="@+id/rpb"
@@ -50,10 +56,15 @@
         android:layout_height="3dp"
         android:visibility="visible" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dialog_rv_content"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorBackground" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dialog_rv_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorBackground" />
+    </RelativeLayout>
 
 </LinearLayout>
