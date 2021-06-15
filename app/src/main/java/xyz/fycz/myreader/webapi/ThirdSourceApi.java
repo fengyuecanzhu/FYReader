@@ -82,7 +82,15 @@ public class ThirdSourceApi {
         headers.putAll(getCookies(rc.getNameSpace()));
         BookChapterList bookChapterList = new BookChapterList(source.getSourceUrl(), source, true);
         if (!TextUtils.isEmpty(book.getCathe("ChapterListHtml"))) {
-            return bookChapterList.analyzeChapterList(book.getCathe("ChapterListHtml"), book, headers);
+            return bookChapterList.analyzeChapterList(book.getCathe("ChapterListHtml"), book, headers)
+                    .flatMap(chapters -> Observable.create(emitter -> {
+                        for (int i = 0; i < chapters.size(); i++) {
+                            Chapter chapter = chapters.get(i);
+                            chapter.setNumber(i);
+                        }
+                        emitter.onNext(chapters);
+                        emitter.onComplete();
+                    }));
         }
         try {
             AnalyzeUrl analyzeUrl = new AnalyzeUrl(book.getChapterUrl(), headers, book.getInfoUrl());
