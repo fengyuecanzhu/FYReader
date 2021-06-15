@@ -401,10 +401,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         mBook.setChapterTotalNum(chapters.size());
                         mBook.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
                         if (hasChangeSource) {
-                            mBookService.matchHistoryChapterPos(mBook, mChapters);
-                            skipToChapterAndPage(mBook.getHisttoryChapterNum(), mBook.getLastReadPosition());
+                            boolean flag = mBookService.matchHistoryChapterPos(mBook, mChapters);
+                            Log.d(TAG, "matchHistoryChapterPos=" + flag);
                             hasChangeSource = false;
-                            mChapterService.addChapters(chapters);
+                            if (flag) {
+                                mPageLoader.skipToChapter(mBook.getHisttoryChapterNum());
+                            }
                         }
                         mBookService.updateEntity(mBook);
                         loadFinish = true;
@@ -481,9 +483,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             if (!StringHelper.isEmpty(bean.getDesc())) {
                 bookTem.setDesc(bean.getDesc());
             }
-            if (isCollected) {
-                mBookService.updateBook(mBook, bookTem);
-            }
+            mBookService.updateBook(mBook, bookTem);
             mBook = bookTem;
             aBooks = mSourceDialog.getaBooks();
             aBooks.set(pos, mBook);
@@ -1748,15 +1748,15 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
                     int dx = (int) event.getRawX() - lastX;
                     int dy = (int) event.getRawY() - lastY;
-                    int l = v.getLeft() + dx;
+                    /*int l = v.getLeft() + dx;
                     int b = v.getBottom() + dy;
                     int r = v.getRight() + dx;
-                    int t = v.getTop() + dy;
+                    int t = v.getTop() + dy;*/
 
-                    v.layout(l, t, r, b);
+                    //v.layout(l, t, r, b);
                     lastX = (int) event.getRawX();
                     lastY = (int) event.getRawY();
-                    v.postInvalidate();
+                    //v.postInvalidate();
 
                     //移动过程中要画线
                     binding.readPvContent.setSelectMode(PageView.SelectMode.SelectMoveForward);
@@ -1779,7 +1779,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         right.setX(binding.readPvContent.getLastSelectTxtChar().getBottomRightPosition().x);
                         right.setY(binding.readPvContent.getLastSelectTxtChar().getBottomRightPosition().y);
                     }
-
 
                     float leftX = left.getX();
                     float leftY = left.getY();
@@ -1831,18 +1830,20 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 显示长按菜单
      */
     public void showAction() {
+        ImageView left = binding.getRoot().findViewWithTag("left");
+        ImageView right = binding.getRoot().findViewWithTag("right");
         float x, y;
-        if (binding.cursorLeft.getX() - binding.cursorRight.getX() > 0) {
-            x = binding.cursorRight.getX() + (binding.cursorLeft.getX() - binding.cursorRight.getX()) / 2 + ScreenUtils.dpToPx(12);
+        if (left.getX() - right.getX() > 0) {
+            x = right.getX() + (left.getX() - right.getX()) / 2 + ScreenUtils.dpToPx(12);
         } else {
-            x = binding.cursorLeft.getX() + (binding.cursorRight.getX() - binding.cursorLeft.getX()) / 2 + ScreenUtils.dpToPx(12);
+            x = left.getX() + (right.getX() - left.getX()) / 2 + ScreenUtils.dpToPx(12);
         }
-        if ((binding.cursorLeft.getY() - ScreenUtils.spToPx(mSetting.getReadWordSize()) - ScreenUtils.dpToPx(60)) < 0) {
+        if ((left.getY() - ScreenUtils.spToPx(mSetting.getReadWordSize()) - ScreenUtils.dpToPx(60)) < 0) {
             longPressMenu.setShowBottom(true);
-            y = binding.cursorLeft.getY() + binding.cursorLeft.getHeight() * 3 / 5;
+            y = left.getY() + left.getHeight() * 3 / 5;
         } else {
             longPressMenu.setShowBottom(false);
-            y = binding.cursorLeft.getY() - ScreenUtils.spToPx(mSetting.getReadWordSize()) - ScreenUtils.dpToPx(5);
+            y = left.getY() - ScreenUtils.spToPx(mSetting.getReadWordSize()) - ScreenUtils.dpToPx(5);
         }
         longPressMenu.showPopupListWindow(binding.rlContent, 0, x, y,
                 longPressMenuItems, longPressMenuListener);

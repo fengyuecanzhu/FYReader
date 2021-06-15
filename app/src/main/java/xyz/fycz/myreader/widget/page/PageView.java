@@ -632,11 +632,13 @@ public class PageView extends View {
     }
 
     public TxtChar getLastTxtChar(TxtChar txtChar){
-        return mPageLoader.detectLastTxtChar(txtChar);
+        TxtChar last = mPageLoader.detectTxtCharByIndex(txtChar.getIndex() - 1);
+        return last == null ? txtChar : last;
     }
 
     public TxtChar getNextTxtChar(TxtChar txtChar){
-        return mPageLoader.detectNextTxtChar(txtChar);
+        TxtChar next = mPageLoader.detectTxtCharByIndex(txtChar.getIndex() + 1);
+        return next == null ? txtChar : next;
     }
 
     private void drawOaleSeletLinesBg(Canvas canvas) {// 绘制选中背景

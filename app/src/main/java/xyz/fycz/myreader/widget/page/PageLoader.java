@@ -2079,7 +2079,9 @@ public abstract class PageLoader {
         if (txtLines == null) return null;
         for (TxtLine l : txtLines) {
             List<TxtChar> txtChars = l.getCharsData();
-            if (txtChars != null) {
+            if (txtChars != null && txtChars.size() > 0) {
+                TxtChar first = txtChars.get(0);
+                TxtChar last = txtChars.get(txtChars.size() - 1);
                 for (int i = 0; i < txtChars.size(); i++) {
                     TxtChar c = txtChars.get(i);
                     Point leftPoint = c.getBottomLeftPosition();
@@ -2091,10 +2093,12 @@ public abstract class PageLoader {
                         boolean flag = down_X2 >= leftPoint.x && down_X2 <= rightPoint.x;
                         switch (detect) {
                             case Left:
-                                flag = flag || (i == 0 && down_X2 < leftPoint.x);
+                                flag = flag || (i == 0 && (down_X2 < leftPoint.x ||
+                                        down_X2 > last.getBottomRightPosition().x));
                                 break;
                             case Right:
-                                flag = flag || (i == txtChars.size() - 1 && down_X2 > rightPoint.x);
+                                flag = flag || (i == txtChars.size() - 1 && (down_X2 > rightPoint.x ||
+                                        down_X2 < first.getBottomLeftPosition().x));
                                 break;
                         }
                         if (flag) return c;
@@ -2106,41 +2110,22 @@ public abstract class PageLoader {
         return null;
     }
 
-    TxtChar detectLastTxtChar(TxtChar txtChar) {
-        TxtChar last = txtChar;
+    TxtChar detectTxtCharByIndex(int index) {
         TxtPage txtPage = mCurPage;
-        if (txtPage == null) return txtChar;
+        if (txtPage == null) return null;
         List<TxtLine> txtLines = txtPage.txtLists;
-        if (txtLines == null) return txtChar;
+        if (txtLines == null) return null;
         for (TxtLine l : txtLines) {
             List<TxtChar> txtChars = l.getCharsData();
             if (txtChars != null) {
                 for (TxtChar c : txtChars) {
-                    if (c != null && c.getIndex() == txtChar.getIndex()) return last;
-                    last = c;
+                    if (c != null && c.getIndex() == index) return c;
                 }
             }
         }
-        return txtChar;
+        return null;
     }
 
-    TxtChar detectNextTxtChar(TxtChar txtChar) {
-        TxtPage txtPage = mCurPage;
-        boolean isNext = false;
-        if (txtPage == null) return txtChar;
-        List<TxtLine> txtLines = txtPage.txtLists;
-        if (txtLines == null) return txtChar;
-        for (TxtLine l : txtLines) {
-            List<TxtChar> txtChars = l.getCharsData();
-            if (txtChars != null) {
-                for (TxtChar c : txtChars) {
-                    if (isNext) return c;
-                    if (c != null && c.getIndex() == txtChar.getIndex()) isNext = true;
-                }
-            }
-        }
-        return txtChar;
-    }
 
     public boolean isPrev() {
         return isPrev;
