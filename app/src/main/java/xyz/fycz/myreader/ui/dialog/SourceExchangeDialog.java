@@ -3,6 +3,7 @@ package xyz.fycz.myreader.ui.dialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -10,6 +11,7 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.SourceExchangeAdapter;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.widget.RefreshProgressBar;
@@ -47,18 +50,13 @@ public class SourceExchangeDialog extends Dialog {
 
     private int sourceIndex = -1;
 
-    private boolean isRead;//是否在阅读界面换源
+    private String sourceSearchStr;
 
     /***************************************************************************/
     public SourceExchangeDialog(@NonNull Activity activity, Book bookBean) {
         super(activity);
         mActivity = activity;
         mShelfBook = bookBean;
-    }
-
-    public SourceExchangeDialog(@NonNull Activity activity, Book bookBean, boolean isRead) {
-        this(activity, bookBean);
-        this.isRead = isRead;
     }
 
     public void setShelfBook(Book mShelfBook) {
@@ -99,7 +97,6 @@ public class SourceExchangeDialog extends Dialog {
     @Override
     protected void onStart() {
         super.onStart();
-        //执行业务逻辑
         if (aBooks.size() == 0) {
             searchEngine.search(mShelfBook.getName(), mShelfBook.getAuthor());
             binding.ivStopSearch.setVisibility(View.VISIBLE);
@@ -108,6 +105,7 @@ public class SourceExchangeDialog extends Dialog {
             if (mAdapter.getItemCount() == 0) {
                 mAdapter.addItems(aBooks);
             }
+            binding.ivStopSearch.setVisibility(View.GONE);
         }
     }
 
@@ -135,11 +133,11 @@ public class SourceExchangeDialog extends Dialog {
             aBooks = new ArrayList<>();
         }
 
-        mAdapter = new SourceExchangeAdapter(this);
+        mAdapter = new SourceExchangeAdapter(this, aBooks);
         binding.dialogRvContent.setLayoutManager(new LinearLayoutManager(mActivity));
         binding.dialogRvContent.setAdapter(mAdapter);
 
-        searchEngine = new SearchEngine(isRead);
+        searchEngine = new SearchEngine();
         searchEngine.initSearchEngine(ReadCrawlerUtil.getEnableReadCrawlers());
     }
 
@@ -167,7 +165,13 @@ public class SourceExchangeDialog extends Dialog {
                         bean.setNewestChapterId("true");
                         sourceIndex = mAdapter.getItemSize();
                     }
-                    mAdapter.addItem(items.get(0));
+                    if (TextUtils.isEmpty(sourceSearchStr)) {
+                        mAdapter.addItem(bean);
+                    } else {
+                        if (BookSourceManager.getSourceNameByStr(bean.getSource()).contains(sourceSearchStr)){
+                            mAdapter.addItem(bean);
+                        }
+                    }
                     aBooks.add(bean);
                 }
             }
@@ -201,11 +205,28 @@ public class SourceExchangeDialog extends Dialog {
         binding.ivStopSearch.setOnClickListener(v -> searchEngine.stopSearch());
         binding.ivRefreshSearch.setOnClickListener(v -> {
             searchEngine.stopSearch();
+            binding.rpb.setIsAutoLoading(true);
             binding.ivStopSearch.setVisibility(View.VISIBLE);
             mAdapter.clear();
             aBooks.clear();
             mAdapter.notifyDataSetChanged();
             searchEngine.search(mShelfBook.getName(), mShelfBook.getAuthor());
+        });
+
+        binding.searchView.onActionViewExpanded();
+        binding.searchView.clearFocus();
+        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                sourceSearchStr = newText;
+                mAdapter.getFilter().filter(newText);
+                return false;
+            }
         });
     }
 

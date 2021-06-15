@@ -158,6 +158,10 @@ public class BookChapterList {
         chapterList = new ArrayList<>(lh);
         Collections.reverse(chapterList);
         Log.d(tag, "-目录解析完成" + analyzeNextUrl);
+        if (chapterList.isEmpty()) {
+            emitter.onError(new Throwable("目录列表为空"));
+            return;
+        }
         emitter.onNext(chapterList);
         emitter.onComplete();
     }

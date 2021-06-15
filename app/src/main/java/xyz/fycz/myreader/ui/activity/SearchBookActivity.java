@@ -243,7 +243,11 @@ public class SearchBookActivity extends BaseActivity {
             mHandler.sendMessage(mHandler.obtainMessage(1));
         });
         initHistoryList();
-        mHandler.postDelayed(() -> binding.etSearchKey.requestFocus(), 200);
+        mHandler.postDelayed(() -> {
+            binding.etSearchKey.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+        }, 400);
     }
 
     @Override

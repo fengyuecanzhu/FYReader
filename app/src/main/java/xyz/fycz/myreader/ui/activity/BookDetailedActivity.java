@@ -119,9 +119,7 @@ public class BookDetailedActivity extends BaseActivity {
                         initBookInfo();
                         mChapters.clear();
                         mNewestChapters.clear();
-                        if (!isThirdSource()) {
-                            initChapters(true);
-                        }
+                        initChapters(true);
                         mCatalogAdapter.clear();
                     }
                     break;
@@ -225,7 +223,7 @@ public class BookDetailedActivity extends BaseActivity {
         binding.ic.bookDetailRvCatalog.setLayoutManager(new LinearLayoutManager(this));
         binding.ic.bookDetailRvCatalog.setAdapter(mCatalogAdapter);
 
-        if (!isThirdSource()) initChapters(false);
+        initChapters(false);
 
         mCatalogAdapter.setOnItemClickListener((view, pos) -> {
             mBook.setHisttoryChapterNum(mChapters.size() - pos - 1);
@@ -435,7 +433,7 @@ public class BookDetailedActivity extends BaseActivity {
         BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
         binding.ih.bookDetailSource.setText(String.format("书源：%s", source.getSourceName()));
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(source);
-        if ((rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl())) || isThirdSource()) {
+        if ((rc instanceof BookInfoCrawler && StringHelper.isEmpty(mBook.getImgUrl()))) {
             binding.pbLoading.setVisibility(View.VISIBLE);
             BookInfoCrawler bic = (BookInfoCrawler) rc;
             BookApi.getBookInfo(mBook, bic).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Book>() {
@@ -443,9 +441,6 @@ public class BookDetailedActivity extends BaseActivity {
                 public void onNext(@NotNull Book book) {
                     if (!App.isDestroy(BookDetailedActivity.this)) {
                         mHandler.sendMessage(mHandler.obtainMessage(4));
-                        if (isThirdSource()) {
-                            initChapters(false);
-                        }
                     }
 
                 }
@@ -454,9 +449,6 @@ public class BookDetailedActivity extends BaseActivity {
                 public void onError(Throwable e) {
                     if (!App.isDestroy(BookDetailedActivity.this)) {
                         ToastUtils.showError("书籍详情加载失败！");
-                        if (isThirdSource()) {
-                            initChapters(false);
-                        }
                         binding.pbLoading.setVisibility(View.GONE);
                     }
                     if (App.isDebug()) e.printStackTrace();
@@ -569,15 +561,15 @@ public class BookDetailedActivity extends BaseActivity {
             mBookService.addBook(mBook);
         }
         Intent intent = new Intent(this, ReadActivity.class);
-        /*aBooks = mSourceDialog.getaBooks();
+        aBooks = mSourceDialog.getaBooks();
         if (aBooks != null) {
             aBooks.set(mSourceDialog.getSourceIndex(), mBook);
             BitIntentDataManager.getInstance().putData(intent, aBooks);
             intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
         } else {
             BitIntentDataManager.getInstance().putData(intent, mBook);
-        }*/
-        BitIntentDataManager.getInstance().putData(intent, mBook);
+        }
+//        BitIntentDataManager.getInstance().putData(intent, mBook);
         intent.putExtra("isCollected", isCollected);
         startActivityForResult(intent, APPCONST.REQUEST_READ);
     }
@@ -727,11 +719,6 @@ public class BookDetailedActivity extends BaseActivity {
                     break;
             }
         }
-    }
-
-
-    private boolean isThirdSource() {
-        return mReadCrawler instanceof ThirdCrawler;
     }
 
 }

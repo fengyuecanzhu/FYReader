@@ -307,7 +307,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
         mPageLoader = binding.readPvContent.getPageLoader(mBook, mReadCrawler, mSetting);
         //Dialog
-        mSourceDialog = new SourceExchangeDialog(this, mBook, true);
+        mSourceDialog = new SourceExchangeDialog(this, mBook);
         if (aBooks != null) {
             mSourceDialog.setABooks(aBooks);
         }
@@ -472,6 +472,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
         mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
             Book bookTem = (Book) mBook.clone();
+            bookTem.setInfoUrl(bean.getInfoUrl());
             bookTem.setChapterUrl(bean.getChapterUrl());
             bookTem.setSource(bean.getSource());
             if (!StringHelper.isEmpty(bean.getImgUrl())) {
@@ -722,10 +723,11 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             mSourceDialog.show();
         } else if (itemId == R.id.action_reload) {
             mPageLoader.setPrev(false);
-            if (!"本地书籍".equals(mBook.getType())) {
+            if (!"本地书籍".equals(mBook.getType()) && !mChapters.isEmpty()) {
                 mChapterService.deleteChapterCacheFile(mChapters.get(mPageLoader.getChapterPos()));
             }
-            mPageLoader.refreshChapter(mChapters.get(mPageLoader.getChapterPos()));
+            if (!mChapters.isEmpty())
+                mPageLoader.refreshChapter(mChapters.get(mPageLoader.getChapterPos()));
         } else if (itemId == R.id.action_add_bookmark) {
             if (mChapters == null || mChapters.size() == 0) {
                 if ("本地书籍".equals(mBook.getType())) {

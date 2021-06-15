@@ -46,17 +46,10 @@ public class SearchEngine {
     private int searchSuccessNum;
     private int searchFinishNum;
 
-    private boolean isRead = false;//是否在阅读界面换源
-
     private OnSearchListener searchListener;
 
     public SearchEngine() {
         threadsNum = SharedPreUtils.getInstance().getInt(App.getmContext().getString(R.string.threadNum), 8);
-    }
-
-    public SearchEngine(boolean isRead) {
-        this();
-        this.isRead = isRead;
     }
 
     public void setOnSearchListener(OnSearchListener searchListener) {
@@ -193,7 +186,6 @@ public class SearchEngine {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
             String searchKey = title;
             BookApi.search(searchKey, crawler)
-                    .flatMap(bookMap -> getBookInfo(bookMap, crawler))
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<ConMVMap<SearchBookBean, Book>>() {
@@ -265,20 +257,6 @@ public class SearchEngine {
                     }
                 });
     }
-
-    public Observable<ConMVMap<SearchBookBean, Book>> getBookInfo(ConMVMap<SearchBookBean, Book> bookMap, ReadCrawler rc) {
-        return Observable.create(emitter -> {
-            if (isRead && rc instanceof ThirdCrawler) {
-                List<Book> books = bookMap.values();
-                for (Book book : books) {
-                    BookApi.getBookInfo(book, (BookInfoCrawler) rc).subscribe();
-                }
-            }
-            emitter.onNext(bookMap);
-            emitter.onComplete();
-        });
-    }
-
 
     /************************************************************************/
     public interface OnSearchListener {
