@@ -6,7 +6,9 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.SpannableString;
@@ -39,6 +41,9 @@ import com.kongzue.dialogx.dialogs.BottomDialog;
 import com.kongzue.dialogx.dialogs.FullScreenDialog;
 import com.kongzue.dialogx.interfaces.OnBackPressedListener;
 import com.kongzue.dialogx.interfaces.OnBindView;
+
+import java.net.URISyntaxException;
+import java.util.List;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
@@ -380,8 +385,46 @@ public class MyAlertDialog {
                 webView.setWebViewClient(new WebViewClient() {
                     @Override
                     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                        view.loadUrl(url);
-                        return true;
+                        try {
+                            //url
+                            if (url.startsWith("intent://")) {
+                                Intent intent;
+                                try {
+                                    intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+                                    intent.addCategory("android.intent.category.BROWSABLE");
+                                    intent.setComponent(null);
+                                    intent.setSelector(null);
+                                    List<ResolveInfo> resolves = context.getPackageManager().queryIntentActivities(intent,0);
+                                    if(resolves.size()>0){
+                                        context.startActivity(intent);
+                                    }
+                                    return true;
+                                } catch (URISyntaxException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            // 处理自定义scheme协议
+                            if (!url.startsWith("http")) {
+                                try {
+                                    // 以下固定写法
+                                    final Intent intent = new Intent(Intent.ACTION_VIEW,
+                                            Uri.parse(url));
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                            | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                    context.startActivity(intent);
+                                } catch (Exception e) {
+                                    // 防止没有安装的情况
+                                    e.printStackTrace();
+                                    ToastUtils.showError("您所打开的第三方App未安装！");
+                                }
+                                return true;
+                            }
+                            view.loadUrl(url);
+                            return true;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return false;
                     }
                 });
 
