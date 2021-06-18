@@ -58,7 +58,7 @@ public class CatalogPresenter implements BasePresenter {
                 changeChapterSort();
             }
         });
-        mChapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(mBook.getId());
+        mChapters = mChapterService.findBookAllChapterByBookId(mBook.getId());
         if (mChapters.size() != 0) {
             initChapterTitleList();
         }else {
