@@ -154,8 +154,6 @@ dependencies {
 
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
 
-    implementation 'me.gujun.android.taggroup:library:1.4@aar'
-
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
 
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

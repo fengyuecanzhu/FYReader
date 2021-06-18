@@ -13,12 +13,13 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.greendao.entity.SearchHistory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SearchHistoryAdapter extends ArrayAdapter<SearchHistory> {
 
     private int mResourceId;
 
-    public SearchHistoryAdapter(Context context, int resourceId, ArrayList<SearchHistory> datas){
+    public SearchHistoryAdapter(Context context, int resourceId, List<SearchHistory> datas){
         super(context,resourceId,datas);
         mResourceId = resourceId;
     }
