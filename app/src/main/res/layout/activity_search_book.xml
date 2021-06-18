@@ -96,7 +96,7 @@
         android:orientation="vertical"
         android:padding="5dp">
 
-        <me.gujun.android.taggroup.TagGroup
+        <xyz.fycz.myreader.widget.TagGroup
             android:id="@+id/tg_suggest_book"
             style="@style/TagGroup"
             android:layout_marginTop="5dp"
@@ -134,7 +134,6 @@
 
 
         </LinearLayout>
-
 
     </LinearLayout>
 

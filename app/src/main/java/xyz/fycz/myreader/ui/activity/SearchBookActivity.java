@@ -1,14 +1,15 @@
 package xyz.fycz.myreader.ui.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +35,7 @@ import java.util.Map;
 
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
+import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
@@ -56,8 +58,8 @@ import xyz.fycz.myreader.ui.adapter.SearchHistoryAdapter;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -73,10 +75,11 @@ public class SearchBookActivity extends BaseActivity {
 
     private SearchBookAdapter mSearchBookAdapter;
     private String searchKey;//搜索关键字
-    private ArrayList<SearchBookBean> mBooksBean = new ArrayList<>();
+    private List<SearchBookBean> mBooksBean = new ArrayList<>();
     private ConMVMap<SearchBookBean, Book> mBooks = new ConMVMap<>();
-    private ArrayList<SearchHistory> mSearchHistories = new ArrayList<>();
-    private ArrayList<String> mSuggestions = new ArrayList<>();
+    private List<SearchHistory> mSearchHistories = new ArrayList<>();
+    private List<CharSequence> mSuggestions = new ArrayList<>();
+    private List<CharSequence> mHotKeys = new ArrayList<>();
 
     private SearchHistoryService mSearchHistoryService;
 
@@ -92,32 +95,14 @@ public class SearchBookActivity extends BaseActivity {
 
     private AlertDialog mDisableSourceDia;
 
+    private Disposable sugDis;
 
-    private static String[] suggestion = {"第一序列", "大道朝天", "伏天氏", "终极斗罗", "我师兄实在太稳健了", "烂柯棋缘", "诡秘之主"};
-    private static String[] suggestion2 = {"不朽凡人", "圣墟", "我是至尊", "龙王传说", "太古神王", "一念永恒", "雪鹰领主", "大主宰"};
+    private boolean showBooks;
+
+
+    private static String[] suggestion = {"第一序列", "大道朝天", "伏天氏", "终极斗罗", "我师兄实在太稳健了", "烂柯棋缘", "诡秘之主", "不朽凡人", "圣墟", "我是至尊", "龙王传说", "太古神王", "一念永恒", "雪鹰领主", "大主宰"};
 
     private boolean showHot;
-
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-                    search();
-                    break;
-                case 2:
-                    binding.srlSearchBookList.finishRefresh();
-                    /*if (curThreadCount == 0 && !isStopSearch) {
-                        rpb.setIsAutoLoading(false);
-                    }*/
-                    break;
-                case 3:
-                    binding.fabSearchStop.setVisibility(View.GONE);
-                    break;
-            }
-        }
-    };
 
 
     @Override
@@ -151,7 +136,7 @@ public class SearchBookActivity extends BaseActivity {
             public void loadMoreSearchBook(ConMVMap<SearchBookBean, Book> items) {
                 mBooks.addAll(items);
                 mSearchBookAdapter.addAll(new ArrayList<>(items.keySet()), searchKey);
-                mHandler.sendMessage(mHandler.obtainMessage(2));
+                binding.srlSearchBookList.finishRefresh();
             }
 
             @Override
@@ -161,20 +146,20 @@ public class SearchBookActivity extends BaseActivity {
 
             @Override
             public void searchBookError(Throwable throwable) {
-                mHandler.sendMessage(mHandler.obtainMessage(2));
+                binding.srlSearchBookList.finishRefresh();
             }
         });
+        initHotKeys();
     }
 
 
     @Override
     protected void initWidget() {
         super.initWidget();
-        initSuggestionList();
         //enter事件
         binding.etSearchKey.setOnEditorActionListener((textView, i, keyEvent) -> {
             if (i == EditorInfo.IME_ACTION_UNSPECIFIED) {
-                mHandler.sendMessage(mHandler.obtainMessage(1));
+                search();
                 return (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER);
             }
             return false;
@@ -228,9 +213,9 @@ public class SearchBookActivity extends BaseActivity {
             public void afterTextChanged(final Editable editable) {
                 searchKey = editable.toString();
                 if (StringHelper.isEmpty(searchKey)) {
-                    mHandler.sendMessage(mHandler.obtainMessage(1));
+                    search();
                 }
-
+                initSuggestionList();
             }
 
         });
@@ -240,10 +225,10 @@ public class SearchBookActivity extends BaseActivity {
         //上拉刷新
         binding.srlSearchBookList.setOnRefreshListener(refreshLayout -> {
             stopSearch();
-            mHandler.sendMessage(mHandler.obtainMessage(1));
+            search();
         });
         initHistoryList();
-        mHandler.postDelayed(() -> {
+        App.getHandler().postDelayed(() -> {
             binding.etSearchKey.requestFocus();
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
@@ -258,18 +243,18 @@ public class SearchBookActivity extends BaseActivity {
         binding.llRefreshSuggestBooks.setOnClickListener(new RenewSuggestionBook());
 
         //搜索按钮点击事件
-        binding.tvSearchConform.setOnClickListener(view -> mHandler.sendMessage(mHandler.obtainMessage(1)));
+        binding.tvSearchConform.setOnClickListener(view -> search());
         //suggestion搜索事件
         binding.tgSuggestBook.setOnTagClickListener(tag -> {
             binding.etSearchKey.setText(tag);
             binding.etSearchKey.setSelection(tag.length());
-            mHandler.sendMessage(mHandler.obtainMessage(1));
+            search();
         });
         //历史记录搜索事件
         binding.lvHistoryList.setOnItemClickListener((parent, view, position, id) -> {
             binding.etSearchKey.setText(mSearchHistories.get(position).getContent());
             binding.etSearchKey.setSelection(mSearchHistories.get(position).getContent().length());
-            mHandler.sendMessage(mHandler.obtainMessage(1));
+            search();
         });
         //清空历史记录
         binding.llClearHistory.setOnClickListener(v -> {
@@ -312,7 +297,7 @@ public class SearchBookActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_hot) {
             showHot = !showHot;
-            initSuggestionList();
+            initHotKeys();
         } else if (item.getItemId() == R.id.action_disable_source) {
             showDisableSourceDia();
         } else if (item.getItemId() == R.id.action_source_man) {
@@ -407,15 +392,14 @@ public class SearchBookActivity extends BaseActivity {
                 });
     }
 
-    /**
-     * 初始化建议书目
-     */
-    private void initSuggestionList() {
+    private void initHotKeys() {
+        mHotKeys.clear();
         if (!showHot) {
-            binding.tgSuggestBook.setTags(suggestion);
+            mHotKeys.addAll(Arrays.asList(suggestion));
+            initSuggestionList();
         } else {
             SharedPreUtils spu = SharedPreUtils.getInstance();
-            Single.create((SingleOnSubscribe<String>) emitter -> {
+            Single.create((SingleOnSubscribe<Boolean>) emitter -> {
                 String cookie = spu.getString(getString(R.string.qdCookie), "");
                 String url = "https://m.qidian.com/majax/search/auto?kw=&";
                 if (cookie.equals("")) {
@@ -424,17 +408,55 @@ public class SearchBookActivity extends BaseActivity {
                 url += cookie.split(";")[0];
                 Map<String, String> headers = new HashMap<>();
                 headers.put("Cookie", cookie);
-                emitter.onSuccess(OkHttpUtils.getHtml(url, null,
-                        "utf-8", headers));
+                emitter.onSuccess(parseHotKeys(OkHttpUtils.getHtml(url, null, "utf-8", headers)));
+            }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Boolean>() {
+                @Override
+                public void onSuccess(@NotNull Boolean b) {
+                    initSuggestionList();
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    mHotKeys.addAll(Arrays.asList(suggestion));
+                    initSuggestionList();
+                }
+            });
+            ;
+        }
+    }
+
+    /**
+     * 初始化建议书目
+     */
+    private void initSuggestionList() {
+        if (showBooks) return;
+        if (sugDis != null) {
+            sugDis.dispose();
+        }
+        mSuggestions.clear();
+        if (StringHelper.isEmpty(searchKey)) {
+            if (mHotKeys.isEmpty()) {
+                binding.llSuggestBooksView.setVisibility(View.GONE);
+            } else {
+                binding.llSuggestBooksView.setVisibility(View.VISIBLE);
+                binding.llRefreshSuggestBooks.setVisibility(View.VISIBLE);
+                binding.tgSuggestBook.setTags2(mHotKeys.subList(0, mHotKeys.size() / 2));
+            }
+        } else {
+            String url = "https://newzxautocmp.reader.qq.com/BookSuggAll?key=" + searchKey;
+            Single.create((SingleOnSubscribe<String>) emitter -> {
+                emitter.onSuccess(OkHttpUtils.getHtml(url));
             }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<String>() {
                 @Override
+                public void onSubscribe(Disposable d) {
+                    sugDis = d;
+                }
+
+                @Override
                 public void onSuccess(@NotNull String s) {
-                    parseSuggestionList(s);
-                    if (mSuggestions.size() > 0) {
-                        binding.tgSuggestBook.setTags(mSuggestions.subList(0, mSuggestions.size() / 2));
-                    } else {
-                        binding.llSuggestBooksView.setVisibility(View.GONE);
-                    }
+                    parseSuggListByKey(s);
+                    binding.llRefreshSuggestBooks.setVisibility(View.GONE);
+                    binding.tgSuggestBook.setTags2(mSuggestions);
                 }
 
                 @Override
@@ -445,12 +467,35 @@ public class SearchBookActivity extends BaseActivity {
         }
     }
 
-    private void parseSuggestionList(String jsonStr) {
+    private boolean parseHotKeys(String jsonStr) {
         try {
             JSONObject json = new JSONObject(jsonStr);
             JSONArray names = json.getJSONObject("data").getJSONArray("popWords");
             for (int i = 0; i < names.length(); i++) {
-                mSuggestions.add(names.getJSONObject(i).getString("name"));
+                mHotKeys.add(names.getJSONObject(i).getString("name"));
+            }
+            return true;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private void parseSuggListByKey(String jsonStr) {
+        try {
+            JSONObject json = new JSONObject(jsonStr);
+            JSONArray names = json.getJSONArray("matchList");
+            for (int i = 0; i < names.length(); i++) {
+                String title = names.getJSONObject(i).getString("title");
+                int start = title.indexOf(searchKey);
+                if (start != -1) {
+                    SpannableString spannableString = new SpannableString(title);
+                    spannableString.setSpan(new ForegroundColorSpan(Color.RED),
+                            start, start + searchKey.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    mSuggestions.add(spannableString);
+                } else {
+                    mSuggestions.add(title);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -460,21 +505,12 @@ public class SearchBookActivity extends BaseActivity {
     private class RenewSuggestionBook implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            if (!showHot) {
+            if (mHotKeys.size() > 0) {
                 String[] s = binding.tgSuggestBook.getTags();
-                if (Arrays.equals(s, suggestion)) {
-                    binding.tgSuggestBook.setTags(suggestion2);
+                if (s[0].equals(mHotKeys.get(0))) {
+                    binding.tgSuggestBook.setTags2(mHotKeys.subList(mHotKeys.size() / 2, mHotKeys.size()));
                 } else {
-                    binding.tgSuggestBook.setTags(suggestion);
-                }
-            } else {
-                if (mSuggestions.size() > 0) {
-                    String[] s = binding.tgSuggestBook.getTags();
-                    if (s[0].equals(mSuggestions.get(0))) {
-                        binding.tgSuggestBook.setTags(mSuggestions.subList(mSuggestions.size() / 2, mSuggestions.size()));
-                    } else {
-                        binding.tgSuggestBook.setTags(mSuggestions.subList(0, mSuggestions.size() / 2));
-                    }
+                    binding.tgSuggestBook.setTags2(mHotKeys.subList(0, mHotKeys.size() / 2));
                 }
             }
         }
@@ -500,7 +536,6 @@ public class SearchBookActivity extends BaseActivity {
     private void initSearchList() {
         //initmBooksBean();
         binding.rvSearchBooksList.setVisibility(View.VISIBLE);
-        binding.llSuggestBooksView.setVisibility(View.GONE);
         binding.llSuggestBooksView.setVisibility(View.GONE);
     }
 
@@ -533,6 +568,7 @@ public class SearchBookActivity extends BaseActivity {
     private void search() {
         binding.rpb.setIsAutoLoading(true);
         if (StringHelper.isEmpty(searchKey)) {
+            showBooks = false;
             stopSearch();
             binding.rpb.setIsAutoLoading(false);
             binding.rvSearchBooksList.setVisibility(View.GONE);
@@ -542,6 +578,7 @@ public class SearchBookActivity extends BaseActivity {
             binding.rvSearchBooksList.setAdapter(null);
             binding.srlSearchBookList.setEnableRefresh(false);
         } else {
+            showBooks = true;
             mSearchBookAdapter = new SearchBookAdapter(this, mBooks, searchEngine, searchKey);
             binding.rvSearchBooksList.setAdapter(mSearchBookAdapter);
             //进入书籍详情页
@@ -569,7 +606,7 @@ public class SearchBookActivity extends BaseActivity {
 
     private void stopSearch() {
         searchEngine.stopSearch();
-        mHandler.sendEmptyMessage(3);
+        binding.fabSearchStop.setVisibility(View.GONE);
     }
 
     @Override
@@ -584,9 +621,6 @@ public class SearchBookActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         stopSearch();
-        for (int i = 0; i < 9; i++) {
-            mHandler.removeMessages(i + 1);
-        }
         super.onDestroy();
     }
 
