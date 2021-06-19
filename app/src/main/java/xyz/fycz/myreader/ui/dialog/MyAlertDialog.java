@@ -2,6 +2,7 @@ package xyz.fycz.myreader.ui.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.SpannableString;
@@ -17,12 +19,15 @@ import android.text.TextPaint;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.DownloadListener;
 import android.webkit.JsResult;
+import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -52,9 +57,12 @@ import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.StatusBarUtil;
+import xyz.fycz.myreader.util.download.DownloadUtil;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FingerprintUtils;
+
+import static android.content.Context.DOWNLOAD_SERVICE;
 
 /**
  * @author fengyue
@@ -446,6 +454,10 @@ public class MyAlertDialog {
 
                 });
 
+                webView.setDownloadListener((url1, userAgent, contentDisposition, mimetype, contentLength) -> {
+                    DownloadUtil.downloadBySystem(context, url1, contentDisposition, mimetype);
+                });
+
                 webView.loadUrl(url);
             }
         }).setOnBackPressedListener(() -> {
@@ -470,4 +482,6 @@ public class MyAlertDialog {
     public interface OnInputFinishListener {
         void finish(String text);
     }
+
+
 }
