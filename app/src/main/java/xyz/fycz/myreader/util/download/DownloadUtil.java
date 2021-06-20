@@ -51,7 +51,7 @@ public class DownloadUtil {
         // 允许漫游时下载
         request.setAllowedOverRoaming(true);
         // 允许下载的网路类型
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
+        //request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
         // 设置下载文件保存的路径和文件名
         String fileName = URLUtil.guessFileName(url, contentDisposition, mimeType);
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
