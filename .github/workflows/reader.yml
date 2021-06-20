@@ -2,7 +2,7 @@ name: Android CI
 
 on:
   release:
-    types: [published]
+    types: [ published ]
   push:
     branches:
       - master
@@ -14,21 +14,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    # 获取打包秘钥
-    - name: Checkout Android Keystore
-      uses: actions/checkout@v2
-      with:
-        repository: fengyuecanzhu/Key
-        token: ${{ secrets.KEY_TOKEN }} # 连接仓库的token,需要单独配置
-        path: keystore # 仓库的根目录名
-    # 打包release
-    - name: Build With Gradle
+      - uses: actions/checkout@v2
+      # 获取打包秘钥
+      - name: Checkout Android Keystore
+        uses: actions/checkout@v2
+        with:
+          repository: fengyuecanzhu/Key
+          token: ${{ secrets.KEY_TOKEN }} # 连接仓库的token,需要单独配置
+          path: keystore # 仓库的根目录名
+      # 打包release
+      - name: Build With Gradle
         run: |
           echo "开始进行release构建"
           chmod +x gradlew
-          ./gradlew assembleAppRelease --parallel
-    - name: Upload App To Artifact
+          ./gradlew assembleAppRelease --build-cache --parallel
+      - name: Upload App To Artifact
         uses: actions/upload-artifact@v2
         with:
           name: fyreader apk
