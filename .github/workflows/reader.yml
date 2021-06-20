@@ -12,11 +12,6 @@ jobs:
       # 登录蓝奏云后在控制台运行document.cookie
       ylogin: ${{ secrets.LANZOU_ID }}
       phpdisk_info: ${{ secrets.LANZOU_PSD }}
-      # 蓝奏云里的文件夹ID
-      LANZOU_FOLDER_ID: '2226473'
-      LANZOU_SHARE_URL: 'https://fycz.lanzoui.com/b00nu1f8d'
-      # 是否上传到artifact
-      UPLOAD_ARTIFACT: 'true'
     steps:
       - uses: actions/checkout@v2
       # 获取打包秘钥
@@ -37,7 +32,7 @@ jobs:
         with:
           name: FYReader-apk
           path: ${{ github.workspace }}/app/build/outputs/apk/release/*.apk
-      - name: Prepare config
+      - name: Prepare Config
         id: config
         run: |
           echo "获取是否需要创建release并获取配置"
@@ -52,9 +47,12 @@ jobs:
           echo ::set-output name=need_create_release::"$NEED_CREATE_RELEASE"
           echo ::set-output name=version_name::"$versionN"
 
-          if [[ $NEED_CREATE_RELEASE == "true" ]];then
-             echo ::set-env name=LANZOU_FOLDER_ID::"1608604"
-             echo ::set-env name=LANZOU_SHARE_URL::"https://fycz.lanzoui.com/b00ngso7e"
+          if [[ $NEED_CREATE_RELEASE == 'true' ]];then
+             echo ::set-output name=lanzou_folder_id::"1608604"
+             echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00ngso7e"
+          else
+             echo ::set-output name=lanzou_folder_id::"2226473"
+             echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00nu1f8d"
           fi
 
           path="$GITHUB_WORKSPACE/app/build/outputs/apk/release"
@@ -95,5 +93,5 @@ jobs:
       - name: Upload App To Lanzou
         if: ${{ env.ylogin }}
         run: |
-          python3 $GITHUB_WORKSPACE/.github/scripts/lzy.py "${{ steps.config.outputs.file_path }}" "$LANZOU_FOLDER_ID"
-          echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: $LANZOU_SHARE_URL"
+          python3 $GITHUB_WORKSPACE/.github/scripts/lzy.py "${{ steps.config.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}"
+          echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: ${{ steps.config.outputs.lanzou_share_url }}"
