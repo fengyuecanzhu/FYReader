@@ -3,13 +3,10 @@ import org.seimicrawler.xpath.JXDocument;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import xyz.fycz.myreader.ai.MatrixUtil;
 import xyz.fycz.myreader.model.sourceAnalyzer.BaseAnalyzer;
 import xyz.fycz.myreader.util.utils.FileUtils;
-import xyz.fycz.myreader.util.utils.GsonUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 
 /**
