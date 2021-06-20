@@ -75,6 +75,8 @@ android {
             keyPassword keyProps['keyPassword']
             storeFile keyProps['storeFile'] ? file(keyProps['storeFile']) : null
             storePassword keyProps['storePassword']
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
 
@@ -89,9 +91,9 @@ android {
             ndk {
                 abiFilters "x86", "armeabi", "armeabi-v7a"
             }
-            if (keyPropsFile.exists()) {
+            //if (keyPropsFile.exists()) {
                 signingConfig signingConfigs.myConifg
-            }
+            //}
         }
         debug {
             ndk {
@@ -99,9 +101,9 @@ android {
             }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            if (keyPropsFile.exists()) {
+            //if (keyPropsFile.exists()) {
                 signingConfig signingConfigs.myConifg
-            }
+            //}
         }
         android.applicationVariants.all { variant ->
             variant.outputs.all {
