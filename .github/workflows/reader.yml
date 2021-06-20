@@ -6,9 +6,6 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
 
 jobs:
   build:
@@ -27,7 +24,7 @@ jobs:
         run: |
           echo "开始进行release构建"
           chmod +x gradlew
-          ./gradlew assembleAppRelease --build-cache --parallel
+          ./gradlew assembleRelease --parallel
       - name: Upload App To Artifact
         uses: actions/upload-artifact@v2
         with:
