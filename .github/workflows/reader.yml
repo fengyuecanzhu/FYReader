@@ -81,7 +81,7 @@ jobs:
           tag_name: ${{ steps.config.outputs.version_name }}
           release_name: FYReader_${{ steps.config.outputs.version_name }}
           body_path: ${{ github.workspace }}/app/release.md
-          draft: true
+          draft: false
       - name: Upload Release Asset
         id: upload_release_asset
         if: ${{ steps.config.outputs.need_create_release == 'true' && steps.create_release.outputs.upload_url }}
