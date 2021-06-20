@@ -49,6 +49,14 @@ def getVersionName(){
 
 def versionN = getVersionName()
 
+// 读取keystore.properties
+def keyProps = new Properties()
+def keyPropsFile = rootProject.file('keystore/keystore.properties')
+if (keyPropsFile.exists()) {
+    keyProps.load(new FileInputStream(keyPropsFile))
+}
+
+
 android {
     compileSdkVersion 29
     buildToolsVersion '29.0.3'
@@ -60,7 +68,16 @@ android {
         versionName versionN
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
-    
+
+    signingConfigs {
+        myConifg {
+            keyAlias keyProps['keyAlias']
+            keyPassword keyProps['keyPassword']
+            storeFile keyProps['storeFile'] ? file(keyProps['storeFile']) : null
+            storePassword keyProps['storePassword']
+        }
+    }
+
     buildFeatures {
         viewBinding true
     }
@@ -72,12 +89,15 @@ android {
             ndk {
                 abiFilters "x86", "armeabi", "armeabi-v7a"
             }
+            signingConfig signingConfigs.myConifg
         }
         debug {
             ndk {
                 abiFilters "x86", "armeabi", "armeabi-v7a"
             }
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.myConifg
         }
         android.applicationVariants.all { variant ->
             variant.outputs.all {
