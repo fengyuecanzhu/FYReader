@@ -47,6 +47,9 @@ jobs:
           echo ::set-output name=need_create_release::"$NEED_CREATE_RELEASE"
           echo ::set-output name=version_name::"$versionN"
 
+          echo need_create_release=$NEED_CREATE_RELEASE
+          echo version_name=$versionN
+
           if [[ $NEED_CREATE_RELEASE == 'true' ]];then
              echo ::set-output name=lanzou_folder_id::"1608604"
              echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00ngso7e"
@@ -77,8 +80,8 @@ jobs:
         with:
           tag_name: ${{ steps.config.outputs.version_name }}
           release_name: FYReader_${{ steps.config.outputs.version_name }}
-          draft: false
-          prerelease: false
+          body_path: ${{ github.workspace }}/app/release.md
+          draft: true
       - name: Upload Release Asset
         id: upload_release_asset
         if: ${{ steps.config.outputs.need_create_release == 'true' && steps.create_release.outputs.upload_url }}
