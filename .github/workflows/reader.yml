@@ -48,7 +48,7 @@ jobs:
           echo ::set-output name=version_name::"$versionN"
 
           echo need_create_release=$NEED_CREATE_RELEASE
-          echo version_name=$versionN
+          echo version_name=v$versionN
 
           if [[ $NEED_CREATE_RELEASE == 'true' ]];then
              echo ::set-output name=lanzou_folder_id::"1608604"
