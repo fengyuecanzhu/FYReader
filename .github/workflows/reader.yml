@@ -38,37 +38,37 @@ jobs:
           name: FYReader-apk
           path: ${{ github.workspace }}/app/build/outputs/apk/release/*.apk
       - name: Prepare config
-          id: config
-          run: |
-            echo "获取是否需要创建release并获取配置"
-            source ${{ github.workspace }}/app/version_code.properties
-            version=$VERSION_CODE
-            hun=$(expr ${version} / 100)
-            ten=$(expr ${version} / 10)
-            ten=$(expr ${ten} % 10)
-            one=$(expr ${version} % 10)
-            versionN=$hun.$ten.$one
+        id: config
+        run: |
+          echo "获取是否需要创建release并获取配置"
+          source ${{ github.workspace }}/app/version_code.properties
+          version=$VERSION_CODE
+          hun=$(expr ${version} / 100)
+          ten=$(expr ${version} / 10)
+          ten=$(expr ${ten} % 10)
+          one=$(expr ${version} % 10)
+          versionN=$hun.$ten.$one
 
-            echo ::set-output name=need_create_release::"$NEED_CREATE_RELEASE"
-            echo ::set-output name=version_name::"$versionN"
+          echo ::set-output name=need_create_release::"$NEED_CREATE_RELEASE"
+          echo ::set-output name=version_name::"$versionN"
 
-            if [[ $NEED_CREATE_RELEASE == "true" ]];then
-               echo ::set-env name=LANZOU_FOLDER_ID::"1608604"
-               echo ::set-env name=LANZOU_SHARE_URL::"https://fycz.lanzoui.com/b00ngso7e"
-            fi
+          if [[ $NEED_CREATE_RELEASE == "true" ]];then
+             echo ::set-env name=LANZOU_FOLDER_ID::"1608604"
+             echo ::set-env name=LANZOU_SHARE_URL::"https://fycz.lanzoui.com/b00ngso7e"
+          fi
 
-            path="$GITHUB_WORKSPACE/app/build/outputs/apk/release"
-            files=$(ls $path)
-            for f in $files
-            do
-             if [[ $f == *"apk" ]]; then
-              file=$f
-              echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 文件:$file"
-              break
-             fi
-            done
-            echo ::set-output name=file_name::"$file"
-            echo ::set-output name=file_path::"$path/$file"
+          path="$GITHUB_WORKSPACE/app/build/outputs/apk/release"
+          files=$(ls $path)
+          for f in $files
+          do
+           if [[ $f == *"apk" ]]; then
+            file=$f
+            echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 文件:$file"
+            break
+           fi
+          done
+          echo ::set-output name=file_name::"$file"
+          echo ::set-output name=file_path::"$path/$file"
       - name: Create Release
         id: create_release
         if: ${{ steps.config.outputs.need_create_release == "true" }}
