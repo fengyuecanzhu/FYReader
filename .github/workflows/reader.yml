@@ -8,11 +8,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ secrets.KEY_TOKEN }}
     env:
       # 登录蓝奏云后在控制台运行document.cookie
       ylogin: ${{ secrets.LANZOU_ID }}
       phpdisk_info: ${{ secrets.LANZOU_PSD }}
+    if: ${{ secrets.KEY_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       # 获取打包秘钥
