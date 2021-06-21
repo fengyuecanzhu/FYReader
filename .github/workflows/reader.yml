@@ -21,44 +21,51 @@ jobs:
           repository: fengyuecanzhu/Key
           token: ${{ secrets.KEY_TOKEN }} # 连接仓库的token,需要单独配置
           path: keystore # 仓库的根目录名
-      # 打包release
+      # 读取配置
+      - name: Prepare Config
+          id: config
+          run: |
+            echo "读取配置"
+            source ${{ github.workspace }}/app/version_code.properties
+            version=$VERSION_CODE
+            hun=$(expr ${version} / 100)
+            ten=$(expr ${version} / 10)
+            ten=$(expr ${ten} % 10)
+            one=$(expr ${version} % 10)
+            versionN=v$hun.$ten.$one
+
+            echo ::set-output name=need_create_release::"$NEED_CREATE_RELEASE"
+            echo ::set-output name=version_name::"$versionN"
+
+            echo need_create_release=$NEED_CREATE_RELEASE
+            echo version_name=$versionN
+
+            if [[ $NEED_CREATE_RELEASE == 'true' ]];then
+               echo ::set-output name=lanzou_folder_id::"1608604"
+               echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00ngso7e"
+            else
+               echo ::set-output name=lanzou_folder_id::"2226473"
+               echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00nu1f8d"
+            fi
+      # 编译打包
       - name: Build With Gradle
         run: |
-          echo "开始进行release构建"
+          echo "开始编译打包"
           chmod +x gradlew
-          ./gradlew assembleRelease --parallel
-      - name: Upload App To Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: FYReader-apk
-          path: ${{ github.workspace }}/app/build/outputs/apk/release/*.apk
-      - name: Prepare Config
-        id: config
-        run: |
-          echo "获取是否需要创建release并获取配置"
-          source ${{ github.workspace }}/app/version_code.properties
-          version=$VERSION_CODE
-          hun=$(expr ${version} / 100)
-          ten=$(expr ${version} / 10)
-          ten=$(expr ${ten} % 10)
-          one=$(expr ${version} % 10)
-          versionN=$hun.$ten.$one
-
-          echo ::set-output name=need_create_release::"$NEED_CREATE_RELEASE"
-          echo ::set-output name=version_name::"$versionN"
-
-          echo need_create_release=$NEED_CREATE_RELEASE
-          echo version_name=v$versionN
-
-          if [[ $NEED_CREATE_RELEASE == 'true' ]];then
-             echo ::set-output name=lanzou_folder_id::"1608604"
-             echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00ngso7e"
+          if [[ ${{ steps.config.outputs.need_create_release }} == 'true' ]];then
+             echo "进行release构建"
+             ./gradlew assembleRelease --parallel
           else
-             echo ::set-output name=lanzou_folder_id::"2226473"
-             echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00nu1f8d"
+             echo "进行Debug构建"
+             ./gradlew assembleDebug --parallel
           fi
-
+      - name: Get File Path
+        id: get_path
+        run: |
           path="$GITHUB_WORKSPACE/app/build/outputs/apk/release"
+          if [[ ${{ steps.config.outputs.need_create_release }} != 'true' ]];then
+            path="$GITHUB_WORKSPACE/app/build/outputs/apk/debug"
+          fi
           files=$(ls $path)
           for f in $files
           do
@@ -70,6 +77,16 @@ jobs:
           done
           echo ::set-output name=file_name::"$file"
           echo ::set-output name=file_path::"$path/$file"
+      - name: Upload App To Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: FYReader-apk
+          path: ${{ steps.get_path.outputs.file_path }}
+      - name: Upload App To Lanzou
+          if: ${{ env.ylogin }}
+          run: |
+            python3 $GITHUB_WORKSPACE/.github/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}"
+            echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: ${{ steps.config.outputs.lanzou_share_url }}"
       - name: Create Release
         id: create_release
         if: ${{ steps.config.outputs.need_create_release == 'true' }}
@@ -90,11 +107,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.config.outputs.file_path }}
+          asset_path: ${{ steps.get_path.outputs.file_path }}
           asset_name: FYReader_${{ steps.config.outputs.version_name }}.apk
           asset_content_type: application/vnd.android.package-archive
-      - name: Upload App To Lanzou
-        if: ${{ env.ylogin }}
-        run: |
-          python3 $GITHUB_WORKSPACE/.github/scripts/lzy.py "${{ steps.config.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}"
-          echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: ${{ steps.config.outputs.lanzou_share_url }}"
