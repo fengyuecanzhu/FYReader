@@ -83,10 +83,10 @@ jobs:
           name: FYReader-apk
           path: ${{ steps.get_path.outputs.file_path }}
       - name: Upload App To Lanzou
-          if: ${{ env.ylogin }}
-          run: |
-            python3 $GITHUB_WORKSPACE/.github/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}"
-            echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: ${{ steps.config.outputs.lanzou_share_url }}"
+        if: ${{ env.ylogin }}
+        run: |
+          python3 $GITHUB_WORKSPACE/.github/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}"
+          echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: ${{ steps.config.outputs.lanzou_share_url }}"
       - name: Create Release
         id: create_release
         if: ${{ steps.config.outputs.need_create_release == 'true' }}
