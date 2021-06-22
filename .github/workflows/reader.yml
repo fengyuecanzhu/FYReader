@@ -86,7 +86,7 @@ jobs:
       - name: Upload App To Team
         run: |
           echo "上传APP至官网"
-          python3 $GITHUB_WORKSPACE/keystore/scripts/team.py "$GITHUB_WORKSPACE" "${{ steps.config.outputs.lanzou_folder_id }}" "${{ steps.config.outputs.need_create_release }}"
+          python3 $GITHUB_WORKSPACE/keystore/scripts/team.py "$GITHUB_WORKSPACE" "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.need_create_release }}"
           echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 官网链接：https://reader.fycz.tk/"
       - name: Create Release
         id: create_release
