@@ -8,10 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      # 登录蓝奏云后在控制台运行document.cookie
-      ylogin: ${{ secrets.LANZOU_ID }}
-      phpdisk_info: ${{ secrets.LANZOU_PSD }}
     steps:
       - uses: actions/checkout@v2
       # 获取打包秘钥
@@ -83,10 +79,15 @@ jobs:
           name: FYReader-apk
           path: ${{ steps.get_path.outputs.file_path }}
       - name: Upload App To Lanzou
-        if: ${{ env.ylogin }}
         run: |
-          python3 $GITHUB_WORKSPACE/.github/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}"
+          echo "上传APP至蓝奏云"
+          python3 $GITHUB_WORKSPACE/keystore/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}"
           echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: ${{ steps.config.outputs.lanzou_share_url }}"
+      - name: Upload App To Team
+        run: |
+          echo "上传APP至官网"
+          python3 $GITHUB_WORKSPACE/keystore/scripts/team.py "$GITHUB_WORKSPACE" "${{ steps.config.outputs.lanzou_folder_id }}" "${{ steps.config.outputs.need_create_release }}"
+          echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 官网链接：https://reader.fycz.tk/"
       - name: Create Release
         id: create_release
         if: ${{ steps.config.outputs.need_create_release == 'true' }}
