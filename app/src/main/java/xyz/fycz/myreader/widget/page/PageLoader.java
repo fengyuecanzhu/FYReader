@@ -1517,8 +1517,8 @@ public abstract class PageLoader {
     private void chapterChangeCallback() {
         if (mPageChangeListener != null) {
             readAloudParagraph = -1;
-            mPageChangeListener.onPageChange(0, resetReadAloud);
             mPageChangeListener.onChapterChange(mCurChapterPos);
+            mPageChangeListener.onPageChange(0, resetReadAloud);
             resetReadAloud = true;
             mPageChangeListener.onPageCountChange(mCurChapter != null ? mCurChapter.getPageSize() : 0);
         }
