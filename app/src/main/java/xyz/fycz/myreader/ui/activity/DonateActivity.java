@@ -2,17 +2,9 @@ package xyz.fycz.myreader.ui.activity;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.widget.Toolbar;
-
-import com.weaction.ddsdk.ad.DdSdkFlowAd;
-import com.weaction.ddsdk.ad.DdSdkInterAd;
-import com.weaction.ddsdk.ad.DdSdkInterVideoAd;
-import com.weaction.ddsdk.ad.DdSdkRewardAd;
-
-import java.util.List;
 
 import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.R;
@@ -49,7 +41,7 @@ public class DonateActivity extends BaseActivity {
 
     @Override
     protected void initWidget() {
-        AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
+        /*AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
             @Override
             public void onSuccess(@NonNull Boolean aBoolean) {
                 if (aBoolean) {
@@ -57,37 +49,13 @@ public class DonateActivity extends BaseActivity {
                     initAd();
                 }
             }
-        });
+        });*/
     }
 
     private void initAd() {
         binding.llAdSupport.setVisibility(View.VISIBLE);
         int flowAdCount = SharedPreUtils.getInstance().getInt("flowAdCount", 2);
         int count = App.isDebug() ? flowAdCount : 1;
-        new DdSdkFlowAd().getFlowViews(DonateActivity.this, 6, count, new DdSdkFlowAd.FlowCallback() {
-            // 信息流广告拉取完毕后返回的 views
-            @Override
-            public void getFlowViews(List<View> views) {
-                Log.d(TAG, "信息流广告拉取完毕后返回了" + views.size() + "个view");
-                for (int i = 0; i < views.size(); i++) {
-                    View view = views.get(i);
-                    binding.llAdSupport.addView(view, i + 2);
-                }
-            }
-
-            // 信息流广告展示后调用
-            @Override
-            public void show() {
-                AdUtils.adRecord("flow","adShow");
-                Log.d(TAG, "信息流广告展示成功");
-            }
-
-            // 广告拉取失败调用
-            @Override
-            public void error(String msg) {
-                Log.d(TAG, "广告拉取失败\n" + msg);
-            }
-        });
     }
 
     @Override
@@ -95,67 +63,6 @@ public class DonateActivity extends BaseActivity {
         binding.llWxZsm.setOnClickListener(v -> goDonate(URLCONST.WX_ZSM));
         binding.llZfbSkm.setOnClickListener(v -> goDonate(URLCONST.ZFB_SKM));
         binding.llQqSkm.setOnClickListener(v -> goDonate(URLCONST.QQ_SKM));
-        binding.llRewardedVideo.setOnClickListener(v -> {
-            DdSdkRewardAd.show(this, new DdSdkRewardAd.DdSdkRewardCallback() {
-                @Override
-                public void show() {
-                    Log.d(TAG, "激励视频展示成功");
-                    AdUtils.adRecord("rewardVideo","adShow");
-                }
-
-                @Override
-                public void click() {
-                    Log.d(TAG, "激励视频被点击");
-                    AdUtils.adRecord("rewardVideo","adClick");
-                }
-
-                @Override
-                public void error(String msg) {
-                }
-
-                @Override
-                public void skip() {
-                    Log.d(TAG, "激励视频被跳过");
-                    AdUtils.adRecord("rewardVideo","adSkip");
-                }
-
-                @Override
-                public void finishCountdown() {
-                    Log.d(TAG, "激励视频计时完成");
-                    AdUtils.adRecord("rewardVideo","adFinishCount");
-                }
-            });
-        });
-
-        binding.llInterAd.setOnClickListener(v -> {
-            /*
-             * 参数 1  activity
-             * 参数 2  marginDp (float)，插屏默认 margin 全屏幕的 24dp，此处允许开发者手动调节 margin 大小，单位为 dp，允许范围为 0dp (全屏) ~ 48dp，请开发者按需填写
-             */
-            DdSdkInterAd.show(this, 48f, new DdSdkInterAd.Callback() {
-                @Override
-                public void show() {
-                    Log.i(TAG, "插屏广告展示成功");
-                    AdUtils.adRecord("inter","adShow");
-                }
-
-                @Override
-                public void click() {
-                    Log.i(TAG, "插屏广告");
-                    AdUtils.adRecord("inter","adClick");
-                }
-
-                @Override
-                public void error(String msg) {
-                }
-
-                @Override
-                public void close() {
-                    Log.i(TAG, "插屏广告被关闭");
-                    AdUtils.adRecord("inter","adClose");
-                }
-            });
-        });
     }
 
 

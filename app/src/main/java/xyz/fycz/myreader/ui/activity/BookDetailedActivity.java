@@ -2,18 +2,12 @@ package xyz.fycz.myreader.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextPaint;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,23 +18,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.weaction.ddsdk.ad.DdSdkFlowAd;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.Single;
-import io.reactivex.SingleOnSubscribe;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import xyz.fycz.myreader.R;
@@ -49,11 +34,8 @@ import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.base.observer.MyObserver;
-import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityBookDetailBinding;
-import xyz.fycz.myreader.entity.SharedBook;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
@@ -65,25 +47,16 @@ import xyz.fycz.myreader.ui.adapter.DetailCatalogAdapter;
 import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
-import xyz.fycz.myreader.util.IOUtils;
-import xyz.fycz.myreader.util.ShareUtils;
-import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.AdUtils;
-import xyz.fycz.myreader.util.utils.BitmapUtil;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.BlurTransformation;
-import xyz.fycz.myreader.util.utils.FileUtils;
-import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.ShareBookUtil;
-import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.webapi.BookApi;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
-import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
 
 /**
  * @author fengyue
@@ -254,45 +227,6 @@ public class BookDetailedActivity extends BaseActivity {
         mSourceDialog.setABooks(aBooks);
         mSourceDialog.setSourceIndex(sourceIndex);
 
-        initAd();
-    }
-
-    /**
-     * type   信息流类型，只能填 1、4、6、3 (样式请看下表)
-     * count  请求返回的信息流广告条目数，最小为 1，最大为 5，通常情况下建议一次返回一条
-     */
-    private void initAd() {
-        if (SharedPreUtils.getInstance().getBoolean("bookDetailAd", false)) {
-            AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
-                @Override
-                public void onSuccess(@NonNull Boolean aBoolean) {
-                    if (aBoolean) {
-                        AdUtils.initAd();
-                        new DdSdkFlowAd().getFlowViews(BookDetailedActivity.this, 6, 1, new DdSdkFlowAd.FlowCallback() {
-                            // 信息流广告拉取完毕后返回的 views
-                            @Override
-                            public void getFlowViews(List<View> views) {
-                                Log.i(TAG, "信息流广告拉取完毕后返回了" + views.size() + "个view");
-                                binding.ic.getRoot().addView(views.get(0), 2);
-                            }
-
-                            // 信息流广告展示后调用
-                            @Override
-                            public void show() {
-                                AdUtils.adRecord("flow", "adShow");
-                                Log.i(TAG, "信息流广告展示成功");
-                            }
-
-                            // 广告拉取失败调用
-                            @Override
-                            public void error(String msg) {
-                                Log.i(TAG, "广告拉取失败\n" + msg);
-                            }
-                        });
-                    }
-                }
-            });
-        }
     }
 
     @Override

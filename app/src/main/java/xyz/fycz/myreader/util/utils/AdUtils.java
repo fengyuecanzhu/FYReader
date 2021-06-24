@@ -2,8 +2,6 @@ package xyz.fycz.myreader.util.utils;
 
 import android.util.Log;
 
-import com.weaction.ddsdk.base.DdSdkHelper;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,12 +11,11 @@ import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.model.backup.UserService;
-import xyz.fycz.myreader.util.help.DateHelper;
 import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.help.DateHelper;
 
 /**
  * @author fengyue
@@ -123,10 +120,6 @@ public class AdUtils {
     public static void initAd() {
         if (!hasInitAd) {
             hasInitAd = true;
-            DdSdkHelper.init("1234", "216", "51716a16fbdf50905704b6575b1b3b60",
-                    "142364", "35ce0efe5f3cc960b116db227498e238",
-                    "8167", "85bd159309c3da1b",
-                    App.getApplication(), App.isDebug());
         }
     }
 }

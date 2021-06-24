@@ -325,6 +325,7 @@
         </RelativeLayout>
         <RelativeLayout
             android:id="@+id/mine_rl_ad_setting"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@drawable/selector_common_bg"

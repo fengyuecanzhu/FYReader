@@ -141,7 +141,7 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.aar'])
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':DialogX')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
@@ -221,11 +221,6 @@ dependencies {
     implementation 'com.hyman:flowlayout-lib:1.1.2'
 
     implementation 'com.liulishuo.filedownloader:library:1.7.7'
-
-    // 如使用视频广告必须依赖，否则会导致视频播放崩溃
-    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
-    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
-    implementation 'tv.danmaku.ijk.media:ijkplayer-exo:0.8.8'
 
     //SwipeBackLayout
     implementation 'me.imid.swipebacklayout.lib:library:1.1.0'
