@@ -325,6 +325,17 @@ public class MyAlertDialog {
         }).setCancelButton("知道了");
     }
 
+    public static void showTipDialogWithLink(Context context, String title, String msg){
+        BottomDialog.show(title, new OnBindView<BottomDialog>(R.layout.dialog_textview) {
+            @Override
+            public void onBind(BottomDialog dialog, View v) {
+                TextView view = (TextView) v;
+                view.setText(msg);
+                view.setMovementMethod(LinkMovementMethod.getInstance());
+            }
+        }).setCancelButton("取消");
+    }
+
     public static void showPrivacyDialog(Context context, DialogInterface.OnClickListener pos, DialogInterface.OnClickListener neg) {
         TextView view = (TextView) LayoutInflater.from(context).inflate(R.layout.dialog_textview, null);
         String msg = context.getString(R.string.privacy_tip);

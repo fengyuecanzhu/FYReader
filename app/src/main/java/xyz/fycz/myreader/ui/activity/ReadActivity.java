@@ -81,8 +81,8 @@ import xyz.fycz.myreader.model.audio.ReadAloudService;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.ui.dialog.AudioPlayerDialog;
-import xyz.fycz.myreader.ui.dialog.CopyContentDialog;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.ui.dialog.ReplaceDialog;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.ui.popmenu.AutoPageMenu;
@@ -759,7 +759,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             Intent ruleIntent = new Intent(this, ReplaceRuleActivity.class);
             startActivityForResult(ruleIntent, APPCONST.REQUEST_REFRESH_READ_UI);
         } else if (itemId == R.id.action_copy_content) {
-            new CopyContentDialog(this, mPageLoader.getContent()).show();
+            String content = mPageLoader.getContentStartPage(0);
+            MyAlertDialog.showTipDialogWithLink(this, "拷贝内容", content == null ? "章节内容为空！" : content);
         } else if (itemId == R.id.action_open_link) {
             Uri uri = Uri.parse(NetworkUtils.getAbsoluteURL(mReadCrawler.getNameSpace(), mBook.getChapterUrl()));
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
