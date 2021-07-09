@@ -479,6 +479,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
         mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
             Book bookTem = (Book) mBook.clone();
+            bookTem.clearCathe();
             bookTem.setInfoUrl(bean.getInfoUrl());
             bookTem.setChapterUrl(bean.getChapterUrl());
             bookTem.setSource(bean.getSource());

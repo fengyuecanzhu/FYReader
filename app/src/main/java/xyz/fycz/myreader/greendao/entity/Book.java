@@ -413,4 +413,10 @@ public class Book implements Serializable {
         }
         return catheMap.get(key);
     }
+
+    public void clearCathe(){
+        if (catheMap != null) {
+            catheMap.clear();
+        }
+    }
 }
