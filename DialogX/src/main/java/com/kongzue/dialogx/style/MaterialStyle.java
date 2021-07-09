@@ -141,7 +141,7 @@ public class MaterialStyle implements DialogXStyle {
             
             @Override
             public boolean touchSlide() {
-                return true;
+                return false;
             }
             
             @Override

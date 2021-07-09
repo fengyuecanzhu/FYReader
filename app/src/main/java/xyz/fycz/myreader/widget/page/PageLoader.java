@@ -1517,8 +1517,8 @@ public abstract class PageLoader {
     private void chapterChangeCallback() {
         if (mPageChangeListener != null) {
             readAloudParagraph = -1;
-            mPageChangeListener.onPageChange(0, resetReadAloud);
             mPageChangeListener.onChapterChange(mCurChapterPos);
+            mPageChangeListener.onPageChange(0, resetReadAloud);
             resetReadAloud = true;
             mPageChangeListener.onPageCountChange(mCurChapter != null ? mCurChapter.getPageSize() : 0);
         }
@@ -2017,7 +2017,7 @@ public abstract class PageLoader {
      * @param page 开始页数
      * @return 从page页开始的的当前章节所有内容
      */
-    private String getContentStartPage(int page) {
+    public String getContentStartPage(int page) {
         if (mCurChapter == null) return null;
         if (mCurChapter.getTxtPageList().isEmpty()) return null;
         StringBuilder s = new StringBuilder();

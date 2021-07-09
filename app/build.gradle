@@ -104,6 +104,7 @@ android {
             if (keyPropsFile.exists()) {
                 signingConfig signingConfigs.myConifg
             }
+            versionNameSuffix "-debug"
         }
         android.applicationVariants.all { variant ->
             variant.outputs.all {

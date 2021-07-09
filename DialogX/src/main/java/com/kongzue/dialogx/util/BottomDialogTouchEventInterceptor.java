@@ -1,6 +1,7 @@
 package com.kongzue.dialogx.util;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -42,7 +43,8 @@ public class BottomDialogTouchEventInterceptor {
     public BottomDialogTouchEventInterceptor(BottomDialog me, BottomDialog.DialogImpl impl) {
         refresh(me, impl);
     }
-    
+
+    @SuppressLint("ClickableViewAccessibility")
     public void refresh(final BottomDialog me, final BottomDialog.DialogImpl impl) {
         if (me == null || impl == null || impl.bkg == null || impl.scrollView == null) {
             return;
@@ -62,6 +64,7 @@ public class BottomDialogTouchEventInterceptor {
          */
         if (me.isAllowInterceptTouch()) {
             impl.bkg.setOnTouchListener(new View.OnTouchListener() {
+
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     //这里 return 什么实际上无关紧要，重点在于 MaxRelativeLayout.java(dispatchTouchEvent:184) 的事件分发会独立触发此处的额外滑动事件
