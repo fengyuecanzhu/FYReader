@@ -95,7 +95,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:background="?android:attr/selectableItemBackground"
-        android:padding="5dp"
+        android:padding="8dp"
         app:srcCompat="@drawable/ic_more"
         app:tint="@color/textSecondary" />
 </RelativeLayout>

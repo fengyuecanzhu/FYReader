@@ -1,57 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <item
-            android:id="@+id/action_finish"
-            android:title="@string/finish"
-            app:showAsAction="always"
-            android:visible="false"/>
+        android:id="@+id/action_finish"
+        android:title="@string/finish"
+        android:visible="false"
+        app:showAsAction="always" />
     <group android:id="@+id/bookcase_menu">
 
         <item
-                android:id="@+id/action_search"
-                android:icon="@drawable/ic_search"
-                android:title="@string/menu_bookcase_search"
-                app:showAsAction="always"/>
+            android:id="@+id/action_search"
+            android:icon="@drawable/ic_search"
+            android:title="@string/menu_bookcase_search"
+            app:showAsAction="always" />
         <item
-                android:id="@+id/action_change_group"
-                android:icon="@drawable/ic_change"
-                android:title="@string/menu_change_group"
-                app:showAsAction="always"/>
+            android:id="@+id/action_change_group"
+            android:icon="@drawable/ic_change"
+            android:title="@string/menu_change_group"
+            app:showAsAction="always" />
 
         <item
-                android:id="@+id/action_edit"
-                android:icon="@drawable/ic_arrange"
-                android:title="@string/menu_bookcase_edit"
-                app:showAsAction="never"/>
+            android:id="@+id/action_edit"
+            android:icon="@drawable/ic_arrange"
+            android:title="@string/menu_bookcase_edit"
+            app:showAsAction="never" />
         <item
-                android:id="@+id/action_styleChange"
-                android:icon="@drawable/ic_view_quilt"
-                android:title="@string/menu_bookcase_style"
-                app:showAsAction="never"/>
+            android:id="@+id/action_styleChange"
+            android:icon="@drawable/ic_view_quilt"
+            android:title="@string/menu_bookcase_style"
+            app:showAsAction="never" />
         <item
-                android:id="@+id/action_group_man"
-                android:icon="@drawable/ic_group"
-                android:title="@string/menu_group_man"
-                app:showAsAction="never"/>
+            android:id="@+id/action_group_man"
+            android:icon="@drawable/ic_group"
+            android:title="@string/menu_group_man"
+            app:showAsAction="never" />
         <item
-                android:id="@+id/action_addLocalBook"
-                android:icon="@drawable/ic_add"
-                android:title="@string/menu_bookcase_add"
-                app:showAsAction="never"/>
+            android:id="@+id/action_addLocalBook"
+            android:icon="@drawable/ic_add"
+            android:title="@string/menu_bookcase_add"
+            app:showAsAction="never" />
 
         <item
-                android:id="@+id/action_download_all"
-                android:icon="@drawable/ic_download_line"
-                android:title="@string/menu_bookcase_download_all"
-                app:showAsAction="never"
-                android:visible="true"/>
+            android:id="@+id/action_download_all"
+            android:icon="@drawable/ic_download_line"
+            android:title="@string/menu_bookcase_download_all"
+            android:visible="true"
+            app:showAsAction="never" />
         <item
             android:id="@+id/action_qr_scan"
             android:icon="@drawable/ic_scan"
             android:title="@string/menu_scan"
-            app:showAsAction="never"
-            android:visible="true"/>
+            android:visible="true"
+            app:showAsAction="never" />
+    </group>
+    <group
+        android:id="@+id/find_menu"
+        android:visible="false">
+        <item
+            android:id="@+id/action_refresh_find"
+            android:icon="@drawable/ic_refresh"
+            android:title="@string/refresh"
+            app:showAsAction="always" />
     </group>
 </menu>

@@ -58,10 +58,10 @@
             android:layout_height="wrap_content"
             android:text="@string/source_tab_search" />
 
-        <!--<com.google.android.material.tabs.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/source_tab_find" />-->
+            android:text="@string/source_tab_find" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"

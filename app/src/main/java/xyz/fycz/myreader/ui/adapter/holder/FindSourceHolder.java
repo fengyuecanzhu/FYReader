@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.ui.adapter.holder;
 
 import android.content.Intent;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;

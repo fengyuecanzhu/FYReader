@@ -3,6 +3,7 @@ package xyz.fycz.myreader.entity.sourceedit
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.greendao.entity.rule.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @author fengyue
@@ -15,8 +16,22 @@ object EditEntityUtil {
             add(EditEntity("sourceUrl", source?.sourceUrl, R.string.source_url, "不能为空且唯一"))
             add(EditEntity("sourceName", source?.sourceName, R.string.source_name, "不能为空"))
             add(EditEntity("sourceGroup", source?.sourceGroup, R.string.source_group, "不同分组以;/,隔开"))
-            add(EditEntity("sourceCharset", source?.sourceCharset, R.string.source_charset, "默认UTF-8"))
-            add(EditEntity("sourceHeaders", source?.sourceHeaders, R.string.source_headers, "json格式"))
+            add(
+                EditEntity(
+                    "sourceCharset",
+                    source?.sourceCharset,
+                    R.string.source_charset,
+                    "默认UTF-8"
+                )
+            )
+            add(
+                EditEntity(
+                    "sourceHeaders",
+                    source?.sourceHeaders,
+                    R.string.source_headers,
+                    "json格式"
+                )
+            )
             add(EditEntity("loginUrl", source?.loginUrl, R.string.login_url, ""))
             add(EditEntity("sourceComment", source?.sourceComment, R.string.comment, "这是您留给使用者的说明"))
         }
@@ -26,12 +41,20 @@ object EditEntityUtil {
     fun getSearchEntities(searchRule: SearchRule? = SearchRule()): List<EditEntity> {
         val searchEntities: ArrayList<EditEntity> = ArrayList()
         searchEntities.apply {
-            add(EditEntity("searchUrl", searchRule?.searchUrl, R.string.r_search_url,
-                    "搜索关键词以{key}进行占位;post请求以“,”分隔url,“,”前是搜索地址,“,”后是请求体"))
+            add(
+                EditEntity(
+                    "searchUrl", searchRule?.searchUrl, R.string.r_search_url,
+                    "搜索关键词以{key}进行占位;post请求以“,”分隔url,“,”前是搜索地址,“,”后是请求体"
+                )
+            )
             add(EditEntity("charset", searchRule?.charset, R.string.r_search_charset, "默认使用书源字符编码"))
-            add(EditEntity("list", searchRule?.list, R.string.r_book_list,
+            add(
+                EditEntity(
+                    "list", searchRule?.list, R.string.r_book_list,
                     "对于Matcher解析器：此处填写书籍列表所在区间，仅支持普通函数；" +
-                            "\n对于Xpath/JsonPath解析器：此处填写书籍列表规则，仅支持列表函数"))
+                            "\n对于Xpath/JsonPath解析器：此处填写书籍列表规则，仅支持列表函数"
+                )
+            )
             add(EditEntity("name", searchRule?.name, R.string.r_book_name))
             add(EditEntity("author", searchRule?.author, R.string.r_author))
             add(EditEntity("type", searchRule?.type, R.string.rule_book_type))
@@ -43,10 +66,42 @@ object EditEntityUtil {
             add(EditEntity("imgUrl", searchRule?.imgUrl, R.string.rule_img_url))
             add(EditEntity("tocUrl", searchRule?.tocUrl, R.string.rule_toc_url))
             add(EditEntity("infoUrl", searchRule?.infoUrl, R.string.r_info_url, "为空时使用目录URL"))
-            add(EditEntity("relatedWithInfo", searchRule?.isRelatedWithInfo?.toString(), R.string.r_search_related_with_info,
-                    "搜索时是否关联书籍详情页，填true/t表示关联，false/f表示不关联，测试时不生效"))
+            add(
+                EditEntity(
+                    "relatedWithInfo",
+                    searchRule?.isRelatedWithInfo?.toString(),
+                    R.string.r_search_related_with_info,
+                    "搜索时是否关联书籍详情页，填true/t表示关联，false/f表示不关联，测试时不生效"
+                )
+            )
         }
         return searchEntities
+    }
+
+    fun getFindEntities(findRule: FindRule? = FindRule()): List<EditEntity> {
+        val findEntities: ArrayList<EditEntity> = ArrayList()
+        findEntities.apply {
+            add(EditEntity("url", findRule?.url, R.string.r_find_url))
+            add(
+                EditEntity(
+                    "bookList", findRule?.bookList, R.string.r_book_list,
+                    "对于Matcher解析器：此处填写书籍列表所在区间，仅支持普通函数；" +
+                            "\n对于Xpath/JsonPath解析器：此处填写书籍列表规则，仅支持列表函数"
+                )
+            )
+            add(EditEntity("name", findRule?.name, R.string.r_book_name))
+            add(EditEntity("author", findRule?.author, R.string.r_author))
+            add(EditEntity("type", findRule?.type, R.string.rule_book_type))
+            add(EditEntity("wordCount", findRule?.wordCount, R.string.rule_word_count))
+            add(EditEntity("status", findRule?.status, R.string.rule_status))
+            add(EditEntity("desc", findRule?.desc, R.string.rule_book_desc))
+            add(EditEntity("lastChapter", findRule?.lastChapter, R.string.rule_last_chapter))
+            add(EditEntity("updateTime", findRule?.updateTime, R.string.rule_update_time))
+            add(EditEntity("imgUrl", findRule?.imgUrl, R.string.rule_img_url))
+            add(EditEntity("tocUrl", findRule?.tocUrl, R.string.rule_toc_url))
+            add(EditEntity("infoUrl", findRule?.infoUrl, R.string.r_info_url))
+        }
+        return findEntities
     }
 
     fun getInfoEntities(infoRule: InfoRule? = InfoRule()): List<EditEntity> {
@@ -71,19 +126,39 @@ object EditEntityUtil {
     fun getTocEntities(tocRule: TocRule? = TocRule()): List<EditEntity> {
         val tocEntities: ArrayList<EditEntity> = ArrayList()
         tocEntities.apply {
-            add(EditEntity("chapterBaseUrl", tocRule?.chapterBaseUrl, R.string.rule_chapter_base_url,
-                    "如果章节URL(一般为相对路径)无法定位章节，可填写此规则获取，默认为书源URL"))
-            add(EditEntity("chapterList", tocRule?.chapterList, R.string.rule_chapter_list,
-                     "对于Mathcer解析器：此处填写书籍列表所在区间，仅支持普通函数；" +
-                             "\n对于Xpath/JsonPath解析器：此处填写书籍列表规则，仅支持列表函数"))
-            add(EditEntity("chapterName", tocRule?.chapterName, R.string.rule_chapter_name,
-            "对于Mathcer解析器：此处填写章节名称和URL规则，其中章节名称以<title>占位，章节URL以<link>占位，仅支持列表函数\n" +
-                    "对于Xpath/JsonPath解析器：此处填写章节名称，仅支持普通函数"))
-            add(EditEntity("chapterUrl", tocRule?.chapterUrl, R.string.rule_chapter_url,
-            "对于Mathcer解析器：此处不用填写\n" +
-                    "对于Xpath/JsonPath解析器：此处填写章节URL规则"))
-            add(EditEntity("tocUrlNext", tocRule?.tocUrlNext, R.string.rule_next_toc_url,
-            "填写后获取目录时将会不断地从目录下一页获取章节，直至下一页URL为空时停止，注意：千万不要获取恒存在的URL，否则将出现死循环甚至崩溃"))
+            add(
+                EditEntity(
+                    "chapterBaseUrl", tocRule?.chapterBaseUrl, R.string.rule_chapter_base_url,
+                    "如果章节URL(一般为相对路径)无法定位章节，可填写此规则获取，默认为书源URL"
+                )
+            )
+            add(
+                EditEntity(
+                    "chapterList", tocRule?.chapterList, R.string.rule_chapter_list,
+                    "对于Mathcer解析器：此处填写书籍列表所在区间，仅支持普通函数；" +
+                            "\n对于Xpath/JsonPath解析器：此处填写书籍列表规则，仅支持列表函数"
+                )
+            )
+            add(
+                EditEntity(
+                    "chapterName", tocRule?.chapterName, R.string.rule_chapter_name,
+                    "对于Mathcer解析器：此处填写章节名称和URL规则，其中章节名称以<title>占位，章节URL以<link>占位，仅支持列表函数\n" +
+                            "对于Xpath/JsonPath解析器：此处填写章节名称，仅支持普通函数"
+                )
+            )
+            add(
+                EditEntity(
+                    "chapterUrl", tocRule?.chapterUrl, R.string.rule_chapter_url,
+                    "对于Mathcer解析器：此处不用填写\n" +
+                            "对于Xpath/JsonPath解析器：此处填写章节URL规则"
+                )
+            )
+            add(
+                EditEntity(
+                    "tocUrlNext", tocRule?.tocUrlNext, R.string.rule_next_toc_url,
+                    "填写后获取目录时将会不断地从目录下一页获取章节，直至下一页URL为空时停止，注意：千万不要获取恒存在的URL，否则将出现死循环甚至崩溃"
+                )
+            )
         }
         return tocEntities
     }
@@ -92,13 +167,22 @@ object EditEntityUtil {
         val contentEntities: ArrayList<EditEntity> = ArrayList()
         contentEntities.apply {
             add(EditEntity("content", contentRule?.content, R.string.rule_book_content))
-            add(EditEntity("contentBaseUrl", contentRule?.contentBaseUrl, R.string.rule_base_url_content,
-            "如果下一页URL(一般为相对路径)无法定位下一页，可填写此规则获取，默认为书源URL"))
-            add(EditEntity("contentUrlNext", contentRule?.contentUrlNext, R.string.rule_next_content,
-            "填写后正文时将会不断地从下一页获取内容，直至下一页URL为空时停止，注意：千万不要获取恒存在的URL，否则将出现死循环甚至崩溃"))
+            add(
+                EditEntity(
+                    "contentBaseUrl", contentRule?.contentBaseUrl, R.string.rule_base_url_content,
+                    "如果下一页URL(一般为相对路径)无法定位下一页，可填写此规则获取，默认为书源URL"
+                )
+            )
+            add(
+                EditEntity(
+                    "contentUrlNext", contentRule?.contentUrlNext, R.string.rule_next_content,
+                    "填写后正文时将会不断地从下一页获取内容，直至下一页URL为空时停止，注意：千万不要获取恒存在的URL，否则将出现死循环甚至崩溃"
+                )
+            )
         }
         return contentEntities
     }
+
 
     fun getSource(bookSource: BookSource, sourceEntities: List<EditEntity>): BookSource {
         val source = bookSource.clone() as BookSource
@@ -138,6 +222,28 @@ object EditEntityUtil {
             }
         }
         return searchRule
+    }
+
+    fun getFindRule(findEntities: List<EditEntity>): FindRule {
+        val findRule = FindRule()
+        findEntities.forEach {
+            when (it.key) {
+                "url" -> findRule.url = it.value
+                "bookList" -> findRule.bookList = it.value
+                "name" -> findRule.name = it.value
+                "author" -> findRule.author = it.value
+                "type" -> findRule.type = it.value
+                "desc" -> findRule.desc = it.value
+                "wordCount" -> findRule.wordCount = it.value
+                "status" -> findRule.status = it.value
+                "lastChapter" -> findRule.lastChapter = it.value
+                "updateTime" -> findRule.updateTime = it.value
+                "imgUrl" -> findRule.imgUrl = it.value
+                "tocUrl" -> findRule.tocUrl = it.value
+                "infoUrl" -> findRule.infoUrl = it.value
+            }
+        }
+        return findRule
     }
 
     fun getInfoRule(infoRuleEntities: List<EditEntity>): InfoRule {
@@ -186,4 +292,5 @@ object EditEntityUtil {
         }
         return contentRule
     }
+
 }

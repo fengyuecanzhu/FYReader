@@ -266,6 +266,7 @@ public class MainActivity extends BaseActivity {
             menu.setGroupVisible(R.id.bookcase_menu, false);
             menu.findItem(R.id.action_finish).setVisible(false);
         }
+        menu.setGroupVisible(R.id.find_menu, binding.viewPagerMain.getCurrentItem() == 1);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -305,6 +306,9 @@ public class MainActivity extends BaseActivity {
         } else if (itemId == R.id.action_qr_scan) {
             Intent intent = new Intent(this, QRCodeScanActivity.class);
             startActivityForResult(intent, APPCONST.REQUEST_QR_SCAN);
+        } else if (itemId == R.id.action_refresh_find){
+            mFindFragment.refreshFind();
+            return true;
         }
         return mBookcaseFragment.getmBookcasePresenter().onOptionsItemSelected(item);
     }

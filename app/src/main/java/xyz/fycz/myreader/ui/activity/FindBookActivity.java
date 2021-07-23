@@ -6,13 +6,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.disposables.Disposable;
@@ -28,7 +24,6 @@ import xyz.fycz.myreader.ui.fragment.FindBook1Fragment;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
-import xyz.fycz.myreader.webapi.crawler.find.QiDianFindCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.find.ThirdFindCrawler;
 
 /**
@@ -58,6 +53,7 @@ public class FindBookActivity extends BaseActivity {
             findCrawler = (FindCrawler) obj;
         }
         if (findCrawler == null) {
+            ToastUtils.showError("findCrawler为null");
             finish();
             return;
         }

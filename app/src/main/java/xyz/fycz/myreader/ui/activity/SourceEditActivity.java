@@ -45,6 +45,7 @@ public class SourceEditActivity extends BaseActivity {
     private List<EditEntity> infoEntities;
     private List<EditEntity> tocEntities;
     private List<EditEntity> contentEntities;
+    private List<EditEntity> findEntities;
     private EditEntityUtil entityUtil;
 
     private SourceEditAdapter adapter;
@@ -83,6 +84,7 @@ public class SourceEditActivity extends BaseActivity {
     private void initEntities(BookSource source) {
         sourceEntities = entityUtil.getSourceEntities(source);
         searchEntities = entityUtil.getSearchEntities(source.getSearchRule());
+        findEntities = entityUtil.getFindEntities(source.getFindRule());
         infoEntities = entityUtil.getInfoEntities(source.getInfoRule());
         tocEntities = entityUtil.getTocEntities(source.getTocRule());
         contentEntities = entityUtil.getContentEntities(source.getContentRule());
@@ -243,12 +245,15 @@ public class SourceEditActivity extends BaseActivity {
                 adapter.refreshItems(searchEntities);
                 break;
             case 2:
-                adapter.refreshItems(infoEntities);
+                adapter.refreshItems(findEntities);
                 break;
             case 3:
-                adapter.refreshItems(tocEntities);
+                adapter.refreshItems(infoEntities);
                 break;
             case 4:
+                adapter.refreshItems(tocEntities);
+                break;
+            case 5:
                 adapter.refreshItems(contentEntities);
                 break;
             default:
@@ -284,6 +289,7 @@ public class SourceEditActivity extends BaseActivity {
         }
         source.setSourceType(sourceType);
         source.setSearchRule(entityUtil.getSearchRule(searchEntities));
+        source.setFindRule(entityUtil.getFindRule(findEntities));
         source.setInfoRule(entityUtil.getInfoRule(infoEntities));
         source.setTocRule(entityUtil.getTocRule(tocEntities));
         source.setContentRule(entityUtil.getContentRule(contentEntities));

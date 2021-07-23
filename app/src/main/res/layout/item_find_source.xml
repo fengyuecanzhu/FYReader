@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rl_find_source"
     android:layout_width="match_parent"
     android:layout_height="50dp"
     android:background="@drawable/selector_common_bg"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp">
+    android:paddingStart="20dp"
+    android:paddingEnd="10dp">
 
     <TextView
         android:id="@+id/tv_name"
@@ -16,5 +16,16 @@
         android:text="@string/app_name"
         android:textColor="@color/textSecondary"
         android:textSize="@dimen/text_normal_size" />
+
+   <!-- <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_more"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="8dp"
+        app:srcCompat="@drawable/ic_more"
+        app:tint="@color/textSecondary" />-->
 
 </RelativeLayout>

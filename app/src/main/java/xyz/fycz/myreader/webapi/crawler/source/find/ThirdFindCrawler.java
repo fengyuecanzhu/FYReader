@@ -80,7 +80,7 @@ public class ThirdFindCrawler extends BaseFindCrawler {
                         }
                         FindKind findKindBean = new FindKind();
                         findKindBean.setTag(source.getSourceUrl());
-                        findKindBean.setName(kind[0]);
+                        findKindBean.setName(kind[0].replaceAll("\\s", ""));
                         findKindBean.setUrl(kind[1]);
                         children.add(findKindBean);
                     }

@@ -43,6 +43,9 @@ public class QiDianFindCrawler extends BaseFindCrawler {
     private LinkedHashMap<String, Integer> sortName = new LinkedHashMap<>();
     private boolean isFemale;
 
+    public QiDianFindCrawler() {
+    }
+
     public QiDianFindCrawler(boolean isFemale) {
         this.isFemale = isFemale;
     }
