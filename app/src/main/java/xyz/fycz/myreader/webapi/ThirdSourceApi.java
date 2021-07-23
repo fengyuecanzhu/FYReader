@@ -22,7 +22,9 @@ import xyz.fycz.myreader.model.third2.content.BookContent;
 import xyz.fycz.myreader.model.third2.content.BookInfo;
 import xyz.fycz.myreader.model.third2.content.BookList;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
+import xyz.fycz.myreader.webapi.crawler.source.find.ThirdFindCrawler;
 
 import static xyz.fycz.myreader.common.APPCONST.JS_PATTERN;
 import static xyz.fycz.myreader.util.utils.OkHttpUtils.getCookies;
@@ -146,5 +148,20 @@ public class ThirdSourceApi {
             return Observable.error(new Throwable(String.format("url错误:%s", chapter.getUrl())));
         }
     }
-
+    /**
+     * 发现
+     */
+    public static Observable<List<Book>> findBook(String url, ThirdFindCrawler fc, int page) {
+        BookSource source = fc.getSource();
+        Map<String, String> headers = getCookies(fc.getTag());
+        BookList bookList = new BookList(source.getSourceUrl(), source.getSourceName(), source, true);
+        try {
+            AnalyzeUrl analyzeUrl = new AnalyzeUrl(url, null, page, headers, source.getSourceUrl());
+            return OkHttpUtils.getStrResponse(analyzeUrl)
+                    .flatMap(response -> OkHttpUtils.setCookie(response, source.getSourceUrl()))
+                    .flatMap(bookList::analyzeSearchBook);
+        } catch (Exception e) {
+            return Observable.error(new Throwable(String.format("%s错误:%s", url, e.getLocalizedMessage())));
+        }
+    }
 }

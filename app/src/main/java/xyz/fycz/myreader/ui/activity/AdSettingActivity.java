@@ -77,6 +77,7 @@ public class AdSettingActivity extends BaseActivity {
             @Override
             public void onSubscribe(Disposable d) {
                 cancelDis = d;
+                addDisposable(d);
             }
 
             @Override
@@ -116,6 +117,7 @@ public class AdSettingActivity extends BaseActivity {
                 @Override
                 public void onSubscribe(Disposable d) {
                     cancelDis = d;
+                    addDisposable(d);
                 }
 
                 @Override

@@ -29,6 +29,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
@@ -76,6 +77,10 @@ public class ReplaceRuleActivity extends BaseActivity {
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         ReplaceRuleManager.getAll().subscribe(new MySingleObserver<List<ReplaceRuleBean>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                addDisposable(d);
+            }
             @Override
             public void onSuccess(@NonNull List<ReplaceRuleBean> replaceRuleBeans) {
                 mReplaceRules = replaceRuleBeans;
@@ -303,6 +308,10 @@ public class ReplaceRuleActivity extends BaseActivity {
         Observable<Boolean> observable = ReplaceRuleManager.importReplaceRule(text);
         if (observable != null) {
             observable.subscribe(new MyObserver<Boolean>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    addDisposable(d);
+                }
                 @Override
                 public void onNext(Boolean aBoolean) {
                     if (aBoolean) {

@@ -12,6 +12,7 @@ import java.util.List;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
@@ -109,6 +110,10 @@ public class LocalSourceFragment extends BaseFragment {
                 emitter.onSuccess(true);
             }).compose(RxUtils::toSimpleSingle)
                     .subscribe(new MySingleObserver<Boolean>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            addDisposable(d);
+                        }
                         @Override
                         public void onSuccess(@NonNull Boolean aBoolean) {
                             mAdapter.notifyDataSetChanged();

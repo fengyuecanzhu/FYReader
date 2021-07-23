@@ -190,6 +190,7 @@ public class SourceDebugActivity extends BaseActivity {
             @Override
             public void onSubscribe(Disposable d) {
                 disposable = d;
+                addDisposable(d);
             }
 
             @Override

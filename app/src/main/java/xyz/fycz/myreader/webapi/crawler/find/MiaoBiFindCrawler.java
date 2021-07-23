@@ -12,10 +12,10 @@ import java.util.List;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.FindCrawler3;
 
 
-public class MiaoBiFindCrawler extends FindCrawler {
+public class MiaoBiFindCrawler extends FindCrawler3 {
     public static final String NAME_SPACE = "https://www.imiaobige.com";
     public static final String CHARSET = "UTF-8";
     public static final String SEARCH_CHARSET = "UTF-8";

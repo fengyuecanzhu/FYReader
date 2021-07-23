@@ -369,6 +369,10 @@ public class SearchBookActivity extends BaseActivity {
                     BookSourceManager.saveDatas(sources)
                             .subscribe(new MySingleObserver<Boolean>() {
                                 @Override
+                                public void onSubscribe(Disposable d) {
+                                    addDisposable(d);
+                                }
+                                @Override
                                 public void onSuccess(@NonNull Boolean aBoolean) {
                                     if (aBoolean) {
                                         ToastUtils.showSuccess("保存成功");
@@ -409,6 +413,10 @@ public class SearchBookActivity extends BaseActivity {
                 emitter.onSuccess(parseHotKeys(OkHttpUtils.getHtml(url, null, "utf-8", headers)));
             }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Boolean>() {
                 @Override
+                public void onSubscribe(Disposable d) {
+                    addDisposable(d);
+                }
+                @Override
                 public void onSuccess(@NotNull Boolean b) {
                     initSuggestionList();
                 }
@@ -448,6 +456,7 @@ public class SearchBookActivity extends BaseActivity {
                 @Override
                 public void onSubscribe(Disposable d) {
                     sugDis = d;
+                    addDisposable(d);
                 }
 
                 @Override

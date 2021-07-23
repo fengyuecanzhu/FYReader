@@ -2,12 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-            android:id="@+id/action_refresh"
-            android:icon="@drawable/ic_refresh"
-            android:title="刷新"
-            app:showAsAction="always"
-            android:visible="true"/>
-    <item
             android:id="@+id/action_tip"
             android:icon="@drawable/ic_question"
             android:title="提示"

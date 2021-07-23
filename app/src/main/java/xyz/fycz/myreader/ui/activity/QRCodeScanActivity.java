@@ -21,6 +21,7 @@ import java.util.List;
 import cn.bingoogolapple.qrcode.core.QRCodeView;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
+import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
@@ -210,6 +211,10 @@ public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Deleg
             emitter.onSuccess(bitmap);
         }).compose(RxUtils::toSimpleSingle)
                 .subscribe(new MySingleObserver<Bitmap>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
                     @Override
                     public void onSuccess(Bitmap bitmap) {
                         binding.zxingview.decodeQRCode(bitmap);

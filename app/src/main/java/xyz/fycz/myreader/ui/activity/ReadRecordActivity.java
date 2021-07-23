@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.BitIntentDataManager;
@@ -67,6 +68,10 @@ public class ReadRecordActivity extends BaseActivity {
         recordService = ReadRecordService.getInstance();
         recordService.getAllRecordsByTime().compose(RxUtils::toSimpleSingle)
                 .subscribe(new MySingleObserver<List<ReadRecord>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                    }
                     @Override
                     public void onSuccess(@NotNull List<ReadRecord> readRecords) {
                         records = readRecords;
@@ -166,6 +171,10 @@ public class ReadRecordActivity extends BaseActivity {
                                 recordService.removeAll().compose(RxUtils::toSimpleSingle)
                                         .subscribe(new MySingleObserver<Boolean>() {
                                             @Override
+                                            public void onSubscribe(Disposable d) {
+                                                addDisposable(d);
+                                            }
+                                            @Override
                                             public void onSuccess(@NotNull Boolean aBoolean) {
                                                 ToastUtils.showSuccess("阅读记录已全部移除");
                                                 records.clear();
@@ -183,6 +192,10 @@ public class ReadRecordActivity extends BaseActivity {
                             case 1:
                                 recordService.removeAllTime(records).compose(RxUtils::toSimpleSingle)
                                         .subscribe(new MySingleObserver<Boolean>() {
+                                            @Override
+                                            public void onSubscribe(Disposable d) {
+                                                addDisposable(d);
+                                            }
                                             @Override
                                             public void onSuccess(@NotNull Boolean aBoolean) {
                                                 ToastUtils.showSuccess("阅读时长已全部清空");

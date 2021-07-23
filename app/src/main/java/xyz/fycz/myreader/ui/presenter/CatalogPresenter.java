@@ -6,6 +6,7 @@ import android.view.View;
 
 import org.jetbrains.annotations.NotNull;
 
+import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BasePresenter;
@@ -61,8 +62,8 @@ public class CatalogPresenter implements BasePresenter {
         mChapters = mChapterService.findBookAllChapterByBookId(mBook.getId());
         if (mChapters.size() != 0) {
             initChapterTitleList();
-        }else {
-            if ("本地书籍".equals(mBook.getType())){
+        } else {
+            if ("本地书籍".equals(mBook.getType())) {
                 ToastUtils.showWarring("本地书籍请先拆分章节！");
                 return;
             }
@@ -147,7 +148,7 @@ public class CatalogPresenter implements BasePresenter {
      * @param query
      */
     public void startSearch(String query) {
-        if (mChapters.size() == 0)  return;
+        if (mChapters.size() == 0) return;
         mChapterTitleAdapter.getFilter().filter(query);
         mCatalogFragment.getLvChapterList().setSelection(0);
     }

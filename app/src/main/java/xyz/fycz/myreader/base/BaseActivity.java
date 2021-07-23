@@ -47,7 +47,7 @@ public abstract class BaseActivity extends SwipeBackActivity {
     protected abstract void bindView();
 
     /************************init area************************************/
-    protected void addDisposable(Disposable d) {
+    public void addDisposable(Disposable d) {
         if (mDisposable == null) {
             mDisposable = new CompositeDisposable();
         }

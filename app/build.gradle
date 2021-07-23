@@ -238,6 +238,8 @@ dependencies {
         exclude group: 'org.slf4j'
         exclude group: 'xmlpull'
     }
+
+    implementation 'com.nshmura:recyclertablayout:1.5.0'
 }
 
 greendao {

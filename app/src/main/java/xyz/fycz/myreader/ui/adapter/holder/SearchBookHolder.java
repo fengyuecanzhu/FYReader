@@ -3,6 +3,7 @@ package xyz.fycz.myreader.ui.adapter.holder;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,7 +80,7 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
     @Override
     public void onBind(RecyclerView.ViewHolder holder, SearchBookBean data, int pos) {
         List<Book> aBooks = mBooks.getValues(data);
-        if (aBooks == null || aBooks.size() == 0){
+        if (aBooks == null || aBooks.size() == 0) {
             aBooks = new ArrayList<>();
             aBooks.add(searchBookBean2Book(data));
         }
@@ -88,37 +89,34 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
         BookSource source = BookSourceManager.getBookSourceByStr(book.getSource());
         ReadCrawler rc = ReadCrawlerUtil.getReadCrawler(source);
         books2SearchBookBean(data, aBooks);
-        if (!StringHelper.isEmpty(data.getImgUrl())) {
-            if (!App.isDestroy((Activity) getContext())) {
-                ivBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), data.getImgUrl()), data.getName(), data.getAuthor());
-            }
-        }else {
+        if (StringHelper.isEmpty(data.getImgUrl())) {
             data.setImgUrl("");
+        }
+        if (!App.isDestroy((Activity) getContext())) {
+            ivBookImg.load(NetworkUtils.getAbsoluteURL(rc.getNameSpace(), data.getImgUrl()), data.getName(), data.getAuthor());
         }
         KeyWordUtils.setKeyWord(tvBookName, data.getName(), keyWord);
         if (!StringHelper.isEmpty(data.getAuthor())) {
             KeyWordUtils.setKeyWord(tvAuthor, data.getAuthor(), keyWord);
+        } else {
+            tvAuthor.setText("");
         }
         initTagList(data);
         if (!StringHelper.isEmpty(data.getLastChapter())) {
             tvNewestChapter.setText(getContext().getString(R.string.newest_chapter, data.getLastChapter()));
-        }else {
+        } else {
             data.setLastChapter("");
+            tvNewestChapter.setText("");
         }
         if (!StringHelper.isEmpty(data.getDesc())) {
             tvDesc.setText(String.format("简介:%s", data.getDesc()));
-        }else {
+        } else {
             data.setDesc("");
+            tvDesc.setText("");
         }
         tvSource.setText(getContext().getString(R.string.source_title_num, source.getSourceName(), bookCount));
         App.getHandler().postDelayed(() -> {
             if (needGetInfo(data) && rc instanceof BookInfoCrawler) {
-                if (tvBookName.getTag() == null || !(Boolean) tvBookName.getTag()) {
-                    tvBookName.setTag(true);
-                } else {
-                    initOtherInfo(data, rc);
-                    return;
-                }
                 Log.i(data.getName(), "initOtherInfo");
                 BookInfoCrawler bic = (BookInfoCrawler) rc;
                 searchEngine.getBookInfo(book, bic, isSuccess -> {
@@ -127,8 +125,6 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
                         books.add(book);
                         books2SearchBookBean(data, books);
                         initOtherInfo(data, rc);
-                    } else {
-                        tvBookName.setTag(false);
                     }
                 });
             }
@@ -163,7 +159,12 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
         String status = data.getStatus();
         if (!StringHelper.isEmpty(status))
             tagList.add("2:" + status);
-        tflBookTag.setAdapter(new BookTagAdapter(activity, tagList, 11));
+        if (tagList.size() == 0) {
+            tflBookTag.setVisibility(View.GONE);
+        } else {
+            tflBookTag.setVisibility(View.VISIBLE);
+            tflBookTag.setAdapter(new BookTagAdapter(activity, tagList, 11));
+        }
     }
 
     private void books2SearchBookBean(SearchBookBean bookBean, List<Book> books) {
@@ -233,7 +234,7 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
         }
     }
 
-    private Book searchBookBean2Book(SearchBookBean bean){
+    private Book searchBookBean2Book(SearchBookBean bean) {
         Book book = new Book();
         book.setName(bean.getName());
         book.setAuthor(bean.getAuthor());

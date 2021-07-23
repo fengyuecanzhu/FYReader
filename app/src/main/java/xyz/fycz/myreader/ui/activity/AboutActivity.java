@@ -86,7 +86,7 @@ public class AboutActivity extends BaseActivity {
 
         binding.il.rlOfficialWeb.setOnClickListener(v -> {
             MyAlertDialog.showFullWebViewDia(this, URLCONST.OFFICIAL_WEB,
-                            true, null);
+                    true, null);
         });
         binding.il.rlGit.setOnClickListener(v -> {
             MyAlertDialog.showFullWebViewDia(this, getString(R.string.this_github_url),
@@ -153,6 +153,7 @@ public class AboutActivity extends BaseActivity {
             @Override
             public void onSubscribe(Disposable d) {
                 disposable[0] = d;
+                addDisposable(d);
             }
 
             @Override
@@ -191,6 +192,11 @@ public class AboutActivity extends BaseActivity {
             }
             emitter.onComplete();
         }).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<File>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                addDisposable(d);
+            }
+
             @Override
             public void onNext(@NotNull File file) {
                 ShareUtils.share(AboutActivity.this, file, "分享日志文件", "application/x-zip-compressed");

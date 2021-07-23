@@ -1,31 +1,24 @@
 package xyz.fycz.myreader.webapi.crawler.base;
 
-import xyz.fycz.myreader.entity.bookstore.BookType;
-import xyz.fycz.myreader.greendao.entity.Book;
-
-import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
+
+import io.reactivex.Observable;
+import xyz.fycz.myreader.entity.FindKind;
+import xyz.fycz.myreader.entity.StrResponse;
+import xyz.fycz.myreader.greendao.entity.Book;
 
 /**
  * @author fengyue
- * @date 2020/9/14 18:36
+ * @date 2021/7/21 22:07
  */
-public abstract class FindCrawler implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    public abstract String getCharset();
-    public abstract String getFindName();
-    public abstract String getFindUrl();
-    public abstract boolean hasImg();
-    public abstract boolean needSearch();
-    //动态获取
-    public List<BookType> getBookTypes(String html) {
-        return null;
-    }
-    //静态获取
-    public List<BookType> getBookTypes(){
-        return null;
-    }
-    public abstract List<Book> getFindBooks(String html, BookType bookType);
-    public abstract boolean getTypePage(BookType curType, int page);
+public interface FindCrawler {
+    String getName();
+    String getTag();
+    List<String> getGroups();
+    Map<String, List<FindKind>> getKindsMap();
+    List<FindKind> getKindsByKey(String key);
+    Observable<Boolean> initData();
+    boolean needSearch();
+    Observable<List<Book>> getFindBooks(StrResponse strResponse, FindKind kind);
 }

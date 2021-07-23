@@ -79,6 +79,7 @@ public class BiQuGeReadCrawler extends BaseReadCrawler implements BookInfoCrawle
             }
 
         }
+
         return bookTypes;
     }
 

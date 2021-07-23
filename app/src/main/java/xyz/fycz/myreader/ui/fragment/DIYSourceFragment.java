@@ -226,6 +226,7 @@ public class DIYSourceFragment extends BaseFragment {
                 @Override
                 public void onSubscribe(Disposable d) {
                     importSourceDis = d;
+                    addDisposable(d);
                 }
 
                 @Override
@@ -281,6 +282,10 @@ public class DIYSourceFragment extends BaseFragment {
             }
             emitter.onSuccess(sourceBeanList);
         }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<List<BookSource>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                addDisposable(d);
+            }
             @Override
             public void onSuccess(@NonNull List<BookSource> sources) {
                 mBookSources = sources;
@@ -392,6 +397,10 @@ public class DIYSourceFragment extends BaseFragment {
                         FileUtils.getFile(APPCONST.FILE_DIR + "BookSources.json")));
             }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Boolean>() {
                 @Override
+                public void onSubscribe(Disposable d) {
+                    addDisposable(d);
+                }
+                @Override
                 public void onSuccess(@NonNull Boolean aBoolean) {
                     if (aBoolean) {
                         DialogCreator.createTipDialog(sourceActivity,
@@ -418,6 +427,10 @@ public class DIYSourceFragment extends BaseFragment {
                     emitter.onError(new Exception("书源文件写出失败"));
                 }
             }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<File>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    addDisposable(d);
+                }
                 @Override
                 public void onSuccess(@NonNull File share) {
                     ShareUtils.share(sourceActivity, share, "书源分享", "text/plain");

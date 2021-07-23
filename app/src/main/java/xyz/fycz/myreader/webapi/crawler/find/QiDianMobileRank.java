@@ -23,7 +23,7 @@ import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
-import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.FindCrawler3;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import java.util.*;
  * @author fengyue
  * @date 2020/9/16 22:01
  */
-public class QiDianMobileRank extends FindCrawler {
+public class QiDianMobileRank extends FindCrawler3 {
     private String rankUrl = "https://m.qidian.com/majax/rank/{rankName}list?_csrfToken={cookie}&gender={sex}&pageNum={page}&catId=-1";
     private String sortUrl = "https://m.qidian.com/majax/category/list?_csrfToken={cookie}&gender={sex}&pageNum={page}&orderBy=&catId={catId}&subCatId=";
     private String[] sex = {"male", "female"};
@@ -83,19 +83,19 @@ public class QiDianMobileRank extends FindCrawler {
     private void initSortNames() {
         /*
         {value: -1, text: "全站"}
-1: {value: 21, text: "玄幻"}
-2: {value: 1, text: "奇幻"}
-3: {value: 2, text: "武侠"}
-4: {value: 22, text: "仙侠"}
-5: {value: 4, text: "都市"}
-6: {value: 15, text: "现实"}
-7: {value: 6, text: "军事"}
-8: {value: 5, text: "历史"}
-9: {value: 7, text: "游戏"}
-10: {value: 8, text: "体育"}
-11: {value: 9, text: "科幻"}
-12: {value: 10, text: "悬疑"}
-13: {value: 12, text: "轻小说"}
+        1: {value: 21, text: "玄幻"}
+        2: {value: 1, text: "奇幻"}
+        3: {value: 2, text: "武侠"}
+        4: {value: 22, text: "仙侠"}
+        5: {value: 4, text: "都市"}
+        6: {value: 15, text: "现实"}
+        7: {value: 6, text: "军事"}
+        8: {value: 5, text: "历史"}
+        9: {value: 7, text: "游戏"}
+        10: {value: 8, text: "体育"}
+        11: {value: 9, text: "科幻"}
+        12: {value: 10, text: "悬疑"}
+        13: {value: 12, text: "轻小说"}
          */
         if (!isFemale) {
             sortName.put("玄幻小说", 21);

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <!--指示器-->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/colorPrimary"
+            android:fitsSystemWindows="true"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarStyle"
+            app:subtitleTextAppearance="@style/toolbar_subtitle_textStyle"
+            app:titleTextAppearance="@style/toolbar_title_textStyle">
+            <com.nshmura.recyclertablayout.RecyclerTabLayout
+                android:id="@+id/tab_tl_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="9"
+                app:rtl_tabIndicatorColor="@color/colorAccent"
+                app:rtl_tabIndicatorHeight="2dp"
+                app:rtl_tabBackground="?attr/selectableItemBackground"
+                app:rtl_tabTextAppearance="@style/TabLayoutTextStyle"
+                app:rtl_tabSelectedTextColor="@color/textPrimaryInverted"
+                app:rtl_tabPaddingStart="12dp"
+                app:rtl_tabPaddingEnd="12dp"
+                app:rtl_scrollEnabled="true"/>
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <xyz.fycz.myreader.widget.RefreshLayout
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/tab_vp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </xyz.fycz.myreader.widget.RefreshLayout>
+</LinearLayout>

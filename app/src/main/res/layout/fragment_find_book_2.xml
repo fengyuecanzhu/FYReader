@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xyz.fycz.myreader.widget.RefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/loading"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/srl_find_books"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:descendantFocusability="blocksDescendants">
+
+        <com.scwang.smartrefresh.header.MaterialHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_find_books"
+            android:layout_marginHorizontal="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <com.scwang.smartrefresh.layout.footer.ClassicsFooter
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srlTextLoading="@string/loading_tip"
+            app:srlTextFailed="@string/loading_tip"
+            app:srlTextNothing="总得有个结尾吧"
+            app:srlAccentColor="@color/textSecondary"/>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+</xyz.fycz.myreader.widget.RefreshLayout>

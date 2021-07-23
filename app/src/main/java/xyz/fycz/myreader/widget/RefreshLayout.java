@@ -224,10 +224,16 @@ public class RefreshLayout extends FrameLayout {
 
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
-        SavedState savedState = (SavedState) state;
-        super.onRestoreInstanceState(savedState.getSuperState());
-        //刷新状态
-        toggleStatus(savedState.status);
+        if (state instanceof SavedState) {
+            SavedState savedState = (SavedState) state;
+            super.onRestoreInstanceState(savedState.getSuperState());
+            //刷新状态
+            toggleStatus(savedState.status);
+        }else {
+            super.onRestoreInstanceState(state);
+            //刷新状态
+            toggleStatus(STATUS_LOADING);
+        }
     }
 
     static class SavedState extends BaseSavedState {

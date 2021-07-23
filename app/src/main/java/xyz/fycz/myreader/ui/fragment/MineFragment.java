@@ -26,6 +26,7 @@ import java.util.Date;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
@@ -176,6 +177,10 @@ public class MineFragment extends BaseFragment {
             }).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new MySingleObserver<ArrayList<String>>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            addDisposable(d);
+                        }
                         @Override
                         public void onSuccess(ArrayList<String> strings) {
                             if (!WebDavHelp.INSTANCE.showRestoreDialog(getContext(), strings, new Restore.CallBack() {

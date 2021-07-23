@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_find_source"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="@drawable/selector_common_bg"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp">
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text="@string/app_name"
+        android:textColor="@color/textSecondary"
+        android:textSize="@dimen/text_normal_size" />
+
+</RelativeLayout>

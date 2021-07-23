@@ -36,7 +36,7 @@ import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.webapi.BookStoreApi;
 import xyz.fycz.myreader.webapi.ResultCallback;
-import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.FindCrawler3;
 import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
 
 /**
@@ -46,7 +46,7 @@ import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
 public class BookstoreActivity extends BaseActivity {
     private ActiityBookstoreBinding binding;
 
-    private FindCrawler findCrawler;
+    private FindCrawler3 findCrawler3;
     private LinearLayoutManager mLinearLayoutManager;
     private BookStoreBookTypeAdapter mBookStoreBookTypeAdapter;
     private List<BookType> mBookTypes;
@@ -107,8 +107,8 @@ public class BookstoreActivity extends BaseActivity {
         super.setUpToolbar(toolbar);
         setStatusBarColor(R.color.colorPrimary, true);
         String subTitle = "";
-        if (findCrawler != null) {
-            String name = findCrawler.getFindName();
+        if (findCrawler3 != null) {
+            String name = findCrawler3.getFindName();
             title = name.substring(0, name.indexOf("["));
             subTitle = name.substring(name.indexOf("[") + 1, name.length() - 1);
         }
@@ -119,7 +119,7 @@ public class BookstoreActivity extends BaseActivity {
     @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
-        findCrawler = (FindCrawler) getIntent().getSerializableExtra(APPCONST.FIND_CRAWLER);
+        findCrawler3 = (FindCrawler3) getIntent().getSerializableExtra(APPCONST.FIND_CRAWLER);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class BookstoreActivity extends BaseActivity {
             getBooksData();
         });
 
-        mBookStoreBookAdapter = new BookStoreBookAdapter(findCrawler.hasImg(), this);
+        mBookStoreBookAdapter = new BookStoreBookAdapter(findCrawler3.hasImg(), this);
         binding.rvBookList.setLayoutManager(new LinearLayoutManager(this));
         binding.rvBookList.setAdapter(mBookStoreBookAdapter);
         binding.refreshLayout.setOnReloadingListener(this::getData);
@@ -150,7 +150,7 @@ public class BookstoreActivity extends BaseActivity {
         super.initClick();
         mBookStoreBookAdapter.setOnItemClickListener((view, pos) -> {
             Book book = bookList.get(pos);
-            if (!findCrawler.needSearch()) {
+            if (!findCrawler3.needSearch()) {
                 goToBookDetail(book);
             } else {
                 if (BookService.getInstance().isBookCollected(book)) {
@@ -174,7 +174,7 @@ public class BookstoreActivity extends BaseActivity {
     protected void processLogic() {
         super.processLogic();
         getData();
-        if (findCrawler.needSearch()) {
+        if (findCrawler3.needSearch()) {
             SharedPreUtils spu = SharedPreUtils.getInstance();
             boolean isReadTopTip = spu.getBoolean(getString(R.string.isReadTopTip), false);
             if (!isReadTopTip) {
@@ -189,15 +189,15 @@ public class BookstoreActivity extends BaseActivity {
      * 获取页面数据
      */
     private void getData() {
-        if (findCrawler instanceof QiDianMobileRank) {
+        if (findCrawler3 instanceof QiDianMobileRank) {
             SharedPreUtils spu = SharedPreUtils.getInstance();
             if (spu.getString(getString(R.string.qdCookie), "").equals("")) {
-                ((QiDianMobileRank) findCrawler).initCookie(this, new ResultCallback() {
+                ((QiDianMobileRank) findCrawler3).initCookie(this, new ResultCallback() {
                     @Override
                     public void onFinish(Object o, int code) {
                         if (App.isDestroy(BookstoreActivity.this)) return;
                         spu.putString(getString(R.string.qdCookie), (String) o);
-                        mBookTypes = findCrawler.getBookTypes();
+                        mBookTypes = findCrawler3.getBookTypes();
                         initBooks();
                     }
 
@@ -209,13 +209,13 @@ public class BookstoreActivity extends BaseActivity {
                     }
                 });
             } else {
-                mBookTypes = findCrawler.getBookTypes();
+                mBookTypes = findCrawler3.getBookTypes();
                 initBooks();
             }
-        } else if ((mBookTypes = findCrawler.getBookTypes()) != null) {
+        } else if ((mBookTypes = findCrawler3.getBookTypes()) != null) {
             initBooks();
         } else {
-            BookStoreApi.getBookTypeList(findCrawler, new ResultCallback() {
+            BookStoreApi.getBookTypeList(findCrawler3, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
                     if (App.isDestroy(BookstoreActivity.this)) return;
@@ -244,14 +244,14 @@ public class BookstoreActivity extends BaseActivity {
      * 获取小数列表数据
      */
     private void getBooksData() {
-        if (findCrawler.getTypePage(curType, page)) {
+        if (findCrawler3.getTypePage(curType, page)) {
             binding.srlBookList.finishLoadMoreWithNoMoreData();
             return;
         }
 
         mHandler.sendEmptyMessage(3);
-        if (findCrawler instanceof QiDianMobileRank) {
-            ((QiDianMobileRank) findCrawler).getRankBooks(curType, new ResultCallback() {
+        if (findCrawler3 instanceof QiDianMobileRank) {
+            ((QiDianMobileRank) findCrawler3).getRankBooks(curType, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
                     if (App.isDestroy(BookstoreActivity.this)) return;
@@ -287,7 +287,7 @@ public class BookstoreActivity extends BaseActivity {
                 }
             });
         } else {
-            BookStoreApi.getBookRankList(curType, findCrawler, new ResultCallback() {
+            BookStoreApi.getBookRankList(curType, findCrawler3, new ResultCallback() {
                 @Override
                 public void onFinish(Object o, int code) {
                     if (App.isDestroy(BookstoreActivity.this)) return;
@@ -381,7 +381,7 @@ public class BookstoreActivity extends BaseActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (findCrawler.needSearch()) {
+        if (findCrawler3.needSearch()) {
             menu.findItem(R.id.action_tip).setVisible(true);
         }
         return true;
@@ -395,14 +395,9 @@ public class BookstoreActivity extends BaseActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_tip:
-                mHandler.sendEmptyMessage(6);
-                return true;
-            case R.id.action_refresh:
-                binding.refreshLayout.showLoading();
-                getData();
-                return true;
+        if (item.getItemId() == R.id.action_tip) {
+            mHandler.sendEmptyMessage(6);
+            return true;
         }
         return false;
     }

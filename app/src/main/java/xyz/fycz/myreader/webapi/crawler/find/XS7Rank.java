@@ -10,8 +10,7 @@ import java.util.List;
 
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
-import xyz.fycz.myreader.webapi.crawler.read.XS7ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.FindCrawler3;
 
 /**
  * @author fengyue
@@ -19,8 +18,8 @@ import xyz.fycz.myreader.webapi.crawler.read.XS7ReadCrawler;
  * 已失效
  */
 @Deprecated
-public class XS7Rank extends FindCrawler {
-    private FindCrawler xs7 = new XS7FindCrawler();
+public class XS7Rank extends FindCrawler3 {
+    private FindCrawler3 xs7 = new XS7FindCrawler();
     public static final String CHARSET = "GBK";
     public static final String FIND_NAME = "排行榜[小说旗]";
     public static final String FIND_URL = "https://www.xs7.la/top/lastupdate/1.html";

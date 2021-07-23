@@ -118,6 +118,7 @@
         <activity android:name=".ui.activity.BookInfoEditActivity" />
         <activity android:name=".ui.activity.SourceLoginActivity" />
         <activity android:name=".ui.activity.ReadRecordActivity" />
+        <activity android:name=".ui.activity.FindBookActivity" />
 
         <receiver android:name=".util.notification.NotificationClickReceiver" />
         <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver" />

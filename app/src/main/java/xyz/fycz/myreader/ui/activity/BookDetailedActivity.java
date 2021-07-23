@@ -373,6 +373,11 @@ public class BookDetailedActivity extends BaseActivity {
             BookInfoCrawler bic = (BookInfoCrawler) rc;
             BookApi.getBookInfo(mBook, bic).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Book>() {
                 @Override
+                public void onSubscribe(Disposable d) {
+                    addDisposable(d);
+                }
+
+                @Override
                 public void onNext(@NotNull Book book) {
                     if (!App.isDestroy(BookDetailedActivity.this)) {
                         mHandler.sendMessage(mHandler.obtainMessage(4));
@@ -438,6 +443,7 @@ public class BookDetailedActivity extends BaseActivity {
                         @Override
                         public void onSubscribe(Disposable d) {
                             chaptersDis = d;
+                            addDisposable(d);
                         }
 
                         @Override

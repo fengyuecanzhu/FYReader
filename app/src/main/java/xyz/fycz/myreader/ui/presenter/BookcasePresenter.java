@@ -380,6 +380,11 @@ public class BookcasePresenter implements BasePresenter {
             emitter.onComplete();
         })).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Object>() {
             @Override
+            public void onSubscribe(Disposable d) {
+                mMainActivity.addDisposable(d);
+            }
+
+            @Override
             public void onNext(@NotNull Object o) {
                 mBookcaseAdapter.getIsLoading().put(book.getId(), false);
                 mBookcaseAdapter.refreshBook(book.getChapterUrl());
@@ -413,6 +418,11 @@ public class BookcasePresenter implements BasePresenter {
                     emitter.onNext(book);
                     emitter.onComplete();
                 })).compose(RxUtils::toSimpleSingle).subscribe(new MyObserver<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        mMainActivity.addDisposable(d);
+                    }
+
                     @Override
                     public void onNext(@NotNull Object o) {
                         mBookcaseAdapter.getIsLoading().put(book.getId(), false);
@@ -856,6 +866,12 @@ public class BookcasePresenter implements BasePresenter {
                 emitter.onNext(chapter);
                 emitter.onComplete();
             })).subscribeOn(Schedulers.from(App.getApplication().getmFixedThreadPool())).subscribe(new MyObserver<Object>() {
+
+                @Override
+                public void onSubscribe(Disposable d) {
+                    mMainActivity.addDisposable(d);
+                }
+
                 @Override
                 public void onNext(@NotNull Object o) {
 

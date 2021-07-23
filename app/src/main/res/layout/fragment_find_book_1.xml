@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tl="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorForeground"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:orientation="horizontal">
+
+        <com.nshmura.recyclertablayout.RecyclerTabLayout
+            android:id="@+id/tab_tl_indicator"
+            android:layout_weight="10"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:rtl_tabIndicatorColor="@color/colorAccent"
+            app:rtl_tabIndicatorHeight="2dp"
+            app:rtl_tabBackground="?attr/selectableItemBackground"
+            app:rtl_tabTextAppearance="@android:style/TextAppearance.Small"
+            app:rtl_tabSelectedTextColor="?android:textColorPrimary"
+            app:rtl_tabPaddingStart="12dp"
+            app:rtl_tabPaddingEnd="12dp"
+            app:rtl_scrollEnabled="true"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_menu"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_marginStart="5dp"
+            android:paddingHorizontal="5dp"
+            app:srcCompat="@drawable/ic_menu"
+            app:tint="@color/colorAccent" />
+    </LinearLayout>
+
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/tab_vp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

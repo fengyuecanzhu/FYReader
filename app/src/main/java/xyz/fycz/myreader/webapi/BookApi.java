@@ -1,9 +1,8 @@
 package xyz.fycz.myreader.webapi;
 
-import android.util.Log;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +10,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import xyz.fycz.myreader.entity.FindKind;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.Book;
@@ -20,9 +20,11 @@ import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.TianLaiReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
+import xyz.fycz.myreader.webapi.crawler.source.find.ThirdFindCrawler;
 
 import static xyz.fycz.myreader.util.utils.OkHttpUtils.getCookies;
 
@@ -143,4 +145,16 @@ public class BookApi {
         }).flatMap(response -> OkHttpUtils.setCookie(response, rc.getNameSpace())).flatMap(rc::getContentFormStrResponse);
     }
 
+
+    public static Observable<List<Book>> findBooks(FindKind kind, FindCrawler findCrawler, int page) {
+        if (findCrawler instanceof ThirdFindCrawler){
+            return ThirdSourceApi.findBook(kind.getUrl(), (ThirdFindCrawler) findCrawler, page);
+        }
+        if (kind.getMaxPage() > 0 && page > kind.getMaxPage()) return Observable.just(Collections.EMPTY_LIST);
+        String url = kind.getUrl().replace("{page}", page + "");
+        return Observable.create((ObservableOnSubscribe<StrResponse>) emitter -> {
+            emitter.onNext(OkHttpUtils.getStrResponse(url, null, null));
+            emitter.onComplete();
+        }).flatMap(response -> OkHttpUtils.setCookie(response, findCrawler.getTag())).flatMap((StrResponse strResponse) -> findCrawler.getFindBooks(strResponse, kind));
+    }
 }

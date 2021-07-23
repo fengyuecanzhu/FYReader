@@ -46,38 +46,42 @@ public class StrResponse {
 
     public String body() {
         if (body == null) {
-            ResponseBody body = response.body();
-            if (body != null) {
-                try {
-                    byte[] responseBytes = UTF8BOMFighter.removeUTF8BOM(body.bytes());
-                    if (!TextUtils.isEmpty(encodeType)) {
-                        try {
-                            this.body = new String((responseBytes), Charset.forName(encodeType));
-                            Log.d("Http: read finish", this.body);
-                            return this.body;
-                        } catch (Exception ignored) {
+            if (response != null) {
+                ResponseBody body = response.body();
+                if (body != null) {
+                    try {
+                        byte[] responseBytes = UTF8BOMFighter.removeUTF8BOM(body.bytes());
+                        if (!TextUtils.isEmpty(encodeType)) {
+                            try {
+                                this.body = new String((responseBytes), Charset.forName(encodeType));
+                                Log.d("Http: read finish", this.body);
+                                return this.body;
+                            } catch (Exception ignored) {
+                            }
                         }
-                    }
-                    String charsetStr;
-                    MediaType mediaType = body.contentType();
-                    //根据http头判断
-                    if (mediaType != null) {
-                        Charset charset = mediaType.charset();
-                        if (charset != null) {
-                            this.body = new String((responseBytes), charset);
-                            Log.d("Http: read finish", this.body);
-                            return this.body;
+                        String charsetStr;
+                        MediaType mediaType = body.contentType();
+                        //根据http头判断
+                        if (mediaType != null) {
+                            Charset charset = mediaType.charset();
+                            if (charset != null) {
+                                this.body = new String((responseBytes), charset);
+                                Log.d("Http: read finish", this.body);
+                                return this.body;
+                            }
                         }
+                        //根据内容判断
+                        charsetStr = EncodingDetect.getEncodeInHtml(responseBytes);
+                        this.body = new String(responseBytes, Charset.forName(charsetStr));
+                        Log.d("Http: read finish", this.body);
+                        return this.body;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        this.body = "";
                     }
-                    //根据内容判断
-                    charsetStr = EncodingDetect.getEncodeInHtml(responseBytes);
-                    this.body =  new String(responseBytes, Charset.forName(charsetStr));
-                    Log.d("Http: read finish", this.body);
-                    return this.body;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    this.body = "";
                 }
+            } else {
+                this.body = "";
             }
         }
         return this.body;

@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.ActivityManage;
 import xyz.fycz.myreader.R;
@@ -1576,6 +1577,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 BookApi.getChapterContent(chapter, mBook, mReadCrawler)
                         .subscribeOn(Schedulers.from(App.getApplication().getmFixedThreadPool()))
                         .subscribe(new MyObserver<String>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                addDisposable(d);
+                            }
                             @Override
                             public void onNext(@NotNull String s) {
                                 downloadingChapter = chapter.getTitle();

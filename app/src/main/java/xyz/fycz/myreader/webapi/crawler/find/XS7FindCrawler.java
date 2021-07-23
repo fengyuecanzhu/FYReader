@@ -11,10 +11,10 @@ import java.util.List;
 import xyz.fycz.myreader.entity.bookstore.BookType;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
+import xyz.fycz.myreader.webapi.crawler.base.FindCrawler3;
 
 
-public class XS7FindCrawler extends FindCrawler{
+public class XS7FindCrawler extends FindCrawler3 {
     public static final String NAME_SPACE = "https://www.xs7.la";
     public static final String CHARSET = "GBK";
     public static final String SEARCH_CHARSET = "GBK";
