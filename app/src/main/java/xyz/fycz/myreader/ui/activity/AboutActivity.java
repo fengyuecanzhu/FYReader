@@ -59,10 +59,6 @@ public class AboutActivity extends BaseActivity {
     protected void initWidget() {
         super.initWidget();
         binding.il.tvVersionName.setText(String.format("风月读书v%s", App.getStrVersionName()));
-        if (!App.isDestroy(this)) {
-            ImageLoader.INSTANCE.load(this, "http://yunjuw.cn/template/mytheme/statics/img/logo.png")
-                    .into(binding.il.ivDyys);
-        }
     }
 
     @Override
@@ -108,12 +104,6 @@ public class AboutActivity extends BaseActivity {
                 .showFullWebViewDia(this, "file:///android_asset/PrivacyPolicy.html",
                         false, null));
         binding.il.rlDisclaimer.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "免责声明", "disclaimer.fy"));
-
-        binding.il.rlDyys.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("http://yunjuw.cn/"));
-            startActivity(intent);
-        });
     }
 
     void openIntent(String intentName, String address) {
