@@ -368,6 +368,9 @@ public class BookcasePresenter implements BasePresenter {
             book.setNoReadNum(Math.max(noReadNum, 0));
             book.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
             mChapterService.updateAllOldChapterData(mChapters, chapters, book.getId());
+            if (book.getHisttoryChapterNum() + 1 > chapters.size()){
+                book.setHisttoryChapterNum(chapters.size() - 1);
+            }
             mBookService.updateEntity(book);
             if (isChangeSource) {
                 if (mBookService.matchHistoryChapterPos(book, chapters)) {

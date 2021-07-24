@@ -18,7 +18,7 @@ import xyz.fycz.myreader.util.help.StringHelper;
  * @author fengyue
  * @date 2021/1/19 9:51
  */
-public class ReplaceRuleAdapter extends BaseListAdapter<ReplaceRuleBean> implements Filterable {
+public class ReplaceRuleAdapter extends BaseListAdapter<ReplaceRuleBean> {
     private AppCompatActivity activity;
     private List<ReplaceRuleBean> beans;
     private OnSwipeListener onSwipeListener;

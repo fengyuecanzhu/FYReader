@@ -14,7 +14,7 @@ import xyz.fycz.myreader.ui.adapter.holder.LocalSourceHolder;
  * @author fengyue
  * @date 2021/2/10 18:27
  */
-public class LocalSourceAdapter extends BaseSourceAdapter implements Filterable {
+public class LocalSourceAdapter extends BaseSourceAdapter {
 
     private List<BookSource> sources;
 

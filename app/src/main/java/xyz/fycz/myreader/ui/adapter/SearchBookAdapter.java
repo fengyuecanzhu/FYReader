@@ -1,6 +1,8 @@
 package xyz.fycz.myreader.ui.adapter;
 
 import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 
 import xyz.fycz.myreader.application.App;
@@ -27,6 +29,9 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
     private ConMVMap<SearchBookBean, Book> mBooks;
     private SearchEngine searchEngine;
     private String keyWord;
+    private Handler handler = new Handler(Looper.getMainLooper());
+    private long postTime = 0L;
+    private Runnable sendRunnable = this::upAdapter;
 
     public SearchBookAdapter(Activity activity, ConMVMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord) {
         this.activity = activity;
@@ -110,12 +115,25 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
                     }
                 }
             }
-            synchronized (this) {
+            mList = copyDataS;
+            upAdapter();
+            /*synchronized (this) {
                 App.runOnUiThread(() -> {
                     mList = copyDataS;
                     notifyDataSetChanged();
                 });
-            }
+            }*/
+        }
+    }
+
+    private synchronized void upAdapter(){
+        if (System.currentTimeMillis() >= postTime + 500) {
+            handler.removeCallbacks(sendRunnable);
+            postTime = System.currentTimeMillis();
+            notifyDataSetChanged();
+        } else {
+            handler.removeCallbacks(sendRunnable);
+            handler.postDelayed(sendRunnable, 500 - System.currentTimeMillis() + postTime);
         }
     }
 

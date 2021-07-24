@@ -3,6 +3,9 @@ package xyz.fycz.myreader.base.adapter;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -14,7 +17,7 @@ import java.util.List;
  * @date 2020/8/12 20:02
  */
 
-public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
 
     private static final String TAG = "BaseListAdapter";
     /*common statement*/
@@ -71,6 +74,11 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
     @Override
     public int getItemCount() {
         return mList.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return null;
     }
 
     protected void onItemClick(View v, int pos){

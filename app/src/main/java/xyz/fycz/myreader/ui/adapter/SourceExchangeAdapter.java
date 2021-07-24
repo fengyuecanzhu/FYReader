@@ -19,7 +19,7 @@ import java.util.List;
  * @author fengyue
  * @date 2020/9/30 18:42
  */
-public class SourceExchangeAdapter extends BaseListAdapter<Book> implements Filterable {
+public class SourceExchangeAdapter extends BaseListAdapter<Book> {
     private SourceExchangeDialog dialog;
     private List<Book> beans;
 

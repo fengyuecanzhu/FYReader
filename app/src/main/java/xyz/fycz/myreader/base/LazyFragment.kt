@@ -1,5 +1,9 @@
 package xyz.fycz.myreader.base
 
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -10,6 +14,8 @@ import io.reactivex.disposables.Disposable
  */
 abstract class LazyFragment : Fragment() {
     protected var mDisposable: CompositeDisposable? = null
+    private var root: View? = null
+
     /**
      * 是否执行懒加载
      */
@@ -76,11 +82,26 @@ abstract class LazyFragment : Fragment() {
         judgeLazyInit()
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        root = bindView(inflater, container)
+        return root
+    }
+
     override fun onDetach() {
         super.onDetach()
         if (mDisposable != null) {
             mDisposable!!.clear()
         }
     }
+
+    /**
+     * 绑定视图
+     */
+    protected abstract fun bindView(inflater: LayoutInflater, container: ViewGroup?): View?
+
     abstract fun lazyInit()
 }

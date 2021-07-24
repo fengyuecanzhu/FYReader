@@ -59,7 +59,7 @@ public class FindBook1Fragment extends LazyFragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+    public View bindView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container) {
         binding = FragmentFindBook1Binding.inflate(inflater, container, false);
         return binding.getRoot();
     }
