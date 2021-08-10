@@ -370,20 +370,23 @@ public class LocalPageLoader extends PageLoader {
 
 
     @Override
-    protected BufferedReader getChapterReader(Chapter chapter) throws Exception {
+    protected String getChapterReader(Chapter chapter) throws Exception {
         if (chapter.getEnd() > 0) {
             Log.d("getChapterReader", chapter.getTitle());
             //从文件中获取数据
-            byte[] content = getContent(chapter);
+            /*byte[] content = getContent(chapter);
             ByteArrayInputStream bais = new ByteArrayInputStream(content);
             BufferedReader br = new BufferedReader(new InputStreamReader(bais, mCharset));
-            return br;
+            return br;*/
+            byte[] content = getContent(chapter);
+            return new String(content, mCharset);
         }
-        File file = new File(APPCONST.BOOK_CACHE_PATH + mCollBook.getId()
+        /*File file = new File(APPCONST.BOOK_CACHE_PATH + mCollBook.getId()
                 + File.separator + chapter.getTitle() + FileUtils.SUFFIX_FY);
-        if (!file.exists()) return null;
         Log.d("getChapterReader", file.getPath());
-        return new BufferedReader(new FileReader(file));
+        if (!file.exists()) return null;
+        return new BufferedReader(new FileReader(file));*/
+        return mChapterService.getChapterCatheContent(chapter);
     }
 
 

@@ -102,12 +102,13 @@ public class NetPageLoader extends PageLoader {
     }
 
     @Override
-    protected BufferedReader getChapterReader(Chapter chapter) throws FileNotFoundException {
-        File file = new File(APPCONST.BOOK_CACHE_PATH + mCollBook.getId()
+    protected String getChapterReader(Chapter chapter) throws FileNotFoundException {
+        /*File file = new File(APPCONST.BOOK_CACHE_PATH + mCollBook.getId()
                 + File.separator + chapter.getTitle() + FileUtils.SUFFIX_FY);
         if (!file.exists()) return null;
         BufferedReader br = new BufferedReader(new FileReader(file));
-        return br;
+        return br;*/
+        return mChapterService.getChapterCatheContent(chapter);
     }
 
     @Override

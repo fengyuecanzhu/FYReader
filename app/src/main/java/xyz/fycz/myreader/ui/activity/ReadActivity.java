@@ -1937,7 +1937,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         ReplaceRuleBean oldRuleBean = new ReplaceRuleBean();
                         oldRuleBean.setReplaceSummary("");
                         oldRuleBean.setEnable(true);
-                        oldRuleBean.setRegex(binding.readPvContent.getSelectStr().trim());
+                        oldRuleBean.setRegex(binding.readPvContent.getSelectStr());
                         oldRuleBean.setIsRegex(false);
                         oldRuleBean.setReplacement("");
                         oldRuleBean.setSerialNumber(0);

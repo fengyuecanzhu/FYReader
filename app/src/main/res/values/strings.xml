@@ -502,6 +502,7 @@
     <string name="contact_author">联系作者</string>
     <string name="browser">浏览器</string>
     <string name="add_url">添加网址</string>
+    <string name="re_seg">章节内容智能分段</string>
 
 
     <string-array name="reset_screen_time">

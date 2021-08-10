@@ -70,6 +70,7 @@ public class MoreSettingActivity extends BaseActivity {
     private boolean noMenuTitle;
     private boolean readAloudVolumeTurnPage;
     private boolean enType;
+    private boolean reSeg;
 
     private ArrayList<Book> mBooks;
     int booksCount;
@@ -114,6 +115,7 @@ public class MoreSettingActivity extends BaseActivity {
         noMenuTitle = mSetting.isNoMenuChTitle();
         readAloudVolumeTurnPage = mSetting.isReadAloudVolumeTurnPage();
         enType = mSetting.isEnType();
+        reSeg = mSetting.isLightNovelParagraph();
         threadNum = SharedPreUtils.getInstance().getInt(getString(R.string.threadNum), 8);
         isWebDav = getIntent().getBooleanExtra(APPCONST.WEB_DAV, false);
     }
@@ -198,6 +200,7 @@ public class MoreSettingActivity extends BaseActivity {
         binding.scLongPress.setChecked(isLongPress);
         binding.scNoMenuTitle.setChecked(noMenuTitle);
         binding.scAdaptEnType.setChecked(enType);
+        binding.scReSeg.setChecked(reSeg);
         binding.scReadAloudVolumeTurnPage.setChecked(readAloudVolumeTurnPage);
     }
 
@@ -280,6 +283,14 @@ public class MoreSettingActivity extends BaseActivity {
                     SysManager.saveSetting(mSetting);
                 }
         );
+
+        binding.rlReSeg.setOnClickListener(v -> {
+            needRefresh = true;
+            reSeg = !reSeg;
+            binding.scReSeg.setChecked(reSeg);
+            mSetting.setLightNovelParagraph(reSeg);
+            SysManager.saveSetting(mSetting);
+        });
 
         binding.llBookSort.setOnClickListener(v -> {
             /*MyAlertDialog.build(this)
