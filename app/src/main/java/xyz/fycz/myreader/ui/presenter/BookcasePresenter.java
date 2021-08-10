@@ -478,45 +478,47 @@ public class BookcasePresenter implements BasePresenter {
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_change_group:
-                mBookcaseFragment.getmBookcasePresenter()
-                        .showBookGroupMenu(mMainActivity.findViewById(R.id.action_change_group));
-                return true;
-            case R.id.action_edit:
-                editBookcase(true);
-                return true;
-            case R.id.action_styleChange:
-                if (mSetting.getBookcaseStyle().equals(BookcaseStyle.listMode)) {
-                    mSetting.setBookcaseStyle(BookcaseStyle.threePalaceMode);
-                    ToastUtils.show("已切换为三列网格视图！");
-                } else {
-                    mSetting.setBookcaseStyle(BookcaseStyle.listMode);
-                    ToastUtils.show("已切换为列表视图！");
-                }
-                isBookcaseStyleChange = true;
-                SysManager.saveSetting(mSetting);
-                init();
-                return true;
-            case R.id.action_group_man:
-                showGroupManDia();
-                return true;
-            case R.id.action_addLocalBook:
-                addLocalBook();
-                break;
-            case R.id.action_download_all:
-                if (!SharedPreUtils.getInstance().getBoolean(mMainActivity.getString(R.string.isReadDownloadAllTip), false)) {
-                    DialogCreator.createCommonDialog(mMainActivity, "一键缓存",
-                            mMainActivity.getString(R.string.all_cathe_tip), true,
-                            (dialog, which) -> {
-                                downloadAll(true, true);
-                                SharedPreUtils.getInstance().putBoolean(mMainActivity.getString(R.string.isReadDownloadAllTip), true);
-                            }, null);
-                } else {
-                    downloadAll(true, true);
-                }
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_change_group) {
+            mBookcaseFragment.getmBookcasePresenter()
+                    .showBookGroupMenu(mMainActivity.findViewById(R.id.action_change_group));
+            return true;
+        } else if (itemId == R.id.action_edit) {
+            editBookcase(true);
+            return true;
+        } else if (itemId == R.id.action_styleChange) {
+            if (mSetting.getBookcaseStyle().equals(BookcaseStyle.listMode)) {
+                mSetting.setBookcaseStyle(BookcaseStyle.threePalaceMode);
+                ToastUtils.show("已切换为三列网格视图！");
+            } else {
+                mSetting.setBookcaseStyle(BookcaseStyle.listMode);
+                ToastUtils.show("已切换为列表视图！");
+            }
+            isBookcaseStyleChange = true;
+            SysManager.saveSetting(mSetting);
+            init();
+            return true;
+        } else if (itemId == R.id.action_group_man) {
+            showGroupManDia();
+            return true;
+        } else if (itemId == R.id.action_addLocalBook) {
+            addLocalBook();
+            return true;
+        } else if (itemId == R.id.action_add_url) {
 
+            return true;
+        } else if (itemId == R.id.action_download_all) {
+            if (!SharedPreUtils.getInstance().getBoolean(mMainActivity.getString(R.string.isReadDownloadAllTip), false)) {
+                DialogCreator.createCommonDialog(mMainActivity, "一键缓存",
+                        mMainActivity.getString(R.string.all_cathe_tip), true,
+                        (dialog, which) -> {
+                            downloadAll(true, true);
+                            SharedPreUtils.getInstance().putBoolean(mMainActivity.getString(R.string.isReadDownloadAllTip), true);
+                        }, null);
+            } else {
+                downloadAll(true, true);
+            }
+            return true;
         }
         return false;
     }
@@ -1065,5 +1067,7 @@ public class BookcasePresenter implements BasePresenter {
             mBookcaseFragment.getmCbSelectAll().setText("全选");
         }
     }
+
+    /*****************************添加网址************************************/
 
 }

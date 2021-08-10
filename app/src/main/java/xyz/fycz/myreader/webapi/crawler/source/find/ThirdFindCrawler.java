@@ -67,22 +67,31 @@ public class ThirdFindCrawler extends BaseFindCrawler {
                     kindA = findRule.split("(&&|\n)+");
                     List<FindKind> children = new ArrayList<>();
                     String groupName = getName();
+                    int nameCount = 0;
                     for (String kindB : kindA) {
-                        if (kindB.trim().isEmpty()) continue;
+                        kindB = StringUtils.trim(kindB);
+                        if (TextUtils.isEmpty(kindB)) continue;
                         String[] kind = kindB.split("::");
-                        if (kind.length == 1){
+                        if (kind.length == 0) {
+                            if (children.size() > 0) {
+                                nameCount++;
+                                kindsMap.put(groupName, children);
+                                children = new ArrayList<>();
+                            }
+                            groupName = getName() + "[" + nameCount + "]";
+                        } else if (kind.length == 1) {
                             if (children.size() > 0) {
                                 kindsMap.put(groupName, children);
                                 children = new ArrayList<>();
                             }
                             groupName = kind[0].replaceAll("\\s", "");
-                            continue;
+                        } else {
+                            FindKind findKindBean = new FindKind();
+                            findKindBean.setTag(source.getSourceUrl());
+                            findKindBean.setName(kind[0].replaceAll("\\s", ""));
+                            findKindBean.setUrl(kind[1]);
+                            children.add(findKindBean);
                         }
-                        FindKind findKindBean = new FindKind();
-                        findKindBean.setTag(source.getSourceUrl());
-                        findKindBean.setName(kind[0].replaceAll("\\s", ""));
-                        findKindBean.setUrl(kind[1]);
-                        children.add(findKindBean);
                     }
                     kindsMap.put(groupName, children);
                 }
