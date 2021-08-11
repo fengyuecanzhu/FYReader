@@ -32,7 +32,6 @@ import xyz.fycz.myreader.util.utils.MD5Utils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 
-
 @Keep
 @SuppressWarnings({"unused"})
 public interface JsExtensions {
