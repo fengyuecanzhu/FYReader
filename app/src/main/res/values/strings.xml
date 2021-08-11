@@ -503,6 +503,8 @@
     <string name="browser">浏览器</string>
     <string name="add_url">添加网址</string>
     <string name="re_seg">章节内容智能分段</string>
+    <string name="backup_path">备份路径</string>
+    <string name="cathe_path">缓存路径</string>
 
 
     <string-array name="reset_screen_time">
@@ -587,5 +589,11 @@
         <item>Xpath</item>
         <item>JsonPath</item>
         <item>第三方</item>
+    </string-array>
+
+    <string-array name="select_folder">
+        <item>默认路径</item>
+        <item>系统文件夹选择器</item>
+        <item>自带选择器</item>
     </string-array>
 </resources>

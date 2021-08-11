@@ -27,7 +27,7 @@ object Backup {
 
     val backupPath = App.getApplication().filesDir.absolutePath + File.separator + "backup"
 
-    val defaultPath by lazy {
+    val defaultPath: String by lazy {
         APPCONST.BACKUP_FILE_DIR
     }
 

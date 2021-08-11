@@ -2,7 +2,9 @@ package xyz.fycz.myreader.ui.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.NumberPicker;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -33,6 +36,9 @@ import xyz.fycz.myreader.databinding.ActivityMoreSettingBinding;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.model.storage.Backup;
+import xyz.fycz.myreader.model.storage.BackupRestoreUi;
+import xyz.fycz.myreader.model.storage.BackupRestoreUiKt;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -49,7 +55,7 @@ import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
  * 阅读界面的更多设置
  */
 
-public class MoreSettingActivity extends BaseActivity {
+public class MoreSettingActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private ActivityMoreSettingBinding binding;
 
@@ -148,6 +154,7 @@ public class MoreSettingActivity extends BaseActivity {
         } else if (sortStyle == 2) {
             binding.tvBookSort.setText(getString(R.string.book_name_sort));
         }
+        binding.tvBackupPath.setText(SharedPreUtils.getInstance().getString("backupPath", APPCONST.BACKUP_FILE_DIR));
         if (isMatchChapter) {
             binding.rlMatchChapterSuitability.setVisibility(View.VISIBLE);
         } else {
@@ -158,6 +165,7 @@ public class MoreSettingActivity extends BaseActivity {
 
     @Override
     protected void processLogic() {
+        SharedPreUtils.getInstance().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
         if (isWebDav) {
             binding.llWebdav.performClick();
         }
@@ -338,6 +346,8 @@ public class MoreSettingActivity extends BaseActivity {
                 showPrivateBooksFragment();
             });
         });
+
+        binding.llBackupPath.setOnClickListener(v -> BackupRestoreUi.INSTANCE.selectBackupFolder(this));
 
         binding.rlAutoRefresh.setOnClickListener(
                 (v) -> {
@@ -689,4 +699,16 @@ public class MoreSettingActivity extends BaseActivity {
         setUpToolbar();
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if ("backupPath".equals(key)){
+            binding.tvBackupPath.setText(SharedPreUtils.getInstance().getString("backupPath", APPCONST.BACKUP_FILE_DIR));
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        BackupRestoreUi.INSTANCE.onActivityResult(requestCode, resultCode, data);
+    }
 }

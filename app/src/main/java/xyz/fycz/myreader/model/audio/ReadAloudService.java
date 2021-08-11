@@ -208,7 +208,7 @@ public class ReadAloudService extends Service {
     public void onCreate() {
         super.onCreate();
         running = true;
-        preference = SharedPreUtils.getInstance().getSharedReadable();
+        preference = SharedPreUtils.getInstance().getSharedPreferences();
         fadeTts = preference.getBoolean("fadeTTS", false);
         dsRunnable = this::doDs;
         initBroadcastReceiver();

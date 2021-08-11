@@ -3,7 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_more_setting.xml" value="0.12132725430597771" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_more_setting.xml" value="0.264" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/view_file_picker.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/menu/menu_book.xml" value="0.13703703703703704" />
       </map>
     </option>

@@ -42,6 +42,7 @@ import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.model.backup.UserService;
 import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.model.storage.BackupRestoreUi;
+import xyz.fycz.myreader.model.storage.BackupRestoreUiKt;
 import xyz.fycz.myreader.model.storage.Restore;
 import xyz.fycz.myreader.model.storage.WebDavHelp;
 import xyz.fycz.myreader.ui.activity.AboutActivity;
@@ -380,15 +381,15 @@ public class MineFragment extends BaseFragment {
             ToastUtils.showWarring("当前书架无任何书籍，无法备份！");
             return;
         }
-        StoragePermissionUtils.request(this, (permissions, all) -> {
+        /*StoragePermissionUtils.request(this, (permissions, all) -> {
             DialogCreator.createCommonDialog(getContext(), "确认备份吗?", "新备份会替换原有备份！", true,
                     (dialogInterface, i) -> {
                         dialogInterface.dismiss();
-                    /*if (mBackupAndRestore.backup("localBackup")) {
+                    *//*if (mBackupAndRestore.backup("localBackup")) {
                         DialogCreator.createTipDialog(getContext(), "备份成功，备份文件路径：" + APPCONST.BACKUP_FILE_DIR);
                     } else {
                         DialogCreator.createTipDialog(getContext(), "未给予储存权限，备份失败！");
-                    }*/
+                    }*//*
                         Backup.INSTANCE.backup(App.getmContext(), APPCONST.BACKUP_FILE_DIR, new Backup.CallBack() {
                             @Override
                             public void backupSuccess() {
@@ -401,18 +402,19 @@ public class MineFragment extends BaseFragment {
                             }
                         }, false);
                     }, (dialogInterface, i) -> dialogInterface.dismiss());
-        });
+        });*/
+        BackupRestoreUi.INSTANCE.backup(getActivity());
     }
 
     /**
      * 恢复
      */
     private void restore() {
-        StoragePermissionUtils.request(this, (permissions, all) -> {
+        /*StoragePermissionUtils.request(this, (permissions, all) -> {
             DialogCreator.createCommonDialog(getContext(), "确认恢复吗?", "恢复书架会覆盖原有书架！", true,
                     (dialogInterface, i) -> {
                         dialogInterface.dismiss();
-                    /*if (mBackupAndRestore.restore("localBackup")) {
+                    *//*if (mBackupAndRestore.restore("localBackup")) {
                         mHandler.sendMessage(mHandler.obtainMessage(7));
 //                            DialogCreator.createTipDialog(mMainActivity,
 //                                    "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");
@@ -420,7 +422,7 @@ public class MineFragment extends BaseFragment {
                         ToastUtils.showSuccess("书架恢复成功！");
                     } else {
                         DialogCreator.createTipDialog(getContext(), "未找到备份文件或未给予储存权限，恢复失败！");
-                    }*/
+                    }*//*
                         Restore.INSTANCE.restore(APPCONST.BACKUP_FILE_DIR, new Restore.CallBack() {
                             @Override
                             public void restoreSuccess() {
@@ -441,7 +443,8 @@ public class MineFragment extends BaseFragment {
                             }
                         });
                     }, (dialogInterface, i) -> dialogInterface.dismiss());
-        });
+        });*/
+        BackupRestoreUi.INSTANCE.restore(getActivity());
     }
 
     /**
@@ -542,6 +545,7 @@ public class MineFragment extends BaseFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        BackupRestoreUi.INSTANCE.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 /*case APPCONST.REQUEST_LOGIN:

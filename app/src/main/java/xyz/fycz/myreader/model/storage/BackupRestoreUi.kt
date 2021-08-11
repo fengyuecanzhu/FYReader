@@ -1,13 +1,20 @@
 package xyz.fycz.myreader.model.storage
 
 import android.app.Activity
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.net.Uri
 import android.text.TextUtils
+import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
+import com.kongzue.dialogx.dialogs.BottomMenu
+import com.kongzue.dialogx.interfaces.OnMenuItemClickListener
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import xyz.fycz.myreader.R
+import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.application.SysManager
 import xyz.fycz.myreader.base.observer.MySingleObserver
 import xyz.fycz.myreader.common.APPCONST
@@ -15,6 +22,8 @@ import xyz.fycz.myreader.model.storage.WebDavHelp.getWebDavFileNames
 import xyz.fycz.myreader.model.storage.WebDavHelp.showRestoreDialog
 import xyz.fycz.myreader.util.SharedPreUtils
 import xyz.fycz.myreader.util.ToastUtils
+import xyz.fycz.myreader.util.utils.StoragePermissionUtils
+import xyz.fycz.myreader.widget.filepicker.picker.FilePicker
 import java.util.*
 
 object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
@@ -23,7 +32,7 @@ object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
     private const val restoreSelectRequestCode = 33
 
     private fun getBackupPath(): String? {
-        return SharedPreUtils.getInstance().getString("backupPath", APPCONST.BACKUP_FILE_DIR)
+        return SharedPreUtils.getInstance().getString("backupPath", null)
     }
 
     private fun setBackupPath(path: String?) {
@@ -54,8 +63,8 @@ object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
     fun backup(activity: Activity) {
         val backupPath = getBackupPath()
         if (backupPath.isNullOrEmpty()) {
-//            selectBackupFolder(activity)
-            ToastUtils.showError("backupPath.isNullOrEmpty")
+            selectBackupFolder(activity)
+//            ToastUtils.showError("backupPath.isNullOrEmpty")
         } else {
             if (backupPath.isContentPath()) {
                 val uri = Uri.parse(backupPath)
@@ -63,32 +72,27 @@ object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
                 if (doc?.canWrite() == true) {
                     Backup.backup(activity, backupPath, this)
                 } else {
-//                    selectBackupFolder(activity)
-                    ToastUtils.showError("doc?.canWrite() != true")
+                    selectBackupFolder(activity)
+//                    ToastUtils.showError("doc?.canWrite() != true")
                 }
             } else {
-//                backupUsePermission(activity)
-                ToastUtils.showError("backupPath.isNotContentPath")
+                backupUsePermission(activity)
+//                ToastUtils.showError("backupPath.isNotContentPath")
             }
         }
     }
 
-    /*private fun backupUsePermission(activity: Activity, path: String = Backup.defaultPath) {
-        PermissionsCompat.Builder(activity)
-                .addPermissions(*Permissions.Group.STORAGE)
-                .rationale(R.string.get_storage_per)
-                .onGranted {
-                    setBackupPath(path)
-                    Backup.backup(activity, path, this)
-                }
-                .request()
+    private fun backupUsePermission(activity: Activity, path: String = Backup.defaultPath) {
+        StoragePermissionUtils.request(activity) { _, _ ->
+            setBackupPath(path)
+            Backup.backup(activity, path, this)
+        }
     }
 
     fun selectBackupFolder(activity: Activity) {
-        activity.alert {
-            titleResource = R.string.select_folder
-            items(activity.resources.getStringArray(R.array.select_folder).toList()) { _, index ->
-                when (index) {
+        BottomMenu.show("选择文件夹", activity.resources.getStringArray(R.array.select_folder))
+            .setOnMenuItemClickListener { _, _, which ->
+                when (which) {
                     0 -> {
                         setBackupPath(Backup.defaultPath)
                         backupUsePermission(activity)
@@ -100,27 +104,23 @@ object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
                             activity.startActivityForResult(intent, backupSelectRequestCode)
                         } catch (e: java.lang.Exception) {
                             e.printStackTrace()
-                            activity.toast(e.localizedMessage ?: "ERROR")
+                            ToastUtils.showError(e.localizedMessage ?: "ERROR")
                         }
                     }
                     2 -> {
-                        PermissionsCompat.Builder(activity)
-                                .addPermissions(*Permissions.Group.STORAGE)
-                                .rationale(R.string.get_storage_per)
-                                .onGranted {
-                                    selectBackupFolderApp(activity, false)
-                                }
-                                .request()
+                        StoragePermissionUtils.request(activity) { _, _ ->
+                            selectBackupFolderApp(activity, false)
+                        }
                     }
                 }
-            }
-        }.show()
+                false
+            }.setCancelButton(R.string.cancel)
     }
 
     private fun selectBackupFolderApp(activity: Activity, isRestore: Boolean) {
         val picker = FilePicker(activity, FilePicker.DIRECTORY)
-        picker.setBackgroundColor(ContextCompat.getColor(activity, R.color.background))
-        picker.setTopBackgroundColor(ContextCompat.getColor(activity, R.color.background))
+        picker.setBackgroundColor(ContextCompat.getColor(activity, R.color.colorBackground))
+        picker.setTopBackgroundColor(ContextCompat.getColor(activity, R.color.colorBackground))
         picker.setItemHeight(30)
         picker.setOnFilePickListener { currentPath: String ->
             setBackupPath(currentPath)
@@ -131,56 +131,51 @@ object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
             }
         }
         picker.show()
-    }*/
+    }
 
     fun restore(activity: Activity) {
         Single.create { emitter: SingleEmitter<ArrayList<String>?> ->
             emitter.onSuccess(getWebDavFileNames())
         }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : MySingleObserver<ArrayList<String>?>() {
-                    override fun onSuccess(strings: ArrayList<String>) {
-                        if (!showRestoreDialog(activity, strings, this@BackupRestoreUi)) {
-                            val path = getBackupPath()
-                            if (TextUtils.isEmpty(path)) {
-                                //selectRestoreFolder(activity)
-                                ToastUtils.showError("TextUtils.isEmpty(path)")
-                            } else {
-                                if (path.isContentPath()) {
-                                    val uri = Uri.parse(path)
-                                    val doc = DocumentFile.fromTreeUri(activity, uri)
-                                    if (doc?.canWrite() == true) {
-                                        Restore.restore(activity, Uri.parse(path), this@BackupRestoreUi)
-                                    } else {
-//                                        selectRestoreFolder(activity)
-                                        ToastUtils.showError("doc?.canWrite() != true")
-                                    }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : MySingleObserver<ArrayList<String>?>() {
+                override fun onSuccess(strings: ArrayList<String>) {
+                    if (!showRestoreDialog(activity, strings, this@BackupRestoreUi)) {
+                        val path = getBackupPath()
+                        if (TextUtils.isEmpty(path)) {
+                            selectRestoreFolder(activity)
+//                            ToastUtils.showError("TextUtils.isEmpty(path)")
+                        } else {
+                            if (path.isContentPath()) {
+                                val uri = Uri.parse(path)
+                                val doc = DocumentFile.fromTreeUri(activity, uri)
+                                if (doc?.canWrite() == true) {
+                                    Restore.restore(activity, Uri.parse(path), this@BackupRestoreUi)
                                 } else {
-//                                    restoreUsePermission(activity)
-                                    ToastUtils.showError("path.isNotContentPath")
+                                    selectRestoreFolder(activity)
+//                                    ToastUtils.showError("doc?.canWrite() != true")
                                 }
+                            } else {
+                                restoreUsePermission(activity)
+//                                ToastUtils.showError("path.isNotContentPath")
                             }
                         }
                     }
-                })
+                }
+            })
     }
 
-    /*private fun restoreUsePermission(activity: Activity, path: String = Backup.defaultPath) {
-        PermissionsCompat.Builder(activity)
-                .addPermissions(*Permissions.Group.STORAGE)
-                .rationale(R.string.get_storage_per)
-                .onGranted {
-                    setBackupPath(path)
-                    Restore.restore(path, this)
-                }
-                .request()
+    private fun restoreUsePermission(activity: Activity, path: String = Backup.defaultPath) {
+        StoragePermissionUtils.request(activity) { _, _ ->
+            setBackupPath(path)
+            Restore.restore(path, this)
+        }
     }
 
     private fun selectRestoreFolder(activity: Activity) {
-        activity.alert {
-            titleResource = R.string.select_folder
-            items(activity.resources.getStringArray(R.array.select_folder).toList()) { _, index ->
-                when (index) {
+        BottomMenu.show("选择文件夹", activity.resources.getStringArray(R.array.select_folder))
+            .setOnMenuItemClickListener { _, _, which ->
+                when (which) {
                     0 -> restoreUsePermission(activity)
                     1 -> {
                         try {
@@ -189,47 +184,43 @@ object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
                             activity.startActivityForResult(intent, restoreSelectRequestCode)
                         } catch (e: java.lang.Exception) {
                             e.printStackTrace()
-                            activity.toast(e.localizedMessage ?: "ERROR")
+                            ToastUtils.showError(e.localizedMessage ?: "ERROR")
                         }
                     }
                     2 -> {
-                        PermissionsCompat.Builder(activity)
-                                .addPermissions(*Permissions.Group.STORAGE)
-                                .rationale(R.string.get_storage_per)
-                                .onGranted {
-                                    selectBackupFolderApp(activity, true)
-                                }
-                                .request()
+                        StoragePermissionUtils.request(activity) { _, _ ->
+                            selectBackupFolderApp(activity, true)
+                        }
                     }
                 }
-            }
-        }.show()
-    }*/
+                false
+            }.setCancelButton(R.string.cancel)
+    }
 
-    /*fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             backupSelectRequestCode -> if (resultCode == RESULT_OK) {
                 data?.data?.let { uri ->
-                    MApplication.getInstance().contentResolver.takePersistableUriPermission(
-                            uri,
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    App.getmContext().contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     )
                     setBackupPath(uri.toString())
-                    Backup.backup(MApplication.getInstance(), uri.toString(), this)
+                    Backup.backup(App.getmContext(), uri.toString(), this)
                 }
             }
             restoreSelectRequestCode -> if (resultCode == RESULT_OK) {
                 data?.data?.let { uri ->
-                    MApplication.getInstance().contentResolver.takePersistableUriPermission(
-                            uri,
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    App.getmContext().contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     )
                     setBackupPath(uri.toString())
-                    Restore.restore(MApplication.getInstance(), uri, this)
+                    Restore.restore(App.getmContext(), uri, this)
                 }
             }
         }
-    }*/
+    }
 
 }
 

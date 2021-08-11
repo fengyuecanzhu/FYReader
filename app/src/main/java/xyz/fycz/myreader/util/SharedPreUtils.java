@@ -34,7 +34,7 @@ public class SharedPreUtils {
         return sInstance;
     }
 
-    public SharedPreferences getSharedReadable(){
+    public SharedPreferences getSharedPreferences(){
         return sharedReadable;
     }
 

@@ -93,7 +93,9 @@ public class ThirdFindCrawler extends BaseFindCrawler {
                             children.add(findKindBean);
                         }
                     }
-                    kindsMap.put(groupName, children);
+                    if (children.size() > 0) {
+                        kindsMap.put(groupName, children);
+                    }
                 }
                 emitter.onNext(true);
             } catch (Exception exception) {
