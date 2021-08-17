@@ -1684,7 +1684,7 @@ public abstract class PageLoader {
         boolean firstLine = true;
         String paragraph = contentHelper.replaceContent(mCollBook.getName() + "-" + mCollBook.getAuthor(), mCollBook.getSource(), chapter.getTitle(), true);//默认展示标题
         paragraph = paragraph.trim() + "\n";
-        int i = 1;
+        int i = 0;
         while (showTitle || i < allLine.length) {
             if (firstLine && !showTitle) {
                 paragraph = paragraph.replace(chapter.getTitle(), "");

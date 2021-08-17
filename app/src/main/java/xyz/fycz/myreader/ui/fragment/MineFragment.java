@@ -545,7 +545,6 @@ public class MineFragment extends BaseFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        BackupRestoreUi.INSTANCE.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 /*case APPCONST.REQUEST_LOGIN:

@@ -23,7 +23,6 @@ import xyz.fycz.myreader.model.storage.WebDavHelp.showRestoreDialog
 import xyz.fycz.myreader.util.SharedPreUtils
 import xyz.fycz.myreader.util.ToastUtils
 import xyz.fycz.myreader.util.utils.StoragePermissionUtils
-import xyz.fycz.myreader.widget.filepicker.picker.FilePicker
 import java.util.*
 
 object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
@@ -107,17 +106,17 @@ object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
                             ToastUtils.showError(e.localizedMessage ?: "ERROR")
                         }
                     }
-                    2 -> {
+                    /*2 -> {
                         StoragePermissionUtils.request(activity) { _, _ ->
                             selectBackupFolderApp(activity, false)
                         }
-                    }
+                    }*/
                 }
                 false
             }.setCancelButton(R.string.cancel)
     }
 
-    private fun selectBackupFolderApp(activity: Activity, isRestore: Boolean) {
+    /*private fun selectBackupFolderApp(activity: Activity, isRestore: Boolean) {
         val picker = FilePicker(activity, FilePicker.DIRECTORY)
         picker.setBackgroundColor(ContextCompat.getColor(activity, R.color.colorBackground))
         picker.setTopBackgroundColor(ContextCompat.getColor(activity, R.color.colorBackground))
@@ -131,7 +130,7 @@ object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
             }
         }
         picker.show()
-    }
+    }*/
 
     fun restore(activity: Activity) {
         Single.create { emitter: SingleEmitter<ArrayList<String>?> ->
@@ -187,11 +186,11 @@ object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
                             ToastUtils.showError(e.localizedMessage ?: "ERROR")
                         }
                     }
-                    2 -> {
+                    /*2 -> {
                         StoragePermissionUtils.request(activity) { _, _ ->
                             selectBackupFolderApp(activity, true)
                         }
-                    }
+                    }*/
                 }
                 false
             }.setCancelButton(R.string.cancel)

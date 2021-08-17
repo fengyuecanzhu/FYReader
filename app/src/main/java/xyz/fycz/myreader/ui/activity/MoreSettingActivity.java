@@ -1,8 +1,10 @@
 package xyz.fycz.myreader.ui.activity;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -701,10 +703,11 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if ("backupPath".equals(key)){
+        if ("backupPath".equals(key)) {
             binding.tvBackupPath.setText(SharedPreUtils.getInstance().getString("backupPath", APPCONST.BACKUP_FILE_DIR));
         }
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

@@ -38,6 +38,7 @@ import xyz.fycz.myreader.entity.SharedBook;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
+import xyz.fycz.myreader.model.storage.BackupRestoreUi;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
@@ -347,6 +348,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        BackupRestoreUi.INSTANCE.onActivityResult(requestCode, resultCode, data);
         if ((resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && requestCode == APPCONST.APP_INSTALL_CODE) {
             installProcess(appFile, isForceUpdate);//再次执行安装流程，包含权限判等
         }
