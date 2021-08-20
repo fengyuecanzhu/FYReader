@@ -23,7 +23,6 @@ import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.BookTagAdapter;
-import xyz.fycz.myreader.ui.adapter.SearchBookAdapter;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.KeyWordUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -43,7 +42,7 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
     private String keyWord;
     private List<String> tagList = new ArrayList<>();
 
-    public SearchBookHolder(Activity activity, ConMVMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord, SearchBookAdapter adapter) {
+    public SearchBookHolder(Activity activity, ConMVMap<SearchBookBean, Book> mBooks, SearchEngine searchEngine, String keyWord) {
         this.activity = activity;
         this.mBooks = mBooks;
         this.searchEngine = searchEngine;
@@ -61,7 +60,7 @@ public class SearchBookHolder extends ViewHolderImpl<SearchBookBean> {
 
     @Override
     protected int getItemLayoutId() {
-        return R.layout.listview_search_book_item;
+        return R.layout.search_book_item;
     }
 
     @Override

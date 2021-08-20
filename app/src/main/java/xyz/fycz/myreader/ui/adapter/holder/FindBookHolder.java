@@ -18,13 +18,11 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl;
 import xyz.fycz.myreader.base.observer.MyObserver;
-import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.BookTagAdapter;
 import xyz.fycz.myreader.util.help.StringHelper;
-import xyz.fycz.myreader.util.utils.KeyWordUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.BookApi;
@@ -50,7 +48,7 @@ public class FindBookHolder extends ViewHolderImpl<Book> {
 
     @Override
     protected int getItemLayoutId() {
-        return R.layout.listview_search_book_item;
+        return R.layout.search_book_item;
     }
 
     @Override

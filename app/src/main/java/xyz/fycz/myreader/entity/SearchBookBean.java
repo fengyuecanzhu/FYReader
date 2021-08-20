@@ -16,6 +16,8 @@ public class SearchBookBean {
     private String lastChapter;
     private String updateTime;
     private String imgUrl;
+    private String sourceName;
+    private int sourceCount;
 
     public SearchBookBean() {
     }
@@ -95,6 +97,22 @@ public class SearchBookBean {
 
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
+    }
+
+    public int getSourceCount() {
+        return sourceCount;
+    }
+
+    public void setSourceCount(int sourceCount) {
+        this.sourceCount = sourceCount;
     }
 
     @Override

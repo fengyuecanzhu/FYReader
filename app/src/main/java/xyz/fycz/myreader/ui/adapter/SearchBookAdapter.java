@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
-import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.adapter.BaseListAdapter;
 import xyz.fycz.myreader.base.adapter.IViewHolder;
@@ -42,7 +41,7 @@ public class SearchBookAdapter extends BaseListAdapter<SearchBookBean> {
 
     @Override
     protected IViewHolder<SearchBookBean> createViewHolder(int viewType) {
-        return new SearchBookHolder(activity, mBooks, searchEngine, keyWord, this);
+        return new SearchBookHolder(activity, mBooks, searchEngine, keyWord);
     }
 
     public void addAll(List<SearchBookBean> newDataS, String keyWord) {

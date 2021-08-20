@@ -53,6 +53,7 @@ import xyz.fycz.myreader.greendao.service.SearchHistoryService;
 import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
+import xyz.fycz.myreader.ui.adapter.SearchAdapter;
 import xyz.fycz.myreader.ui.adapter.SearchBookAdapter;
 import xyz.fycz.myreader.ui.adapter.SearchHistoryAdapter;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
@@ -73,10 +74,8 @@ public class SearchBookActivity extends BaseActivity {
 
     private ActivitySearchBookBinding binding;
 
-    private SearchBookAdapter mSearchBookAdapter;
+    private SearchAdapter mSearchBookAdapter;
     private String searchKey;//搜索关键字
-    private List<SearchBookBean> mBooksBean = new ArrayList<>();
-    private ConMVMap<SearchBookBean, Book> mBooks = new ConMVMap<>();
     private List<SearchHistory> mSearchHistories = new ArrayList<>();
     private List<CharSequence> mSuggestions = new ArrayList<>();
     private List<CharSequence> mHotKeys = new ArrayList<>();
@@ -134,8 +133,7 @@ public class SearchBookActivity extends BaseActivity {
 
             @Override
             public void loadMoreSearchBook(ConMVMap<SearchBookBean, Book> items) {
-                mBooks.addAll(items);
-                mSearchBookAdapter.addAll(new ArrayList<>(items.keySet()), searchKey);
+                mSearchBookAdapter.addAll(items, searchKey);
                 binding.srlSearchBookList.finishRefresh();
             }
 
@@ -372,6 +370,7 @@ public class SearchBookActivity extends BaseActivity {
                                 public void onSubscribe(Disposable d) {
                                     addDisposable(d);
                                 }
+
                                 @Override
                                 public void onSuccess(@NonNull Boolean aBoolean) {
                                     if (aBoolean) {
@@ -416,6 +415,7 @@ public class SearchBookActivity extends BaseActivity {
                 public void onSubscribe(Disposable d) {
                     addDisposable(d);
                 }
+
                 @Override
                 public void onSuccess(@NotNull Boolean b) {
                     initSuggestionList();
@@ -552,8 +552,6 @@ public class SearchBookActivity extends BaseActivity {
      */
     private void getData() {
         initSearchList();
-        mBooksBean.clear();
-        mBooks.clear();
         List<ReadCrawler> readCrawlers = ReadCrawlerUtil
                 .getEnableReadCrawlers(SharedPreUtils.getInstance().getString("searchGroup"));
         allThreadCount = readCrawlers.size();
@@ -586,18 +584,8 @@ public class SearchBookActivity extends BaseActivity {
             binding.srlSearchBookList.setEnableRefresh(false);
         } else {
             showBooks = true;
-            mSearchBookAdapter = new SearchBookAdapter(this, mBooks, searchEngine, searchKey);
+            mSearchBookAdapter = new SearchAdapter(this, searchKey, searchEngine);
             binding.rvSearchBooksList.setAdapter(mSearchBookAdapter);
-            //进入书籍详情页
-            mSearchBookAdapter.setOnItemClickListener((view, pos) -> {
-                SearchBookBean data = mSearchBookAdapter.getItem(pos);
-                ArrayList<Book> books = (ArrayList<Book>) mBooks.getValues(data);
-                if (books == null || books.size() == 0) return;
-                searchBookBean2Book(data, books.get(0));
-                Intent intent = new Intent(this, BookDetailedActivity.class);
-                BitIntentDataManager.getInstance().putData(intent, books);
-                startActivity(intent);
-            });
             binding.srlSearchBookList.setEnableRefresh(true);
             binding.rvSearchBooksList.setVisibility(View.VISIBLE);
             binding.llSuggestBooksView.setVisibility(View.GONE);
