@@ -28,11 +28,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.BaseFragment;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityMoreSettingBinding;
 import xyz.fycz.myreader.entity.Setting;
@@ -42,6 +46,7 @@ import xyz.fycz.myreader.model.storage.Backup;
 import xyz.fycz.myreader.model.storage.BackupRestoreUi;
 import xyz.fycz.myreader.model.storage.BackupRestoreUiKt;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.ui.fragment.PrivateBooksFragment;
@@ -49,6 +54,7 @@ import xyz.fycz.myreader.ui.fragment.WebDavFragment;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
 
 import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
 
@@ -495,34 +501,73 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
         binding.rlCatheGap.setOnClickListener(v -> binding.scCatheGap.performClick());
 
         binding.rlDeleteCathe.setOnClickListener(v -> {
+            final Disposable[] catheDis = new Disposable[2];
+            LoadingDialog loadingDialog = new LoadingDialog(this,
+                    "正在计算", () -> {
+                for (Disposable d : catheDis) {
+                    if (d != null) {
+                        d.dispose();
+                    }
+                }
+            });
+            loadingDialog.show();
             File catheFile = getCacheDir();
-            String catheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(catheFile));
+            Single.create((SingleOnSubscribe<CharSequence[]>) emitter -> {
+                String catheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(catheFile));
+                File eCatheFile = new File(BOOK_CACHE_PATH);
+                String eCatheFileSize;
+                if (eCatheFile.exists() && eCatheFile.isDirectory()) {
+                    eCatheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(eCatheFile));
+                } else {
+                    eCatheFileSize = "0";
+                }
+                CharSequence[] cathe = {"章节缓存：" + eCatheFileSize, "图片缓存：" + catheFileSize};
+                emitter.onSuccess(cathe);
+            }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<CharSequence[]>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    catheDis[0] = d;
+                    addDisposable(d);
+                }
 
-            File eCatheFile = new File(BOOK_CACHE_PATH);
-            String eCatheFileSize;
-            if (eCatheFile.exists() && eCatheFile.isDirectory()) {
-                eCatheFileSize = FileUtils.getFileSize(FileUtils.getDirSize(eCatheFile));
-            } else {
-                eCatheFileSize = "0";
-            }
-            CharSequence[] cathes = {"章节缓存：" + eCatheFileSize, "图片缓存：" + catheFileSize};
-            boolean[] catheCheck = {true, true};
-            new MultiChoiceDialog().create(this, "清除缓存", cathes, catheCheck, 2,
-                    (dialog, which) -> {
-                        String tip = "";
-                        if (catheCheck[0]) {
-                            BookService.getInstance().deleteAllBookCathe();
-                            tip += "章节缓存 ";
-                        }
-                        if (catheCheck[1]) {
-                            FileUtils.deleteFile(catheFile.getAbsolutePath());
-                            tip += "图片缓存 ";
-                        }
-                        if (tip.length() > 0) {
-                            tip += "清除成功";
-                            ToastUtils.showSuccess(tip);
-                        }
-                    }, null, null);
+                @Override
+                public void onSuccess(@NonNull CharSequence[] cathe) {
+                    loadingDialog.dismiss();
+                    boolean[] catheCheck = {true, true};
+                    new MultiChoiceDialog().create(MoreSettingActivity.this, "清除缓存", cathe, catheCheck, 2,
+                            (dialog, which) -> {
+                                loadingDialog.setmMessage("正在清除");
+                                loadingDialog.show();
+                                Single.create((SingleOnSubscribe<String>) e -> {
+                                    String tip = "";
+                                    if (catheCheck[0]) {
+                                        BookService.getInstance().deleteAllBookCathe();
+                                        tip += "章节缓存 ";
+                                    }
+                                    if (catheCheck[1]) {
+                                        FileUtils.deleteFile(catheFile.getAbsolutePath());
+                                        tip += "图片缓存 ";
+                                    }
+                                    e.onSuccess(tip);
+                                }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<String>() {
+                                    @Override
+                                    public void onSubscribe(Disposable d) {
+                                        catheDis[1] = d;
+                                        addDisposable(d);
+                                    }
+
+                                    @Override
+                                    public void onSuccess(@NonNull String tip) {
+                                        loadingDialog.dismiss();
+                                        if (tip.length() > 0) {
+                                            tip += "清除成功";
+                                            ToastUtils.showSuccess(tip);
+                                        }
+                                    }
+                                });
+                            }, null, null);
+                }
+            });
         });
     }
 

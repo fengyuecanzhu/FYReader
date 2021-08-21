@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.NumberPicker;
 
+import com.kongzue.dialogx.dialogs.BottomMenu;
+import com.kongzue.dialogx.interfaces.OnMenuItemClickListener;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -43,6 +46,8 @@ public class WebDavFragment extends BaseFragment {
     private String webdavAccount;
     private String webdavPassword;
     private int restoreNum;
+    private int sortType;
+    private String[] sortTypeArr = new String[]{"逆序", "顺序"};
 
     @Override
     protected View bindView(LayoutInflater inflater, ViewGroup container) {
@@ -57,6 +62,7 @@ public class WebDavFragment extends BaseFragment {
         webdavAccount = SharedPreUtils.getInstance().getString("webdavAccount", "");
         webdavPassword = SharedPreUtils.getInstance().getString("webdavPassword", "");
         restoreNum = SharedPreUtils.getInstance().getInt("restoreNum", 30);
+        sortType = SharedPreUtils.getInstance().getInt("sortType");
     }
 
     @Override
@@ -66,6 +72,7 @@ public class WebDavFragment extends BaseFragment {
         binding.tvWebdavAccount.setText(StringHelper.isEmpty(webdavAccount) ? "请输入WebDav账号" : webdavAccount);
         binding.tvWebdavPassword.setText(StringHelper.isEmpty(webdavPassword) ? "请输入WebDav授权密码" : "************");
         binding.tvRestoreNum.setText(getString(R.string.cur_restore_list_num, restoreNum));
+        binding.tvRestoreSort.setText(sortType == 0 ? sortTypeArr[0] : sortTypeArr[1]);
     }
 
     @Override
@@ -163,6 +170,17 @@ public class WebDavFragment extends BaseFragment {
                         binding.tvRestoreNum.setText(getString(R.string.cur_restore_list_num, restoreNum));
                     }).setNegativeButton("取消", null)
                     .show();
+        });
+
+        binding.llRestoreSort.setOnClickListener(v -> {
+            BottomMenu.show(getString(R.string.sort_type), sortTypeArr)
+                    .setSelection(sortType)
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        sortType = which;
+                        SharedPreUtils.getInstance().putInt("sortType", which);
+                        binding.tvRestoreSort.setText(sortType == 0 ? sortTypeArr[0] : sortTypeArr[1]);
+                        return false;
+                    }).setCancelButton(R.string.cancel);
         });
     }
 }

@@ -505,6 +505,7 @@
     <string name="re_seg">章节内容智能分段</string>
     <string name="backup_path">备份路径</string>
     <string name="cathe_path">缓存路径</string>
+    <string name="sort_type">排序方式</string>
 
 
     <string-array name="reset_screen_time">

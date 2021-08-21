@@ -111,8 +111,7 @@ constructor(urlStr: String) {
         for (p in propsList) {
             requestProps.append("<a:").append(p).append("/>\n")
         }
-        val requestPropsStr: String
-        requestPropsStr = if (requestProps.toString().isEmpty()) {
+        val requestPropsStr: String = if (requestProps.toString().isEmpty()) {
             DIR.replace("%s", "")
         } else {
             String.format(DIR, requestProps.toString() + "\n")
