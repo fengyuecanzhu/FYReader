@@ -35,12 +35,12 @@ public class BookTagAdapter extends TagAdapter<String> {
             tvTagName = (TextView) View.inflate(context, R.layout.item_book_tag, null);
             tvTagName.setTextSize(textSize);
             //默认为分类
-            if (tagName.startsWith("1:")) { //字数
+            if (position % 3 == 1) { //字数
                 tvTagName.setBackground(ContextCompat.getDrawable(context, R.drawable.tag_green_shape));
-            } else if (tagName.startsWith("2:")) {//连载状态
+            } else if (position % 3 == 2) {//连载状态
                 tvTagName.setBackground(ContextCompat.getDrawable(context, R.drawable.tag_red_shape));
             }
-            tvTagName.setText(tagName.substring(2));
+            tvTagName.setText(tagName);
         } catch (Exception e) {
             e.printStackTrace();
             ToastUtils.showError("" + e.getLocalizedMessage());

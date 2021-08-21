@@ -128,13 +128,13 @@ public class FindBookHolder extends ViewHolderImpl<Book> {
         tagList.clear();
         String type = data.getType();
         if (!StringHelper.isEmpty(type))
-            tagList.add("0:" + type);
+            tagList.add(type);
         String wordCount = data.getWordCount();
         if (!StringHelper.isEmpty(wordCount))
-            tagList.add("1:" + wordCount);
+            tagList.add(wordCount);
         String status = data.getStatus();
         if (!StringHelper.isEmpty(status))
-            tagList.add("2:" + status);
+            tagList.add(status);
         if (tagList.size() == 0) {
             tflBookTag.setVisibility(View.GONE);
         } else {

@@ -584,7 +584,7 @@ public class SearchBookActivity extends BaseActivity {
             binding.srlSearchBookList.setEnableRefresh(false);
         } else {
             showBooks = true;
-            mSearchBookAdapter = new SearchAdapter(this, searchKey, searchEngine);
+            mSearchBookAdapter = new SearchAdapter(this, searchKey);
             binding.rvSearchBooksList.setAdapter(mSearchBookAdapter);
             binding.srlSearchBookList.setEnableRefresh(true);
             binding.rvSearchBooksList.setVisibility(View.VISIBLE);

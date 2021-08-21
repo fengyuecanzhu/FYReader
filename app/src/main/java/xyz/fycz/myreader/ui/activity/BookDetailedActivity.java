@@ -168,13 +168,13 @@ public class BookDetailedActivity extends BaseActivity {
         tagList.clear();
         String type = mBook.getType();
         if (!StringHelper.isEmpty(type))
-            tagList.add("0:" + type);
+            tagList.add(type);
         String wordCount = mBook.getWordCount();
         if (!StringHelper.isEmpty(wordCount))
-            tagList.add("1:" + wordCount);
+            tagList.add(wordCount);
         String status = mBook.getStatus();
         if (!StringHelper.isEmpty(status))
-            tagList.add("2:" + status);
+            tagList.add(status);
         binding.ih.tflBookTag.setAdapter(new BookTagAdapter(this, tagList, 13));
     }
 

@@ -6,31 +6,23 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import xyz.fycz.myreader.R
-import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.application.SysManager
 import xyz.fycz.myreader.base.BitIntentDataManager
 import xyz.fycz.myreader.base.adapter2.DiffRecyclerAdapter
 import xyz.fycz.myreader.base.adapter2.ItemViewHolder
-import xyz.fycz.myreader.base.adapter2.onClick
 import xyz.fycz.myreader.databinding.SearchBookItemBinding
 import xyz.fycz.myreader.entity.SearchBookBean
 import xyz.fycz.myreader.greendao.entity.Book
-import xyz.fycz.myreader.model.SearchEngine
-import xyz.fycz.myreader.model.SearchEngine.OnGetBookInfoListener
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity
 import xyz.fycz.myreader.util.help.StringHelper
 import xyz.fycz.myreader.util.utils.KeyWordUtils
-import xyz.fycz.myreader.util.utils.NetworkUtils
 import xyz.fycz.myreader.util.utils.StringUtils
-import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil
-import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler
 
 /**
  * @author fengyue
@@ -39,11 +31,10 @@ import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler
 
 class SearchAdapter(
     context: Context,
-    val keyword: String,
-    private val searchEngine: SearchEngine
+    val keyword: String
 ) : DiffRecyclerAdapter<SearchBookBean, SearchBookItemBinding>(context) {
     private val mBooks: ConMVMap<SearchBookBean, Book> = ConMVMap()
-    private var mList: List<SearchBookBean> = ArrayList()
+    private lateinit var mList: List<SearchBookBean>
     private val tagList: MutableList<String> = ArrayList()
     private val handler = Handler(Looper.getMainLooper())
     private var postTime = 0L
@@ -116,89 +107,20 @@ class SearchAdapter(
         }
         val book = aBooks.getOrNull(0) ?: return
         val source = BookSourceManager.getBookSourceByStr(book.source)
-        val rc = ReadCrawlerUtil.getReadCrawler(source)
         data.sourceName = source.sourceName
         books2SearchBookBean(data, aBooks)
         binding.run {
-            if (data.imgUrl.isNullOrEmpty()) {
-                data.imgUrl = ""
-            } else {
-                data.imgUrl = NetworkUtils.getAbsoluteURL(rc.nameSpace, data.imgUrl)
-            }
             ivBookImg.load(data.imgUrl, data.name, data.author)
             KeyWordUtils.setKeyWord(tvBookName, data.name, keyword)
-            if (data.author.isNullOrEmpty()) {
-                data.author = ""
-            } else {
-                KeyWordUtils.setKeyWord(tvBookAuthor, data.author, keyword)
-            }
+            KeyWordUtils.setKeyWord(tvBookAuthor, data.author ?: "", keyword)
             initTagList(this, data)
-            if (data.lastChapter.isNullOrEmpty()) {
-                data.lastChapter = ""
-            } else {
-                tvBookNewestChapter.text = context.getString(
-                    R.string.newest_chapter,
-                    data.lastChapter
-                )
-            }
-            if (data.desc.isNullOrEmpty()) {
-                data.desc = ""
-            } else {
-                tvBookDesc.text = String.format("简介:%s", data.desc)
-            }
+            upLast(binding, data.lastChapter)
+            tvBookDesc.text = String.format("简介:%s", data.desc ?: "暂无简介")
             tvBookSource.text = context.getString(
                 R.string.source_title_num,
                 data.sourceName,
                 data.sourceCount
             )
-        }
-        App.getHandler().postDelayed({
-            val url = rc.nameSpace
-            if (needGetInfo(data) && rc is BookInfoCrawler) {
-                Log.i(data.name, "initOtherInfo")
-                searchEngine.getBookInfo(book, rc) { isSuccess: Boolean ->
-                    if (isSuccess) {
-                        val books: MutableList<Book> = ArrayList()
-                        books.add(book)
-                        books2SearchBookBean(data, books)
-                        val payload = Bundle()
-                        if (!data.imgUrl.isNullOrEmpty())
-                            payload.putString(
-                                "imgUrl",
-                                NetworkUtils.getAbsoluteURL(url, data.imgUrl)
-                            )
-                        if (!data.type.isNullOrEmpty())
-                            payload.putString("type", data.type)
-                        if (!data.status.isNullOrEmpty())
-                            payload.putString("status", data.status)
-                        if (!data.wordCount.isNullOrEmpty())
-                            payload.putString("wordCount", data.wordCount)
-                        if (!data.lastChapter.isNullOrEmpty())
-                            payload.putString("last", data.lastChapter)
-                        if (!data.desc.isNullOrEmpty())
-                            payload.putString("desc", data.desc)
-                        bindChange(binding, data, payload)
-                    }
-                }
-            }
-        }, 1000)
-    }
-
-    private fun initTagList(binding: SearchBookItemBinding, data: SearchBookBean) {
-        tagList.clear()
-        val type = data.type
-        if (!type.isNullOrEmpty()) tagList.add("0:$type")
-        val wordCount = data.wordCount
-        if (!wordCount.isNullOrEmpty()) tagList.add("1:$wordCount")
-        val status = data.status
-        if (!status.isNullOrEmpty()) tagList.add("2:$status")
-        binding.run {
-            if (tagList.size == 0) {
-                tflBookTag.visibility = View.GONE
-            } else {
-                tflBookTag.visibility = View.VISIBLE
-                tflBookTag.adapter = BookTagAdapter(context, tagList, 11)
-            }
         }
     }
 
@@ -217,12 +139,43 @@ class SearchAdapter(
                         data.name,
                         data.author
                     )
-                    "last" -> tvBookNewestChapter.text = context.getString(
-                        R.string.newest_chapter,
-                        data.lastChapter
-                    )
+                    "last" -> upLast(binding, data.lastChapter)
                     "desc" -> tvBookDesc.text = String.format("简介:%s", data.desc)
                 }
+            }
+        }
+    }
+
+    private fun initTagList(binding: SearchBookItemBinding, data: SearchBookBean) {
+        tagList.clear()
+        val type = data.type
+        if (!type.isNullOrEmpty()){
+            tagList.add(type)
+        }
+        val wordCount = data.wordCount
+        if (!wordCount.isNullOrEmpty()) tagList.add(wordCount)
+        val status = data.status
+        if (!status.isNullOrEmpty()) tagList.add(status)
+        binding.run {
+            if (tagList.size == 0) {
+                tflBookTag.visibility = View.GONE
+            } else {
+                tflBookTag.visibility = View.VISIBLE
+                tflBookTag.adapter = BookTagAdapter(context, tagList, 11)
+            }
+        }
+    }
+
+    private fun upLast(binding: SearchBookItemBinding, lastChapter: String?) {
+        binding.run {
+            if (lastChapter.isNullOrEmpty()) {
+                tvBookNewestChapter.visibility = View.GONE
+            } else {
+                tvBookNewestChapter.visibility = View.VISIBLE
+                tvBookNewestChapter.text = context.getString(
+                    R.string.newest_chapter,
+                    lastChapter
+                )
             }
         }
     }
@@ -241,13 +194,6 @@ class SearchAdapter(
                 context.startActivity(intent)
             }
         }
-    }
-
-    private fun needGetInfo(bookBean: SearchBookBean): Boolean {
-        if (bookBean.author.isNullOrEmpty()) return true
-        if (bookBean.type.isNullOrEmpty()) return true
-        if (bookBean.desc.isNullOrEmpty()) return true
-        return if (bookBean.lastChapter.isNullOrEmpty()) true else bookBean.imgUrl.isNullOrEmpty()
     }
 
     private fun books2SearchBookBean(bookBean: SearchBookBean, books: List<Book>) {

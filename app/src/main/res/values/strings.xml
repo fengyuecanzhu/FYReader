@@ -594,6 +594,5 @@
     <string-array name="select_folder">
         <item>默认路径</item>
         <item>系统文件夹选择器</item>
-        <item>自带选择器</item>
     </string-array>
 </resources>

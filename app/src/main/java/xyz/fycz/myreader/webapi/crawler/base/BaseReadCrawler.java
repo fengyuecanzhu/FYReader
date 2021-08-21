@@ -1,5 +1,7 @@
 package xyz.fycz.myreader.webapi.crawler.base;
 
+import android.text.TextUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +14,7 @@ import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
+import xyz.fycz.myreader.util.utils.NetworkUtils;
 
 /**
  * 因新版书源使用StrResponse，为了兼容旧版本，书源全部继承自此类
@@ -45,7 +48,13 @@ public abstract class BaseReadCrawler implements ReadCrawler {
     @Override
     public Observable<ConMVMap<SearchBookBean, Book>> getBooksFromStrResponse(StrResponse response) {
         return Observable.create(emitter -> {
-            emitter.onNext(getBooksFromSearchHtml(response.body()));
+            ConMVMap<SearchBookBean, Book> bookMap = getBooksFromSearchHtml(response.body());
+            for (Book book : bookMap.values()){
+                if (!TextUtils.isEmpty(book.getImgUrl())){
+                    book.setImgUrl(NetworkUtils.getAbsoluteURL(getNameSpace(), book.getImgUrl()));
+                }
+            }
+            emitter.onNext(bookMap);
             emitter.onComplete();
         });
     }
