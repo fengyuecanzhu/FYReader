@@ -504,10 +504,10 @@ public class BookcasePresenter implements BasePresenter {
         } else if (itemId == R.id.action_addLocalBook) {
             addLocalBook();
             return true;
-        } else if (itemId == R.id.action_add_url) {
+        } /*else if (itemId == R.id.action_add_url) {
 
             return true;
-        } else if (itemId == R.id.action_download_all) {
+        }*/ else if (itemId == R.id.action_download_all) {
             if (!SharedPreUtils.getInstance().getBoolean(mMainActivity.getString(R.string.isReadDownloadAllTip), false)) {
                 DialogCreator.createCommonDialog(mMainActivity, "一键缓存",
                         mMainActivity.getString(R.string.all_cathe_tip), true,

@@ -30,6 +30,15 @@
             android:icon="@drawable/ic_replace"
             android:title="@string/content_replace"
             app:showAsAction="never"/>
+
+        <item
+            android:id="@+id/action_re_seg"
+            android:checkable="true"
+            android:checked="false"
+            android:icon="@drawable/ic_re_seg"
+            android:title="@string/re_seg"
+            app:showAsAction="never" />
+
         <item
                 android:id="@+id/action_copy_content"
                 android:icon="@drawable/ic_copy"

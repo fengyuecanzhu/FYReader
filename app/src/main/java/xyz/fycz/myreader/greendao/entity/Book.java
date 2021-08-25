@@ -65,6 +65,8 @@ public class Book implements Serializable {
 
     private int groupSort;//分组排序
 
+    private boolean reSeg;//智能分段
+
     private String tag;
 
     private Boolean replaceEnable = SharedPreUtils.getInstance().getBoolean("replaceEnableDefault", true);
@@ -83,13 +85,13 @@ public class Book implements Serializable {
     public Book() {
     }
 
-    @Generated(hash = 1910282685)
-    public Book(String id, String name, String chapterUrl, String infoUrl, String imgUrl, String desc,
-                String author, String type, String updateDate, String wordCount, String status,
-                String newestChapterId, String newestChapterTitle, String historyChapterId, int histtoryChapterNum,
-                int sortCode, int noReadNum, int chapterTotalNum, int lastReadPosition, String source,
-                boolean isCloseUpdate, boolean isDownLoadAll, String groupId, int groupSort, String tag,
-                Boolean replaceEnable, long lastReadTime, String variable) {
+    @Generated(hash = 1472063028)
+    public Book(String id, String name, String chapterUrl, String infoUrl, String imgUrl, String desc, String author,
+            String type, String updateDate, String wordCount, String status, String newestChapterId,
+            String newestChapterTitle, String historyChapterId, int histtoryChapterNum, int sortCode, int noReadNum,
+            int chapterTotalNum, int lastReadPosition, String source, boolean isCloseUpdate, boolean isDownLoadAll,
+            String groupId, int groupSort, boolean reSeg, String tag, Boolean replaceEnable, long lastReadTime,
+            String variable) {
         this.id = id;
         this.name = name;
         this.chapterUrl = chapterUrl;
@@ -114,6 +116,7 @@ public class Book implements Serializable {
         this.isDownLoadAll = isDownLoadAll;
         this.groupId = groupId;
         this.groupSort = groupSort;
+        this.reSeg = reSeg;
         this.tag = tag;
         this.replaceEnable = replaceEnable;
         this.lastReadTime = lastReadTime;
@@ -418,5 +421,13 @@ public class Book implements Serializable {
         if (catheMap != null) {
             catheMap.clear();
         }
+    }
+
+    public boolean getReSeg() {
+        return this.reSeg;
+    }
+
+    public void setReSeg(boolean reSeg) {
+        this.reSeg = reSeg;
     }
 }

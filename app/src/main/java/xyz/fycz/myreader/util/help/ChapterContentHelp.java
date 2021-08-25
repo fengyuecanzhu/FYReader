@@ -493,90 +493,90 @@ public class ChapterContentHelp {
      * @return
      */
     public static String LightNovelParagraph2(String content, String chapterName) {
-        if (SysManager.getSetting().isLightNovelParagraph()) {
-            String _content;
-            int chapterNameLength = chapterName.trim().length();
-            if (chapterNameLength > 1) {
-                String regexp = chapterName.trim().replaceAll("\\s+", "(\\\\s*)");
+//        if (SysManager.getSetting().isLightNovelParagraph()) {
+        String _content;
+        int chapterNameLength = chapterName.trim().length();
+        if (chapterNameLength > 1) {
+            String regexp = chapterName.trim().replaceAll("\\s+", "(\\\\s*)");
 //            质量较低的页面，章节内可能重复出现章节标题
-                if (chapterNameLength > 5)
-                    _content = content.replaceAll(regexp, "").trim();
-                else
-                    _content = content.replaceFirst("^\\s*" + regexp, "").trim();
-            } else {
-                _content = content;
-            }
+            if (chapterNameLength > 5)
+                _content = content.replaceAll(regexp, "").trim();
+            else
+                _content = content.replaceFirst("^\\s*" + regexp, "").trim();
+        } else {
+            _content = content;
+        }
 
-            List<String> dict = makeDict(_content);
+        List<String> dict = makeDict(_content);
 
-            String[] p = _content
-                    .replaceAll("&quot;", "“")
-                    .replaceAll("[:：]['\"‘”“]+", "：“")
-                    .replaceAll("[\"”“]+[\\s]*[\"”“][\\s\"”“]*", "”\n“")
-                    .split("\n(\\s*)");
+        String[] p = _content
+                .replaceAll("&quot;", "“")
+                .replaceAll("[:：]['\"‘”“]+", "：“")
+                .replaceAll("[\"”“]+[\\s]*[\"”“][\\s\"”“]*", "”\n“")
+                .split("\n(\\s*)");
 
 //      初始化StringBuffer的长度,在原content的长度基础上做冗余
-            StringBuffer buffer = new StringBuffer((int) (content.length() * 1.15));
+        StringBuffer buffer = new StringBuffer((int) (content.length() * 1.15));
 //          章节的文本格式为章节标题-空行-首段，所以处理段落时需要略过第一行文本。
-            buffer.append(" ");
+        buffer.append(" ");
 
-            if (!chapterName.trim().equals(p[0].trim())) {
-                // 去除段落内空格。unicode 3000 象形字间隔（中日韩符号和标点），不包含在\s内
-                buffer.append(p[0].replaceAll("[\u3000\\s]+", ""));
-            }
+        if (!chapterName.trim().equals(p[0].trim())) {
+            // 去除段落内空格。unicode 3000 象形字间隔（中日韩符号和标点），不包含在\s内
+            buffer.append(p[0].replaceAll("[\u3000\\s]+", ""));
+        }
 
 //      如果原文存在分段错误，需要把段落重新黏合
-            for (int i = 1; i < p.length; i++) {
-                if (match(MARK_SENTENCES_END, buffer.charAt(buffer.length() - 1)))
-                    buffer.append("\n");
-//            段落开头以外的地方不应该有空格
-                // 去除段落内空格。unicode 3000 象形字间隔（中日韩符号和标点），不包含在\s内
-                buffer.append(p[i].replaceAll("[\u3000\\s]", ""));
-
-            }
-            //     预分段预处理
-            //         ”“处理为”\n“。
-            //         ”。“处理为”。\n“。不考虑“？”  “！”的情况。
-//                  ”。xxx处理为 ”。\n xxx
-            p = buffer.toString()
-                    .replaceAll("[\"”“]+[\\s]*[\"”“]+", "”\n“")
-                    .replaceAll("[\"”“]+(？。！?!~)[\"”“]+", "”$1\n“")
-                    .replaceAll("[\"”“]+(？。！?!~)([^\"”“])", "”$1\n$2")
-                    .replaceAll("([问说喊唱叫骂道着答])[\\.。]", "$1。\n")
-//                .replaceAll("([\\.。\\!！?？])([^\"”“]+)[:：][\"”“]", "$1\n$2：“")
-                    .split("\n");
-
-            buffer = new StringBuffer((int) (content.length() * 1.15));
-
-            for (String s : p) {
+        for (int i = 1; i < p.length; i++) {
+            if (match(MARK_SENTENCES_END, buffer.charAt(buffer.length() - 1)))
                 buffer.append("\n");
-                buffer.append(FindNewLines(s, dict)
-                );
-            }
+//            段落开头以外的地方不应该有空格
+            // 去除段落内空格。unicode 3000 象形字间隔（中日韩符号和标点），不包含在\s内
+            buffer.append(p[i].replaceAll("[\u3000\\s]", ""));
 
-            buffer = reduceLength(buffer);
-
-            content = chapterName + "\n\n"
-                    + buffer.toString()
-                    //处理章节头部空格和换行
-                    .replaceFirst("^\\s+", "")
-                    // 此规则会造成不规范引号被误换行，暂时无法解决，我认为利大于弊
-                    // 例句：“你”“我”“他”都是一样的
-                    // 误处理为 “你”\n“我”\n“他”都是一样的
-                    // 而规范使用的标点不会被误处理： “你”、“我”、“他”，都是一样的。
-                    .replaceAll("\\s*[\"”“]+[\\s]*[\"”“][\\s\"”“]*", "”\n“")
-                    // 规范 A：“B...
-                    .replaceAll("[:：][”“\"\\s]+", "：“")
-                    // 处理奇怪的多余引号  \n”A：“B... 为 \nA:“B...
-                    .replaceAll("\n[\"“”]([^\n\"“”]+)([,:，：][\"”“])([^\n\"“”]+)", "\n$1：“$3")
-                    .replaceAll("\n(\\s*)", "\n")
-                    // 处理“……”
-//                    .replaceAll("\n[\"”“][.,。，…]+\\s*[.,。，…]+[\"”“]","\n“……”")
-                    // 处理被错误断行的省略号。存在较高的误判，但是我认为利大于弊
-                    .replaceAll("[.,。，…]+\\s*[.,。，…]+", "……")
-                    .replaceAll("\n([\\s:：，,]+)", "\n")
-            ;
         }
+        //     预分段预处理
+        //         ”“处理为”\n“。
+        //         ”。“处理为”。\n“。不考虑“？”  “！”的情况。
+//                  ”。xxx处理为 ”。\n xxx
+        p = buffer.toString()
+                .replaceAll("[\"”“]+[\\s]*[\"”“]+", "”\n“")
+                .replaceAll("[\"”“]+(？。！?!~)[\"”“]+", "”$1\n“")
+                .replaceAll("[\"”“]+(？。！?!~)([^\"”“])", "”$1\n$2")
+                .replaceAll("([问说喊唱叫骂道着答])[\\.。]", "$1。\n")
+//                .replaceAll("([\\.。\\!！?？])([^\"”“]+)[:：][\"”“]", "$1\n$2：“")
+                .split("\n");
+
+        buffer = new StringBuffer((int) (content.length() * 1.15));
+
+        for (String s : p) {
+            buffer.append("\n");
+            buffer.append(FindNewLines(s, dict)
+            );
+        }
+
+        buffer = reduceLength(buffer);
+
+        content = chapterName + "\n\n"
+                + buffer.toString()
+                //处理章节头部空格和换行
+                .replaceFirst("^\\s+", "")
+                // 此规则会造成不规范引号被误换行，暂时无法解决，我认为利大于弊
+                // 例句：“你”“我”“他”都是一样的
+                // 误处理为 “你”\n“我”\n“他”都是一样的
+                // 而规范使用的标点不会被误处理： “你”、“我”、“他”，都是一样的。
+                .replaceAll("\\s*[\"”“]+[\\s]*[\"”“][\\s\"”“]*", "”\n“")
+                // 规范 A：“B...
+                .replaceAll("[:：][”“\"\\s]+", "：“")
+                // 处理奇怪的多余引号  \n”A：“B... 为 \nA:“B...
+                .replaceAll("\n[\"“”]([^\n\"“”]+)([,:，：][\"”“])([^\n\"“”]+)", "\n$1：“$3")
+                .replaceAll("\n(\\s*)", "\n")
+                // 处理“……”
+//                    .replaceAll("\n[\"”“][.,。，…]+\\s*[.,。，…]+[\"”“]","\n“……”")
+                // 处理被错误断行的省略号。存在较高的误判，但是我认为利大于弊
+                .replaceAll("[.,。，…]+\\s*[.,。，…]+", "……")
+                .replaceAll("\n([\\s:：，,]+)", "\n")
+        ;
+//        }
         return content;
     }
 

@@ -5,10 +5,8 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.net.Uri
 import android.text.TextUtils
-import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import com.kongzue.dialogx.dialogs.BottomMenu
-import com.kongzue.dialogx.interfaces.OnMenuItemClickListener
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -17,7 +15,6 @@ import xyz.fycz.myreader.R
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.application.SysManager
 import xyz.fycz.myreader.base.observer.MySingleObserver
-import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.model.storage.WebDavHelp.getWebDavFileNames
 import xyz.fycz.myreader.model.storage.WebDavHelp.showRestoreDialog
 import xyz.fycz.myreader.util.SharedPreUtils
@@ -139,7 +136,7 @@ object BackupRestoreUi : Backup.CallBack, Restore.CallBack {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : MySingleObserver<ArrayList<String>?>() {
                 override fun onSuccess(strings: ArrayList<String>) {
-                    if (!showRestoreDialog(activity, strings, this@BackupRestoreUi)) {
+                    if (!showRestoreDialog(strings, this@BackupRestoreUi)) {
                         val path = getBackupPath()
                         if (TextUtils.isEmpty(path)) {
                             selectRestoreFolder(activity)

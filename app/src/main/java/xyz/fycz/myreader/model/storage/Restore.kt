@@ -23,6 +23,7 @@ object Restore {
 
     fun restore(context: Context, uri: Uri, callBack: CallBack?) {
         Single.create(SingleOnSubscribe<Boolean> { e ->
+            deleteOldFile()
             DocumentFile.fromTreeUri(context, uri)?.listFiles()?.forEach { doc ->
                 for (fileName in Backup.backupFileNames) {
                     if (doc.name == fileName) {
@@ -46,6 +47,15 @@ object Restore {
                         callBack?.restoreError(e.localizedMessage ?: "ERROR")
                     }
                 })
+    }
+
+    private fun deleteOldFile() {
+        val dir = FileUtils.getFile(Backup.backupPath)
+        dir.listFiles()?.forEach {
+            if (it.name in Backup.backupFileNames){
+                it?.delete()
+            }
+        }
     }
 
     fun restore(path: String, callBack: CallBack?) {

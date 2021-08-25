@@ -285,9 +285,7 @@ public abstract class PageLoader {
         mTextPaint = new TextPaint();
         mTextPaint.setColor(mTextColor);
         mTextPaint.setTextSize(mTextSize);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mTextPaint.setLetterSpacing(mSettingManager.getTextLetterSpacing());
-        }
+        mTextPaint.setLetterSpacing(mSettingManager.getTextLetterSpacing());
         mTextPaint.setTypeface(mTypeFace);
         mTextPaint.setAntiAlias(true);
 
@@ -295,9 +293,7 @@ public abstract class PageLoader {
         mTitlePaint = new TextPaint();
         mTitlePaint.setColor(mTextColor);
         mTitlePaint.setTextSize(mTitleSize);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mTitlePaint.setLetterSpacing(mSettingManager.getTextLetterSpacing());
-        }
+        mTitlePaint.setLetterSpacing(mSettingManager.getTextLetterSpacing());
         mTitlePaint.setStyle(Paint.Style.FILL_AND_STROKE);
         mTitlePaint.setTypeface(Typeface.create(mTypeFace, Typeface.BOLD));
         mTitlePaint.setAntiAlias(true);
@@ -1672,7 +1668,9 @@ public abstract class PageLoader {
         TxtChapter txtChapter = new TxtChapter(chapter.getNumber());
 
         content = contentHelper.replaceContent(mCollBook.getName() + "-" + mCollBook.getAuthor(), mCollBook.getSource(), content, true);
-        content = contentHelper.LightNovelParagraph2(content, chapter.getTitle());
+        if (mCollBook.getReSeg()) {
+            content = contentHelper.LightNovelParagraph2(content, chapter.getTitle());
+        }
         String[] allLine = content.split("\n");
 
         //使用流的方式加载

@@ -3,12 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/android/FYReader/app/src/main/res/drawable/ic_re_seg.xml" value="0.1962962962962963" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_more_setting.xml" value="0.264" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fingerprint_dialog.xml" value="0.20425724637681159" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fragment_webdav_setting.xml" value="0.4" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/listview_search_book_item.xml" value="0.22010869565217392" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/view_file_picker.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/menu/menu_book.xml" value="0.13703703703703704" />
+        <entry key="..\:/android/FYReader/app/src/main/res/menu/menu_book_detail.xml" value="0.24947916666666667" />
+        <entry key="..\:/android/FYReader/app/src/main/res/menu/menu_read.xml" value="0.24947916666666667" />
       </map>
     </option>
   </component>

@@ -298,33 +298,6 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/rl_re_seg"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@drawable/selector_common_bg"
-                    android:gravity="center"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/re_seg"
-                        android:textColor="@color/textSecondary"
-                        android:textSize="@dimen/text_normal_size" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/sc_re_seg"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:clickable="false"
-                        android:longClickable="false" />
-                </RelativeLayout>
-
-                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="25dp"
                     android:paddingLeft="5dp"

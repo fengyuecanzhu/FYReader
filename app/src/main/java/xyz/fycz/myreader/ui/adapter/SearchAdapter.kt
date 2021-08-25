@@ -309,7 +309,7 @@ class SearchAdapter(
             }
         }
         if (filterDataS.size > 0) {
-            val searchBookBeansAdd: MutableList<SearchBookBean> = java.util.ArrayList()
+            val searchBookBeansAdd: MutableList<SearchBookBean> = ArrayList()
             if (copyDataS.size == 0) {
                 copyDataS.addAll(filterDataS)
             } else {
@@ -345,10 +345,8 @@ class SearchAdapter(
                     } else if (TextUtils.equals(keyWord, temp.author)) {
                         for (i in copyDataS.indices) {
                             val searchBook = copyDataS[i]
-                            if (!TextUtils.equals(keyWord, searchBook.name) && !TextUtils.equals(
-                                    keyWord,
-                                    searchBook.author
-                                )
+                            if (!TextUtils.equals(keyWord, searchBook.name) &&
+                                !TextUtils.equals(keyWord, searchBook.author)
                             ) {
                                 copyDataS.add(i, temp)
                                 break

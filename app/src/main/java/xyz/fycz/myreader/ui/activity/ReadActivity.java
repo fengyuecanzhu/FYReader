@@ -722,6 +722,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             menu.findItem(R.id.action_open_link).setVisible(false);
             menu.findItem(R.id.action_download).setVisible(false);
         }
+        menu.findItem(R.id.action_re_seg).setChecked(mBook.getReSeg());
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -760,6 +761,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         } else if (itemId == R.id.action_replace_content) {
             Intent ruleIntent = new Intent(this, ReplaceRuleActivity.class);
             startActivityForResult(ruleIntent, APPCONST.REQUEST_REFRESH_READ_UI);
+        }else if(itemId == R.id.action_re_seg){
+            mBook.setReSeg(!mBook.getReSeg());
+            mBookService.updateEntity(mBook);
+            if (mPageLoader != null) {
+                mPageLoader.refreshUi();
+            }
         } else if (itemId == R.id.action_copy_content) {
             String content = mPageLoader.getContentStartPage(0);
             MyAlertDialog.showTipDialogWithLink(this, "拷贝内容", content == null ? "章节内容为空！" : content);

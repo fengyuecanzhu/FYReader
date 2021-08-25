@@ -130,7 +130,7 @@ public class WebDavFragment extends BaseFragment {
                         }
                         @Override
                         public void onSuccess(ArrayList<String> strings) {
-                            if (!WebDavHelp.INSTANCE.showRestoreDialog(getContext(), strings, new Restore.CallBack() {
+                            if (!WebDavHelp.INSTANCE.showRestoreDialog(strings, new Restore.CallBack() {
                                 @Override
                                 public void restoreSuccess() {
                                     SysManager.regetmSetting();
