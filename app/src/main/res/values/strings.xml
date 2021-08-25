@@ -106,6 +106,7 @@
     <string name="email">邮箱：fy@fycz.xyz</string>
     <string name="this_github_url">https://github.com/fengyuecanzhu/FYReader</string>
     <string name="update">检查更新</string>
+    <string name="thanks">致谢名单</string>
 
 
     <!--file system-->

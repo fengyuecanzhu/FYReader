@@ -13,6 +13,7 @@ import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityDonateBinding;
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.AdUtils;
@@ -52,17 +53,15 @@ public class DonateActivity extends BaseActivity {
         });*/
     }
 
-    private void initAd() {
-        binding.llAdSupport.setVisibility(View.VISIBLE);
-        int flowAdCount = SharedPreUtils.getInstance().getInt("flowAdCount", 2);
-        int count = App.isDebug() ? flowAdCount : 1;
-    }
 
     @Override
     protected void initClick() {
         binding.llWxZsm.setOnClickListener(v -> goDonate(URLCONST.WX_ZSM));
         binding.llZfbSkm.setOnClickListener(v -> goDonate(URLCONST.ZFB_SKM));
         binding.llQqSkm.setOnClickListener(v -> goDonate(URLCONST.QQ_SKM));
+        binding.rlThanks.setOnClickListener(v ->
+                MyAlertDialog.showFullWebViewDia(this, URLCONST.THANKS_URL,
+                        false, null));
     }
 
 
