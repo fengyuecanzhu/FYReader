@@ -262,9 +262,9 @@ public class MainActivity extends BaseActivity {
             } else {
                 menu.setGroupVisible(R.id.bookcase_menu, true);
                 menu.findItem(R.id.action_finish).setVisible(false);
-            }
-            menu.findItem(R.id.action_change_group).setVisible(SharedPreUtils
+                menu.findItem(R.id.action_change_group).setVisible(SharedPreUtils
                     .getInstance().getBoolean("openGroup"));
+            }
         } else {
             menu.setGroupVisible(R.id.bookcase_menu, false);
             menu.findItem(R.id.action_finish).setVisible(false);
