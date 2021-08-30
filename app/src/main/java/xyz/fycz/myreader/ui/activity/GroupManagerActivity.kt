@@ -36,7 +36,7 @@ class GroupManagerActivity : BaseActivity() {
 
     private var openGroup = false
     
-    private var curBookGroupId = SharedPreUtils.getInstance().getString(getString(R.string.curBookGroupId), "")
+    private lateinit var curBookGroupId: String
 
     override fun bindView() {
         binding = ActivityGroupManagerBinding.inflate(layoutInflater)
@@ -54,6 +54,7 @@ class GroupManagerActivity : BaseActivity() {
         groupDialog = BookGroupDialog(this)
         groupDialog.initBookGroups(false)
         openGroup = SharedPreUtils.getInstance().getBoolean("openGroup")
+        curBookGroupId = SharedPreUtils.getInstance().getString(getString(R.string.curBookGroupId), "")
     }
 
     override fun initWidget() {
