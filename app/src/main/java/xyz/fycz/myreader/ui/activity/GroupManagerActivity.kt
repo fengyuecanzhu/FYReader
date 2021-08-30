@@ -8,7 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import io.reactivex.Single
+import io.reactivex.Singlehttps://github.com/fengyuecanzhu/FYReader/blob/master/app/src/main/java/xyz/fycz/myreader/ui/activity/GroupManagerActivity.kt
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.application.SysManager
@@ -34,7 +34,9 @@ class GroupManagerActivity : BaseActivity() {
 
     private lateinit var itemTouchHelper: ItemTouchHelper
 
-    private var openGroup: Boolean = false
+    private var openGroup = false
+    
+    private var curBookGroupId = SharedPreUtils.getInstance().getString(getString(R.string.curBookGroupId), "")
 
     override fun bindView() {
         binding = ActivityGroupManagerBinding.inflate(layoutInflater)
@@ -103,7 +105,13 @@ class GroupManagerActivity : BaseActivity() {
             openGroup = !openGroup
             binding.scBookGroup.isChecked = openGroup
             SharedPreUtils.getInstance().putBoolean("openGroup", openGroup)
-            binding.recyclerView.visibility = if (openGroup) View.VISIBLE else View.GONE
+            if (openGroup) {
+                binding.recyclerView.visibility = View.VISIBLE
+                SharedPreUtils.getInstance().putString(getString(R.string.curBookGroupId), curBookGroupId)
+            } else {
+                binding.recyclerView.visibility = View.GONE
+                SharedPreUtils.getInstance().putString(getString(R.string.curBookGroupId), "")
+            }
             setResult(RESULT_OK)
         }
     }
