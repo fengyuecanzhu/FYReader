@@ -4,6 +4,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+
+import androidx.recyclerview.widget.RecyclerView;
+
+import xyz.fycz.myreader.R;
 
 /**
  * @author fengyue
@@ -15,7 +21,6 @@ public abstract class ViewHolderImpl<T> implements IViewHolder<T> {
     private Context context;
     /****************************************************/
     protected abstract int getItemLayoutId();
-
 
     @Override
     public View createItemView(ViewGroup parent) {

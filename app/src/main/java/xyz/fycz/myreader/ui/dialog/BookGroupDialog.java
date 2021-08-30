@@ -35,7 +35,6 @@ public class BookGroupDialog {
     private ArrayList<BookGroup> mBookGroups = new ArrayList<>();//书籍分组
     private CharSequence[] mGroupNames;//书籍分组名称
     private final BookGroupService mBookGroupService;
-    private Handler mHandler = new Handler();
     private Context mContext;
 
     public BookGroupDialog(Context context) {
@@ -49,6 +48,10 @@ public class BookGroupDialog {
 
     public CharSequence[] getmGroupNames() {
         return mGroupNames;
+    }
+
+    public int getGroupSize() {
+        return mBookGroups.size();
     }
 
     //初始化书籍分组
@@ -114,6 +117,10 @@ public class BookGroupDialog {
 
     /**
      * 添加/重命名分组对话框
+     * @param isRename
+     * @param isAddGroup 是否在将书籍添加分组对话框中调用
+     * @param groupNum
+     * @param onGroup
      */
     public void showAddOrRenameGroupDia(boolean isRename, boolean isAddGroup, int groupNum, OnGroup onGroup) {
         BookGroup bookGroup = !isRename ? new BookGroup() : mBookGroups.get(groupNum);
@@ -141,8 +148,9 @@ public class BookGroupDialog {
                     ToastUtils.showSuccess("成功" +
                             (!isRename ? "添加分组[" : "成功将[" + oldName + "]重命名为[")
                             + bookGroup.getName() + "]");
+                    initBookGroups(false);
                     if (isAddGroup) {
-                        if (onGroup != null) onGroup.addGroup();
+                        if (onGroup != null) onGroup.addGroup(bookGroup);
                     }
                 });
     }
@@ -192,7 +200,7 @@ public class BookGroupDialog {
     public abstract static class OnGroup {
         public abstract void change();
 
-        public void addGroup() {
+        public void addGroup(BookGroup group) {
 
         }
     }

@@ -93,6 +93,7 @@ public class APPCONST {
     public static final int REQUEST_BOOK_SOURCE = 1011;
     public static final int REQUEST_SELECT_COVER = 1012;
     public static final int REQUEST_EDIT_BOOK = 1013;
+    public static final int REQUEST_GROUP_MANAGER = 1014;
 
     public static final int REQUEST_READ = 1;
 
@@ -101,7 +102,7 @@ public class APPCONST {
     public static final int SELECT_FILE_CODE = 10000;
 
     //设置版本号
-    public static final int SETTING_VERSION = 11;
+    public static final int SETTING_VERSION = 12;
 
     public static final int SOURCE_VERSION = 7;
 

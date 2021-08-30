@@ -1,9 +1,12 @@
 package xyz.fycz.myreader.greendao.service;
 
+import org.jetbrains.annotations.NotNull;
+
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
+import xyz.fycz.myreader.greendao.gen.BookDao;
 import xyz.fycz.myreader.greendao.gen.BookGroupDao;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
@@ -96,10 +99,14 @@ public class BookGroupService extends BaseService{
         return !StringHelper.isEmpty(curBookGroupId) && curBookGroupId.equals(privateGroupId);
     }
 
-    private int countBookGroup(){
+    public int countBookGroup(){
         return (int) DbManager.getInstance().getSession().getBookGroupDao()
                 .queryBuilder()
                 .count();
     }
 
+    public void updateGroups(@NotNull List<BookGroup> groups) {
+        BookGroupDao bookDao = DbManager.getInstance().getSession().getBookGroupDao();
+        bookDao.insertOrReplaceInTx(groups);
+    }
 }

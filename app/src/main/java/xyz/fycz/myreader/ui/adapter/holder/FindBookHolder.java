@@ -3,6 +3,8 @@ package xyz.fycz.myreader.ui.adapter.holder;
 import android.app.Activity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -105,6 +107,7 @@ public class FindBookHolder extends ViewHolderImpl<Book> {
                         }
                     });
         }
+        setAnimation(holder.itemView, pos);
     }
 
     private void initOtherInfo(Book book, ReadCrawler rc) {
@@ -148,5 +151,14 @@ public class FindBookHolder extends ViewHolderImpl<Book> {
         if (StringHelper.isEmpty(bookBean.getDesc())) return true;
         if (StringHelper.isEmpty(bookBean.getNewestChapterTitle())) return true;
         return StringHelper.isEmpty(bookBean.getImgUrl());
+    }
+    /**
+     * Here is the key method to apply the animation
+     */
+    protected void setAnimation(View viewToAnimate, int position){
+        // If the bound view wasn't previously displayed on screen, it's animated
+        Animation animation =
+                AnimationUtils.loadAnimation(viewToAnimate.getContext(), R.anim.anim_recycle_item);
+        viewToAnimate.startAnimation(animation);
     }
 }

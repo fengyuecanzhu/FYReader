@@ -49,23 +49,23 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
         iHolder.onBind(holder, getItem(position), position);
 
         //设置点击事件
-        holder.itemView.setOnClickListener((v)->{
-            if (mClickListener != null){
-                mClickListener.onItemClick(v,position);
+        holder.itemView.setOnClickListener((v) -> {
+            if (mClickListener != null) {
+                mClickListener.onItemClick(v, position);
             }
             //adapter监听点击事件
             iHolder.onClick();
-            onItemClick(v,position);
+            onItemClick(v, position);
         });
         //设置长点击事件
         holder.itemView.setOnLongClickListener(
                 (v) -> {
                     boolean isClicked = false;
-                    if (mLongClickListener != null){
-                        isClicked =  mLongClickListener.onItemLongClick(v,position);
+                    if (mLongClickListener != null) {
+                        isClicked = mLongClickListener.onItemLongClick(v, position);
                     }
                     //Adapter监听长点击事件
-                    onItemLongClick(v,position);
+                    onItemLongClick(v, position);
                     return isClicked;
                 }
         );
@@ -81,10 +81,10 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
         return null;
     }
 
-    protected void onItemClick(View v, int pos){
+    protected void onItemClick(View v, int pos) {
     }
 
-    protected void onItemLongClick(View v, int pos){
+    protected void onItemLongClick(View v, int pos) {
     }
 
     /******************************public area***********************************/
@@ -93,71 +93,85 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
         this.mClickListener = mListener;
     }
 
-    public void setOnItemLongClickListener(OnItemLongClickListener mListener){
+    public void setOnItemLongClickListener(OnItemLongClickListener mListener) {
         this.mLongClickListener = mListener;
     }
 
-    public void addItem(T value){
-        mList.add(value);
-        notifyDataSetChanged();
+    public synchronized void addItem(T value) {
+        int oldSize = getItemSize();
+        if (mList.add(value)) {
+            notifyItemInserted(oldSize);
+        }
     }
 
-    public void addItem(int index,T value){
+    public synchronized void addItem(int index, T value) {
         mList.add(index, value);
-        notifyDataSetChanged();
+        notifyItemInserted(index);
     }
 
-    public void addItems(List<T> values){
-        mList.addAll(values);
-
-        Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
+    public synchronized void addItems(List<T> values) {
+        int oldSize = getItemSize();
+        if (mList.addAll(values)) {
+            if (oldSize == 0) {
                 notifyDataSetChanged();
+            } else {
+                notifyItemRangeInserted(oldSize, values.size());
             }
-        });
+        }
     }
 
-    public void removeItem(T value){
-        mList.remove(value);
-        notifyDataSetChanged();
+    public synchronized void removeItem(T value) {
+        int pos = mList.indexOf(value);
+        if (mList.remove(value)){
+            notifyItemRemoved(pos);
+            if (pos != mList.size())
+                notifyItemRangeChanged(pos, mList.size() - pos);
+        }
     }
 
-    public void removeItems(List<T> value){
-        mList.removeAll(value);
-        notifyDataSetChanged();
+    public synchronized void removeItems(List<T> value) {
+        if (mList.removeAll(value)) {
+            notifyDataSetChanged();
+        }
     }
 
-    public T getItem(int position){
+    public synchronized void swapItem(int oldPos, int newPos){
+        int size = getItemSize();
+        if (oldPos >= 0 && oldPos < size && newPos >=0 && newPos < size){
+            Collections.swap(mList, oldPos, newPos);
+            notifyItemMoved(oldPos, newPos);
+        }
+    }
+
+    public T getItem(int position) {
         return mList.get(position);
     }
 
-    public List<T> getItems(){
+    public List<T> getItems() {
         return Collections.unmodifiableList(mList);
     }
 
-    public int getItemSize(){
+    public int getItemSize() {
         return mList.size();
     }
 
-    public void refreshItems(List<T> list){
+    public synchronized void refreshItems(List<T> list) {
         mList.clear();
         mList.addAll(list);
         notifyDataSetChanged();
     }
 
-    public void clear(){
+    public synchronized void clear() {
         mList.clear();
         notifyDataSetChanged();
     }
 
     /***************************inner class area***********************************/
-    public interface OnItemClickListener{
+    public interface OnItemClickListener {
         void onItemClick(View view, int pos);
     }
 
-    public interface OnItemLongClickListener{
+    public interface OnItemLongClickListener {
         boolean onItemLongClick(View view, int pos);
     }
 }

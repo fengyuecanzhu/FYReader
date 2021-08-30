@@ -79,12 +79,12 @@ public class BookStoreBookHolder extends ViewHolderImpl<Book> implements IItemTo
     }
 
     @Override
-    public void onItemSelected() {
+    public void onItemSelected(RecyclerView.ViewHolder viewHolder) {
         getItemView().setTranslationZ(10);
     }
 
     @Override
-    public void onItemClear() {
+    public void onItemClear(RecyclerView.ViewHolder viewHolder) {
         getItemView().setTranslationZ(0);
     }
 }

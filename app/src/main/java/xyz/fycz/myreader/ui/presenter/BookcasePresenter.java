@@ -243,7 +243,7 @@ public class BookcasePresenter implements BasePresenter {
                 }
 
                 @Override
-                public void addGroup() {
+                public void addGroup(BookGroup group) {
                     mBookcaseFragment.getmBtnAddGroup().performClick();
                 }
             });
@@ -368,7 +368,7 @@ public class BookcasePresenter implements BasePresenter {
             book.setNoReadNum(Math.max(noReadNum, 0));
             book.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
             mChapterService.updateAllOldChapterData(mChapters, chapters, book.getId());
-            if (book.getHisttoryChapterNum() + 1 > chapters.size()){
+            if (book.getHisttoryChapterNum() + 1 > chapters.size()) {
                 book.setHisttoryChapterNum(chapters.size() - 1);
             }
             mBookService.updateEntity(book);
@@ -499,7 +499,11 @@ public class BookcasePresenter implements BasePresenter {
             init();
             return true;
         } else if (itemId == R.id.action_group_man) {
-            showGroupManDia();
+            //showGroupManDia();
+            mMainActivity.startActivityForResult(
+                    new Intent(mMainActivity, GroupManagerActivity.class),
+                    APPCONST.REQUEST_GROUP_MANAGER
+            );
             return true;
         } else if (itemId == R.id.action_addLocalBook) {
             addLocalBook();
@@ -586,7 +590,6 @@ public class BookcasePresenter implements BasePresenter {
                 mBookcaseFragment.getRlBookEdit().startAnimation(mMainActivity.getmBottomInAnim());
                 setBtnClickable(false);
                 changeCheckedAllStatus();
-                mBookcaseAdapter.notifyDataSetChanged();
             } else {
                 ToastUtils.showWarring("当前无任何书籍，无法编辑书架!");
             }
@@ -598,7 +601,6 @@ public class BookcasePresenter implements BasePresenter {
             mBookcaseFragment.getRlBookEdit().setVisibility(View.GONE);
             mMainActivity.initMenuAnim();
             mBookcaseFragment.getRlBookEdit().startAnimation(mMainActivity.getmBottomOutAnim());
-            mBookcaseAdapter.notifyDataSetChanged();
         }
     }
 
@@ -667,7 +669,7 @@ public class BookcasePresenter implements BasePresenter {
                                 }
 
                                 @Override
-                                public void addGroup() {
+                                public void addGroup(BookGroup group) {
                                     mBookcaseFragment.getmBtnAddGroup().performClick();
                                 }
                             });
@@ -681,7 +683,7 @@ public class BookcasePresenter implements BasePresenter {
                                     }
 
                                     @Override
-                                    public void addGroup() {
+                                    public void addGroup(BookGroup group) {
                                         mBookcaseFragment.getmBtnAddGroup().performClick();
                                     }
                                 });
@@ -720,7 +722,7 @@ public class BookcasePresenter implements BasePresenter {
             }
 
             @Override
-            public void addGroup() {
+            public void addGroup(BookGroup group) {
                 BookcasePresenter.this.addGroup(book);
             }
         });

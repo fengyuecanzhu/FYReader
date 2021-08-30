@@ -141,14 +141,14 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
             if (viewHolder instanceof IItemTouchHelperViewHolder) {
                 IItemTouchHelperViewHolder itemTouchHelperViewHolder =
                         (IItemTouchHelperViewHolder) viewHolder;
-                itemTouchHelperViewHolder.onItemSelected();
+                itemTouchHelperViewHolder.onItemSelected(viewHolder);
             }
         }
-        if (onItemTouchListener != null) {
+        /*if (onItemTouchListener != null) {
             if (viewHolder == null) {
                 onItemTouchListener.onEnd();
             }
-        }
+        }*/
         super.onSelectedChanged(viewHolder, actionState);
         final boolean swiping = actionState == ItemTouchHelper.ACTION_STATE_DRAG;
         if (viewPager != null) {
@@ -162,7 +162,10 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
         if (viewHolder instanceof IItemTouchHelperViewHolder) {
             IItemTouchHelperViewHolder itemTouchHelperViewHolder =
                     (IItemTouchHelperViewHolder) viewHolder;
-            itemTouchHelperViewHolder.onItemClear();
+            itemTouchHelperViewHolder.onItemClear(viewHolder);
+        }
+        if (onItemTouchListener != null) {
+            onItemTouchListener.onClearView(recyclerView, viewHolder);
         }
     }
 
@@ -177,7 +180,7 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
          *
          * @param adapterPosition item的position
          */
-        void onSwiped(int adapterPosition);
+        default void onSwiped(int adapterPosition){}
 
         /**
          * 当两个Item位置互换的时候被回调
@@ -191,6 +194,6 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
         /**
          * 当滑动删除或拖拽结束时调用
          */
-        void onEnd();
+        void onClearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder);
     }
 }

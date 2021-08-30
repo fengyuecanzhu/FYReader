@@ -263,6 +263,8 @@ public class MainActivity extends BaseActivity {
                 menu.setGroupVisible(R.id.bookcase_menu, true);
                 menu.findItem(R.id.action_finish).setVisible(false);
             }
+            menu.findItem(R.id.action_change_group).setVisible(SharedPreUtils
+                    .getInstance().getBoolean("openGroup"));
         } else {
             menu.setGroupVisible(R.id.bookcase_menu, false);
             menu.findItem(R.id.action_finish).setVisible(false);
@@ -307,7 +309,7 @@ public class MainActivity extends BaseActivity {
         } else if (itemId == R.id.action_qr_scan) {
             Intent intent = new Intent(this, QRCodeScanActivity.class);
             startActivityForResult(intent, APPCONST.REQUEST_QR_SCAN);
-        } else if (itemId == R.id.action_refresh_find){
+        } else if (itemId == R.id.action_refresh_find) {
             mFindFragment.refreshFind();
             return true;
         }
@@ -387,6 +389,9 @@ public class MainActivity extends BaseActivity {
                             }
                         }
                     }
+                    break;
+                case APPCONST.REQUEST_GROUP_MANAGER:
+                    invalidateOptionsMenu();
                     break;
             }
         }

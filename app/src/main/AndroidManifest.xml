@@ -119,6 +119,7 @@
         <activity android:name=".ui.activity.SourceLoginActivity" />
         <activity android:name=".ui.activity.ReadRecordActivity" />
         <activity android:name=".ui.activity.FindBookActivity" />
+        <activity android:name=".ui.activity.GroupManagerActivity" />
 
         <receiver android:name=".util.notification.NotificationClickReceiver" />
         <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver" />

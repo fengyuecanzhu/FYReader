@@ -2,6 +2,7 @@ package xyz.fycz.myreader.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
@@ -47,23 +49,22 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
                                    boolean editState, BookcasePresenter bookcasePresenter, boolean isGroup) {
         super(context, textViewResourceId, objects, editState, bookcasePresenter, isGroup);
         itemTouchCallbackListener = new ItemTouchCallback.OnItemTouchListener() {
-            @Override
-            public void onSwiped(int adapterPosition) {
-
-            }
+            private boolean isMoved = false;
 
             @Override
             public boolean onMove(int srcPosition, int targetPosition) {
                 Collections.swap(list, srcPosition, targetPosition);
                 notifyItemMoved(srcPosition, targetPosition);
-                /*notifyItemChanged(srcPosition);
-                notifyItemChanged(targetPosition);*/
+                isMoved = true;
                 return true;
             }
 
             @Override
-            public void onEnd() {
-                App.getHandler().postDelayed(() -> notifyDataSetChanged(), 500);
+            public void onClearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                if (isMoved){
+                    AsyncTask.execute(() -> onDataMove());
+                }
+                isMoved = false;
             }
 
         };

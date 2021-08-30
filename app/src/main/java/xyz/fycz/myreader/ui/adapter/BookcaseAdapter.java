@@ -6,18 +6,19 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.*;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.CheckBox;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hjq.permissions.OnPermissionCallback;
-import com.hjq.permissions.XXPermissions;
 import com.kongzue.dialogx.dialogs.BottomDialog;
 import com.kongzue.dialogx.dialogs.BottomMenu;
 import com.kongzue.dialogx.interfaces.OnBindView;
-import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
 import com.kongzue.dialogx.interfaces.OnMenuItemSelectListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,17 +29,25 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
+import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
 import xyz.fycz.myreader.ui.activity.BookInfoEditActivity;
@@ -46,26 +55,20 @@ import xyz.fycz.myreader.ui.activity.SourceEditActivity;
 import xyz.fycz.myreader.ui.adapter.helper.IItemTouchHelperViewHolder;
 import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
+import xyz.fycz.myreader.ui.presenter.BookcasePresenter;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
+import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.ShareBookUtil;
 import xyz.fycz.myreader.util.utils.StoragePermissionUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.widget.BadgeView;
 import xyz.fycz.myreader.widget.CoverImageView;
 import xyz.fycz.myreader.widget.SwitchButton;
-import xyz.fycz.myreader.widget.custom.DragAdapter;
-import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.greendao.entity.Chapter;
-import xyz.fycz.myreader.greendao.service.BookService;
-import xyz.fycz.myreader.greendao.service.ChapterService;
-import xyz.fycz.myreader.ui.presenter.BookcasePresenter;
-import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.FileUtils;
-import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.widget.BadgeView;
 
 /**
  * @author fengyue
@@ -179,9 +182,9 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
                 mCheckMap.put(book.getId(), false);
             }
             mCheckedCount = 0;
-        } else {
+        } /*else {
             onDataMove();
-        }
+        }*/
         this.mEditState = mEditState;
         notifyDataSetChanged();
     }
@@ -608,12 +611,12 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
         }
 
         @Override
-        public void onItemSelected() {
+        public void onItemSelected(RecyclerView.ViewHolder viewHolder) {
             itemView.setTranslationZ(10);
         }
 
         @Override
-        public void onItemClear() {
+        public void onItemClear(RecyclerView.ViewHolder viewHolder) {
             itemView.setTranslationZ(0);
         }
     }

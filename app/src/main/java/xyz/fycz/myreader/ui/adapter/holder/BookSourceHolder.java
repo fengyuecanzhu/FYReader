@@ -202,12 +202,12 @@ public class BookSourceHolder extends ViewHolderImpl<BookSource> implements IIte
     }
 
     @Override
-    public void onItemSelected() {
+    public void onItemSelected(RecyclerView.ViewHolder viewHolder) {
         getItemView().setTranslationZ(10);
     }
 
     @Override
-    public void onItemClear() {
+    public void onItemClear(RecyclerView.ViewHolder viewHolder) {
         getItemView().setTranslationZ(0);
     }
 }

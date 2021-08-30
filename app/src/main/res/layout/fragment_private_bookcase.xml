@@ -31,7 +31,7 @@
             android:longClickable="false" />
     </RelativeLayout>
 
-    <LinearLayout
+    <View
         android:layout_height="15dp"
         android:layout_width="match_parent" />
 

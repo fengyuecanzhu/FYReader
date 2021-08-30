@@ -4,6 +4,7 @@ package xyz.fycz.myreader.ui.adapter;
 import android.os.AsyncTask;
 
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Collections;
 
@@ -26,36 +27,28 @@ public class BookSourceAdapter extends BaseSourceAdapter {
     private  OnStartDragListener onStartDragListener;
     private boolean mEditState;
     private final ItemTouchCallback.OnItemTouchListener itemTouchListener = new ItemTouchCallback.OnItemTouchListener() {
-        @Override
-        public void onSwiped(int adapterPosition) {
 
-        }
-
+        private boolean isMoved = true;
         @Override
         public boolean onMove(int srcPosition, int targetPosition) {
-            Collections.swap(mList, srcPosition, targetPosition);
-            notifyItemMoved(srcPosition, targetPosition);
-            /*notifyItemChanged(srcPosition);
-            notifyItemChanged(targetPosition);
-            AsyncTask.execute(() -> {
-                for (int i = 1; i <= mList.size(); i++) {
-                    mList.get(i - 1).setOrderNum(i);
-                }
-                DbManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(mList);
-            });*/
+            swapItem(srcPosition, targetPosition);
+            isMoved = true;
             return true;
         }
 
 
         @Override
-        public void onEnd() {
-            App.getHandler().postDelayed(() -> notifyDataSetChanged(), 500);
-            AsyncTask.execute(() -> {
-                for (int i = 1; i <= mList.size(); i++) {
-                    mList.get(i - 1).setOrderNum(i);
-                }
-                DbManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(mList);
-            });
+        public void onClearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            if (isMoved) {
+                App.getHandler().postDelayed(() -> notifyDataSetChanged(), 500);
+                AsyncTask.execute(() -> {
+                    for (int i = 1; i <= mList.size(); i++) {
+                        mList.get(i - 1).setOrderNum(i);
+                    }
+                    DbManager.getDaoSession().getBookSourceDao().insertOrReplaceInTx(mList);
+                });
+            }
+            isMoved = false;
         }
 
     };

@@ -7,6 +7,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookcaseStyle;
 import xyz.fycz.myreader.enums.LocalBookSource;
+import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.util.CacheHelper;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -98,6 +99,9 @@ public class SysManager {
                 setting.setSharedLayout(true);
                 Log.d("SettingVersion", "" + 10);
             case 11:
+                if (BookGroupService.getInstance().countBookGroup() > 0) {
+                    SharedPreUtils.getInstance().putBoolean("openGroup", true);
+                }
                 Log.d("SettingVersion", "" + 11);
             case 12:
                 Log.d("SettingVersion", "" + 12);
