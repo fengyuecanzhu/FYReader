@@ -8,7 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import io.reactivex.Singlehttps://github.com/fengyuecanzhu/FYReader/blob/master/app/src/main/java/xyz/fycz/myreader/ui/activity/GroupManagerActivity.kt
+import io.reactivex.Single
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.application.SysManager
