@@ -266,7 +266,7 @@ public class MainActivity extends BaseActivity {
                 menu.setGroupVisible(R.id.bookcase_menu, true);
                 menu.findItem(R.id.action_finish).setVisible(false);
                 menu.findItem(R.id.action_change_group).setVisible(SharedPreUtils
-                        .getInstance().getBoolean("openGroup"));
+                        .getInstance().getBoolean("openGroup", true));
             }
         } else {
             menu.setGroupVisible(R.id.bookcase_menu, false);

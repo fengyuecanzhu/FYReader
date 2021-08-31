@@ -90,7 +90,7 @@ public class SearchHistoryService extends BaseService {
         SearchHistory searchHistory = null;
         String sql = "select * from search_history where content = ?";
         Cursor cursor = selectBySql(sql,new String[]{content});
-        if (cursor == null) return searchHistory;
+        if (cursor == null) return null;
         if (cursor.moveToNext()){
             searchHistory = new SearchHistory();
             searchHistory.setId(cursor.getString(0));
@@ -111,7 +111,7 @@ public class SearchHistoryService extends BaseService {
             searchHistory.setContent(history);
             addSearchHistory(searchHistory);
         }else {
-            searchHistory.setCreateDate(DateHelper.longToTime(new Date().getTime()));
+            searchHistory.setCreateDate(DateHelper.longToTime(System.currentTimeMillis()));
             updateEntity(searchHistory);
         }
     }
