@@ -59,8 +59,7 @@ class BookGroupAdapter(
                 val item = getItem(holder.layoutPosition)
                 DialogCreator.createCommonDialog(
                     context, "确定删除分组[" + item?.name + "]？",
-                    "删除后，该书籍分组将永久不再显示，是否继续删除？", true,
-                    "确定", "取消", { _, _ ->
+                    "删除后，该书籍分组将永久不再显示，是否继续删除？", true, { _, _ ->
                         BookGroupService.getInstance()
                             .deleteBookGroup(item)
                         removeItem(holder.layoutPosition)
@@ -82,9 +81,13 @@ class BookGroupAdapter(
                 ToastUtils.showWarring("分组数量不能超过50")
                 return@setOnClickListener
             }
-            groupDialog.showAddOrRenameGroupDia(true, false,
+            groupDialog.showAddOrRenameGroupDia(true, true,
                 holder.layoutPosition, object : BookGroupDialog.OnGroup() {
                     override fun change() {
+
+                    }
+
+                    override fun addGroup(group: BookGroup?) {
                         App.getHandler().postDelayed(
                             { notifyItemChanged(holder.layoutPosition) }, 300
                         )

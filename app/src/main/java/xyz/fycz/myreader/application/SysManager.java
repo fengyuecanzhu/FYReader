@@ -99,9 +99,6 @@ public class SysManager {
                 setting.setSharedLayout(true);
                 Log.d("SettingVersion", "" + 10);
             case 11:
-                if (BookGroupService.getInstance().countBookGroup() > 0) {
-                    SharedPreUtils.getInstance().putBoolean("openGroup", true);
-                }
                 Log.d("SettingVersion", "" + 11);
             case 12:
                 Log.d("SettingVersion", "" + 12);

@@ -144,11 +144,14 @@ public class MainActivity extends BaseActivity {
         super.initClick();
 
         mToolbar.setOnLongClickListener(v -> {
-            if (binding.viewPagerMain.getCurrentItem() == 0 &&
-                    !BookGroupService.getInstance().curGroupIsPrivate() &&
-                    (mBookcaseFragment.getmBookcasePresenter() != null &&
-                            !mBookcaseFragment.getmBookcasePresenter().ismEditState())) {
-                goPrivateBookcase();
+            if (binding.viewPagerMain.getCurrentItem() == 0
+                    && (mBookcaseFragment.getmBookcasePresenter() != null
+                    && !mBookcaseFragment.getmBookcasePresenter().ismEditState())) {
+                if (BookGroupService.getInstance().curGroupIsPrivate()) {
+                    goBackNormalBookcase();
+                } else {
+                    goPrivateBookcase();
+                }
                 return true;
             }
             return false;
@@ -263,7 +266,7 @@ public class MainActivity extends BaseActivity {
                 menu.setGroupVisible(R.id.bookcase_menu, true);
                 menu.findItem(R.id.action_finish).setVisible(false);
                 menu.findItem(R.id.action_change_group).setVisible(SharedPreUtils
-                    .getInstance().getBoolean("openGroup"));
+                        .getInstance().getBoolean("openGroup"));
             }
         } else {
             menu.setGroupVisible(R.id.bookcase_menu, false);
@@ -465,6 +468,20 @@ public class MainActivity extends BaseActivity {
         MyAlertDialog.showPrivateVerifyDia(this, needGoTo -> {
             if (needGoTo) showPrivateBooks();
         });
+    }
+
+    private void goBackNormalBookcase() {
+        DialogCreator.createCommonDialog(this, "退出私密书架",
+                "确定要退出私密书架吗？", true, (dialog, which) -> {
+                    groupName = "";
+                    SharedPreUtils.getInstance().putString(getString(R.string.curBookGroupId), "");
+                    SharedPreUtils.getInstance().putString(getString(R.string.curBookGroupName), groupName);
+                    getSupportActionBar().setSubtitle("");
+                    if (mBookcaseFragment.isRecreate()) {
+                        reLoadFragment();
+                    }
+                    mBookcaseFragment.init();
+                }, null);
     }
 
     /**

@@ -102,7 +102,7 @@ public class APPCONST {
     public static final int SELECT_FILE_CODE = 10000;
 
     //设置版本号
-    public static final int SETTING_VERSION = 12;
+    public static final int SETTING_VERSION = 11;
 
     public static final int SOURCE_VERSION = 7;
 

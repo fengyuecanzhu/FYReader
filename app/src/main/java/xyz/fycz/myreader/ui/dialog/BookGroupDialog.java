@@ -141,7 +141,7 @@ public class BookGroupDialog {
                         mBookGroupService.updateEntity(bookGroup);
                         SharedPreUtils spu = SharedPreUtils.getInstance();
                         if (spu.getString(mContext.getString(R.string.curBookGroupName), "").equals(oldName)) {
-                            spu.putString(mContext.getString(R.string.curBookGroupName), newGroupName.toString());
+                            spu.putString(mContext.getString(R.string.curBookGroupName), newGroupName);
                             if (onGroup != null) onGroup.change();
                         }
                     }
@@ -198,8 +198,10 @@ public class BookGroupDialog {
     }
 
     public abstract static class OnGroup {
+        //当前正使用分组名称改变回调
         public abstract void change();
 
+        //回调
         public void addGroup(BookGroup group) {
 
         }

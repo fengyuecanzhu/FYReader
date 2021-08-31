@@ -34,7 +34,7 @@ class GroupManagerActivity : BaseActivity() {
 
     private lateinit var itemTouchHelper: ItemTouchHelper
 
-    private var openGroup = false
+    private var openGroup = true
     
     private lateinit var curBookGroupId: String
 
@@ -53,7 +53,7 @@ class GroupManagerActivity : BaseActivity() {
         super.initData(savedInstanceState)
         groupDialog = BookGroupDialog(this)
         groupDialog.initBookGroups(false)
-        openGroup = SharedPreUtils.getInstance().getBoolean("openGroup")
+        openGroup = SharedPreUtils.getInstance().getBoolean("openGroup", true)
         curBookGroupId = SharedPreUtils.getInstance().getString(getString(R.string.curBookGroupId), "")
     }
 
