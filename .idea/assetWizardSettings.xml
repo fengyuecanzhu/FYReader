@@ -14,8 +14,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_plus" />
-                            <entry key="sourceFile" value="F:\SVG图标\加.svg" />
+                            <entry key="outputName" value="ic_right_arrow_small" />
+                            <entry key="sourceFile" value="F:\SVG图标\向右.svg" />
                           </map>
                         </option>
                       </PersistentState>

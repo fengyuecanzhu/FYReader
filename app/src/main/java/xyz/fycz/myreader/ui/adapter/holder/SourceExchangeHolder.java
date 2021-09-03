@@ -42,9 +42,11 @@ public class SourceExchangeHolder extends ViewHolderImpl<Book> {
     public void onBind(RecyclerView.ViewHolder holder, Book data, int pos) {
         sourceTvTitle.setText(BookSourceManager.getSourceNameByStr(data.getSource()));
         sourceTvChapter.setText(data.getNewestChapterTitle());
-        if (data.getSource() != null && data.getSource().equals(dialog.getmShelfBook().getSource()))
+        if (data.getSource() != null && data.getSource().equals(dialog.getmShelfBook().getSource())) {
             sourceIv.setVisibility(View.VISIBLE);
-        else
+            dialog.setSourceIndex(pos);
+        } else {
             sourceIv.setVisibility(View.GONE);
+        }
     }
 }

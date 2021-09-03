@@ -31,6 +31,7 @@ import xyz.fycz.myreader.ui.activity.BookstoreActivity;
 import xyz.fycz.myreader.ui.adapter.holder.FindBookHolder;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.BookApi;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
@@ -48,12 +49,35 @@ public class FindBook2Fragment extends LazyFragment {
     private BaseListAdapter<Book> findBookAdapter;
     private SourceExchangeDialog mSourceDia;
 
+    private static final String KIND = "kind";
+    private static final String FIND_CRAWLER = "findCrawler";
+
+    public FindBook2Fragment() {
+    }
 
     public FindBook2Fragment(FindKind kind, FindCrawler findCrawler) {
         this.kind = kind;
         this.findCrawler = findCrawler;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            String dataKey = savedInstanceState.getString(APPCONST.DATA_KEY);
+            kind = (FindKind) BitIntentDataManager.getInstance().getData(KIND + dataKey);
+            findCrawler = (FindCrawler) BitIntentDataManager.getInstance().getData(FIND_CRAWLER + dataKey);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        String dataKey = StringHelper.getStringRandom(25);
+        BitIntentDataManager.getInstance().putData(KIND + dataKey, kind);
+        BitIntentDataManager.getInstance().putData(FIND_CRAWLER + dataKey, findCrawler);
+        outState.putString(APPCONST.DATA_KEY, dataKey);
+        super.onSaveInstanceState(outState);
+    }
     @Override
     public void lazyInit() {
         initData();

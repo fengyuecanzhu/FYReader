@@ -271,6 +271,15 @@ public class SearchBookActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void processLogic() {
+        String searchKey = getIntent().getStringExtra(APPCONST.SEARCH_KEY);
+        if (searchKey != null) {
+            binding.etSearchKey.setText(searchKey);
+            binding.etSearchKey.setSelection(searchKey.length());
+            search();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

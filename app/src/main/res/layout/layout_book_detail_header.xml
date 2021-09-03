@@ -21,37 +21,39 @@
 
 
         <xyz.fycz.myreader.widget.CoverImageView
-                android:id="@+id/book_detail_iv_cover"
-                android:layout_width="82dp"
-                android:layout_height="110dp"
-                android:scaleType="centerCrop"
-                android:background="@color/colorPrimary"
-                app:srcCompat="@mipmap/default_cover" />
+            android:id="@+id/book_detail_iv_cover"
+            android:layout_width="82dp"
+            android:layout_height="110dp"
+            android:background="@color/colorPrimary"
+            android:scaleType="centerCrop"
+            app:srcCompat="@mipmap/default_cover" />
 
     </androidx.cardview.widget.CardView>
 
     <TextView
-            android:id="@+id/book_detail_tv_author"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/cover"
-            android:layout_marginStart="14dp"
-            android:layout_marginTop="30dp"
-            android:layout_toEndOf="@+id/cover"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/origin"
-            tools:text=" 茶叶蛋" />
-
+        android:id="@+id/book_detail_tv_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/cover"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="30dp"
+        android:layout_toEndOf="@+id/cover"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/origin"
+        app:drawableRightCompat="@drawable/ic_right_arrow_small"
+        app:drawableTint="@color/textAssistInverted"
+        tools:text=" 茶叶蛋" />
 
 
     <com.zhy.view.flowlayout.TagFlowLayout
         android:id="@+id/tfl_book_tag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/book_detail_tv_author"
         android:layout_alignStart="@id/book_detail_tv_author"
         android:layout_marginTop="2dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         app:max_select="0"
         app:tag_gravity="left" />
 

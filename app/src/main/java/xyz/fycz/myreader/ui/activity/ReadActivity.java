@@ -225,18 +225,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            pagePos = savedInstanceState.getInt("pagePos");
-            chapterPos = savedInstanceState.getInt("chapterPos");
-        } else {
-            pagePos = -1;
-            chapterPos = -1;
-        }
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     protected void onStop() {
         recordReadTime();
         super.onStop();
@@ -256,11 +244,18 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mBook != null) {
-            outState.putInt("pagePos", mBook.getLastReadPosition());
-            outState.putInt("chapterPos", mBook.getHisttoryChapterNum());
+        aBooks = mSourceDialog.getaBooks();
+        Intent intent = new Intent();
+        if (aBooks != null) {
+            aBooks.set(mSourceDialog.getSourceIndex(), mBook);
+            BitIntentDataManager.getInstance().putData(intent, aBooks);
+            intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
+        } else {
+            BitIntentDataManager.getInstance().putData(intent, mBook);
         }
+        intent.putExtra("isCollected", isCollected);
+        outState.putParcelable(INTENT, intent);
+        super.onSaveInstanceState(outState);
     }
 
     @Override

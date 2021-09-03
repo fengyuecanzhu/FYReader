@@ -71,7 +71,16 @@ public class SourceExchangeDialog extends Dialog {
         this.sourceIndex = sourceIndex;
     }
     public int getSourceIndex() {
-        return sourceIndex;
+        if (sourceIndex == -1){
+            for (int i = 0; i < aBooks.size(); i++) {
+                Book book = aBooks.get(i);
+                if (book.getSource().equals(mShelfBook.getSource())) {
+                    sourceIndex = i;
+                    break;
+                }
+            }
+        }
+        return sourceIndex == -1 ? 0 : sourceIndex;
     }
     public void setOnSourceChangeListener(OnSourceChangeListener listener) {
         this.listener = listener;

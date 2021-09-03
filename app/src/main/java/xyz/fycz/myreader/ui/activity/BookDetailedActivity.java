@@ -12,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -115,6 +117,22 @@ public class BookDetailedActivity extends BaseActivity {
     protected void bindView() {
         binding = ActivityBookDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        aBooks = mSourceDialog.getaBooks();
+        Intent intent = new Intent();
+        if (aBooks != null) {
+            aBooks.set(mSourceDialog.getSourceIndex(), mBook);
+            BitIntentDataManager.getInstance().putData(intent, aBooks);
+            intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
+        } else {
+            BitIntentDataManager.getInstance().putData(intent, mBook);
+        }
+        intent.putExtra("isCollected", isCollected);
+        outState.putParcelable(INTENT, intent);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -226,12 +244,16 @@ public class BookDetailedActivity extends BaseActivity {
         }
         mSourceDialog.setABooks(aBooks);
         mSourceDialog.setSourceIndex(sourceIndex);
-
     }
 
     @Override
     protected void initClick() {
         super.initClick();
+        binding.ih.bookDetailTvAuthor.setOnClickListener(v -> {
+            Intent intent = new Intent(BookDetailedActivity.this, SearchBookActivity.class);
+            intent.putExtra(APPCONST.SEARCH_KEY, binding.ih.bookDetailTvAuthor.getText());
+            startActivity(intent);
+        });
         binding.ic.bookDetailTvDesc.setOnClickListener(v -> showMoreDesc());
         binding.ic.bookDetailTvCatalogMore.setOnClickListener(v -> goToMoreChapter());
         binding.ib.flAddBookcase.setOnClickListener(view -> {

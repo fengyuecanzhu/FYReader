@@ -35,6 +35,8 @@ import xyz.fycz.myreader.util.StatusBarUtil;
 public abstract class BaseActivity extends SwipeBackActivity {
     private static final int INVALID_VAL = -1;
 
+    protected static final String INTENT = "intent";
+
     protected CompositeDisposable mDisposable;
 
     protected Toolbar mToolbar;
@@ -119,6 +121,7 @@ public abstract class BaseActivity extends SwipeBackActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initIntent(savedInstanceState);
         initTheme();
         ActivityManage.addActivity(this);
         bindView();
@@ -128,6 +131,15 @@ public abstract class BaseActivity extends SwipeBackActivity {
         initWidget();
         initClick();
         processLogic();
+    }
+
+    private void initIntent(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            Intent intent = savedInstanceState.getParcelable(INTENT);
+            if (intent != null) {
+                setIntent(intent);
+            }
+        }
     }
 
     private void initToolbar() {

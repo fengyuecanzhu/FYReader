@@ -1,10 +1,13 @@
 package xyz.fycz.myreader.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +43,15 @@ public class FindBookActivity extends BaseActivity {
     protected void bindView() {
         binding = ActivityFindBookBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        Intent intent = new Intent();
+        BitIntentDataManager.getInstance().putData(intent, findCrawler);
+        outState.putParcelable(INTENT, intent);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
