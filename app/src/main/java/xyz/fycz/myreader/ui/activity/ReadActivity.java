@@ -280,13 +280,8 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             finish();
             return;
         }
-        if (pagePos != -1 && chapterPos != -1) {
-            mBook.setHisttoryChapterNum(chapterPos);
-            mBook.setLastReadPosition(pagePos);
-        } else {
-            pagePos = mBook.getLastReadPosition();
-            chapterPos = mBook.getHisttoryChapterNum();
-        }
+        pagePos = mBook.getLastReadPosition();
+        chapterPos = mBook.getHisttoryChapterNum();
         if (SharedPreUtils.getInstance().getBoolean(getString(R.string.isNightFS), false)) {
             mSetting.setDayStyle(!ColorUtil.isColorLight(getResources().getColor(R.color.textPrimary)));
         }
@@ -756,7 +751,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         } else if (itemId == R.id.action_replace_content) {
             Intent ruleIntent = new Intent(this, ReplaceRuleActivity.class);
             startActivityForResult(ruleIntent, APPCONST.REQUEST_REFRESH_READ_UI);
-        }else if(itemId == R.id.action_re_seg){
+        } else if (itemId == R.id.action_re_seg) {
             mBook.setReSeg(!mBook.getReSeg());
             mBookService.updateEntity(mBook);
             if (mPageLoader != null) {
@@ -1583,6 +1578,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                             public void onSubscribe(Disposable d) {
                                 addDisposable(d);
                             }
+
                             @Override
                             public void onNext(@NotNull String s) {
                                 downloadingChapter = chapter.getTitle();
