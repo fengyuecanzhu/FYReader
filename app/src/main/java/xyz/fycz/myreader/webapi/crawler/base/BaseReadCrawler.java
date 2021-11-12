@@ -14,6 +14,7 @@ import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 
 /**
@@ -50,6 +51,7 @@ public abstract class BaseReadCrawler implements ReadCrawler {
         return Observable.create(emitter -> {
             ConMVMap<SearchBookBean, Book> bookMap = getBooksFromSearchHtml(response.body());
             for (Book book : bookMap.values()){
+                book.setId(StringHelper.getStringRandom(25));
                 if (!TextUtils.isEmpty(book.getImgUrl())){
                     book.setImgUrl(NetworkUtils.getAbsoluteURL(getNameSpace(), book.getImgUrl()));
                 }

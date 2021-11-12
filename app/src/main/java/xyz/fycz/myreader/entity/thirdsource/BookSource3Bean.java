@@ -1,11 +1,15 @@
 package xyz.fycz.myreader.entity.thirdsource;
 
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import kotlin.jvm.Transient;
+import xyz.fycz.myreader.util.utils.GsonUtils;
+import xyz.fycz.myreader.util.utils.StringUtils;
 
 // 解析阅读3.0的书源规则,toBookSourceBean()方法转换为阅读2.0书源规则
 // https://raw.githubusercontent.com/gedoor/legado/master/app/src/main/java/io/legado/app/data/entities/BookSource.kt
@@ -215,6 +219,9 @@ public class BookSource3Bean {
             header="@Header:"+this.header.replaceAll("\\n"," ");
         }
 
+        if (!TextUtils.isEmpty(ruleFindUrl)){
+            ruleFindUrl += header;
+        }
 
         return new BookSourceBean(
                 bookSourceUrl,
@@ -226,7 +233,7 @@ public class BookSource3Bean {
                 0, //u  serialNumber,
                 weight,
                 true, //u enable,
-                ruleFindUrl+header,//发现规则 ruleFindUrl,
+                ruleFindUrl,//发现规则 ruleFindUrl,
                 ruleExplore.bookList,  //  列表 ruleFindList,
                 ruleExplore.name,//  ruleFindName,
                 ruleExplore.author,//   ruleFindAuthor,

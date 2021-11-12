@@ -11,11 +11,13 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.entity.FindKind;
 import xyz.fycz.myreader.entity.StrResponse;
+import xyz.fycz.myreader.entity.thirdsource.ExploreKind;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.entity.rule.FindRule;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeRule;
+import xyz.fycz.myreader.util.utils.GsonUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.webapi.crawler.base.BaseFindCrawler;
 
@@ -54,6 +56,18 @@ public class ThirdFindCrawler extends BaseFindCrawler {
     public Observable<Boolean> initData() {
         return Observable.create(emitter -> {
             try {
+                if (StringUtils.isJsonArray(findRuleBean.getUrl())) {
+                    List<ExploreKind> kinds = GsonUtils.parseJArray(findRuleBean.getUrl(), ExploreKind.class);
+                    StringBuilder sb = new StringBuilder();
+                    for (ExploreKind kind : kinds){
+                        String url = kind.getUrl() == null ? "" : kind.getUrl();
+                        sb.append(kind.getTitle()).append("::").append(url).append("\n");
+                    }
+                    if (sb.length() > 0){
+                        sb.deleteCharAt(sb.length() - 1);
+                    }
+                    findRuleBean.setUrl(sb.toString());
+                }
                 String[] kindA;
                 String findRule;
                 if (!TextUtils.isEmpty(findRuleBean.getUrl()) && !source.containsGroup(findError)) {

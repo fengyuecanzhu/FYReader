@@ -6,10 +6,13 @@
         <entry key="..\:/android/FYReader/app/src/main/res/drawable/ic_re_seg.xml" value="0.1962962962962963" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_about.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_donate.xml" value="0.536" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_feedback.xml" value="0.12132725430597771" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_file_picker.xml" value="0.2318840579710145" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_group_manager.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_manage_group.xml" value="0.21195652173913043" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_more_setting.xml" value="0.264" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fingerprint_dialog.xml" value="0.20425724637681159" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/fragment_file_category.xml" value="0.2318840579710145" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fragment_find_book_2.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fragment_private_bookcase.xml" value="0.21195652173913043" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fragment_webdav_setting.xml" value="0.4" />
@@ -25,6 +28,9 @@
         <entry key="..\:/android/FYReader/app/src/main/res/menu/menu_read.xml" value="0.24947916666666667" />
       </map>
     </option>
+  </component>
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />

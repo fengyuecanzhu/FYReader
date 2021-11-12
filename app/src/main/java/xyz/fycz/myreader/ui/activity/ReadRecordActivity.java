@@ -63,6 +63,14 @@ public class ReadRecordActivity extends BaseActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        if (mSourceDia != null) {
+            mSourceDia.stopSearch();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         recordService = ReadRecordService.getInstance();

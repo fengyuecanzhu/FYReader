@@ -3,7 +3,9 @@ package xyz.fycz.myreader.ui.fragment;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -23,6 +25,8 @@ import com.kongzue.dialogx.dialogs.BottomMenu;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -50,6 +54,7 @@ import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.UriFileUtil;
 import xyz.fycz.myreader.util.utils.ClipBoardUtil;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
@@ -67,6 +72,7 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
  * @date 2021/2/10 12:05
  */
 public class DIYSourceFragment extends BaseFragment {
+    private static final String TAG = DIYSourceFragment.class.getSimpleName();
     private FragmentImportSourceBinding binding;
 
     private final BookSourceActivity sourceActivity;
@@ -182,11 +188,13 @@ public class DIYSourceFragment extends BaseFragment {
                                 ToastUtils.showError("剪切板内容为空，导入失败");
                             }
                         } else if (which == 1) {
-                            ToastUtils.showInfo("请选择书源JSON文件");
-                            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                            intent.addCategory(Intent.CATEGORY_OPENABLE);
-                            intent.setType("application/json");
-                            startActivityForResult(intent, APPCONST.REQUEST_IMPORT_BOOK_SOURCE);
+                            StoragePermissionUtils.request(this, (permissions, all) -> {
+                                ToastUtils.showInfo("请选择书源文件");
+                                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                                        .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"text/*", "application/json"})
+                                        .setType("*/*");
+                                startActivityForResult(intent, APPCONST.REQUEST_IMPORT_BOOK_SOURCE);
+                            });
                         } else {
                             String[] url = new String[1];
                             MyAlertDialog.createInputDia(getContext(), "网络导入",
@@ -236,19 +244,19 @@ public class DIYSourceFragment extends BaseFragment {
                         refreshSources();
                         ToastUtils.showSuccess(String.format("成功导入%s个书源", size));
                     } else {
-                        ToastUtils.showError("格式不对");
+                        ToastUtils.showError("书源格式错误，请导入正确的书源");
                     }
                     dialog.dismiss();
                 }
 
                 @Override
                 public void onError(Throwable e) {
-                    ToastUtils.showError("格式不对");
+                    ToastUtils.showError("书源格式错误，请导入正确的书源");
                     dialog.dismiss();
                 }
             });
         } else {
-            ToastUtils.showError("导入失败");
+            ToastUtils.showError("书源格式错误，请导入正确的书源");
         }
     }
 
@@ -303,13 +311,35 @@ public class DIYSourceFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == APPCONST.REQUEST_IMPORT_BOOK_SOURCE) {
-                String path = getPath(getContext(), data.getData());
-                String json = FileUtils.readText(path);
-                if (!isEmpty(json)) {
-                    importDataS(json);
-                } else {
-                    ToastUtils.showError("文件读取失败");
-                }
+                LoadingDialog dialog = new LoadingDialog(getContext(), "读取文件", () -> {
+                    if (importSourceDis != null) {
+                        importSourceDis.dispose();
+                    }
+                });
+                dialog.show();
+                Single.create((SingleOnSubscribe<String>) emitter -> {
+                    String path = UriFileUtil.getChooseFileResultPath(getContext(), data.getData());
+                    Log.d(TAG, "filePath:" + path);
+                    emitter.onSuccess(path);
+                }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        importSourceDis = d;
+                        addDisposable(d);
+                    }
+
+                    @Override
+                    public void onSuccess(@NonNull String s) {
+                        importDataS(s);
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ToastUtils.showError("文件读取失败");
+                        dialog.dismiss();
+                    }
+                });
             } else if (requestCode == APPCONST.REQUEST_EDIT_BOOK_SOURCE) {
                 refreshSources();
             }

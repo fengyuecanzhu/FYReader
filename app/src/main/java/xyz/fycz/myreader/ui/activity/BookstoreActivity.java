@@ -117,6 +117,14 @@ public class BookstoreActivity extends BaseActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        if (mSourceDia != null) {
+            mSourceDia.stopSearch();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         findCrawler3 = (FindCrawler3) getIntent().getSerializableExtra(APPCONST.FIND_CRAWLER);

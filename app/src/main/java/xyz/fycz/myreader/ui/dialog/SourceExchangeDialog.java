@@ -2,6 +2,7 @@ package xyz.fycz.myreader.ui.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -108,14 +109,13 @@ public class SourceExchangeDialog extends Dialog {
         super.onStart();
         if (aBooks.size() == 0) {
             searchEngine.search(mShelfBook.getName(), mShelfBook.getAuthor());
-            binding.ivStopSearch.setVisibility(View.VISIBLE);
             binding.rpb.setIsAutoLoading(true);
         }else {
             if (mAdapter.getItemCount() == 0) {
                 mAdapter.addItems(aBooks);
             }
-            binding.ivStopSearch.setVisibility(View.GONE);
         }
+        binding.ivStopSearch.setVisibility(searchEngine.isSearching() ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -239,6 +239,11 @@ public class SourceExchangeDialog extends Dialog {
         });
     }
 
+    public void stopSearch(){
+        if (searchEngine != null) {
+            searchEngine.stopSearch();
+        }
+    }
 
     /**************************Interface**********************************/
     public interface OnSourceChangeListener {

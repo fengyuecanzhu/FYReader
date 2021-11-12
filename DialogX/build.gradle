@@ -7,11 +7,11 @@ def gitUrl = 'https://github.com/kongzue/DialogX.git'   //Git仓库的地址
 group = "com.kongzue.dialogx"
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 29
         versionCode 10
         versionName "1.0"
 

@@ -258,6 +258,10 @@ public class SearchEngine {
                 });
     }
 
+    public boolean isSearching(){
+        return compositeDisposable != null && compositeDisposable.size() > 0;
+    }
+
     /************************************************************************/
     public interface OnSearchListener {
 

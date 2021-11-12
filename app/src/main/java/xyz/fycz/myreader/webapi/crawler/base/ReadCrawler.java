@@ -15,7 +15,6 @@ import java.util.Map;
  * @author fengyue
  * @date 2020/4/28 16:18
  */
-
 public interface ReadCrawler {
     String getSearchLink();  // 书源的搜索url
     String getCharset(); // 书源的字符编码

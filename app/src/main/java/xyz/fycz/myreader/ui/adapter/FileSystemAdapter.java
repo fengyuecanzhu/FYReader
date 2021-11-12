@@ -86,7 +86,7 @@ public class FileSystemAdapter extends BaseListAdapter<File> {
             mCheckMap.put(file, true);
             ++mCheckedCount;
         }
-        notifyDataSetChanged();
+        notifyItemChanged(pos);
     }
 
     public void setCheckedAll(boolean isChecked){

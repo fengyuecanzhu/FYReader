@@ -696,6 +696,9 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             mPageLoader.closeBook();
             mPageLoader = null;
         }
+        if (mSourceDialog != null) {
+            mSourceDialog.stopSearch();
+        }
     }
 
     @Override

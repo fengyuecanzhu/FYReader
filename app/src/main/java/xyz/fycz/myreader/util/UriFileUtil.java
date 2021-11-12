@@ -40,6 +40,20 @@ public class UriFileUtil {
         return uri;
     }
 
+    public static String getChooseFileResultPath(Context context, Uri uri) {
+        String chooseFilePath = null;
+        if ("file".equalsIgnoreCase(uri.getScheme())) {//使用第三方应用打开
+            chooseFilePath = uri.getPath();
+            return chooseFilePath;
+        }
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
+            chooseFilePath = getPath(context, uri);
+        } else {//4.4以下下系统调用方法
+            chooseFilePath = getRealPathFromUri(context, uri);
+        }
+        return chooseFilePath;
+    }
+
     public static String getRealPathFromUri(Context context, Uri contentUri) {
         Cursor cursor = null;
         try {

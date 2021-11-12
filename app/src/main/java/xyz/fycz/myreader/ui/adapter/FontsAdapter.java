@@ -10,6 +10,7 @@ import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -168,9 +169,10 @@ public class FontsAdapter extends ArrayAdapter<Font> {
                 dialog.show();*/
                 StoragePermissionUtils.request(mFontsActivity, (permissions, all) -> {
                     ToastUtils.showInfo("请选择一个ttf格式的字体文件");
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("*/*");
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension("ttf");
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                            .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{mime})
+                            .setType("*/*");
                     mFontsActivity.startActivityForResult(intent, APPCONST.SELECT_FILE_CODE);
                 });
             });

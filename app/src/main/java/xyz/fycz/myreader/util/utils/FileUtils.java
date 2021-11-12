@@ -358,7 +358,7 @@ public class FileUtils {
             return sb.toString();
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+            return "";
         }finally {
             IOUtils.close(br);
         }

@@ -61,7 +61,6 @@
                 android:resource="@xml/shortcuts" />
         </activity>
 
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -88,8 +87,9 @@
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
-                <data android:mimeType="application/epub+zip"/>
+                <data android:mimeType="application/epub+zip" />
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.FontsActivity" />
@@ -110,7 +110,9 @@
         <activity android:name=".ui.activity.MoreSettingActivity" />
         <activity android:name=".ui.activity.BookstoreActivity" />
         <activity android:name=".ui.activity.QRCodeScanActivity" />
-        <activity android:name=".ui.activity.BookSourceActivity" />
+        <activity
+            android:name=".ui.activity.BookSourceActivity"
+            android:exported="true" />
         <activity android:name=".ui.activity.SourceEditActivity" />
         <activity android:name=".ui.activity.SourceDebugActivity" />
         <activity android:name=".ui.activity.AdSettingActivity" />

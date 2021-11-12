@@ -138,6 +138,9 @@ public class BookDetailedActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         if (chaptersDis != null) chaptersDis.dispose();
+        if (mSourceDialog != null) {
+            mSourceDialog.stopSearch();
+        }
         super.onDestroy();
     }
 
