@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.PopupMenu;
 
 import androidx.annotation.Nullable;
@@ -190,8 +191,9 @@ public class DIYSourceFragment extends BaseFragment {
                         } else if (which == 1) {
                             StoragePermissionUtils.request(this, (permissions, all) -> {
                                 ToastUtils.showInfo("请选择书源文件");
+                                String jsonMime = MimeTypeMap.getSingleton().getMimeTypeFromExtension("json");
                                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
-                                        .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"text/*", "application/json"})
+                                        .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"text/*", jsonMime})
                                         .setType("*/*");
                                 startActivityForResult(intent, APPCONST.REQUEST_IMPORT_BOOK_SOURCE);
                             });
