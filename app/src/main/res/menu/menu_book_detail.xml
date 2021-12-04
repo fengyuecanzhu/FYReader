@@ -49,4 +49,10 @@
         android:icon="@drawable/ic_source"
         android:title="@string/book_source"
         app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_word_count"
+        android:icon="@drawable/ic_wc"
+        android:title="@string/book_word_count"
+        app:showAsAction="ifRoom"/>
 </menu>

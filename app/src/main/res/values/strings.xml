@@ -510,6 +510,7 @@
     <string name="manage_book_group">管理书籍分组</string>
     <string name="book_group">书籍分组</string>
     <string name="book_group_tip">在书架内显示书籍分组</string>
+    <string name="book_word_count">计算字数(实验)</string>
 
 
     <string-array name="reset_screen_time">

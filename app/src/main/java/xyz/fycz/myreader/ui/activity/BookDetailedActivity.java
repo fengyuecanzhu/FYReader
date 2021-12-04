@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -28,6 +27,8 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import xyz.fycz.myreader.R;
@@ -36,8 +37,10 @@ import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.base.observer.MyObserver;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityBookDetailBinding;
+import xyz.fycz.myreader.experiment.BookWCEstimate;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
@@ -48,6 +51,7 @@ import xyz.fycz.myreader.ui.adapter.BookTagAdapter;
 import xyz.fycz.myreader.ui.adapter.DetailCatalogAdapter;
 import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
@@ -83,6 +87,7 @@ public class BookDetailedActivity extends BaseActivity {
     private BookGroupDialog mBookGroupDia;
     private List<String> tagList = new ArrayList<>();
     private Disposable chaptersDis;
+    private Disposable wcDis;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -588,6 +593,7 @@ public class BookDetailedActivity extends BaseActivity {
      * @param item
      * @return
      */
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -631,10 +637,63 @@ public class BookDetailedActivity extends BaseActivity {
                     startActivity(sourceIntent);
                 }
                 break;
+            case R.id.action_word_count:
+                getWordCount();
+                break;
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void getWordCount() {
+
+        LoadingDialog dialog = new LoadingDialog(this, "正在计算", () -> {
+            if (wcDis != null) {
+                wcDis.dispose();
+            }
+        });
+        dialog.show();
+        Single.create((SingleOnSubscribe<Integer>) emitter -> {
+            BookWCEstimate bookWCEstimate = new BookWCEstimate();
+            emitter.onSuccess(bookWCEstimate.getWordCount(mBook));
+        }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Integer>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                addDisposable(d);
+                wcDis = d;
+            }
+
+            @Override
+            public void onSuccess(@NonNull Integer count) {
+                dialog.dismiss();
+                if (count == -1) {
+                    ToastUtils.showWarring("书籍源文件不存在，无法计算字数");
+                } else if (count == -2) {
+                    ToastUtils.showWarring("已缓存章节数量不足20，无法计算字数");
+                } else {
+                    String tip = "\n";
+                    if (count > 0) {
+                        tip += "注：当前为网络书籍，无法获取准确字数，软件采用简单线性回归模型进行字数预测，仅供参考";
+                    } else {
+                        tip += "注：当前为本地书籍，字数统计自书籍源文件";
+                    }
+                    count = count < 0 ? -count : count;
+                    String countTag = count > 100000 ? count / 10000 + "万" : count + "";
+                    mBook.setWordCount(countTag);
+                    initTagList();
+                    mBookService.updateEntity(mBook);
+                    DialogCreator.createTipDialog(BookDetailedActivity.this, "书籍字数(实验性功能)",
+                            "书籍字数计算成功，本书字数：" + count + tip);
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                ToastUtils.showError("书籍字数计算失败！\n" + e.getLocalizedMessage());
+                dialog.dismiss();
+            }
+        });
     }
 
 

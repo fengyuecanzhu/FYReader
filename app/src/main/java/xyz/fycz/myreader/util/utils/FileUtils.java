@@ -364,7 +364,7 @@ public class FileUtils {
         }
     }
 
-    private static String readInStream(FileInputStream inStream) {
+    public static String readInStream(InputStream inStream) {
         ByteArrayOutputStream outStream = null;
         try {
             outStream = new ByteArrayOutputStream();

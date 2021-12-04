@@ -19,4 +19,9 @@
         android:icon="@drawable/ic_group"
         android:title="@string/menu_group_setting"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_word_count"
+        android:icon="@drawable/ic_wc"
+        android:title="@string/book_word_count"
+        app:showAsAction="ifRoom"/>
 </menu>

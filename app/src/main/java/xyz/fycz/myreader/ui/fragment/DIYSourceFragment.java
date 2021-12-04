@@ -25,6 +25,8 @@ import com.hjq.permissions.XXPermissions;
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,6 +59,7 @@ import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.UriFileUtil;
 import xyz.fycz.myreader.util.utils.ClipBoardUtil;
+import xyz.fycz.myreader.util.utils.DocumentUtil;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.RxUtils;
@@ -320,9 +323,9 @@ public class DIYSourceFragment extends BaseFragment {
                 });
                 dialog.show();
                 Single.create((SingleOnSubscribe<String>) emitter -> {
-                    String path = UriFileUtil.getChooseFileResultPath(getContext(), data.getData());
-                    Log.d(TAG, "filePath:" + path);
-                    emitter.onSuccess(path);
+//                    String json = FileUtils.readInStream(DocumentUtil.getFileInputSteam(getContext(), data.getData()));
+                    String json = new String(DocumentUtil.readBytes(getContext(), data.getData()), StandardCharsets.UTF_8);
+                    emitter.onSuccess(json);
                 }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<String>() {
                     @Override
                     public void onSubscribe(Disposable d) {
