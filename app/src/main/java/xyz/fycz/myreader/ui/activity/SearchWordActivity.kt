@@ -96,6 +96,12 @@ class SearchWordActivity : BaseActivity() {
             override fun loadFinish(isEmpty: Boolean) {
                 binding.fabSearchStop.visibility = View.GONE
                 binding.rpb.isAutoLoading = false
+                var sum = 0
+                adapter.items.forEach {
+                    sum += it.searchWord2List.size
+                }
+                supportActionBar?.title = getString(R.string.search_word) + "(共" + adapter.itemSize +
+                        "个章节，" + sum + "条结果)"
             }
 
             @Synchronized
@@ -139,6 +145,7 @@ class SearchWordActivity : BaseActivity() {
     private fun search() {
         val keyword = binding.etSearchKey.text.toString()
         if (keyword.isNotEmpty()) {
+            supportActionBar?.title = getString(R.string.search_word)
             adapter.clear()
             binding.fabSearchStop.visibility = View.VISIBLE
             binding.rpb.isAutoLoading = true

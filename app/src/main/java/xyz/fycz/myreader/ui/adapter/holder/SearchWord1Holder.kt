@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.ui.adapter.holder
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.view.View
@@ -34,7 +35,7 @@ class SearchWord1Holder(var activity: AppCompatActivity) : ViewHolderImpl<Search
     }
 
     override fun onBind(holder: RecyclerView.ViewHolder?, data: SearchWord1?, pos: Int) {
-        tvChapterTitle.text = data?.chapterTitle
+        tvChapterTitle.text = String.format("%s(%d)", data?.chapterTitle, data?.searchWord2List?.size)
         adapter = object : BaseListAdapter<SearchWord2>() {
             override fun createViewHolder(viewType: Int): IViewHolder<SearchWord2> {
                 return SearchWord2Holder()
