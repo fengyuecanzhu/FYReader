@@ -2200,9 +2200,9 @@ public abstract class PageLoader {
 
         // charIndex
         String currentLine = currentPage.lines.get(lineIndex);
-        if (currentLine.endsWith("\n")){
+        if (currentLine.endsWith("\n")) {
             currentLine = StringUtils.trim(currentLine) + "\n";
-        }else {
+        } else {
             currentLine = StringUtils.trim(currentLine);
         }
         length -= currentLine.length();
