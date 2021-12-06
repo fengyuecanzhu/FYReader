@@ -2128,31 +2128,36 @@ public abstract class PageLoader {
 
     public void skipToSearch(int chapterNum, int countInChapter, String keyword) {
         skipToChapter(chapterNum);
-        if (mStatus != STATUS_FINISH){
+        if (mStatus != STATUS_FINISH) {
             App.getHandler().postDelayed(() -> skipToSearch(chapterNum, countInChapter, keyword), 300);
             return;
         }
         int[] position = searchWordPositions(countInChapter, keyword);
         skipToPage(position[0]);
-        mPageView.setFirstSelectTxtChar(mCurPage.txtLists.get(position[1]).
-                getCharsData().get(position[2]));
-        switch (position[3]) {
-            case 0:
-                mPageView.setLastSelectTxtChar(mCurPage.txtLists.get(position[1]).
-                        getCharsData().get(position[2] + keyword.length() - 1));
-                break;
-            case 1:
-                mPageView.setLastSelectTxtChar(mCurPage.txtLists.get(position[1] + 1).
-                        getCharsData().get(position[4]));
-                break;
-            case -1:
-                mPageView.setLastSelectTxtChar(mCurPage.txtLists.get(mCurPage.txtLists.size() - 1).
-                        getCharsData().get(mCurPage.txtLists.get(mCurPage.txtLists.size() - 1).
-                        getCharsData().size() - 1));
-                break;
+
+        try {
+            mPageView.setFirstSelectTxtChar(mCurPage.txtLists.get(position[1]).
+                    getCharsData().get(position[2]));
+            switch (position[3]) {
+                case 0:
+                    mPageView.setLastSelectTxtChar(mCurPage.txtLists.get(position[1]).
+                            getCharsData().get(position[2] + keyword.length() - 1));
+                    break;
+                case 1:
+                    mPageView.setLastSelectTxtChar(mCurPage.txtLists.get(position[1] + 1).
+                            getCharsData().get(position[4]));
+                    break;
+                case -1:
+                    mPageView.setLastSelectTxtChar(mCurPage.txtLists.get(mCurPage.txtLists.size() - 1).
+                            getCharsData().get(mCurPage.txtLists.get(mCurPage.txtLists.size() - 1).
+                            getCharsData().size() - 1));
+                    break;
+            }
+            mPageView.setSelectMode(PageView.SelectMode.SelectMoveForward);
+            mPageView.invalidate();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        mPageView.setSelectMode(PageView.SelectMode.SelectMoveForward);
-        mPageView.invalidate();
     }
 
     private int[] searchWordPositions(int countInChapter, String keyword) {
@@ -2195,9 +2200,14 @@ public abstract class PageLoader {
 
         // charIndex
         String currentLine = currentPage.lines.get(lineIndex);
-        currentLine = StringUtils.trim(currentLine);
+        if (currentLine.endsWith("\n")){
+            currentLine = StringUtils.trim(currentLine) + "\n";
+        }else {
+            currentLine = StringUtils.trim(currentLine);
+        }
         length -= currentLine.length();
         int charIndex = contentPosition - length;
+        if (charIndex < 0) charIndex = 0;
         int addLine = 0;
         int charIndex2 = 0;
         // change line
@@ -2210,6 +2220,7 @@ public abstract class PageLoader {
             addLine = -1;
             charIndex2 = charIndex + keyword.length() - currentLine.length() - 1;
         }
+        if (charIndex2 < 0) charIndex = 0;
         return new int[]{pageIndex, lineIndex, charIndex, addLine, charIndex2};
     }
 

@@ -100,6 +100,7 @@ class SearchWordActivity : BaseActivity() {
 
             @Synchronized
             override fun loadMore(item: SearchWord1) {
+                if (adapter.items.contains(item)) return
                 if (adapter.itemSize == 0) {
                     adapter.addItem(item)
                 } else {
