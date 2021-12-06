@@ -37,8 +37,8 @@ class SearchWordEngine(
     private var scheduler: Scheduler
     private var compositeDisposable: CompositeDisposable
     private lateinit var searchListener: OnSearchListener
-    private val threadsNum = 4
-//        SharedPreUtils.getInstance().getInt(App.getmContext().getString(R.string.threadNum), 8)
+    private val threadsNum =
+        SharedPreUtils.getInstance().getInt(App.getmContext().getString(R.string.threadNum), 8)
     private var searchSiteIndex = 0
     private var searchSuccessNum = 0
     private var searchFinishNum = 0

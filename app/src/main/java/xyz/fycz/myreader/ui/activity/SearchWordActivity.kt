@@ -107,13 +107,13 @@ class SearchWordActivity : BaseActivity() {
                         if (index == 0 && item.chapterNum < searchWord1.chapterNum) {
                             adapter.addItem(0, item)
                             break
+                        } else if (index == adapter.itemSize - 1) {
+                            adapter.addItem(item)
+                            break
                         } else if (item.chapterNum >= searchWord1.chapterNum &&
                             item.chapterNum < adapter.items[index + 1].chapterNum
                         ) {
                             adapter.addItem(index + 1, item)
-                            break
-                        } else if (index == adapter.itemSize - 1) {
-                            adapter.addItem(item)
                             break
                         }
                     }
