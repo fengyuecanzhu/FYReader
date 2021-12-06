@@ -8,7 +8,7 @@ import java.util.List;
  * 书籍chapter
  */
 
-public class TxtChapter{
+public class TxtChapter {
 
     private int position;
     private List<TxtPage> txtPageList = new ArrayList<>();

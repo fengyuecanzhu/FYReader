@@ -1291,6 +1291,7 @@ public class ChapterContentHelp {
     private boolean isUseTo(String useTo, String bookTag, String bookSource) {
         String[] useTos = useTo.split(";");
         return useTo.length() <= 1
+                || TextUtils.isEmpty(useTo)
                 || TextUtils.isEmpty(useTos[0])
                 || TextUtils.isEmpty(useTos[1])
                 || useTo.contains(bookTag)

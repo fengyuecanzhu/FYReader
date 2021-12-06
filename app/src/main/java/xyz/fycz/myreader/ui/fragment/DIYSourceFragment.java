@@ -16,6 +16,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.PopupMenu;
 
 import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -299,6 +300,7 @@ public class DIYSourceFragment extends BaseFragment {
             public void onSubscribe(Disposable d) {
                 addDisposable(d);
             }
+
             @Override
             public void onSuccess(@NonNull List<BookSource> sources) {
                 mBookSources = sources;
@@ -324,6 +326,11 @@ public class DIYSourceFragment extends BaseFragment {
                 dialog.show();
                 Single.create((SingleOnSubscribe<String>) emitter -> {
 //                    String json = FileUtils.readInStream(DocumentUtil.getFileInputSteam(getContext(), data.getData()));
+                    DocumentFile file = DocumentFile.fromSingleUri(getContext(), data.getData());
+                    if (!file.getName().endsWith(".txt") && !file.getType().equals(".json")) {
+                        emitter.onError(new Throwable("文件格式错误"));
+                        return;
+                    }
                     String json = new String(DocumentUtil.readBytes(getContext(), data.getData()), StandardCharsets.UTF_8);
                     emitter.onSuccess(json);
                 }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<String>() {
@@ -341,7 +348,7 @@ public class DIYSourceFragment extends BaseFragment {
 
                     @Override
                     public void onError(Throwable e) {
-                        ToastUtils.showError("文件读取失败");
+                        ToastUtils.showError("文件读取失败\n" + e.getLocalizedMessage());
                         dialog.dismiss();
                     }
                 });
@@ -435,6 +442,7 @@ public class DIYSourceFragment extends BaseFragment {
                 public void onSubscribe(Disposable d) {
                     addDisposable(d);
                 }
+
                 @Override
                 public void onSuccess(@NonNull Boolean aBoolean) {
                     if (aBoolean) {
@@ -466,6 +474,7 @@ public class DIYSourceFragment extends BaseFragment {
                 public void onSubscribe(Disposable d) {
                     addDisposable(d);
                 }
+
                 @Override
                 public void onSuccess(@NonNull File share) {
                     ShareUtils.share(sourceActivity, share, "书源分享", "text/plain");

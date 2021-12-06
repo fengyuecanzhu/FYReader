@@ -50,7 +50,7 @@ public class FindBookHolder extends ViewHolderImpl<Book> {
 
     @Override
     protected int getItemLayoutId() {
-        return R.layout.search_book_item;
+        return R.layout.item_search_book;
     }
 
     @Override

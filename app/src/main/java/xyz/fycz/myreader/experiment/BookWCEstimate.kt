@@ -18,6 +18,7 @@ class BookWCEstimate {
     /**
      * -1：本地文件不存在
      * -2：书籍章节缓存数量少于20
+     * -3：epub书籍暂不支持计算字数
      */
     fun getWordCount(book: Book): Int {
         if (book.type == "本地书籍") {
@@ -29,6 +30,7 @@ class BookWCEstimate {
     }
 
     private fun getLocalWordCount(book: Book): Int {
+        if (book.chapterUrl.endsWith(".epub")) return -3
         val file = File(book.chapterUrl)
         if (!file.exists()) return -1
         return -countChar(file)

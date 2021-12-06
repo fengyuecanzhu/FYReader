@@ -88,7 +88,8 @@ public class SearchEngine {
      * 关闭引擎
      */
     public void closeSearchEngine() {
-        executorService.shutdown();
+        if (executorService != null)
+            executorService.shutdown();
         if (!compositeDisposable.isDisposed())
             compositeDisposable.dispose();
         compositeDisposable = null;
@@ -170,7 +171,7 @@ public class SearchEngine {
                         }
                     });
         } else {
-            if (searchFinishNum >= mSourceList.size()) {
+            if (searchFinishNum == mSourceList.size()) {
                 if (searchSuccessNum == 0) {
                     searchListener.searchBookError(new Throwable("未搜索到内容"));
                 }

@@ -20,7 +20,7 @@ public class RefreshProgressBar extends View {
     private int bgColor = 0x00000000;
     private int secondColor = 0xFFC1C1C1;
     private int fontColor = 0xFF363636;
-    private int speed = 1;
+    private int speed = 2;
     private int secondFinalProgress = 0;
     private Paint paint;
     private Boolean isAutoLoading = false;

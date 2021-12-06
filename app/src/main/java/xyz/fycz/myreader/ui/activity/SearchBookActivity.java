@@ -118,6 +118,18 @@ public class SearchBookActivity extends BaseActivity {
     }
 
     @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus){
+            App.getHandler().postDelayed(() -> {
+                binding.etSearchKey.requestFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.showSoftInput(binding.etSearchKey, InputMethodManager.SHOW_IMPLICIT);
+            }, 400);
+        }
+    }
+
+    @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         mSetting = SysManager.getSetting();
@@ -226,9 +238,6 @@ public class SearchBookActivity extends BaseActivity {
             search();
         });
         initHistoryList();
-        App.getHandler().postDelayed(() -> {
-            binding.etSearchKey.requestFocus();
-        }, 200);
     }
 
     @Override
@@ -625,6 +634,7 @@ public class SearchBookActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         stopSearch();
+        searchEngine.closeSearchEngine();
         super.onDestroy();
     }
 

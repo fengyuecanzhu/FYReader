@@ -13,15 +13,18 @@ import android.widget.TextView;
 public class KeyWordUtils {
 
     public static void setKeyWord(TextView textView, String str, String keyWord){
+        setKeyWord(textView, str, keyWord, Color.RED);
+    }
+
+    public static void setKeyWord(TextView textView, String str, String keyWord, int colorId){
         int start = str.indexOf(keyWord);
         if (start == -1){
             textView.setText(str);
         }else {
             SpannableString spannableString = new SpannableString(str);
-            spannableString.setSpan(new ForegroundColorSpan(Color.RED),
+            spannableString.setSpan(new ForegroundColorSpan(colorId),
                     start, start + keyWord.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             textView.setText(spannableString);
         }
     }
-
 }

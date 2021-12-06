@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/android/FYReader/app/src/main/res/drawable/ic_re_seg.xml" value="0.1962962962962963" />
+        <entry key="..\:/android/FYReader/app/src/main/res/drawable/ic_search_word.xml" value="0.21944444444444444" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_about.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_donate.xml" value="0.536" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_feedback.xml" value="0.12132725430597771" />
@@ -11,17 +12,29 @@
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_group_manager.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_manage_group.xml" value="0.21195652173913043" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_more_setting.xml" value="0.264" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_read.xml" value="0.17028985507246377" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_search_book.xml" value="0.12132725430597771" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_search_word.xml" value="0.144" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/dialog_textview.xml" value="0.1947463768115942" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fingerprint_dialog.xml" value="0.20425724637681159" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fragment_file_category.xml" value="0.2318840579710145" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fragment_find_book_2.xml" value="0.12132725430597771" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/fragment_local_source.xml" value="0.1947463768115942" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fragment_private_bookcase.xml" value="0.21195652173913043" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fragment_webdav_setting.xml" value="0.4" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/gridview_book_detailed_item.xml" value="0.1947463768115942" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/item_book_source.xml" value="0.21195652173913043" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/item_group.xml" value="0.4" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/item_local_source.xml" value="0.21195652173913043" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/item_replace_rule.xml" value="0.1947463768115942" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/item_search_book.xml" value="0.1947463768115942" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/item_search_word1.xml" value="0.2889273356401384" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/item_search_word2.xml" value="0.1947463768115942" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/item_search_word_1.xml" value="0.1947463768115942" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/layout_about_content.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/layout_book_detail_header.xml" value="0.536" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/listview_search_book_item.xml" value="0.22010869565217392" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/search_book_item.xml" value="0.1947463768115942" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/view_file_picker.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/menu/menu_book.xml" value="0.13703703703703704" />
         <entry key="..\:/android/FYReader/app/src/main/res/menu/menu_book_detail.xml" value="0.24947916666666667" />

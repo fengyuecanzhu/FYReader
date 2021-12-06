@@ -511,6 +511,9 @@
     <string name="book_group">书籍分组</string>
     <string name="book_group_tip">在书架内显示书籍分组</string>
     <string name="book_word_count">计算字数(实验)</string>
+    <string name="input_keyword">输入关键词</string>
+    <string name="search_word">内容搜索</string>
+    <string name="search_word_tip">搜索书籍已缓存的内容</string>
 
 
     <string-array name="reset_screen_time">

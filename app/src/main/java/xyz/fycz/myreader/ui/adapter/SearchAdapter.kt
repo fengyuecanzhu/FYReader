@@ -14,7 +14,7 @@ import xyz.fycz.myreader.application.SysManager
 import xyz.fycz.myreader.base.BitIntentDataManager
 import xyz.fycz.myreader.base.adapter2.DiffRecyclerAdapter
 import xyz.fycz.myreader.base.adapter2.ItemViewHolder
-import xyz.fycz.myreader.databinding.SearchBookItemBinding
+import xyz.fycz.myreader.databinding.ItemSearchBookBinding
 import xyz.fycz.myreader.entity.SearchBookBean
 import xyz.fycz.myreader.greendao.entity.Book
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap
@@ -32,7 +32,7 @@ import xyz.fycz.myreader.util.utils.StringUtils
 class SearchAdapter(
     context: Context,
     val keyword: String
-) : DiffRecyclerAdapter<SearchBookBean, SearchBookItemBinding>(context) {
+) : DiffRecyclerAdapter<SearchBookBean, ItemSearchBookBinding>(context) {
     private val mBooks: ConMVMap<SearchBookBean, Book> = ConMVMap()
     private lateinit var mList: List<SearchBookBean>
     private val tagList: MutableList<String> = ArrayList()
@@ -79,13 +79,13 @@ class SearchAdapter(
             }
         }
 
-    override fun getViewBinding(parent: ViewGroup): SearchBookItemBinding {
-        return SearchBookItemBinding.inflate(inflater, parent, false)
+    override fun getViewBinding(parent: ViewGroup): ItemSearchBookBinding {
+        return ItemSearchBookBinding.inflate(inflater, parent, false)
     }
 
     override fun convert(
         holder: ItemViewHolder,
-        binding: SearchBookItemBinding,
+        binding: ItemSearchBookBinding,
         item: SearchBookBean,
         payloads: MutableList<Any>
     ) {
@@ -99,7 +99,7 @@ class SearchAdapter(
         }
     }
 
-    private fun bind(binding: SearchBookItemBinding, data: SearchBookBean) {
+    private fun bind(binding: ItemSearchBookBinding, data: SearchBookBean) {
         var aBooks = mBooks.getValues(data)
         if (aBooks == null || aBooks.size == 0) {
             aBooks = ArrayList()
@@ -124,7 +124,7 @@ class SearchAdapter(
         }
     }
 
-    private fun bindChange(binding: SearchBookItemBinding, data: SearchBookBean, payload: Bundle) {
+    private fun bindChange(binding: ItemSearchBookBinding, data: SearchBookBean, payload: Bundle) {
         binding.run {
             initTagList(this, data)
             payload.keySet().forEach {
@@ -146,7 +146,7 @@ class SearchAdapter(
         }
     }
 
-    private fun initTagList(binding: SearchBookItemBinding, data: SearchBookBean) {
+    private fun initTagList(binding: ItemSearchBookBinding, data: SearchBookBean) {
         tagList.clear()
         val type = data.type
         if (!type.isNullOrEmpty()){
@@ -166,7 +166,7 @@ class SearchAdapter(
         }
     }
 
-    private fun upLast(binding: SearchBookItemBinding, lastChapter: String?) {
+    private fun upLast(binding: ItemSearchBookBinding, lastChapter: String?) {
         binding.run {
             if (lastChapter.isNullOrEmpty()) {
                 tvBookNewestChapter.visibility = View.GONE
@@ -180,7 +180,7 @@ class SearchAdapter(
         }
     }
 
-    override fun registerListener(holder: ItemViewHolder, binding: SearchBookItemBinding) {
+    override fun registerListener(holder: ItemViewHolder, binding: ItemSearchBookBinding) {
         binding.root.setOnClickListener {
             getItem(holder.layoutPosition)?.let {
                 val books = mBooks.getValues(it)

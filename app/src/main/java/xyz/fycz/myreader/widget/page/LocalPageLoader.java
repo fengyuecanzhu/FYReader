@@ -370,9 +370,8 @@ public class LocalPageLoader extends PageLoader {
 
 
     @Override
-    protected String getChapterReader(Chapter chapter) throws Exception {
+    public String getChapterReader(Chapter chapter) throws Exception {
         if (chapter.getEnd() > 0) {
-            Log.d("getChapterReader", chapter.getTitle());
             //从文件中获取数据
             /*byte[] content = getContent(chapter);
             ByteArrayInputStream bais = new ByteArrayInputStream(content);

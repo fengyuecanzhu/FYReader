@@ -1,35 +1,36 @@
 <?xml version ="1.0" encoding ="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <item
-            android:id="@+id/action_change_source"
-            android:icon="@drawable/ic_change"
-            android:title="@string/menu_change_source"
-            app:showAsAction="ifRoom"/>
+        android:id="@+id/action_change_source"
+        android:icon="@drawable/ic_change"
+        android:title="@string/menu_change_source"
+        app:showAsAction="ifRoom" />
     <item
-            android:id="@+id/action_reload"
-            android:icon="@drawable/ic_refresh"
-            android:title="@string/menu_reload"
-            app:showAsAction="ifRoom"/>
+        android:id="@+id/action_reload"
+        android:icon="@drawable/ic_refresh"
+        android:title="@string/menu_reload"
+        app:showAsAction="ifRoom" />
 
     <group android:id="@+id/action_load_finish">
         <item
             android:id="@+id/action_download"
             android:icon="@drawable/ic_download"
             android:title="@string/download_book"
-            app:showAsAction="always"/>
+            app:showAsAction="always" />
         <item
-                android:id="@+id/action_add_bookmark"
-                android:icon="@drawable/ic_bookmark"
-                android:title="@string/menu_add_bookmark"
-                app:showAsAction="never"/>
+            android:id="@+id/action_add_bookmark"
+            android:icon="@drawable/ic_bookmark"
+            android:title="@string/menu_add_bookmark"
+            app:showAsAction="never" />
         <item
             android:id="@+id/action_replace_content"
             android:icon="@drawable/ic_replace"
             android:title="@string/content_replace"
-            app:showAsAction="never"/>
+            app:showAsAction="never" />
 
         <item
             android:id="@+id/action_re_seg"
@@ -40,20 +41,28 @@
             app:showAsAction="never" />
 
         <item
-                android:id="@+id/action_copy_content"
-                android:icon="@drawable/ic_copy"
-                android:title="@string/menu_copy_content"
-                app:showAsAction="never"/>
+            android:id="@+id/action_copy_content"
+            android:icon="@drawable/ic_copy"
+            android:title="@string/menu_copy_content"
+            app:showAsAction="never" />
         <item
-                android:id="@+id/action_open_link"
-                android:icon="@drawable/ic_link"
-                android:title="@string/menu_open_link"
-                app:showAsAction="never"/>
+            android:id="@+id/action_search"
+            android:icon="@drawable/ic_search_word"
+            android:title="@string/search_word"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_open_link"
+            android:icon="@drawable/ic_link"
+            android:title="@string/menu_open_link"
+            app:showAsAction="never" />
+
     </group>
 
     <item
         android:id="@+id/action_edit_source"
         android:icon="@drawable/ic_source"
         android:title="@string/book_source"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
+
+
 </menu>

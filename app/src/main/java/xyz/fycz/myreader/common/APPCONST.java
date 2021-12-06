@@ -65,6 +65,9 @@ public class APPCONST {
     public static final String RESULT_HISTORY_CHAPTER = "result_history_chapter";
     public static final String RESULT_UP_MENU = "result_up_menu";
     public static final String SEARCH_KEY = "searchKey";
+    public static final String BOOK_KEY = "bookKey";
+    public static final String CHAPTERS_KEY = "chaptersKey";
+    public static final String PAGE_LOADER_KEY = "pageLoaderKey";
 
 
     public static final String[] READ_STYLE_NIGHT = {"#94928c", "#393431"};//黑夜
@@ -95,6 +98,7 @@ public class APPCONST {
     public static final int REQUEST_SELECT_COVER = 1012;
     public static final int REQUEST_EDIT_BOOK = 1013;
     public static final int REQUEST_GROUP_MANAGER = 1014;
+    public static final int REQUEST_SEARCH_WORD = 1015;
 
     public static final int REQUEST_READ = 1;
 

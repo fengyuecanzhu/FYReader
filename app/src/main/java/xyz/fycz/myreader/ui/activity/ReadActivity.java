@@ -778,6 +778,16 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 sourceIntent.putExtra(APPCONST.BOOK_SOURCE, source);
                 startActivity(sourceIntent);
             }
+        } else if (itemId == R.id.action_search) {
+            BitIntentDataManager.getInstance().putData(APPCONST.BOOK_KEY, mBook);
+            BitIntentDataManager.getInstance().putData(APPCONST.CHAPTERS_KEY, mChapters);
+            BitIntentDataManager.getInstance().putData(APPCONST.PAGE_LOADER_KEY, mPageLoader);
+            //切换菜单
+            toggleMenu(true);
+            //跳转
+            mHandler.postDelayed(() -> {
+                startActivityForResult(new Intent(this, SearchWordActivity.class), APPCONST.REQUEST_SEARCH_WORD);
+            }, mBottomOutAnim.getDuration());
         }
         return super.onOptionsItemSelected(item);
     }
@@ -836,6 +846,13 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                 case APPCONST.REQUEST_IMPORT_LAYOUT:
                     String zipPath = getPath(this, data.getData());
                     binding.readCustomizeLayoutMenu.zip2Layout(zipPath);
+                    break;
+                case APPCONST.REQUEST_SEARCH_WORD:
+                    int chapterNum = data.getIntExtra("chapterNum", chapterPos);
+                    int countInChapter = data.getIntExtra("countInChapter", 0);
+                    String keyword = data.getStringExtra("keyword");
+                    if (!TextUtils.isEmpty(keyword))
+                        mPageLoader.skipToSearch(chapterNum, countInChapter, keyword);
                     break;
             }
         }
@@ -1876,7 +1893,6 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         cursorShow();
         //set current word selected
         binding.readPvContent.invalidate();
-
 //        hideSnackBar();
     }
 

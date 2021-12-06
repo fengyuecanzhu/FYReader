@@ -671,6 +671,8 @@ public class BookDetailedActivity extends BaseActivity {
                     ToastUtils.showWarring("书籍源文件不存在，无法计算字数");
                 } else if (count == -2) {
                     ToastUtils.showWarring("已缓存章节数量不足20，无法计算字数");
+                } else if (count == -3) {
+                    ToastUtils.showWarring("epub书籍暂不支持计算字数");
                 } else {
                     String tip = "\n";
                     if (count > 0) {

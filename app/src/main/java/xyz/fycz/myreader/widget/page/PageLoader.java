@@ -168,7 +168,7 @@ public abstract class PageLoader {
     private int readAloudParagraph = -1; //正在朗读章节
 
     private Bitmap bgBitmap;
-    private ChapterContentHelp contentHelper = new ChapterContentHelp();
+    public ChapterContentHelp contentHelper = new ChapterContentHelp();
 
     protected Disposable mChapterDis = null;
 
@@ -863,7 +863,7 @@ public abstract class PageLoader {
      * @param chapter
      * @return
      */
-    protected abstract String getChapterReader(Chapter chapter) throws Exception;
+    public abstract String getChapterReader(Chapter chapter) throws Exception;
 
     /**
      * 章节数据是否存在
@@ -2126,6 +2126,88 @@ public abstract class PageLoader {
         return null;
     }
 
+    public void skipToSearch(int chapterNum, int countInChapter, String keyword) {
+        skipToChapter(chapterNum);
+        int[] position = searchWordPositions(countInChapter, keyword);
+        skipToPage(position[0]);
+        mPageView.setFirstSelectTxtChar(mCurPage.txtLists.get(position[1]).
+                getCharsData().get(position[2]));
+        switch (position[3]) {
+            case 0:
+                mPageView.setLastSelectTxtChar(mCurPage.txtLists.get(position[1]).
+                        getCharsData().get(position[2] + keyword.length() - 1));
+                break;
+            case 1:
+                mPageView.setLastSelectTxtChar(mCurPage.txtLists.get(position[1] + 1).
+                        getCharsData().get(position[4]));
+                break;
+            case -1:
+                mPageView.setLastSelectTxtChar(mCurPage.txtLists.get(mCurPage.txtLists.size() - 1).
+                        getCharsData().get(mCurPage.txtLists.get(mCurPage.txtLists.size() - 1).
+                        getCharsData().size() - 1));
+                break;
+        }
+        mPageView.setSelectMode(PageView.SelectMode.SelectMoveForward);
+        mPageView.invalidate();
+    }
+
+    private int[] searchWordPositions(int countInChapter, String keyword) {
+        List<TxtPage> pages = mCurChapter.getTxtPageList();
+        // calculate search result's pageIndex
+        StringBuilder sb = new StringBuilder();
+        for (TxtPage page : pages) {
+            sb.append(page.getContent());
+        }
+        String content = sb.toString();
+        int count = 0;
+        int index = content.indexOf(keyword);
+        while (count != countInChapter) {
+            index = content.indexOf(keyword, index + 1);
+            count++;
+        }
+        int contentPosition = index;
+        int pageIndex = 0;
+        int length = mCurChapter.getPageLength(pageIndex);
+        while (length < contentPosition) {
+            pageIndex++;
+            if (pageIndex > pages.size()) {
+                pageIndex = pages.size();
+                break;
+            }
+            length = mCurChapter.getPageLength(pageIndex);
+        }
+        // calculate search word's lineIndex
+        TxtPage currentPage = pages.get(pageIndex);
+        int lineIndex = 0;
+        length = length - currentPage.getContent().length() + currentPage.lines.get(lineIndex).length();
+        while (length < contentPosition) {
+            lineIndex += 1;
+            if (lineIndex > currentPage.lines.size()) {
+                lineIndex = currentPage.lines.size();
+                break;
+            }
+            length += currentPage.lines.get(lineIndex).length();
+        }
+
+        // charIndex
+        String currentLine = currentPage.lines.get(lineIndex);
+        currentLine = StringUtils.trim(currentLine);
+        length -= currentLine.length();
+        int charIndex = contentPosition - length;
+        int addLine = 0;
+        int charIndex2 = 0;
+        // change line
+        if ((charIndex + keyword.length()) > currentLine.length()) {
+            addLine = 1;
+            charIndex2 = charIndex + keyword.length() - currentLine.length() - 1;
+        }
+        // changePage
+        if ((lineIndex + addLine + 1) > currentPage.lines.size()) {
+            addLine = -1;
+            charIndex2 = charIndex + keyword.length() - currentLine.length() - 1;
+        }
+        return new int[]{pageIndex, lineIndex, charIndex, addLine, charIndex2};
+    }
 
     public boolean isPrev() {
         return isPrev;
