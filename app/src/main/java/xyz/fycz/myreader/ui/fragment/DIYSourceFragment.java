@@ -327,7 +327,7 @@ public class DIYSourceFragment extends BaseFragment {
                 Single.create((SingleOnSubscribe<String>) emitter -> {
 //                    String json = FileUtils.readInStream(DocumentUtil.getFileInputSteam(getContext(), data.getData()));
                     DocumentFile file = DocumentFile.fromSingleUri(getContext(), data.getData());
-                    if (!file.getName().endsWith(".txt") && !file.getType().equals(".json")) {
+                    if (!file.getName().endsWith(".txt") && !file.getType().endsWith(".json")) {
                         emitter.onError(new Throwable("文件格式错误"));
                         return;
                     }

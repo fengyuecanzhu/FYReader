@@ -2221,6 +2221,7 @@ public abstract class PageLoader {
             charIndex2 = charIndex + keyword.length() - currentLine.length() - 1;
         }
         if (charIndex2 < 0) charIndex = 0;
+        if (charIndex2 >= currentLine.length()) charIndex2 = currentLine.length() - 1;
         return new int[]{pageIndex, lineIndex, charIndex, addLine, charIndex2};
     }
 

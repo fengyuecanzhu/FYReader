@@ -133,8 +133,8 @@ class SearchWordEngine(
                             leftI = index - 20
                             leftS = "..."
                         }
-                        if (rightI > index + 20) {
-                            rightI = index + 20
+                        if (rightI > index + keyword.length + 20) {
+                            rightI = index + keyword.length + 20
                             rightS = "..."
                         }
                         val str = leftS + it.substring(leftI, rightI) + rightS
