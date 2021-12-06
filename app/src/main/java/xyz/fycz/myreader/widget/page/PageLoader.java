@@ -2128,6 +2128,10 @@ public abstract class PageLoader {
 
     public void skipToSearch(int chapterNum, int countInChapter, String keyword) {
         skipToChapter(chapterNum);
+        if (mStatus != STATUS_FINISH){
+            App.getHandler().postDelayed(() -> skipToSearch(chapterNum, countInChapter, keyword), 300);
+            return;
+        }
         int[] position = searchWordPositions(countInChapter, keyword);
         skipToPage(position[0]);
         mPageView.setFirstSelectTxtChar(mCurPage.txtLists.get(position[1]).
@@ -2180,7 +2184,7 @@ public abstract class PageLoader {
         TxtPage currentPage = pages.get(pageIndex);
         int lineIndex = 0;
         length = length - currentPage.getContent().length() + currentPage.lines.get(lineIndex).length();
-        while (length < contentPosition) {
+        while (length <= contentPosition) {
             lineIndex += 1;
             if (lineIndex > currentPage.lines.size()) {
                 lineIndex = currentPage.lines.size();

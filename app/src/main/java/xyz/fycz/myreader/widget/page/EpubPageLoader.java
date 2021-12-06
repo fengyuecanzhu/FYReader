@@ -280,7 +280,6 @@ public class EpubPageLoader extends PageLoader {
 
     @Override
     public String getChapterReader(Chapter chapter) throws Exception {
-        Log.d("getChapterReader", chapter.getTitle());
         /*byte[] content = getChapterContent(chapter).getBytes();
         ByteArrayInputStream bais = new ByteArrayInputStream(content);
         BufferedReader br = new BufferedReader(new InputStreamReader(bais));

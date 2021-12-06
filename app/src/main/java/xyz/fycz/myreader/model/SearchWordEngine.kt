@@ -37,8 +37,8 @@ class SearchWordEngine(
     private var scheduler: Scheduler
     private var compositeDisposable: CompositeDisposable
     private lateinit var searchListener: OnSearchListener
-    private val threadsNum =
-        SharedPreUtils.getInstance().getInt(App.getmContext().getString(R.string.threadNum), 8);
+    private val threadsNum = 4
+//        SharedPreUtils.getInstance().getInt(App.getmContext().getString(R.string.threadNum), 8)
     private var searchSiteIndex = 0
     private var searchSuccessNum = 0
     private var searchFinishNum = 0
@@ -120,9 +120,11 @@ class SearchWordEngine(
                 }
                 val allLine: List<String> = content.split("\n")
                 var count = 0
+                var blockPos = 0
                 allLine.forEach {
                     var index: Int = -1
                     while (it.indexOf(keyword, index + 1).also { index = it } != -1) {
+                        blockPos++
                         var leftI = 0
                         var rightI = it.length
                         var leftS = ""
@@ -147,6 +149,11 @@ class SearchWordEngine(
                             )
                         searchWord1.searchWord2List.add(searchWord2)
                         count++
+                        //当添加的block太多的时候，执行GC
+                        if (blockPos % 15 == 0) {
+                            System.gc()
+                            System.runFinalization()
+                        }
                     }
                 }
                 emitter.onNext(searchWord1)

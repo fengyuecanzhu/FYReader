@@ -25,6 +25,7 @@ import xyz.fycz.myreader.ui.adapter.holder.SearchWord1Holder
 import xyz.fycz.myreader.ui.adapter.holder.SearchWord2Holder
 import xyz.fycz.myreader.util.ToastUtils
 import xyz.fycz.myreader.widget.page.PageLoader
+import xyz.fycz.myreader.widget.page.PageView
 
 /**
  * @author fengyue
@@ -34,6 +35,8 @@ class SearchWordActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySearchWordBinding
     private lateinit var book: Book
+    private lateinit var chapters: List<Chapter>
+    private lateinit var pageLoader: PageLoader
     private lateinit var searchWordEngine: SearchWordEngine
     private lateinit var adapter: BaseListAdapter<SearchWord1>
 
@@ -46,6 +49,13 @@ class SearchWordActivity : BaseActivity() {
         super.setUpToolbar(toolbar)
         setStatusBarColor(R.color.colorPrimary, true)
         supportActionBar?.title = getString(R.string.search_word)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        BitIntentDataManager.getInstance().putData(APPCONST.BOOK_KEY, book)
+        BitIntentDataManager.getInstance().putData(APPCONST.CHAPTERS_KEY, chapters)
+        BitIntentDataManager.getInstance().putData(APPCONST.PAGE_LOADER_KEY, pageLoader)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -66,9 +76,9 @@ class SearchWordActivity : BaseActivity() {
     override fun initData(savedInstanceState: Bundle?) {
         super.initData(savedInstanceState)
         book = BitIntentDataManager.getInstance().getData(APPCONST.BOOK_KEY) as Book
-        val chapters =
+        chapters =
             BitIntentDataManager.getInstance().getData(APPCONST.CHAPTERS_KEY) as List<Chapter>
-        val pageLoader =
+        pageLoader =
             BitIntentDataManager.getInstance().getData(APPCONST.PAGE_LOADER_KEY) as PageLoader
         searchWordEngine = SearchWordEngine(book, chapters, pageLoader)
     }
