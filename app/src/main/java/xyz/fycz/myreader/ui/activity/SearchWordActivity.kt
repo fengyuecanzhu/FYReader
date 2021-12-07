@@ -2,6 +2,8 @@ package xyz.fycz.myreader.ui.activity
 
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -191,5 +193,21 @@ class SearchWordActivity : BaseActivity() {
         super.onDestroy()
         searchWordEngine.stopSearch()
         searchWordEngine.closeSearchEngine()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_search_word, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_clear) {
+            adapter.clear()
+            searchWord = null
+            setUpToolbarTitle()
+            DbManager.getDaoSession().searchWordDao.deleteByKey(book.id)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

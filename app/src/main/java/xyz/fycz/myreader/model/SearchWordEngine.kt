@@ -112,7 +112,7 @@ class SearchWordEngine(
                     emitter.onNext(searchWord1)
                     return@ObservableOnSubscribe
                 }
-                var content = pageLoader.getChapterReader(chapter)
+                var content = chapter.title + "\n" + pageLoader.getChapterReader(chapter)
                 content = pageLoader.contentHelper.replaceContent(
                     book.name + "-" + book.author,
                     book.source,

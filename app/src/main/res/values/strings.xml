@@ -514,6 +514,7 @@
     <string name="input_keyword">输入关键词</string>
     <string name="search_word">内容搜索</string>
     <string name="search_word_tip">搜索书籍已缓存的内容</string>
+    <string name="clear_result">清除搜索结果</string>
 
 
     <string-array name="reset_screen_time">
