@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.entity
+package xyz.fycz.myreader.greendao.entity.search
 
 /**
  * @author fengyue

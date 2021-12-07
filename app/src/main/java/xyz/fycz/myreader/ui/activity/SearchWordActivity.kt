@@ -7,7 +7,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
-import org.jetbrains.anko.contentView
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.base.BaseActivity
@@ -17,15 +16,14 @@ import xyz.fycz.myreader.base.adapter.IViewHolder
 import xyz.fycz.myreader.base.adapter2.onClick
 import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.databinding.ActivitySearchWordBinding
-import xyz.fycz.myreader.entity.SearchWord1
+import xyz.fycz.myreader.greendao.DbManager
+import xyz.fycz.myreader.greendao.entity.search.SearchWord1
 import xyz.fycz.myreader.greendao.entity.Book
 import xyz.fycz.myreader.greendao.entity.Chapter
+import xyz.fycz.myreader.greendao.entity.search.SearchWord
 import xyz.fycz.myreader.model.SearchWordEngine
 import xyz.fycz.myreader.ui.adapter.holder.SearchWord1Holder
-import xyz.fycz.myreader.ui.adapter.holder.SearchWord2Holder
-import xyz.fycz.myreader.util.ToastUtils
 import xyz.fycz.myreader.widget.page.PageLoader
-import xyz.fycz.myreader.widget.page.PageView
 
 /**
  * @author fengyue
@@ -39,6 +37,8 @@ class SearchWordActivity : BaseActivity() {
     private lateinit var pageLoader: PageLoader
     private lateinit var searchWordEngine: SearchWordEngine
     private lateinit var adapter: BaseListAdapter<SearchWord1>
+    private var searchWord: SearchWord? = null
+    private var keyword: String? = null
 
     override fun bindView() {
         binding = ActivitySearchWordBinding.inflate(layoutInflater)
@@ -48,7 +48,21 @@ class SearchWordActivity : BaseActivity() {
     override fun setUpToolbar(toolbar: Toolbar?) {
         super.setUpToolbar(toolbar)
         setStatusBarColor(R.color.colorPrimary, true)
-        supportActionBar?.title = getString(R.string.search_word)
+        setUpToolbarTitle()
+    }
+
+    private fun setUpToolbarTitle() {
+        if (searchWord == null) {
+            supportActionBar?.title = getString(R.string.search_word)
+        } else {
+            var sum = 0
+            searchWord?.searchWords?.forEach {
+                sum += it.searchWord2List.size
+            }
+            supportActionBar?.title =
+                getString(R.string.search_word) + "(共" + searchWord?.searchWords?.size +
+                        "个章节，" + sum + "条结果)"
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -60,7 +74,7 @@ class SearchWordActivity : BaseActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
+        if (hasFocus && binding.etSearchKey.text?.isEmpty() == true) {
             App.getHandler().postDelayed({
                 binding.etSearchKey.requestFocus()
                 val imm =
@@ -81,6 +95,7 @@ class SearchWordActivity : BaseActivity() {
         pageLoader =
             BitIntentDataManager.getInstance().getData(APPCONST.PAGE_LOADER_KEY) as PageLoader
         searchWordEngine = SearchWordEngine(book, chapters, pageLoader)
+        searchWord = DbManager.getDaoSession().searchWordDao.load(book.id)
     }
 
     override fun initWidget() {
@@ -96,12 +111,11 @@ class SearchWordActivity : BaseActivity() {
             override fun loadFinish(isEmpty: Boolean) {
                 binding.fabSearchStop.visibility = View.GONE
                 binding.rpb.isAutoLoading = false
-                var sum = 0
-                adapter.items.forEach {
-                    sum += it.searchWord2List.size
+                if (adapter.itemSize > 0) {
+                    searchWord = SearchWord(book.id, keyword, adapter.items)
+                    setUpToolbarTitle()
+                    DbManager.getDaoSession().searchWordDao.insertOrReplace(searchWord)
                 }
-                supportActionBar?.title = getString(R.string.search_word) + "(共" + adapter.itemSize +
-                        "个章节，" + sum + "条结果)"
             }
 
             @Synchronized
@@ -135,6 +149,11 @@ class SearchWordActivity : BaseActivity() {
         }
         binding.rvSearchWord1.layoutManager = LinearLayoutManager(this)
         binding.rvSearchWord1.adapter = adapter
+        searchWord?.let {
+            binding.etSearchKey.setText(it.keyword)
+            keyword = it.keyword
+            adapter.refreshItems(it.searchWords)
+        }
     }
 
     override fun initClick() {
@@ -144,8 +163,8 @@ class SearchWordActivity : BaseActivity() {
 
     private fun search() {
         val keyword = binding.etSearchKey.text.toString()
-        if (keyword.isNotEmpty()) {
-            supportActionBar?.title = getString(R.string.search_word)
+        if (keyword.isNotEmpty() && this.keyword != keyword) {
+            this.keyword = keyword
             adapter.clear()
             binding.fabSearchStop.visibility = View.VISIBLE
             binding.rpb.isAutoLoading = true
@@ -156,6 +175,9 @@ class SearchWordActivity : BaseActivity() {
                 binding.etSearchKey.windowToken,
                 InputMethodManager.HIDE_NOT_ALWAYS
             )
+            DbManager.getDaoSession().searchWordDao.deleteByKey(book.id)
+            searchWord = null
+            setUpToolbarTitle()
         }
     }
 

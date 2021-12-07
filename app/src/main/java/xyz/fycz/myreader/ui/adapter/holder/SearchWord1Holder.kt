@@ -1,9 +1,7 @@
 package xyz.fycz.myreader.ui.adapter.holder
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,8 +10,8 @@ import xyz.fycz.myreader.R
 import xyz.fycz.myreader.base.adapter.BaseListAdapter
 import xyz.fycz.myreader.base.adapter.IViewHolder
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl
-import xyz.fycz.myreader.entity.SearchWord1
-import xyz.fycz.myreader.entity.SearchWord2
+import xyz.fycz.myreader.greendao.entity.search.SearchWord1
+import xyz.fycz.myreader.greendao.entity.search.SearchWord2
 
 /**
  * @author fengyue

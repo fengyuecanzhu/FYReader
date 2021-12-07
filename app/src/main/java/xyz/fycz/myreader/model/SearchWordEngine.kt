@@ -7,8 +7,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.application.App
-import xyz.fycz.myreader.entity.SearchWord1
-import xyz.fycz.myreader.entity.SearchWord2
+import xyz.fycz.myreader.greendao.entity.search.SearchWord1
+import xyz.fycz.myreader.greendao.entity.search.SearchWord2
 import xyz.fycz.myreader.greendao.entity.Book
 import xyz.fycz.myreader.greendao.entity.Chapter
 import xyz.fycz.myreader.greendao.service.ChapterService
@@ -102,8 +102,12 @@ class SearchWordEngine(
             val chapterNum = searchSiteIndex
             val chapter = chapters[chapterNum]
             Observable.create(ObservableOnSubscribe<SearchWord1> { emitter ->
-                val searchWord1 =
-                    SearchWord1(book.id, chapterNum, chapter.title, mutableListOf())
+                val searchWord1 = SearchWord1(
+                    bookId = book.id,
+                    chapterNum = chapterNum,
+                    chapterTitle = chapter.title,
+                    searchWord2List = mutableListOf()
+                )
                 if (!isLocalBook && !ChapterService.isChapterCached(book.id, chapter.title)) {
                     emitter.onNext(searchWord1)
                     return@ObservableOnSubscribe

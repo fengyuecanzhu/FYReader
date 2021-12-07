@@ -42,6 +42,7 @@ object Backup {
                 "replaceRule.json",
                 "bookSource.json",
                 "readRecord.json",
+                "searchWord.json",
                 "config.xml"
         )
     }
@@ -107,6 +108,13 @@ object Backup {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "readRecord.json")
+                        .writeText(json)
+                }
+            }
+            DbManager.getDaoSession().searchWordDao.queryBuilder().list().let {
+                if (it.isNotEmpty()) {
+                    val json = GSON.toJson(it)
+                    FileUtils.getFile(backupPath + File.separator + "searchWord.json")
                         .writeText(json)
                 }
             }

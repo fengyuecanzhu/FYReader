@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl
-import xyz.fycz.myreader.entity.SearchWord2
+import xyz.fycz.myreader.greendao.entity.search.SearchWord2
 
 /**
  * @author fengyue

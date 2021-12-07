@@ -15,16 +15,15 @@ import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.OrderBy;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Transient;
-import org.greenrobot.greendao.annotation.Unique;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
-import xyz.fycz.myreader.greendao.entity.rule.convert.ContentRuleConvert;
-import xyz.fycz.myreader.greendao.entity.rule.convert.FindRuleConvert;
-import xyz.fycz.myreader.greendao.entity.rule.convert.InfoRuleConvert;
-import xyz.fycz.myreader.greendao.entity.rule.convert.SearchRuleConvert;
-import xyz.fycz.myreader.greendao.entity.rule.convert.TocRuleConvert;
+import xyz.fycz.myreader.greendao.convert.ContentRuleConvert;
+import xyz.fycz.myreader.greendao.convert.FindRuleConvert;
+import xyz.fycz.myreader.greendao.convert.InfoRuleConvert;
+import xyz.fycz.myreader.greendao.convert.SearchRuleConvert;
+import xyz.fycz.myreader.greendao.convert.TocRuleConvert;
 
 import static xyz.fycz.myreader.util.utils.StringUtils.stringEquals;
 

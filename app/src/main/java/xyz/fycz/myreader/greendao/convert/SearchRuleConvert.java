@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.greendao.entity.rule.convert;
+package xyz.fycz.myreader.greendao.convert;
 
 import org.greenrobot.greendao.converter.PropertyConverter;
 

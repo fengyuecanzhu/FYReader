@@ -15,6 +15,7 @@ import xyz.fycz.myreader.entity.Setting
 import xyz.fycz.myreader.greendao.DbManager
 import xyz.fycz.myreader.greendao.entity.*
 import xyz.fycz.myreader.greendao.entity.rule.BookSource
+import xyz.fycz.myreader.greendao.entity.search.SearchWord
 import xyz.fycz.myreader.util.SharedPreUtils
 import xyz.fycz.myreader.util.utils.*
 import java.io.File
@@ -125,6 +126,15 @@ object Restore {
                 val json = file.readText()
                 GSON.fromJsonArray<ReadRecord>(json)?.let {
                     DbManager.getInstance().session.readRecordDao.insertOrReplaceInTx(it)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            try {
+                val file = FileUtils.getFile(path + File.separator + "searchWord.json")
+                val json = file.readText()
+                GSON.fromJsonArray<SearchWord>(json)?.let {
+                    DbManager.getInstance().session.searchWordDao.insertOrReplaceInTx(it)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

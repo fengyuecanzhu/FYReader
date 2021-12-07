@@ -189,10 +189,11 @@ public class BookService extends BaseService {
      * @param id
      */
     public void deleteBookById(String id) {
-        BookDao bookDao = DbManager.getInstance().getSession().getBookDao();
+        BookDao bookDao = DbManager.getDaoSession().getBookDao();
         bookDao.deleteByKey(id);
         mChapterService.deleteBookALLChapterById(id);
         mBookMarkService.deleteBookALLBookMarkById(id);
+        DbManager.getDaoSession().getSearchWordDao().deleteByKey(id);
     }
 
     /**
@@ -205,6 +206,7 @@ public class BookService extends BaseService {
             deleteEntity(book);
             mChapterService.deleteBookALLChapterById(book.getId());
             mBookMarkService.deleteBookALLBookMarkById(book.getId());
+            DbManager.getDaoSession().getSearchWordDao().deleteByKey(book.getId());
         }catch (Exception ignored){}
     }
 

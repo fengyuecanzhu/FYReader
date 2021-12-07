@@ -38,10 +38,10 @@ public class MySQLiteOpenHelper extends DaoMaster.OpenHelper {
                 },
                 BookDao.class, ChapterDao.class, SearchHistoryDao.class,
                 BookMarkDao.class, BookGroupDao.class, ReplaceRuleBeanDao.class,
-                BookSourceDao.class, CookieBeanDao.class, ReadRecordDao.class
+                BookSourceDao.class, CookieBeanDao.class, ReadRecordDao.class,
+                SearchWordDao.class
         );
     }
-
 
 
 }

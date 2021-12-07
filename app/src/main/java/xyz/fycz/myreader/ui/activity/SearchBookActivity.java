@@ -120,7 +120,7 @@ public class SearchBookActivity extends BaseActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus){
+        if (hasFocus && binding.etSearchKey.getText().length() == 0){
             App.getHandler().postDelayed(() -> {
                 binding.etSearchKey.requestFocus();
                 InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);

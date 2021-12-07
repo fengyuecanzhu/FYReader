@@ -75,9 +75,7 @@
             android:name=".ui.activity.MainActivity"
             android:alwaysRetainTaskState="true"
             android:launchMode="singleTask" />
-        <activity
-            android:name=".ui.activity.SearchBookActivity"
-            android:windowSoftInputMode="stateVisible" />
+        <activity android:name=".ui.activity.SearchBookActivity" />
         <activity android:name=".ui.activity.BookDetailedActivity" />
 
         <activity

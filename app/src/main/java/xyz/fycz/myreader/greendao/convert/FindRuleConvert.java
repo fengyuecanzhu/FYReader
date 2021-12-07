@@ -1,9 +1,8 @@
-package xyz.fycz.myreader.greendao.entity.rule.convert;
+package xyz.fycz.myreader.greendao.convert;
 
 import org.greenrobot.greendao.converter.PropertyConverter;
 
 import xyz.fycz.myreader.greendao.entity.rule.FindRule;
-import xyz.fycz.myreader.greendao.entity.rule.TocRule;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 
 /**
