@@ -1,12 +1,16 @@
 package xyz.fycz.myreader.model.user
 
+import io.reactivex.ObservableSource
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
+import io.reactivex.SingleSource
+import io.reactivex.functions.Function
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.common.URLCONST
+import xyz.fycz.myreader.entity.StrResponse
 import xyz.fycz.myreader.model.storage.Backup
 import xyz.fycz.myreader.model.storage.Restore
 import xyz.fycz.myreader.model.storage.Restore.restore
@@ -15,6 +19,7 @@ import xyz.fycz.myreader.util.utils.FileUtils
 import xyz.fycz.myreader.util.utils.GSON
 import xyz.fycz.myreader.util.utils.OkHttpUtils
 import xyz.fycz.myreader.util.utils.RxUtils
+import java.io.File
 
 /**
  * @author fengyue
@@ -91,46 +96,48 @@ object UserService2 {
     }
 
     fun webBackup(user: User): Single<Result> {
-        return Single.create(SingleOnSubscribe<Result> {
-            Backup.backup(App.getmContext(), APPCONST.FILE_DIR + "webBackup/",
-                object : Backup.CallBack {
-                    override fun backupSuccess() {
-                        val inputFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup")
-                        val zipFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup.zip")
-                        //压缩文件
-                        ZipUtils.zipFile(inputFile, zipFile)
-                        val ret = OkHttpUtils.upload(
-                            URLCONST.USER_URL + "/do/bak?" +
-                                    "username=${user.userName}" +
-                                    makeAuth(),
-                            zipFile.absolutePath,
-                            zipFile.name
-                        )
-                        zipFile.delete()
-                        it.onSuccess(GSON.fromJson(ret, Result::class.java))
-                    }
-
-                    override fun backupError(msg: String) {
-                        it.onError(Throwable(msg))
-                    }
-
-                })
-        }).compose { RxUtils.toSimpleSingle(it) }
+        return Backup.backup(App.getmContext(), APPCONST.FILE_DIR + "webBackup/")
+            .flatMap(Function<Boolean, SingleSource<Result>> {
+                Single.create {
+                    val inputFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup")
+                    val zipFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup.zip")
+                    //压缩文件
+                    ZipUtils.zipFile(inputFile, zipFile)
+                    FileUtils.deleteFile(zipFile.absolutePath)
+                    val ret = OkHttpUtils.upload(
+                        URLCONST.USER_URL + "/do/bak?" +
+                                "username=${user.userName}" +
+                                makeAuth(),
+                        zipFile.absolutePath,
+                        zipFile.name
+                    )
+                    zipFile.delete()
+                    it.onSuccess(GSON.fromJson(ret, Result::class.java))
+                }
+            }).compose { RxUtils.toSimpleSingle(it) }
     }
 
     fun webRestore(user: User): Single<Result> {
         return Single.create(SingleOnSubscribe<Result> {
             val zipFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup.zip")
+            val mediaType = MediaType.parse("application/x-www-form-urlencoded")
+            val body = "username=${user.userName}" +
+                    makeAuth()
+            val requestBody = RequestBody.create(mediaType, body)
             val input = OkHttpUtils.getInputStream(
-                URLCONST.USER_URL + "/do/ret?" +
-                        "username=${user.userName}" +
-                        makeAuth()
+                URLCONST.USER_URL + "/do/ret", requestBody
             )
-            if (FileUtils.writeFile(input.readBytes(), zipFile)) {
+            val bytes = input.readBytes()
+            if (bytes.size < 50) {
+                it.onError(Throwable(String(bytes)))
+                return@SingleOnSubscribe
+            }
+            if (FileUtils.writeFile(bytes, zipFile)) {
                 ZipUtils.unzipFile(zipFile.absolutePath, APPCONST.FILE_DIR)
+                zipFile.delete()
                 restore(APPCONST.FILE_DIR + "webBackup/", object : Restore.CallBack {
                     override fun restoreSuccess() {
-                        zipFile.delete()
+                        FileUtils.deleteFile(zipFile.absolutePath)
                         it.onSuccess(Result(100, "成功从网络同步到本地"))
                     }
 
@@ -162,10 +169,20 @@ object UserService2 {
         return FileUtils.readText(APPCONST.QQ_DATA_DIR + "user")
     }
 
+    /**
+     * 判断是否登录
+     * @return
+     */
+    fun isLogin(): Boolean {
+        val file = App.getApplication().getFileStreamPath("userConfig.fy")
+        return file.exists()
+    }
+
     private fun makeAuth(): String {
         return "&signal=" + AppInfoUtils.getSingInfo(
             App.getmContext(),
-            App.getApplication().packageName, AppInfoUtils.SHA1
+            App.getApplication().packageName,
+            AppInfoUtils.SHA1
         ) + "&appVersion=" + App.getVersionCode()
     }
 }

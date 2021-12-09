@@ -142,8 +142,18 @@ public class OkHttpUtils {
     }
 
     public static InputStream getInputStream(String url) throws IOException {
+        return getInputStream(url, null);
+    }
+
+    public static InputStream getInputStream(String url, RequestBody body) throws IOException {
         Request.Builder builder = new Request.Builder()
                 .addHeader("user-agent", APPCONST.DEFAULT_USER_AGENT);
+        if (body != null) {
+            builder.post(body);
+            Log.d("HttpPost URl", url);
+        } else {
+            Log.d("HttpGet URl", url);
+        }
         Request request = builder
                 .url(url)
                 .build();
@@ -331,7 +341,8 @@ public class OkHttpUtils {
         OkHttpClient client = getOkHttpClient();
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", fileName, RequestBody.create(MediaType.parse("multipart/form-data"), new File(filePath)))
+                .addFormDataPart("file", fileName,
+                        RequestBody.create(MediaType.parse("multipart/form-data"), new File(filePath)))
                 .build();
 
         Request request = new Request.Builder()

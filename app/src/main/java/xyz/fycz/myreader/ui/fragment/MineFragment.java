@@ -1,5 +1,7 @@
 package xyz.fycz.myreader.ui.fragment;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,12 +39,11 @@ import xyz.fycz.myreader.databinding.FragmentMineBinding;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
-import xyz.fycz.myreader.model.user.Result;
-import xyz.fycz.myreader.model.user.User;
-import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.model.storage.BackupRestoreUi;
 import xyz.fycz.myreader.model.storage.Restore;
 import xyz.fycz.myreader.model.storage.WebDavHelp;
+import xyz.fycz.myreader.model.user.Result;
+import xyz.fycz.myreader.model.user.User;
 import xyz.fycz.myreader.model.user.UserService2;
 import xyz.fycz.myreader.ui.activity.AboutActivity;
 import xyz.fycz.myreader.ui.activity.AdSettingActivity;
@@ -55,13 +56,9 @@ import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
 import xyz.fycz.myreader.ui.activity.ReadRecordActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
-import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.webapi.ResultCallback;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * @author fengyue
@@ -164,6 +161,70 @@ public class MineFragment extends BaseFragment {
                 getActivity().startActivityForResult(intent, APPCONST.REQUEST_LOGIN);
             }
         });
+        binding.mineRlSyn.setOnClickListener(v -> {
+            if (!isLogin) {
+                ToastUtils.showWarring("请先登录！");
+                Intent loginIntent = new Intent(getActivity(), LoginActivity.class);
+                getActivity().startActivityForResult(loginIntent, APPCONST.REQUEST_LOGIN);
+                return;
+            }
+            if (mSetting.isAutoSyn()) {
+                webSynMenu[2] = App.getmContext().getString(R.string.menu_backup_autoSyn) + "已开启";
+            } else {
+                webSynMenu[2] = App.getmContext().getString(R.string.menu_backup_autoSyn) + "已关闭";
+            }
+            /*MyAlertDialog.build(getContext())
+                    .setTitle(getActivity().getString(R.string.menu_bookcase_syn))
+                    .setItems(webSynMenu, (dialog, which) -> {
+                        switch (which) {
+                            case 0:
+                                synBookcaseToWeb(false);
+                                break;
+                            case 1:
+                                webRestore();
+                                break;
+                            case 2:
+                                String tip = "";
+                                if (mSetting.isAutoSyn()) {
+                                    mSetting.setAutoSyn(false);
+                                    tip = "每日自动同步已关闭！";
+                                } else {
+                                    mSetting.setAutoSyn(true);
+                                    tip = "每日自动同步已开启！";
+                                }
+                                SysManager.saveSetting(mSetting);
+                                ToastUtils.showSuccess(tip);
+                                break;
+                        }
+                    })
+                    .setNegativeButton(null, null)
+                    .setPositiveButton(null, null)
+                    .show();*/
+            BottomMenu.show("同步书架", webSynMenu)
+                    .setOnMenuItemClickListener((dialog1, text, which) -> {
+                        switch (which) {
+                            case 0:
+                                synBookcaseToWeb(false);
+                                break;
+                            case 1:
+                                webRestore();
+                                break;
+                            case 2:
+                                String tip = "";
+                                if (mSetting.isAutoSyn()) {
+                                    mSetting.setAutoSyn(false);
+                                    tip = "每日自动同步已关闭！";
+                                } else {
+                                    mSetting.setAutoSyn(true);
+                                    tip = "每日自动同步已开启！";
+                                }
+                                SysManager.saveSetting(mSetting);
+                                ToastUtils.showSuccess(tip);
+                                break;
+                        }
+                        return false;
+                    }).setCancelButton(R.string.cancel);
+        });
 
         binding.mineRlWebdav.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), MoreSettingActivity.class);
@@ -171,7 +232,7 @@ public class MineFragment extends BaseFragment {
             startActivity(intent);
         });
 
-        /*binding.mineRlSyn.setOnClickListener(v -> {
+        binding.mineRlSynWebdav.setOnClickListener(v -> {
             String account = SharedPreUtils.getInstance().getString("webdavAccount");
             String password = SharedPreUtils.getInstance().getString("webdavPassword");
             if (TextUtils.isEmpty(account) || TextUtils.isEmpty(password)) {
@@ -212,7 +273,7 @@ public class MineFragment extends BaseFragment {
                             }
                         }
                     });
-        });*/
+        });
         binding.mineRlBookSource.setOnClickListener(v -> {
             startActivity(new Intent(getContext(), BookSourceActivity.class));
         });
@@ -246,46 +307,6 @@ public class MineFragment extends BaseFragment {
                         }
                         return false;
                     }).setCancelButton(R.string.cancel);
-        });
-        binding.mineRlSyn.setOnClickListener(v -> {
-            if (!isLogin) {
-                ToastUtils.showWarring("请先登录！");
-                Intent loginIntent = new Intent(getActivity(), LoginActivity.class);
-                getActivity().startActivityForResult(loginIntent, APPCONST.REQUEST_LOGIN);
-                return;
-            }
-            if (mSetting.isAutoSyn()) {
-                webSynMenu[2] = App.getmContext().getString(R.string.menu_backup_autoSyn) + "已开启";
-            } else {
-                webSynMenu[2] = App.getmContext().getString(R.string.menu_backup_autoSyn) + "已关闭";
-            }
-            MyAlertDialog.build(getContext())
-                    .setTitle(getActivity().getString(R.string.menu_bookcase_syn))
-                    .setItems(webSynMenu, (dialog, which) -> {
-                        switch (which) {
-                            case 0:
-                                synBookcaseToWeb(false);
-                                break;
-                            case 1:
-                                webRestore();
-                                break;
-                            case 2:
-                                String tip = "";
-                                if (mSetting.isAutoSyn()) {
-                                    mSetting.setAutoSyn(false);
-                                    tip = "每日自动同步已关闭！";
-                                } else {
-                                    mSetting.setAutoSyn(true);
-                                    tip = "每日自动同步已开启！";
-                                }
-                                SysManager.saveSetting(mSetting);
-                                ToastUtils.showSuccess(tip);
-                                break;
-                        }
-                    })
-                    .setNegativeButton(null, null)
-                    .setPositiveButton(null, null)
-                    .show();
         });
 
         binding.mineRlReadRecord.setOnClickListener(v -> {
@@ -524,7 +545,6 @@ public class MineFragment extends BaseFragment {
         DialogCreator.createCommonDialog(getContext(), "确认同步吗?", "将书架从网络同步至本地会覆盖原有书架！", true,
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
-                    App.getApplication().newThread(() -> {
                         /*if (UserService.webRestore()) {
                             mHandler.sendMessage(mHandler.obtainMessage(7));
 //                                    DialogCreator.createTipDialog(mMainActivity,
@@ -534,38 +554,38 @@ public class MineFragment extends BaseFragment {
                         } else {
                             DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！");
                         }*/
-                        dialog.show();
-                        UserService2.INSTANCE.webRestore(user).subscribe(new MySingleObserver<Result>() {
-                            @Override
-                            public void onSubscribe(Disposable d) {
-                                addDisposable(d);
-                                disp = d;
-                            }
+                    dialog.show();
+                    UserService2.INSTANCE.webRestore(user).subscribe(new MySingleObserver<Result>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            addDisposable(d);
+                            disp = d;
+                        }
 
-                            @Override
-                            public void onSuccess(@NonNull Result result) {
-                                if (result.getCode() < 200) {
-                                    mHandler.sendMessage(mHandler.obtainMessage(7));
+                        @Override
+                        public void onSuccess(@NonNull Result result) {
+                            if (result.getCode() < 200) {
+                                mHandler.sendMessage(mHandler.obtainMessage(7));
 //                                    DialogCreator.createTipDialog(mMainActivity,
 //                                            "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");、
-                                    SysManager.regetmSetting();
-                                    ToastUtils.showSuccess("成功将书架从网络同步至本地！");
-                                    if (getActivity() != null) {
-                                        getActivity().finish();
-                                    }
-                                    startActivity(new Intent(getContext(), MainActivity.class));
-                                } else {
-                                    DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！");
+                                SysManager.regetmSetting();
+                                ToastUtils.showSuccess("成功将书架从网络同步至本地！");
+                                if (getActivity() != null) {
+                                    getActivity().finish();
                                 }
-                                dialog.dismiss();
+                                startActivity(new Intent(getContext(), MainActivity.class));
+                            } else {
+                                DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！");
                             }
+                            dialog.dismiss();
+                        }
 
-                            @Override
-                            public void onError(Throwable e) {
-                                DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！\n" + e.getLocalizedMessage());
-                                DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！\n" + e.getLocalizedMessage());
-                            }
-                        });
+                        @Override
+                        public void onError(Throwable e) {
+                            if (App.isDebug()) e.printStackTrace();
+                            DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！\n" + e.getLocalizedMessage());
+                            dialog.dismiss();
+                        }
                     });
                 }, (dialogInterface, i) -> dialogInterface.dismiss());
     }

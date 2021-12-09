@@ -1,12 +1,9 @@
 package xyz.fycz.myreader.ui.activity;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
@@ -17,9 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
@@ -29,7 +23,6 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityLoginBinding;
 import xyz.fycz.myreader.model.user.Result;
 import xyz.fycz.myreader.model.user.User;
-import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.model.user.UserService2;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
@@ -37,9 +30,7 @@ import xyz.fycz.myreader.util.CodeUtil;
 import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.util.utils.ProgressUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
-import xyz.fycz.myreader.webapi.ResultCallback;
 
 /**
  * @author fengyue

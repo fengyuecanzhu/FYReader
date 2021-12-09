@@ -33,17 +33,17 @@ object Backup {
 
     val backupFileNames by lazy {
         arrayOf(
-                "myBooks.json",
-                "mySearchHistory.json",
-                "myBookMark.json",
-                "myBookGroup.json",
-                "setting.json",
-                "readStyles.json",
-                "replaceRule.json",
-                "bookSource.json",
-                "readRecord.json",
-                "searchWord.json",
-                "config.xml"
+            "myBooks.json",
+            "mySearchHistory.json",
+            "myBookMark.json",
+            "myBookGroup.json",
+            "setting.json",
+            "readStyles.json",
+            "replaceRule.json",
+            "bookSource.json",
+            "readRecord.json",
+            "searchWord.json",
+            "config.xml"
         )
     }
 
@@ -61,8 +61,27 @@ object Backup {
     }
 
     fun backup(context: Context, path: String, callBack: CallBack?, isAuto: Boolean = false) {
+        backup(context, path, isAuto).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : MySingleObserver<Boolean>() {
+                override fun onSuccess(t: Boolean) {
+                    callBack?.backupSuccess()
+                }
+
+                override fun onError(e: Throwable) {
+                    e.printStackTrace()
+                    callBack?.backupError(e.localizedMessage ?: "ERROR")
+                }
+            })
+    }
+
+    fun backup(
+        context: Context,
+        path: String,
+        isAuto: Boolean = false
+    ): Single<Boolean> {
         SharedPreUtils.getInstance().putLong("lastBackup", System.currentTimeMillis())
-        Single.create(SingleOnSubscribe<Boolean> { e ->
+        return Single.create { e ->
             BookService.getInstance().allBooks.let {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
@@ -73,35 +92,35 @@ object Backup {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "mySearchHistory.json")
-                            .writeText(json)
+                        .writeText(json)
                 }
             }
             DbManager.getInstance().session.bookMarkDao.queryBuilder().list().let {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "myBookMark.json")
-                            .writeText(json)
+                        .writeText(json)
                 }
             }
             DbManager.getInstance().session.bookGroupDao.queryBuilder().list().let {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "myBookGroup.json")
-                            .writeText(json)
+                        .writeText(json)
                 }
             }
             DbManager.getInstance().session.replaceRuleBeanDao.queryBuilder().list().let {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "replaceRule.json")
-                            .writeText(json)
+                        .writeText(json)
                 }
             }
             DbManager.getInstance().session.bookSourceDao.queryBuilder().list().let {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "bookSource.json")
-                            .writeText(json)
+                        .writeText(json)
                 }
             }
             DbManager.getInstance().session.readRecordDao.queryBuilder().list().let {
@@ -125,9 +144,9 @@ object Backup {
                 setting.readStyles = null
                 val settingJson = GSON.toJson(setting)
                 FileUtils.getFile(backupPath + File.separator + "setting.json")
-                        .writeText(settingJson)
+                    .writeText(settingJson)
                 FileUtils.getFile(backupPath + File.separator + "readStyles.json")
-                        .writeText(readStylesJson)
+                    .writeText(readStylesJson)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -153,18 +172,7 @@ object Backup {
                 copyBackup(path, isAuto)
             }
             e.onSuccess(true)
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : MySingleObserver<Boolean>() {
-                    override fun onSuccess(t: Boolean) {
-                        callBack?.backupSuccess()
-                    }
-
-                    override fun onError(e: Throwable) {
-                        e.printStackTrace()
-                        callBack?.backupError(e.localizedMessage ?: "ERROR")
-                    }
-                })
+        }
     }
 
     @Throws(Exception::class)
@@ -202,7 +210,10 @@ object Backup {
                 if (isAuto) {
                     val file = File(backupPath + File.separator + fileName)
                     if (file.exists()) {
-                        file.copyTo(FileUtils.getFile(path + File.separator + "auto" + File.separator + fileName), true)
+                        file.copyTo(
+                            FileUtils.getFile(path + File.separator + "auto" + File.separator + fileName),
+                            true
+                        )
                     }
                 } else {
                     val file = File(backupPath + File.separator + fileName)

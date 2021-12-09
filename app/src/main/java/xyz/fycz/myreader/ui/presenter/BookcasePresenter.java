@@ -1,19 +1,23 @@
 package xyz.fycz.myreader.ui.presenter;
 
+import static xyz.fycz.myreader.application.App.checkVersionByServer;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-
 import android.widget.PopupMenu;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,35 +45,38 @@ import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BasePresenter;
 import xyz.fycz.myreader.base.observer.MyObserver;
-import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
-import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
-import xyz.fycz.myreader.util.help.StringHelper;
-import xyz.fycz.myreader.util.utils.RxUtils;
-import xyz.fycz.myreader.webapi.ResultCallback;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.greendao.entity.BookGroup;
-import xyz.fycz.myreader.greendao.service.BookGroupService;
-import xyz.fycz.myreader.model.user.UserService;
-import xyz.fycz.myreader.ui.activity.*;
-import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
-import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
-import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookcaseStyle;
 import xyz.fycz.myreader.greendao.entity.Book;
+import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.entity.Chapter;
+import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
+import xyz.fycz.myreader.model.user.Result;
+import xyz.fycz.myreader.model.user.UserService2;
+import xyz.fycz.myreader.ui.activity.FileSystemActivity;
+import xyz.fycz.myreader.ui.activity.GroupManagerActivity;
+import xyz.fycz.myreader.ui.activity.MainActivity;
+import xyz.fycz.myreader.ui.activity.SearchBookActivity;
 import xyz.fycz.myreader.ui.adapter.BookcaseAdapter;
 import xyz.fycz.myreader.ui.adapter.BookcaseDetailedAdapter;
 import xyz.fycz.myreader.ui.adapter.BookcaseDragAdapter;
+import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
+import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
-import xyz.fycz.myreader.util.*;
+import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.notification.NotificationUtil;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.BookApi;
-
-import static xyz.fycz.myreader.application.App.checkVersionByServer;
+import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
+import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 
 
 public class BookcasePresenter implements BasePresenter {
@@ -168,9 +175,9 @@ public class BookcasePresenter implements BasePresenter {
 
         getData();
 
-        /*if (mSetting.isAutoSyn() && UserService.isLogin()) {
+        if (mSetting.isAutoSyn() && UserService2.INSTANCE.isLogin()) {
             synBookcaseToWeb(true);
-        }*/
+        }
 
         //设置是否启用内容视图拖动效果
         mBookcaseFragment.getSrlContent().setEnableHeaderTranslationContent(false);
@@ -979,10 +986,15 @@ public class BookcasePresenter implements BasePresenter {
         SharedPreUtils spb = SharedPreUtils.getInstance();
         String synTime = spb.getString(mMainActivity.getString(R.string.synTime));
         if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
-            UserService.webBackup(new ResultCallback() {
+            UserService2.INSTANCE.webBackup(UserService2.INSTANCE.readConfig()).subscribe(new MySingleObserver<Result>() {
                 @Override
-                public void onFinish(Object o, int code) {
-                    if ((boolean) o) {
+                public void onSubscribe(Disposable d) {
+                    mMainActivity.addDisposable(d);
+                }
+
+                @Override
+                public void onSuccess(@NonNull Result result) {
+                    if (result.getCode() == 104) {
                         spb.putString(mMainActivity.getString(R.string.synTime), nowTimeStr);
                         if (!isAutoSyn) {
                             DialogCreator.createTipDialog(mMainActivity, "成功将书架同步至网络！");
@@ -993,9 +1005,8 @@ public class BookcasePresenter implements BasePresenter {
                         }
                     }
                 }
-
                 @Override
-                public void onError(Exception e) {
+                public void onError(Throwable e) {
                     if (!isAutoSyn) {
                         DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！\n" + e.getLocalizedMessage());
                     }

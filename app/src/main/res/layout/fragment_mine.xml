@@ -31,7 +31,7 @@
         <RelativeLayout
                 android:id="@+id/mine_rl_user"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="50dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
                 android:background="@drawable/selector_common_bg">
@@ -58,6 +58,35 @@
 
         </RelativeLayout>
         <RelativeLayout
+            android:id="@+id/mine_rl_syn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <ImageView
+                android:id="@+id/iv_syn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_online_syn"
+                app:tint="@color/textPrimary" />
+
+            <TextView
+                android:id="@+id/tv_syn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/iv_syn"
+                android:text="@string/menu_bookcase_syn"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
+
+        </RelativeLayout>
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="25dp"
             android:paddingLeft="5dp"
@@ -68,7 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerInParent="true"
-                android:text="云服务"
+                android:text="WebDav云服务"
                 android:textColor="@color/textPrimary" />
 
         </RelativeLayout>
@@ -76,7 +105,7 @@
         <RelativeLayout
             android:id="@+id/mine_rl_webdav"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp">
@@ -104,30 +133,30 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/mine_rl_syn"
+            android:id="@+id/mine_rl_syn_webdav"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp">
 
             <ImageView
-                android:id="@+id/iv_syn"
+                android:id="@+id/iv_syn_webdav"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_online_syn"
+                android:src="@drawable/ic_restore"
                 app:tint="@color/textPrimary" />
 
             <TextView
-                android:id="@+id/tv_syn"
+                android:id="@+id/tv_syn_webdav"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="15dp"
-                android:layout_toEndOf="@id/iv_syn"
-                android:text="@string/menu_bookcase_syn"
+                android:layout_toEndOf="@id/iv_syn_webdav"
+                android:text="@string/webdav_restore_tip"
                 android:textColor="@color/textSecondary"
                 android:textSize="@dimen/text_normal_size" />
 
@@ -152,7 +181,7 @@
         <RelativeLayout
             android:id="@+id/mine_rl_book_source"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp">
@@ -182,7 +211,7 @@
         <RelativeLayout
             android:id="@+id/mine_rl_backup"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp">
@@ -211,7 +240,7 @@
         <RelativeLayout
             android:id="@+id/mine_rl_read_record"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp">
@@ -257,7 +286,7 @@
         <RelativeLayout
             android:id="@+id/mine_rl_setting"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp">
@@ -287,7 +316,7 @@
         <RelativeLayout
             android:id="@+id/mine_rl_theme_mode"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp">
@@ -327,7 +356,7 @@
             android:id="@+id/mine_rl_ad_setting"
             android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp">
@@ -374,7 +403,7 @@
         <RelativeLayout
             android:id="@+id/mine_rl_feedback"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp">
@@ -404,7 +433,7 @@
         <RelativeLayout
             android:id="@+id/mine_rl_donate"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp">
@@ -433,7 +462,7 @@
         <RelativeLayout
             android:id="@+id/mine_rl_about"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
             android:paddingLeft="20dp"
             android:paddingRight="20dp">
