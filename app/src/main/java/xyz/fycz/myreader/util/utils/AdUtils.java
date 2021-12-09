@@ -13,7 +13,7 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.model.backup.UserService;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.help.DateHelper;
 

@@ -88,7 +88,7 @@ public class StringHelper {
     //生成随机数字和字母,
     public static String getStringRandom(int length) {
 
-        String val = "";
+        StringBuilder val = new StringBuilder();
         Random random = new Random();
 
         //参数length，表示生成几位随机数
@@ -98,12 +98,12 @@ public class StringHelper {
             if( "char".equalsIgnoreCase(charOrNum) ) {
                 //输出是大写字母还是小写字母
                 int temp = random.nextInt(2) % 2 == 0 ? 65 : 97;
-                val += (char)(random.nextInt(26) + temp);
+                val.append((char) (random.nextInt(26) + temp));
             } else if( "num".equalsIgnoreCase(charOrNum) ) {
-                val += String.valueOf(random.nextInt(10));
+                val.append(String.valueOf(random.nextInt(10)));
             }
         }
-        return val;
+        return val.toString();
     }
 
     public static String jidToUsername(String jid){

@@ -1,5 +1,7 @@
 package xyz.fycz.myreader.common;
 
+import xyz.fycz.myreader.util.SharedPreUtils;
+
 public class URLCONST {
 
     public static final String OFFICIAL_WEB = "https://reader.fycz.tk/";
@@ -19,11 +21,15 @@ public class URLCONST {
 
     public static final String YOU_DAO_SEARCH = "http://m.youdao.com/dict?le=eng&q={key}";
 
-    public static final String FY_READER_URL = "https://fyreader.fycz.tk";
+    public static final String DEFAULT_DOMAIN =
+            SharedPreUtils.getInstance().getString("domain", "fycz.tk");
+
+    public static final String FY_READER_URL = "https://fyreader." + DEFAULT_DOMAIN;
 
     public static final String AD_URL = FY_READER_URL + "/ad";
     public static final String LOG_UPLOAD_URL = FY_READER_URL + "/logUpload";
     public static final String THANKS_URL = FY_READER_URL + "/thanks/";
+    public static final String USER_URL = "https://user." + DEFAULT_DOMAIN;
 
     public static final String DONATE = "https://gitee.com/fengyuecanzhu/Donate/raw/master";
 

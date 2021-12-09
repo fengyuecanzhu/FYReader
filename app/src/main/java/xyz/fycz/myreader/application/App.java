@@ -247,7 +247,6 @@ public class App extends Application {
         try {
             PackageManager manager = application.getPackageManager();
             PackageInfo info = manager.getPackageInfo(application.getPackageName(), 0);
-
             return info.versionCode;
         } catch (Exception e) {
             e.printStackTrace();
@@ -334,6 +333,9 @@ public class App extends Application {
 
                 forceUpdateVersion = Integer.parseInt(contents[8].substring(contents[8].indexOf(":") + 1));
                 spu.putInt("forceUpdateVersion", forceUpdateVersion);
+
+                String domain = contents[9].substring(contents[9].indexOf(":") + 1);
+                spu.putString("domain", domain);
 
                 int versionCode = getVersionCode();
 

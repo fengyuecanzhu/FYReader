@@ -165,7 +165,7 @@ class SearchWordActivity : BaseActivity() {
 
     private fun search() {
         val keyword = binding.etSearchKey.text.toString()
-        if (keyword.isNotEmpty() && this.keyword != keyword) {
+        if (keyword.isNotEmpty() && (this.keyword != keyword || adapter.itemSize == 0)) {
             this.keyword = keyword
             adapter.clear()
             binding.fabSearchStop.visibility = View.VISIBLE

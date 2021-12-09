@@ -22,6 +22,7 @@
     <dimen name="text_small_size">14sp</dimen>
     <dimen name="text_normal_size">16sp</dimen>
     <dimen name="text_medium_size">18sp</dimen>
+    <dimen name="text_senior_size">20sp</dimen>
     <dimen name="text_large_size">22sp</dimen>
     <dimen name="default_padding_top">5dp</dimen>
     <dimen name="default_padding_bottom">5dp</dimen>

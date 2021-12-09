@@ -21,8 +21,8 @@ import javax.script.ScriptEngineManager;
 
 public class APPCONST {
 
-    public static String publicKey = "";//服务端公钥
-    public static final String KEY = "";
+    public static String publicKey = "fyds2.0";//服务端公钥
+    public static final String KEY = "readerByFengyue";
 
     public static final String[] STORAGE_PERMISSIONS = new String[]{Permission.WRITE_EXTERNAL_STORAGE,
             Permission.READ_EXTERNAL_STORAGE};
@@ -99,6 +99,7 @@ public class APPCONST {
     public static final int REQUEST_EDIT_BOOK = 1013;
     public static final int REQUEST_GROUP_MANAGER = 1014;
     public static final int REQUEST_SEARCH_WORD = 1015;
+    public static final int REQUEST_AUTH_EMAIL = 1016;
 
     public static final int REQUEST_READ = 1;
 

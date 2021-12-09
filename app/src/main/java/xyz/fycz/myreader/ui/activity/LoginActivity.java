@@ -13,17 +13,26 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.BitIntentDataManager;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityLoginBinding;
-import xyz.fycz.myreader.model.backup.UserService;
+import xyz.fycz.myreader.model.user.Result;
+import xyz.fycz.myreader.model.user.User;
+import xyz.fycz.myreader.model.user.UserService;
+import xyz.fycz.myreader.model.user.UserService2;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.CodeUtil;
 import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -40,23 +49,9 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
 
     private ActivityLoginBinding binding;
     private String code;
-
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
-        @SuppressLint("HandlerLeak")
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-                    binding.btLogin.setEnabled(true);
-                    break;
-                case 2:
-                    createCaptcha();
-                    break;
-            }
-        }
-    };
-
+    private Disposable loginDisp;
+    private LoadingDialog dialog;
+    private User user;
 
     @Override
     protected void bindView() {
@@ -74,13 +69,18 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
     @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
+        dialog = new LoadingDialog(this, "正在登录", () -> {
+            if (loginDisp != null) {
+                loginDisp.dispose();
+            }
+        });
     }
 
     @Override
     protected void initWidget() {
         super.initWidget();
-        mHandler.sendMessage(mHandler.obtainMessage(2));
-        String username = UserService.readUsername();
+        createCaptcha();
+        String username = UserService2.INSTANCE.readUsername();
         binding.etUser.getEditText().setText(username);
         binding.etUser.getEditText().requestFocus(username.length());
         //监听内容改变 -> 控制按钮的点击状态
@@ -92,11 +92,10 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
     @Override
     protected void initClick() {
         super.initClick();
-        binding.ivCaptcha.setOnClickListener(v -> mHandler.sendMessage(mHandler.obtainMessage(2)));
+        binding.ivCaptcha.setOnClickListener(v -> createCaptcha());
 
         binding.btLogin.setOnClickListener(v -> {
-            mHandler.sendMessage(mHandler.obtainMessage(2));
-            if (!code.toLowerCase().equals(binding.etCaptcha.getEditText().getText().toString().toLowerCase())){
+            if (!code.equalsIgnoreCase(binding.etCaptcha.getEditText().getText().toString())) {
                 DialogCreator.createTipDialog(this, "验证码错误！");
                 return;
             }
@@ -104,52 +103,63 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
                 ToastUtils.showError("无网络连接！");
                 return;
             }
-            ProgressUtils.show(this, "正在登陆...");
             binding.btLogin.setEnabled(false);
             final String loginName = binding.etUser.getEditText().getText().toString().trim();
             String loginPwd = binding.etPassword.getEditText().getText().toString();
-            final Map<String, String> userLoginInfo = new HashMap<>();
-            userLoginInfo.put("loginName", loginName);
-            userLoginInfo.put("loginPwd", CyptoUtils.encode(APPCONST.KEY, loginPwd));
-            //验证用户名和密码
-            UserService.login(userLoginInfo, new ResultCallback() {
+            user = new User(loginName, CyptoUtils.encode(APPCONST.KEY, loginPwd));
+            dialog.show();
+            UserService2.INSTANCE.login(user).subscribe(new MySingleObserver<Result>() {
                 @Override
-                public void onFinish(Object o, int code) {
-                    String result = (String) o;
-                    String[] info = result.split(":");
-                    int resultCode = Integer.parseInt(info[0].trim());
-                    String resultName = info[1].trim();
-                    //最后输出结果
-                    if (resultCode == 102) {
-                        UserService.writeConfig(userLoginInfo);
-                        UserService.writeUsername(loginName);
-                        Intent intent = new Intent();
-                        intent.putExtra("isLogin", true);
-                        setResult(Activity.RESULT_OK, intent);
-                        finish();
-                        ToastUtils.showSuccess(resultName);
-                    } else {
-                        mHandler.sendMessage(mHandler.obtainMessage(1));
-                        ProgressUtils.dismiss();
-                        ToastUtils.showWarring(resultName);
-                    }
-
+                public void onSubscribe(Disposable d) {
+                    addDisposable(d);
+                    loginDisp = d;
                 }
 
                 @Override
-                public void onError(Exception e) {
+                public void onSuccess(@NonNull Result result) {
+                    if (result.getCode() == 102) {
+                        loginSuccess();
+                        ToastUtils.showSuccess(result.getResult().toString());
+                    } else if (result.getCode() == 301) {
+                        Intent intent = new Intent(LoginActivity.this, AuthEmailActivity.class);
+                        BitIntentDataManager.getInstance().putData(intent, user);
+                        startActivityForResult(intent, APPCONST.REQUEST_AUTH_EMAIL);
+                        ToastUtils.showWarring(result.getResult().toString());
+                    } else {
+                        ToastUtils.showWarring(result.getResult().toString());
+                    }
+                    binding.btLogin.setEnabled(false);
+                    dialog.dismiss();
+                }
+
+                @Override
+                public void onError(Throwable e) {
                     ToastUtils.showError("登录失败\n" + e.getLocalizedMessage());
-                    mHandler.sendMessage(mHandler.obtainMessage(1));
-                    ProgressUtils.dismiss();
+                    binding.btLogin.setEnabled(false);
+                    dialog.dismiss();
+                    createCaptcha();
                 }
             });
+        });
 
+        binding.tvForgotPwd.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, AuthEmailActivity.class);
+            startActivity(intent);
         });
 
         binding.tvRegister.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
+    }
+
+    private void loginSuccess() {
+        UserService2.INSTANCE.writeConfig(user);
+        UserService2.INSTANCE.writeUsername(user.getUserName());
+        Intent intent = new Intent();
+        intent.putExtra("isLogin", true);
+        setResult(Activity.RESULT_OK, intent);
+        finish();
     }
 
     public void createCaptcha() {
@@ -163,21 +173,21 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
      * 当有控件获得焦点focus 自动弹出键盘
      * 1. 点击软键盘的enter键 自动收回键盘
      * 2. 代码控制 InputMethodManager
-     *    requestFocus
-     *    showSoftInput:显示键盘 必须先让这个view成为焦点requestFocus
-     *
-     *    hideSoftInputFromWindow 隐藏键盘
+     * requestFocus
+     * showSoftInput:显示键盘 必须先让这个view成为焦点requestFocus
+     * <p>
+     * hideSoftInputFromWindow 隐藏键盘
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN){
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
             //隐藏键盘
             //1.获取系统输入的管理器
             InputMethodManager inputManager =
                     (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
             //2.隐藏键盘
-            inputManager.hideSoftInputFromWindow(binding.etUser.getWindowToken(),0);
+            inputManager.hideSoftInputFromWindow(binding.etUser.getWindowToken(), 0);
 
             //3.取消焦点
             View focusView = getCurrentFocus();
@@ -209,18 +219,28 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
         //判断两个输入框是否有内容
         if (binding.etUser.getEditText().getText().toString().length() > 0 &&
                 binding.etPassword.getEditText().getText().toString().length() > 0 &&
-                binding.etCaptcha.getEditText().getText().toString().length() > 0){
+                binding.etCaptcha.getEditText().getText().toString().length() > 0) {
             //按钮可以点击
             binding.btLogin.setEnabled(true);
-        }else{
+        } else {
             //按钮不能点击
             binding.btLogin.setEnabled(false);
         }
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == APPCONST.REQUEST_AUTH_EMAIL) {
+                loginSuccess();
+            }
+        }
+    }
+
+    @Override
     protected void onDestroy() {
+        dialog.dismiss();
         super.onDestroy();
-        ProgressUtils.dismiss();
     }
 }

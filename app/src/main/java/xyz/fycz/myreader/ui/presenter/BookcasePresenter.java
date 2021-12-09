@@ -6,23 +6,19 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.*;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.PopupMenu;
 
-import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hjq.permissions.OnPermissionCallback;
-import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
@@ -31,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -39,7 +34,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import xyz.fycz.myreader.R;
@@ -55,12 +49,11 @@ import xyz.fycz.myreader.webapi.ResultCallback;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
-import xyz.fycz.myreader.model.backup.UserService;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.activity.*;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.widget.custom.DragSortGridView;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookcaseStyle;
 import xyz.fycz.myreader.greendao.entity.Book;

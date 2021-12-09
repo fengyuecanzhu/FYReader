@@ -316,12 +316,10 @@ public class FileUtils {
     public static void write(Context context, String fileName, String content) {
         if (content == null)
             content = "";
-
         try {
             FileOutputStream fos = context.openFileOutput(fileName,
                     Context.MODE_PRIVATE);
             fos.write(content.getBytes());
-
             fos.close();
         } catch (Exception e) {
             e.printStackTrace();

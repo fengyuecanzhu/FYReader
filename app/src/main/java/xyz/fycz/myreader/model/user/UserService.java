@@ -1,4 +1,6 @@
-package xyz.fycz.myreader.model.backup;
+package xyz.fycz.myreader.model.user;
+
+import android.content.Context;
 
 import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.application.App;
@@ -111,7 +113,7 @@ public class UserService {
     public static boolean writeConfig(Map<String,String> userLoginInfo){
         FileOutputStream fos = null;
         try {
-            fos = App.getApplication().openFileOutput("userConfig.fy", App.getApplication().MODE_PRIVATE);
+            fos = App.getApplication().openFileOutput("userConfig.fy", Context.MODE_PRIVATE);
             String userInfo = "username='" + userLoginInfo.get("loginName") + "',\npassword='" + userLoginInfo.get("loginPwd") + "'";
             byte[] bs = userInfo.getBytes();
             fos.write(bs);

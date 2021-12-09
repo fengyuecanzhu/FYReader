@@ -2,6 +2,7 @@ package xyz.fycz.myreader.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
@@ -9,17 +10,28 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.MyTextWatcher;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
+import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityRegisterBinding;
-import xyz.fycz.myreader.model.backup.UserService;
+import xyz.fycz.myreader.model.user.Result;
+import xyz.fycz.myreader.model.user.User;
+import xyz.fycz.myreader.model.user.UserService;
+import xyz.fycz.myreader.model.user.UserService2;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.CodeUtil;
+import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.ProgressUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
@@ -36,27 +48,12 @@ public class RegisterActivity extends BaseActivity {
     private String code;
     private String username = "";
     private String password = "";
-    private String rpPassword = "";
+    private String email = "";
+    private String emailCode = "";
+    private String keyc = "";
     private String inputCode = "";
-
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
-        @SuppressLint("HandlerLeak")
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-                    createCaptcha();
-                    break;
-                case 2:
-                    showTip((String) msg.obj);
-                    break;
-                case 3:
-                    binding.tvRegisterTip.setVisibility(View.GONE);
-                    break;
-            }
-        }
-    };
+    private LoadingDialog dialog;
+    private Disposable disp;
 
     @Override
     protected void bindView() {
@@ -72,163 +69,177 @@ public class RegisterActivity extends BaseActivity {
     }
 
     @Override
+    protected void initData(Bundle savedInstanceState) {
+        dialog = new LoadingDialog(this, "正在注册", () -> {
+            if (disp != null) {
+                disp.dispose();
+            }
+        });
+    }
+
+    @Override
     protected void initWidget() {
         super.initWidget();
-        mHandler.sendMessage(mHandler.obtainMessage(1));
+        createCaptcha();
         binding.etUsername.requestFocus();
-        binding.etUsername.getEditText().addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+        binding.etUsername.getEditText().addTextChangedListener(new MyTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
                 StringUtils.isNotChinese(s);
                 username = s.toString();
-                if (username.length() < 6 || username.length() >14){
-                    mHandler.sendMessage(mHandler.obtainMessage(2, "用户名必须在6-14位之间"));
-                } else if(!username.substring(0, 1).matches("^[A-Za-z]$")){
-                    mHandler.sendMessage(mHandler.obtainMessage(2,
-                            "用户名只能以字母开头"));
-                }else if(!username.matches("^[A-Za-z0-9-_]+$")){
-                    mHandler.sendMessage(mHandler.obtainMessage(2,
-                            "用户名只能由数字、字母、下划线、减号组成"));
-                }else {
-                    mHandler.sendMessage(mHandler.obtainMessage(3));
+                if (username.length() < 6 || username.length() > 14) {
+                    showTip("用户名必须在6-14位之间");
+                } else if (!username.substring(0, 1).matches("^[A-Za-z]$")) {
+                    showTip("用户名只能以字母开头");
+                } else if (!username.matches("^[A-Za-z0-9-_]+$")) {
+                    showTip("用户名只能由数字、字母、下划线、减号组成");
+                } else {
+                    binding.tvRegisterTip.setVisibility(View.GONE);
                 }
                 checkNotNone();
             }
         });
 
-        binding.etPassword.getEditText().addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+        binding.etPassword.getEditText().addTextChangedListener(new MyTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
                 password = s.toString();
-                if (password.length() < 8 || password.length() > 16){
-                    mHandler.sendMessage(mHandler.obtainMessage(2, "密码必须在8-16位之间"));
-                } else if(password.matches("^\\d+$")){
-                    mHandler.sendMessage(mHandler.obtainMessage(2, "密码不能是纯数字"));
+                if (password.length() < 8 || password.length() > 16) {
+                    showTip("密码必须在8-16位之间");
+                } else if (password.matches("^\\d+$")) {
+                    showTip("密码不能是纯数字");
                 } else {
-                    mHandler.sendMessage(mHandler.obtainMessage(3));
+                    binding.tvRegisterTip.setVisibility(View.GONE);
                 }
                 checkNotNone();
             }
         });
 
-        binding.etRpPassword.getEditText().addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+        binding.etEmail.getEditText().addTextChangedListener(new MyTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                rpPassword = s.toString();
-                if (!rpPassword.equals(password)){
-                    mHandler.sendMessage(mHandler.obtainMessage(2, "两次输入的密码不一致"));
+                email = s.toString();
+                if (!email.matches("^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,})$")) {
+                    showTip("邮箱格式错误");
                 } else {
-                    mHandler.sendMessage(mHandler.obtainMessage(3));
+                    binding.tvRegisterTip.setVisibility(View.GONE);
                 }
                 checkNotNone();
             }
         });
 
-        binding.etCaptcha.getEditText().addTextChangedListener(new TextWatcher() {
+        binding.etEmailCode.getEditText().addTextChangedListener(new MyTextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+            public void afterTextChanged(Editable s) {
+                emailCode = s.toString().trim();
+                checkNotNone();
             }
+        });
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+        binding.etCaptcha.getEditText().addTextChangedListener(new MyTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
                 inputCode = s.toString().trim().toLowerCase();
-                if (!inputCode.equals(code.toLowerCase())){
-                    mHandler.sendMessage(mHandler.obtainMessage(2, "验证码错误"));
+                if (!inputCode.equals(code.toLowerCase())) {
+                    showTip("验证码错误");
                 } else {
-                    mHandler.sendMessage(mHandler.obtainMessage(3));
+                    binding.tvRegisterTip.setVisibility(View.GONE);
                 }
                 checkNotNone();
             }
         });
 
-        binding.tvAgreement.setMovementMethod(LinkMovementMethod.getInstance());
-
+        binding.cbAgreement.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     @Override
     protected void initClick() {
         super.initClick();
-        binding.ivCaptcha.setOnClickListener(v -> mHandler.sendMessage(mHandler.obtainMessage(1)));
+        binding.ivCaptcha.setOnClickListener(v -> createCaptcha());
+        binding.tvGetEmailCode.setOnClickListener(v -> {
+            if (!email.matches("^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,})$")) {
+                ToastUtils.showWarring("请正确输入邮箱");
+                return;
+            }
+            dialog.show();
+            dialog.setmMessage("正在发送");
+            UserService2.INSTANCE.sendEmail(email, "reg", keyc).subscribe(new MySingleObserver<Result>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    addDisposable(d);
+                    disp = d;
+                }
+
+                @Override
+                public void onSuccess(@NonNull Result result) {
+                    if (result.getCode() == 106) {
+                        ToastUtils.showSuccess("验证码发送成功");
+                        keyc = result.getResult().toString();
+                        timeDown(60);
+                    } else {
+                        ToastUtils.showWarring(result.getResult().toString());
+                    }
+                    dialog.dismiss();
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    ToastUtils.showError("验证码发送失败：\n" + e.getLocalizedMessage());
+                    dialog.dismiss();
+                }
+            });
+        });
 
         binding.btRegister.setOnClickListener(v -> {
-            if (!username.matches("^[A-Za-z][A-Za-z0-9]{5,13}$")){
+            if (!username.matches("^[A-Za-z][A-Za-z0-9]{5,13}$")) {
                 DialogCreator.createTipDialog(this, "用户名格式错误",
                         "用户名必须在6-14位之间\n用户名只能以字母开头\n用户名只能由数字、字母、下划线、减号组成");
-            }else if(password.matches("^\\d+$") || !password.matches("^.{8,16}$")){
+            } else if (password.matches("^\\d+$") || !password.matches("^.{8,16}$")) {
                 DialogCreator.createTipDialog(this, "密码格式错误",
                         "密码必须在8-16位之间\n密码不能是纯数字");
-            }else if(!password.equals(rpPassword)){
-                DialogCreator.createTipDialog(this, "重复密码错误",
-                        "两次输入的密码不一致");
-            }else if(!inputCode.trim().toLowerCase().equals(code.toLowerCase())){
+            } else if (!email.matches("^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,})$")) {
+                DialogCreator.createTipDialog(this, "邮箱格式错误",
+                        "电子邮箱的正确写法为：用户名@邮箱网站.com(.cn等)");
+            } else if ("".equals(keyc)) {
+                DialogCreator.createTipDialog(this, "请先获取邮箱验证码");
+            } else if (emailCode.length() < 6) {
+                DialogCreator.createTipDialog(this, "请输入6位邮箱验证码");
+            } else if (!inputCode.trim().equalsIgnoreCase(code)) {
                 DialogCreator.createTipDialog(this, "验证码错误");
-            }else if(!binding.cbAgreement.isChecked()){
+            } else if (!binding.cbAgreement.isChecked()) {
                 DialogCreator.createTipDialog(this, "请勾选同意《用户服务协议》");
-            }else {
-                ProgressUtils.show(this, "正在注册...");
-                Map<String, String> userRegisterInfo = new HashMap<>();
-                userRegisterInfo.put("username", username);
-                userRegisterInfo.put("password", password);
-                UserService.register(userRegisterInfo, new ResultCallback() {
+            } else {
+                dialog.show();
+                dialog.setmMessage("正在注册");
+                User user = new User(username, CyptoUtils.encode(APPCONST.KEY, password), email);
+                UserService2.INSTANCE.register(user, emailCode, keyc).subscribe(new MySingleObserver<Result>() {
                     @Override
-                    public void onFinish(Object o, int code) {
-                        String[] info = ((String) o).split(":");
-                        int result = Integer.parseInt(info[0].trim());
-                        if (result == 101){
-                            UserService.writeUsername(username);
-                            ToastUtils.showSuccess(info[1]);
-                            finish();
-                        }else {
-                            ToastUtils.showWarring(info[1]);
-                        }
-                        ProgressUtils.dismiss();
+                    public void onSubscribe(Disposable d) {
+                        addDisposable(d);
+                        disp = d;
                     }
+
                     @Override
-                    public void onError(Exception e) {
+                    public void onSuccess(@NonNull Result result) {
+                        if (result.getCode() == 101) {
+                            UserService2.INSTANCE.writeUsername(user.getUserName());
+                            ToastUtils.showSuccess(result.getResult().toString());
+                            finish();
+                        } else {
+                            ToastUtils.showWarring(result.getResult().toString());
+                        }
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
                         ToastUtils.showError("注册失败：\n" + e.getLocalizedMessage());
-                        ProgressUtils.dismiss();
+                        dialog.dismiss();
+                        createCaptcha();
                     }
                 });
             }
-            mHandler.sendMessage(mHandler.obtainMessage(1));
         });
-
     }
 
     public void createCaptcha() {
@@ -242,17 +253,29 @@ public class RegisterActivity extends BaseActivity {
         binding.tvRegisterTip.setText(tip);
     }
 
-    public void checkNotNone(){
-        if ("".equals(username) || "".equals(password) || "".equals(rpPassword) || "".equals(inputCode)){
-            binding.btRegister.setEnabled(false);
-        }else {
-            binding.btRegister.setEnabled(true);
+    private void timeDown(int time) {
+        if (time == 0) {
+            binding.tvGetEmailCode.setText(getString(R.string.re_get_email_code, ""));
+            binding.tvGetEmailCode.setEnabled(true);
+        } else {
+            binding.tvGetEmailCode.setEnabled(false);
+            String timeStr = "(" + time + ")";
+            binding.tvGetEmailCode.setText(getString(R.string.re_get_email_code, timeStr));
+            App.getHandler().postDelayed(() -> timeDown(time - 1), 1000);
         }
+    }
+
+    public void checkNotNone() {
+        binding.btRegister.setEnabled(!"".equals(username) &&
+                !"".equals(password) &&
+                !"".equals(email) &&
+                !"".equals(emailCode) &&
+                !"".equals(inputCode));
     }
 
     @Override
     protected void onDestroy() {
+        dialog.dismiss();
         super.onDestroy();
-        ProgressUtils.dismiss();
     }
 }

@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!--<RelativeLayout
+        <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="25dp"
                 android:paddingLeft="5dp"
@@ -56,7 +56,7 @@
                     android:textSize="@dimen/text_medium_size"
                     android:text="登录/注册"/>
 
-        </RelativeLayout>-->
+        </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="25dp"

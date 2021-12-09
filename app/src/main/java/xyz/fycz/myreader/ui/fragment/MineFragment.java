@@ -2,7 +2,6 @@ package xyz.fycz.myreader.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,12 +12,12 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,30 +36,29 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentMineBinding;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
-import xyz.fycz.myreader.greendao.entity.ReadRecord;
 import xyz.fycz.myreader.greendao.service.BookService;
-import xyz.fycz.myreader.model.backup.UserService;
-import xyz.fycz.myreader.model.storage.Backup;
+import xyz.fycz.myreader.model.user.Result;
+import xyz.fycz.myreader.model.user.User;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.model.storage.BackupRestoreUi;
-import xyz.fycz.myreader.model.storage.BackupRestoreUiKt;
 import xyz.fycz.myreader.model.storage.Restore;
 import xyz.fycz.myreader.model.storage.WebDavHelp;
+import xyz.fycz.myreader.model.user.UserService2;
 import xyz.fycz.myreader.ui.activity.AboutActivity;
 import xyz.fycz.myreader.ui.activity.AdSettingActivity;
 import xyz.fycz.myreader.ui.activity.BookSourceActivity;
 import xyz.fycz.myreader.ui.activity.DonateActivity;
 import xyz.fycz.myreader.ui.activity.FeedbackActivity;
+import xyz.fycz.myreader.ui.activity.LoginActivity;
 import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
 import xyz.fycz.myreader.ui.activity.ReadRecordActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
+import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
-import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
-import xyz.fycz.myreader.util.utils.StoragePermissionUtils;
 import xyz.fycz.myreader.webapi.ResultCallback;
 
 import static android.app.Activity.RESULT_OK;
@@ -73,20 +71,23 @@ public class MineFragment extends BaseFragment {
 
     private FragmentMineBinding binding;
 
-    //private boolean isLogin;
+    private boolean isLogin;
     private Setting mSetting;
-    //    private String[] webSynMenu;
+    private String[] webSynMenu;
     private String[] backupMenu;
     //    private AlertDialog themeModeDia;
     private int themeMode;
     private String[] themeModeArr;
+    private User user;
+    private Disposable disp;
+    private LoadingDialog dialog;
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             switch (msg.what) {
                 case 1:
-                    //binding.tvUser.setText("登录/注册");
+                    binding.tvUser.setText("登录/注册");
                     break;
                 case 2:
                     backup();
@@ -110,34 +111,40 @@ public class MineFragment extends BaseFragment {
     @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
-        //isLogin = UserService.isLogin();
+        user = UserService2.INSTANCE.readConfig();
+        isLogin = user != null && !TextUtils.isEmpty(user.getUserName());
         mSetting = SysManager.getSetting();
-        /*webSynMenu = new String[]{
+        webSynMenu = new String[]{
                 App.getmContext().getString(R.string.menu_backup_webBackup),
                 App.getmContext().getString(R.string.menu_backup_webRestore),
                 App.getmContext().getString(R.string.menu_backup_autoSyn)
-        };*/
+        };
         backupMenu = new String[]{
                 App.getmContext().getResources().getString(R.string.menu_backup_backup),
                 App.getmContext().getResources().getString(R.string.menu_backup_restore),
         };
         themeMode = App.getApplication().isNightFS() ? 0 : mSetting.isDayStyle() ? 1 : 2;
         themeModeArr = getResources().getStringArray(R.array.theme_mode_arr);
+        dialog = new LoadingDialog(getContext(), "正在同步", (LoadingDialog.OnCancelListener) () -> {
+            if (disp != null) {
+                disp.dispose();
+            }
+        });
     }
 
     @Override
     protected void initWidget(Bundle savedInstanceState) {
         super.initWidget(savedInstanceState);
-        /*if (isLogin) {
-            binding.tvUser.setText(UserService.readUsername());
-        }*/
+        if (isLogin) {
+            binding.tvUser.setText(user.getUserName());
+        }
         binding.tvThemeModeSelect.setText(themeModeArr[themeMode]);
     }
 
     @Override
     protected void initClick() {
         super.initClick();
-        /*binding.mineRlUser.setOnClickListener(v -> {
+        binding.mineRlUser.setOnClickListener(v -> {
             if (isLogin) {
                 DialogCreator.createCommonDialog(getActivity(), "退出登录", "确定要退出登录吗？"
                         , true, (dialog, which) -> {
@@ -156,7 +163,7 @@ public class MineFragment extends BaseFragment {
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 getActivity().startActivityForResult(intent, APPCONST.REQUEST_LOGIN);
             }
-        });*/
+        });
 
         binding.mineRlWebdav.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), MoreSettingActivity.class);
@@ -164,7 +171,7 @@ public class MineFragment extends BaseFragment {
             startActivity(intent);
         });
 
-        binding.mineRlSyn.setOnClickListener(v -> {
+        /*binding.mineRlSyn.setOnClickListener(v -> {
             String account = SharedPreUtils.getInstance().getString("webdavAccount");
             String password = SharedPreUtils.getInstance().getString("webdavPassword");
             if (TextUtils.isEmpty(account) || TextUtils.isEmpty(password)) {
@@ -182,6 +189,7 @@ public class MineFragment extends BaseFragment {
                         public void onSubscribe(Disposable d) {
                             addDisposable(d);
                         }
+
                         @Override
                         public void onSuccess(ArrayList<String> strings) {
                             if (!WebDavHelp.INSTANCE.showRestoreDialog(strings, new Restore.CallBack() {
@@ -204,7 +212,7 @@ public class MineFragment extends BaseFragment {
                             }
                         }
                     });
-        });
+        });*/
         binding.mineRlBookSource.setOnClickListener(v -> {
             startActivity(new Intent(getContext(), BookSourceActivity.class));
         });
@@ -239,8 +247,8 @@ public class MineFragment extends BaseFragment {
                         return false;
                     }).setCancelButton(R.string.cancel);
         });
-        /*binding.mineRlSyn.setOnClickListener(v -> {
-            if (!UserService.isLogin()) {
+        binding.mineRlSyn.setOnClickListener(v -> {
+            if (!isLogin) {
                 ToastUtils.showWarring("请先登录！");
                 Intent loginIntent = new Intent(getActivity(), LoginActivity.class);
                 getActivity().startActivityForResult(loginIntent, APPCONST.REQUEST_LOGIN);
@@ -278,7 +286,7 @@ public class MineFragment extends BaseFragment {
                     .setNegativeButton(null, null)
                     .setPositiveButton(null, null)
                     .show();
-        });*/
+        });
 
         binding.mineRlReadRecord.setOnClickListener(v -> {
             startActivity(new Intent(getContext(), ReadRecordActivity.class));
@@ -470,10 +478,17 @@ public class MineFragment extends BaseFragment {
         SharedPreUtils spb = SharedPreUtils.getInstance();
         String synTime = spb.getString(getString(R.string.synTime));
         if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
-            UserService.webBackup(new ResultCallback() {
+            dialog.show();
+            UserService2.INSTANCE.webBackup(user).subscribe(new MySingleObserver<Result>() {
                 @Override
-                public void onFinish(Object o, int code) {
-                    if ((boolean) o) {
+                public void onSubscribe(Disposable d) {
+                    addDisposable(d);
+                    disp = d;
+                }
+
+                @Override
+                public void onSuccess(@NonNull Result result) {
+                    if (result.getCode() == 104) {
                         spb.putString(getString(R.string.synTime), nowTimeStr);
                         if (!isAutoSyn) {
                             DialogCreator.createTipDialog(getContext(), "成功将书架同步至网络！");
@@ -483,16 +498,19 @@ public class MineFragment extends BaseFragment {
                             DialogCreator.createTipDialog(getContext(), "同步失败，请重试！");
                         }
                     }
+                    dialog.dismiss();
                 }
 
                 @Override
-                public void onError(Exception e) {
+                public void onError(Throwable e) {
                     if (!isAutoSyn) {
                         DialogCreator.createTipDialog(getContext(), "同步失败，请重试！\n" + e.getLocalizedMessage());
                     }
+                    dialog.dismiss();
                 }
             });
         }
+
     }
 
     /**
@@ -516,10 +534,17 @@ public class MineFragment extends BaseFragment {
                         } else {
                             DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！");
                         }*/
-                        UserService.webRestore(new ResultCallback() {
+                        dialog.show();
+                        UserService2.INSTANCE.webRestore(user).subscribe(new MySingleObserver<Result>() {
                             @Override
-                            public void onFinish(Object o, int code) {
-                                if ((boolean) o) {
+                            public void onSubscribe(Disposable d) {
+                                addDisposable(d);
+                                disp = d;
+                            }
+
+                            @Override
+                            public void onSuccess(@NonNull Result result) {
+                                if (result.getCode() < 200) {
                                     mHandler.sendMessage(mHandler.obtainMessage(7));
 //                                    DialogCreator.createTipDialog(mMainActivity,
 //                                            "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");、
@@ -532,10 +557,12 @@ public class MineFragment extends BaseFragment {
                                 } else {
                                     DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！");
                                 }
+                                dialog.dismiss();
                             }
 
                             @Override
-                            public void onError(Exception e) {
+                            public void onError(Throwable e) {
+                                DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！\n" + e.getLocalizedMessage());
                                 DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！\n" + e.getLocalizedMessage());
                             }
                         });
@@ -547,13 +574,14 @@ public class MineFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                /*case APPCONST.REQUEST_LOGIN:
+                case APPCONST.REQUEST_LOGIN:
                     assert data != null;
                     isLogin = data.getBooleanExtra("isLogin", false);
-                    if (isLogin) {
-                        binding.tvUser.setText(UserService.readUsername());
+                    user = UserService2.INSTANCE.readConfig();
+                    if (isLogin && user != null) {
+                        binding.tvUser.setText(user.getUserName());
                     }
-                    break;*/
+                    break;
             }
         }
     }

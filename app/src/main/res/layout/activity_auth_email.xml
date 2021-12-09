@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar" />
+
 
     <!--添加标题和输入框-->
     <LinearLayout
@@ -19,33 +19,44 @@
         android:padding="10dp">
 
         <!--标题-->
+
         <TextView
+            android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/text_login"
+            android:text="@string/text_register"
             android:textAlignment="center"
             android:textColor="@color/textPrimary"
             android:textSize="@dimen/text_senior_size" />
 
+        <TextView
+            android:id="@+id/tv_register_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text=""
+            android:textColor="@color/textError"
+            android:visibility="gone" />
+
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/et_user"
+            android:id="@+id/et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:drawablePadding="10dp"
             app:counterEnabled="true"
-            app:counterMaxLength="14">
+            app:counterMaxLength="100">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/et_account_tip"
+                android:hint="@string/et_email"
                 android:inputType="text" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/et_password"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawablePadding="10dp"
@@ -57,7 +68,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/et_password_tip"
+                android:hint="@string/et_new_password_tip"
                 android:inputType="textPassword" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -68,66 +79,47 @@
             android:orientation="horizontal">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/et_captcha"
+                android:id="@+id/et_email_code"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:drawablePadding="10dp"
                 app:counterEnabled="true"
-                app:counterMaxLength="4">
+                app:counterMaxLength="6">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/et_rp_captcha"
+                    android:hint="@string/et_email_captcha"
                     android:inputType="text" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <ImageView
-                android:id="@+id/iv_captcha"
+            <TextView
+                android:id="@+id/tv_get_email_code"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="2"
-                android:paddingStart="7dp"
-                tools:ignore="RtlSymmetry" />
+                android:layout_height="match_parent"
+                android:layout_weight="2.5"
+                android:gravity="center"
+                android:text="@string/get_email_code"
+                android:textColor="@color/selector_get_emali_code"
+                android:textSize="@dimen/text_small_size" />
 
         </LinearLayout>
+
         <!--登录按钮-->
         <Button
-            android:id="@+id/bt_login"
+            android:id="@+id/bt_submit"
             android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_marginTop="20dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/login_btn_selector"
             android:enabled="false"
-            android:text="@string/text_login"
+            android:text="@string/text_register"
             android:textAlignment="center"
-            android:textColor="@color/textPrimaryInverted"
+            android:textColor="#ffffff"
             android:textSize="@dimen/text_large_size" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
-
-            <TextView
-                android:id="@+id/tv_register"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tv_register"
-                android:textColor="@color/colorAccent" />
-
-            <TextView
-                android:id="@+id/tv_forgot_pwd"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="@string/tv_forget_pwd"
-                android:textColor="@color/colorAccent" />
-        </RelativeLayout>
-
     </LinearLayout>
+
 </LinearLayout>
