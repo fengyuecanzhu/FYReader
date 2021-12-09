@@ -45,16 +45,17 @@
                     app:tint="@color/textPrimary"
                     android:src="@drawable/ic_user"
             />
+
             <TextView
-                    android:id="@+id/tv_user"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="15dp"
-                    android:layout_toEndOf="@id/iv_user"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="@dimen/text_medium_size"
-                    android:text="登录/注册"/>
+                android:id="@+id/tv_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/iv_user"
+                android:text="登录/注册"
+                android:textColor="@color/textSecondary"
+                android:textSize="@dimen/text_normal_size" />
 
         </RelativeLayout>
         <RelativeLayout

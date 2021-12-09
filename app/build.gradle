@@ -238,6 +238,10 @@ dependencies {
     }
 
     implementation 'com.nshmura:recyclertablayout:1.5.0'
+
+    // https://mvnrepository.com/artifact/net.lingala.zip4j/zip4j
+    implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.9.1'
+
 }
 
 greendao {

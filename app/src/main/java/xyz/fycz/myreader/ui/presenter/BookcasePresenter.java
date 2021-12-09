@@ -1010,6 +1010,7 @@ public class BookcasePresenter implements BasePresenter {
                     if (!isAutoSyn) {
                         DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！\n" + e.getLocalizedMessage());
                     }
+                    if (App.isDebug()) e.printStackTrace();
                 }
             });
         }

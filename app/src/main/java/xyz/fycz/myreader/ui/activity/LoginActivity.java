@@ -16,6 +16,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
@@ -129,6 +130,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
                     binding.btLogin.setEnabled(false);
                     dialog.dismiss();
                     createCaptcha();
+                    if (App.isDebug()) e.printStackTrace();
                 }
             });
         });

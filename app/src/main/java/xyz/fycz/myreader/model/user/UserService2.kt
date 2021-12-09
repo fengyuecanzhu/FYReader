@@ -5,6 +5,8 @@ import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.SingleSource
 import io.reactivex.functions.Function
+import net.lingala.zip4j.ZipFile
+import net.lingala.zip4j.model.UnzipParameters
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import xyz.fycz.myreader.application.App
@@ -20,6 +22,10 @@ import xyz.fycz.myreader.util.utils.GSON
 import xyz.fycz.myreader.util.utils.OkHttpUtils
 import xyz.fycz.myreader.util.utils.RxUtils
 import java.io.File
+import net.lingala.zip4j.model.enums.EncryptionMethod
+
+import net.lingala.zip4j.model.ZipParameters
+
 
 /**
  * @author fengyue
@@ -100,10 +106,19 @@ object UserService2 {
             .flatMap(Function<Boolean, SingleSource<Result>> {
                 Single.create {
                     val inputFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup")
-                    val zipFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup.zip")
                     //压缩文件
-                    ZipUtils.zipFile(inputFile, zipFile)
-                    FileUtils.deleteFile(zipFile.absolutePath)
+//                    ZipUtils.zipFile(inputFile, zipFile)
+                    val zipParameters = ZipParameters().apply {
+                        isEncryptFiles = true
+                        encryptionMethod = EncryptionMethod.AES
+                    }
+                    ZipFile(
+                        APPCONST.FILE_DIR + "webBackup.zip",
+                        CyptoUtils.decode(APPCONST.KEY, user.password).toCharArray()
+                    )
+                        .addFolder(inputFile, zipParameters)
+                    val zipFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup.zip")
+                    FileUtils.deleteFile(inputFile.absolutePath)
                     val ret = OkHttpUtils.upload(
                         URLCONST.USER_URL + "/do/bak?" +
                                 "username=${user.userName}" +
@@ -133,11 +148,13 @@ object UserService2 {
                 return@SingleOnSubscribe
             }
             if (FileUtils.writeFile(bytes, zipFile)) {
-                ZipUtils.unzipFile(zipFile.absolutePath, APPCONST.FILE_DIR)
+//                ZipUtils.unzipFile(zipFile.absolutePath, APPCONST.FILE_DIR)
+                ZipFile(zipFile, CyptoUtils.decode(APPCONST.KEY, user.password).toCharArray())
+                    .extractAll(APPCONST.FILE_DIR)
                 zipFile.delete()
                 restore(APPCONST.FILE_DIR + "webBackup/", object : Restore.CallBack {
                     override fun restoreSuccess() {
-                        FileUtils.deleteFile(zipFile.absolutePath)
+                        FileUtils.deleteFile(APPCONST.FILE_DIR + "webBackup/")
                         it.onSuccess(Result(100, "成功从网络同步到本地"))
                     }
 

@@ -528,6 +528,7 @@ public class MineFragment extends BaseFragment {
                         DialogCreator.createTipDialog(getContext(), "同步失败，请重试！\n" + e.getLocalizedMessage());
                     }
                     dialog.dismiss();
+                    if (App.isDebug()) e.printStackTrace();
                 }
             });
         }
