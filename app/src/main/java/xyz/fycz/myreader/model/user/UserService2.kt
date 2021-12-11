@@ -1,18 +1,15 @@
 package xyz.fycz.myreader.model.user
 
-import io.reactivex.ObservableSource
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.SingleSource
 import io.reactivex.functions.Function
 import net.lingala.zip4j.ZipFile
-import net.lingala.zip4j.model.UnzipParameters
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.common.URLCONST
-import xyz.fycz.myreader.entity.StrResponse
 import xyz.fycz.myreader.model.storage.Backup
 import xyz.fycz.myreader.model.storage.Restore
 import xyz.fycz.myreader.model.storage.Restore.restore
@@ -25,13 +22,14 @@ import java.io.File
 import net.lingala.zip4j.model.enums.EncryptionMethod
 
 import net.lingala.zip4j.model.ZipParameters
-
+import xyz.fycz.myreader.base.observer.MySingleObserver
 
 /**
  * @author fengyue
  * @date 2021/12/9 10:17
  */
 object UserService2 {
+
     fun login(user: User): Single<Result> {
         return Single.create(SingleOnSubscribe<Result> {
             val mediaType = MediaType.parse("application/x-www-form-urlencoded")
@@ -112,12 +110,13 @@ object UserService2 {
                         isEncryptFiles = true
                         encryptionMethod = EncryptionMethod.AES
                     }
+                    var zipFile = File(APPCONST.FILE_DIR + "webBackup.zip")
+                    if (zipFile.exists()) zipFile.delete()
                     ZipFile(
                         APPCONST.FILE_DIR + "webBackup.zip",
                         CyptoUtils.decode(APPCONST.KEY, user.password).toCharArray()
-                    )
-                        .addFolder(inputFile, zipParameters)
-                    val zipFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup.zip")
+                    ).addFolder(inputFile, zipParameters)
+                    zipFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup.zip")
                     FileUtils.deleteFile(inputFile.absolutePath)
                     val ret = OkHttpUtils.upload(
                         URLCONST.USER_URL + "/do/bak?" +
@@ -126,7 +125,7 @@ object UserService2 {
                         zipFile.absolutePath,
                         zipFile.name
                     )
-                    zipFile.delete()
+                    if (!App.isDebug()) zipFile.delete()
                     it.onSuccess(GSON.fromJson(ret, Result::class.java))
                 }
             }).compose { RxUtils.toSimpleSingle(it) }

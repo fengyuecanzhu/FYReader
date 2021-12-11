@@ -1,7 +1,6 @@
 package xyz.fycz.myreader.ui.activity
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.view.View
@@ -18,12 +17,9 @@ import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.databinding.ActivityAuthEmailBinding
 import xyz.fycz.myreader.model.user.Result
 import xyz.fycz.myreader.model.user.User
-import xyz.fycz.myreader.model.user.UserService2
 import xyz.fycz.myreader.model.user.UserService2.bindEmail
-import xyz.fycz.myreader.model.user.UserService2.register
 import xyz.fycz.myreader.model.user.UserService2.resetPwd
 import xyz.fycz.myreader.model.user.UserService2.sendEmail
-import xyz.fycz.myreader.model.user.UserService2.writeUsername
 import xyz.fycz.myreader.ui.dialog.DialogCreator
 import xyz.fycz.myreader.ui.dialog.LoadingDialog
 import xyz.fycz.myreader.util.CyptoUtils

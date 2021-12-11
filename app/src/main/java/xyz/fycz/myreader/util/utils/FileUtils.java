@@ -209,19 +209,16 @@ public class FileUtils {
 
         //获取文件夹
         File[] dirs = file.listFiles(
-                new FileFilter() {
-                    @Override
-                    public boolean accept(File pathname) {
-                        if (pathname.isDirectory() && !pathname.getName().startsWith(".")) {
-                            return true;
-                        }
-                        //获取txt文件
-                        else if (pathname.getName().endsWith(".txt")) {
-                            txtFiles.add(pathname);
-                            return false;
-                        } else {
-                            return false;
-                        }
+                pathname -> {
+                    if (pathname.isDirectory() && !pathname.getName().startsWith(".")) {
+                        return true;
+                    }
+                    //获取txt文件
+                    else if (pathname.getName().endsWith(".txt")) {
+                        txtFiles.add(pathname);
+                        return false;
+                    } else {
+                        return false;
                     }
                 }
         );
@@ -316,10 +313,14 @@ public class FileUtils {
     public static void write(Context context, String fileName, String content) {
         if (content == null)
             content = "";
+        write(context, fileName, content.getBytes());
+    }
+
+    public static void write(Context context, String fileName, byte[] content) {
         try {
             FileOutputStream fos = context.openFileOutput(fileName,
                     Context.MODE_PRIVATE);
-            fos.write(content.getBytes());
+            fos.write(content);
             fos.close();
         } catch (Exception e) {
             e.printStackTrace();
