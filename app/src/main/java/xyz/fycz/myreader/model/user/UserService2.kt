@@ -171,8 +171,12 @@ object UserService2 {
 
     fun readConfig(): User? {
         val config = FileUtils.read(App.getmContext(), "userConfig.fy")
-        if ("" != config) {
-            return GSON.fromJson(config, User::class.java)
+        if (!config.isNullOrEmpty()) {
+            return try {
+                GSON.fromJson(config, User::class.java)
+            } catch (e: Exception) {
+                null
+            }
         }
         return null
     }
