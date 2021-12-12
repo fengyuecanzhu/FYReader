@@ -194,8 +194,7 @@ object UserService2 {
      * @return
      */
     fun isLogin(): Boolean {
-        val file = App.getApplication().getFileStreamPath("userConfig.fy")
-        return file.exists()
+        return readConfig() != null
     }
 
     private fun makeAuth(): String {
