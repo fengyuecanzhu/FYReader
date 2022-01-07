@@ -41,7 +41,6 @@ public abstract class BaseActivity extends SwipeBackActivity {
 
     protected Toolbar mToolbar;
 
-    private int curNightMode;
     /****************************abstract area*************************************/
     /**
      * 绑定视图
@@ -154,9 +153,6 @@ public abstract class BaseActivity extends SwipeBackActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (isThemeChange()) {
-            recreate();
-        }
     }
 
     @Override
@@ -174,15 +170,10 @@ public abstract class BaseActivity extends SwipeBackActivity {
     public void initTheme() {
         //if (isNightTheme()) {
         //setTheme(R.style.AppNightTheme);
-        curNightMode = AppCompatDelegate.getDefaultNightMode();
         /*} else {
             //curNightMode = false;
             //setTheme(R.style.AppDayTheme);
         }*/
-    }
-
-    protected boolean isThemeChange() {
-        return curNightMode != AppCompatDelegate.getDefaultNightMode();
     }
 
     /**************************used method area*******************************************/

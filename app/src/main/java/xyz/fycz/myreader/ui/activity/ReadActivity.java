@@ -653,6 +653,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                         }
                     }
                     , (dialog, which) -> {
+                        isCollected = false;
                         mBookService.deleteBookById(mBook.getId());
                         exit();
                     });
@@ -1392,13 +1393,28 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private void changeNightAndDaySetting(boolean isNight) {
         mSetting.setDayStyle(!isNight);
         SysManager.saveSetting(mSetting);
-        App.getApplication().setNightTheme(isNight);
+        toggleMenu(true);
         mHandler.postDelayed(() -> {
+            Intent intent = new Intent(this, ReadActivity.class);
+            if (aBooks != null) {
+                intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
+                BitIntentDataManager.getInstance().putData(intent, aBooks);
+            } else {
+                BitIntentDataManager.getInstance().putData(intent, mBook);
+            }
+            if (!isCollected) {
+                intent.putExtra("isCollected", false);
+            }
+            exit();
+            App.getApplication().setNightTheme(isNight);
+            startActivity(intent);
+        }, mBottomOutAnim.getDuration());
+        /*mHandler.postDelayed(() -> {
             AppCompatActivity activity = ActivityManage.getByClass(this.getClass());
             if (activity != null) {
                 BaseDialog.initActivityContext(activity);
             }
-        }, 1000);
+        }, 1000);*/
         //mPageLoader.setPageStyle(!isCurDayStyle);
     }
 
