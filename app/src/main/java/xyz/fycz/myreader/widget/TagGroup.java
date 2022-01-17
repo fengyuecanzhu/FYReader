@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.widget;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import xyz.fycz.myreader.R;
+import xyz.fycz.myreader.widget.explosion_field.ExplosionField;
 
 /**
  * A <code>TagGroup</code> is a special layout with a set of tags.
@@ -139,6 +141,8 @@ public class TagGroup extends ViewGroup {
     /** Listener used to handle tag click event. */
     private InternalTagClickListener mInternalTagClickListener = new InternalTagClickListener();
 
+    private ExplosionField mExplosionField;
+
     public TagGroup(Context context) {
         this(context, null);
     }
@@ -195,6 +199,18 @@ public class TagGroup extends ViewGroup {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        mExplosionField = ExplosionField.attach2Window((Activity) getContext());
+        super.onAttachedToWindow();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        mExplosionField.clear();
+        super.onDetachedFromWindow();
     }
 
     /**
@@ -559,6 +575,7 @@ public class TagGroup extends ViewGroup {
     }
 
     protected void deleteTag(TagView tagView) {
+        mExplosionField.explode(tagView);
         removeView(tagView);
         if (mOnTagChangeListener != null) {
             mOnTagChangeListener.onDelete(TagGroup.this, tagView.getText().toString(), tagView.pos);
@@ -1034,6 +1051,7 @@ public class TagGroup extends ViewGroup {
                     }
                     break;
                 }
+                case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP: {
                     isPressed = false;
                     invalidatePaint();

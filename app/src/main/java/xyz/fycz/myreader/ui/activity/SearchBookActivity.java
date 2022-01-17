@@ -318,9 +318,8 @@ public class SearchBookActivity extends BaseActivity {
             public void onDelete(TagGroup tagGroup, String tag, int pos) {
                 if (mCurHistories.get(pos) != null) {
                     mSearchHistoryService.deleteHistory(mCurHistories.get(pos));
+                    mSearchHistories.remove(mCurHistories.get(pos));
                 }
-                needReGetHistory = true;
-                initHistoryList();
             }
         });
 
@@ -587,8 +586,7 @@ public class SearchBookActivity extends BaseActivity {
             hisDis.dispose();
         }
         Single.create((SingleOnSubscribe<Boolean>) emitter -> {
-            if (needReGetHistory)
-                mSearchHistories = mSearchHistoryService.findAllSearchHistory();
+            mSearchHistories = mSearchHistoryService.findAllSearchHistory();
             mHistoryNames.clear();
             mCurHistories.clear();
             if (mSearchHistories == null || mSearchHistories.size() == 0) {
