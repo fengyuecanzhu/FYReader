@@ -20,7 +20,6 @@ import javax.script.SimpleBindings;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.CookieStore;
 import xyz.fycz.myreader.util.help.StringHelper;
-import xyz.fycz.myreader.util.help.JsExtensions;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 

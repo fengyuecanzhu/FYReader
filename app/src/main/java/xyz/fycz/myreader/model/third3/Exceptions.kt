@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package io.legado.app.model
+package xyz.fycz.myreader.model.third3
 
 class AppException(msg: String) : Exception(msg)
 

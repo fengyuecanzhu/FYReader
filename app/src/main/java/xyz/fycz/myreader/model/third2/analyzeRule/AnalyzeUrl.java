@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 import javax.script.SimpleBindings;
 
 import xyz.fycz.myreader.util.help.StringHelper;
-import xyz.fycz.myreader.util.help.JsExtensions;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 import xyz.fycz.myreader.util.utils.UrlEncoderUtils;

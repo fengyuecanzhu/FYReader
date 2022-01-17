@@ -1,24 +1,20 @@
-package io.legado.app.help
+package xyz.fycz.myreader.model.third3.analyzeRule
 
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import androidx.annotation.Keep
-import io.legado.app.BuildConfig
-import io.legado.app.constant.AppConst
-import io.legado.app.constant.AppConst.dateFormat
-import io.legado.app.data.entities.BaseSource
 import io.legado.app.help.http.*
-import io.legado.app.model.Debug
-import io.legado.app.model.analyzeRule.AnalyzeUrl
-import io.legado.app.model.analyzeRule.QueryTTF
-import io.legado.app.utils.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import nl.siegmann.epublib.epub.PackageDocumentBase.dateFormat
 import org.jsoup.Connection
 import org.jsoup.Jsoup
-import splitties.init.appCtx
-import timber.log.Timber
+import xyz.fycz.myreader.greendao.entity.rule.BookSource
+import xyz.fycz.myreader.greendao.service.CookieStore
+import xyz.fycz.myreader.util.ZipUtils
+import xyz.fycz.myreader.util.utils.*
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -38,7 +34,10 @@ import java.util.zip.ZipInputStream
 @Suppress("unused")
 interface JsExtensions {
 
-    fun getSource(): BaseSource?
+    private val TAG: String?
+        get() = JsExtensions::class.simpleName
+
+    fun getSource(): BookSource?
 
     /**
      * 访问网络,返回String
@@ -50,9 +49,9 @@ interface JsExtensions {
                 analyzeUrl.getStrResponseAwait().body
             }.onFailure {
                 log("ajax(${urlStr}) error\n${it.stackTraceToString()}")
-                Timber.e(it)
+                Log.e(TAG, it.toString())
             }.getOrElse {
-                it.msg
+                it.message
             }
         }
     }
@@ -86,7 +85,7 @@ interface JsExtensions {
                 analyzeUrl.getStrResponseAwait()
             }.onFailure {
                 log("connect(${urlStr}) error\n${it.stackTraceToString()}")
-                Timber.e(it)
+                Log.e(TAG, it.toString())
             }.getOrElse {
                 StrResponse(analyzeUrl.url, it.localizedMessage)
             }
@@ -101,7 +100,7 @@ interface JsExtensions {
                 analyzeUrl.getStrResponseAwait()
             }.onFailure {
                 log("ajax($urlStr,$header) error\n${it.stackTraceToString()}")
-                Timber.e(it)
+                Log.e(TAG, it.toString())
             }.getOrElse {
                 StrResponse(analyzeUrl.url, it.localizedMessage)
             }
@@ -134,11 +133,11 @@ interface JsExtensions {
     fun downloadFile(content: String, url: String): String {
         val type = AnalyzeUrl(url, source = getSource()).type ?: return ""
         val zipPath = FileUtils.getPath(
-            FileUtils.createFolderIfNotExist(FileUtils.getCachePath()),
+            FileUtils.getFile(FileUtils.getCachePath()),
             "${MD5Utils.md5Encode16(url)}.${type}"
         )
         FileUtils.deleteFile(zipPath)
-        val zipFile = FileUtils.createFileIfNotExist(zipPath)
+        val zipFile = FileUtils.getFile(zipPath)
         StringUtils.hexStringToByte(content).let {
             if (it.isNotEmpty()) {
                 zipFile.writeBytes(it)
@@ -303,7 +302,7 @@ interface JsExtensions {
     fun readTxtFile(path: String): String {
         val file = getFile(path)
         if (file.exists()) {
-            val charsetName = EncodingDetect.getEncode(file)
+            val charsetName = EncodingDetect.getJavaEncode(file)
             return String(file.readBytes(), charset(charsetName))
         }
         return ""
@@ -321,8 +320,7 @@ interface JsExtensions {
      * 删除本地文件
      */
     fun deleteFile(path: String) {
-        val file = getFile(path)
-        FileUtils.delete(file, true)
+        FileUtils.deleteFile(path)
     }
 
     /**
@@ -332,16 +330,13 @@ interface JsExtensions {
      */
     fun unzipFile(zipPath: String): String {
         if (zipPath.isEmpty()) return ""
-        val unzipPath = FileUtils.getPath(
-            FileUtils.createFolderIfNotExist(FileUtils.getCachePath()),
-            FileUtils.getNameExcludeExtension(zipPath)
-        )
+        val unzipPath = FileUtils.getCachePath() + File.separator + FileUtils.getNameExcludeExtension(zipPath)
         FileUtils.deleteFile(unzipPath)
-        val zipFile = getFile(zipPath)
-        val unzipFolder = FileUtils.createFolderIfNotExist(unzipPath)
+        val zipFile = FileUtils.getFile(zipPath)
+        val unzipFolder = FileUtils.getFolder(unzipPath)
         ZipUtils.unzipFile(zipFile, unzipFolder)
-        FileUtils.deleteFile(zipFile.absolutePath)
-        return unzipPath.substring(FileUtils.getCachePath().length)
+        FileUtils.deleteFile(zipPath)
+        return unzipPath
     }
 
     /**
@@ -354,7 +349,7 @@ interface JsExtensions {
         unzipFolder.listFiles().let {
             if (it != null) {
                 for (f in it) {
-                    val charsetName = EncodingDetect.getEncode(f)
+                    val charsetName = EncodingDetect.getJavaEncode(f)
                     contents.append(String(f.readBytes(), charset(charsetName)))
                         .append("\n")
                 }
@@ -373,7 +368,7 @@ interface JsExtensions {
      */
     fun getZipStringContent(url: String, path: String): String {
         val byteArray = getZipByteArrayContent(url, path) ?: return ""
-        val charsetName = EncodingDetect.getEncode(byteArray)
+        val charsetName = EncodingDetect.getJavaEncode(byteArray)
         return String(byteArray, Charset.forName(charsetName))
     }
 
@@ -485,7 +480,7 @@ interface JsExtensions {
             Debug.log(it.getKey(), msg)
         } ?: Debug.log(msg)
         if (BuildConfig.DEBUG) {
-            Timber.d(msg)
+            Log.e(TAG, msg)
         }
         return msg
     }
@@ -515,7 +510,7 @@ interface JsExtensions {
                 iv.encodeToByteArray()
             )
         } catch (e: Exception) {
-            Timber.e(e)
+            Log.e(TAG, e.toString())
             log(e.localizedMessage ?: "aesDecodeToByteArrayERROR")
             null
         }
@@ -554,7 +549,7 @@ interface JsExtensions {
                 iv.encodeToByteArray()
             )
         } catch (e: Exception) {
-            Timber.e(e)
+            Log.e(TAG, r.toString())
             log(e.localizedMessage ?: "aesDecodeToByteArrayERROR")
             null
         }
@@ -592,7 +587,7 @@ interface JsExtensions {
                 iv.encodeToByteArray()
             )
         } catch (e: Exception) {
-            Timber.e(e)
+            Log.e(TAG, e.toString())
             log(e.localizedMessage ?: "aesEncodeToByteArrayERROR")
             null
         }
@@ -629,7 +624,7 @@ interface JsExtensions {
                 iv.encodeToByteArray()
             )
         } catch (e: Exception) {
-            Timber.e(e)
+            Log.e(TAG, e.toString())
             log(e.localizedMessage ?: "aesEncodeToBase64ByteArrayERROR")
             null
         }

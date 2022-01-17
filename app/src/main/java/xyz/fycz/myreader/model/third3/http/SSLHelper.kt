@@ -1,8 +1,8 @@
 package io.legado.app.help.http
 
 import android.annotation.SuppressLint
+import android.util.Log
 
-import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
 import java.security.KeyManagementException
@@ -16,7 +16,7 @@ import javax.net.ssl.*
 
 @Suppress("unused")
 object SSLHelper {
-
+    private val TAG = SSLHelper::class.simpleName
     /**
      * 为了解决客户端不信任服务器数字证书的问题，
      * 网络上大部分的解决方案都是让客户端不对证书做任何检查，
@@ -127,9 +127,9 @@ object SSLHelper {
             sslParams.trustManager = manager
             return sslParams
         } catch (e: NoSuchAlgorithmException) {
-            Timber.e(e)
+            Log.e(TAG, e.toString())
         } catch (e: KeyManagementException) {
-            Timber.e(e)
+            Log.e(TAG, e.toString())
         }
         return null
     }
@@ -143,7 +143,7 @@ object SSLHelper {
             kmf.init(clientKeyStore, password.toCharArray())
             return kmf.keyManagers
         } catch (e: Exception) {
-            Timber.e(e)
+            Log.e(TAG, e.toString())
         }
         return null
     }
@@ -162,7 +162,7 @@ object SSLHelper {
             try {
                 certStream.close()
             } catch (e: IOException) {
-                Timber.e(e)
+                Log.e(TAG, e.toString())
             }
         }
         //我们创建一个默认类型的TrustManagerFactory

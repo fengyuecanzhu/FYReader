@@ -1,4 +1,4 @@
-package io.legado.app.model.webBook
+package xyz.fycz.myreader.model.third3.webBook
 
 import io.legado.app.R
 import io.legado.app.data.appDb
@@ -10,8 +10,8 @@ import io.legado.app.help.BookHelp
 import io.legado.app.model.ContentEmptyException
 import io.legado.app.model.Debug
 import io.legado.app.model.NoStackTraceException
-import io.legado.app.model.analyzeRule.AnalyzeRule
-import io.legado.app.model.analyzeRule.AnalyzeUrl
+import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeRule
+import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeUrl
 import io.legado.app.utils.HtmlFormatter
 import io.legado.app.utils.NetworkUtils
 import kotlinx.coroutines.CoroutineScope

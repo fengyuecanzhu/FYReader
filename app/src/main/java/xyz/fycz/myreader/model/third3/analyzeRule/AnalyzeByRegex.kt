@@ -1,4 +1,4 @@
-package io.legado.app.model.analyzeRule
+package xyz.fycz.myreader.model.third3.analyzeRule
 
 import androidx.annotation.Keep
 import java.util.*

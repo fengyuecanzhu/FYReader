@@ -1,4 +1,4 @@
-package io.legado.app.model.webBook
+package xyz.fycz.myreader.model.third3.webBook
 
 import io.legado.app.constant.AppConst
 import io.legado.app.constant.PreferKey

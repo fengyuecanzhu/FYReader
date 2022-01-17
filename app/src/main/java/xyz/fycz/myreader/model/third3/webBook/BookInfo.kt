@@ -1,4 +1,4 @@
-package io.legado.app.model.webBook
+package xyz.fycz.myreader.model.third3.webBook
 
 import io.legado.app.R
 import io.legado.app.data.entities.Book
@@ -6,7 +6,7 @@ import io.legado.app.data.entities.BookSource
 import io.legado.app.help.BookHelp
 import io.legado.app.model.Debug
 import io.legado.app.model.NoStackTraceException
-import io.legado.app.model.analyzeRule.AnalyzeRule
+import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeRule
 import io.legado.app.utils.HtmlFormatter
 import io.legado.app.utils.NetworkUtils
 import io.legado.app.utils.StringUtils.wordCountFormat

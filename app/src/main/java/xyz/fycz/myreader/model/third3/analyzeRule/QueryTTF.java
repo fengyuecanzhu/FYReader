@@ -1,4 +1,4 @@
-package io.legado.app.model.analyzeRule;
+package xyz.fycz.myreader.model.third3.analyzeRule;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;

@@ -1,16 +1,16 @@
-package io.legado.app.model.webBook
+package xyz.fycz.myreader.model.third3.webBook
 
 import android.text.TextUtils
 import io.legado.app.R
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
 import io.legado.app.data.entities.BookSource
-import io.legado.app.data.entities.rule.TocRule
+import xyz.fycz.myreader.model.third3.rule.TocRule
 import io.legado.app.model.Debug
 import io.legado.app.model.NoStackTraceException
 import io.legado.app.model.TocEmptyException
-import io.legado.app.model.analyzeRule.AnalyzeRule
-import io.legado.app.model.analyzeRule.AnalyzeUrl
+import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeRule
+import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeUrl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async

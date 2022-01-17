@@ -1,4 +1,4 @@
-package io.legado.app.model.webBook
+package xyz.fycz.myreader.model.third3.webBook
 
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
@@ -8,7 +8,7 @@ import io.legado.app.help.coroutine.Coroutine
 import io.legado.app.help.http.StrResponse
 import io.legado.app.model.Debug
 import io.legado.app.model.NoStackTraceException
-import io.legado.app.model.analyzeRule.AnalyzeUrl
+import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeUrl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive

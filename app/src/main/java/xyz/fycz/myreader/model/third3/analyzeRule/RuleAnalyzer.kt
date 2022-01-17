@@ -1,4 +1,4 @@
-package io.legado.app.model.analyzeRule
+package xyz.fycz.myreader.model.third3.analyzeRule
 
 //通用的规则切分处理
 class RuleAnalyzer(data: String, code: Boolean = false) {

@@ -1,15 +1,17 @@
-package io.legado.app.model.analyzeRule
+package xyz.fycz.myreader.model.third3.analyzeRule
 
+import android.util.Log
 import androidx.annotation.Keep
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.ReadContext
 
-import timber.log.Timber
 import java.util.*
 
 @Suppress("RegExpRedundantEscape")
 @Keep
 class AnalyzeByJSonPath(json: Any) {
+
+    private val TAG = AnalyzeByJSonPath::class.simpleName
 
     companion object {
 
@@ -50,7 +52,7 @@ class AnalyzeByJSonPath(json: Any) {
                         ob.toString()
                     }
                 } catch (e: Exception) {
-                    Timber.e(e)
+                    Log.e(TAG, e.toString())
                 }
             }
             return result
@@ -87,7 +89,7 @@ class AnalyzeByJSonPath(json: Any) {
                         result.add(obj.toString())
                     }
                 } catch (e: Exception) {
-                    Timber.e(e)
+                    Log.e(TAG, e.toString())
                 }
             } else {
                 result.add(st)
@@ -137,7 +139,7 @@ class AnalyzeByJSonPath(json: Any) {
                 try {
                     return it.read<ArrayList<Any>>(rules[0])
                 } catch (e: Exception) {
-                    Timber.e(e)
+                    Log.e(TAG, e.toString())
                 }
             }
         } else {

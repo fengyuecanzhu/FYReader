@@ -1,4 +1,4 @@
-package xyz.fycz.myreader.util.help;
+package xyz.fycz.myreader.model.third2.analyzeRule;
 
 
 import android.text.TextUtils;
@@ -23,10 +23,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import xyz.fycz.myreader.greendao.service.CookieStore;
-import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
 import xyz.fycz.myreader.util.ZipUtils;
+import xyz.fycz.myreader.util.help.SSLSocketClient;
 import xyz.fycz.myreader.util.utils.EncoderUtils;
-import xyz.fycz.myreader.util.utils.EncodingDetect;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.MD5Utils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;

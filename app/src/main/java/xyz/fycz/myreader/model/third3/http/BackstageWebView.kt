@@ -8,12 +8,12 @@ import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import io.legado.app.constant.AppConst
-import io.legado.app.model.NoStackTraceException
-import io.legado.app.utils.runOnUI
 import kotlinx.coroutines.*
 import org.apache.commons.text.StringEscapeUtils
-import splitties.init.appCtx
+import xyz.fycz.myreader.application.App
+import xyz.fycz.myreader.common.APPCONST
+import xyz.fycz.myreader.greendao.service.CookieStore
+import xyz.fycz.myreader.model.third3.NoStackTraceException
 import java.lang.ref.WeakReference
 import kotlin.coroutines.resume
 
@@ -36,7 +36,7 @@ class BackstageWebView(
 
     suspend fun getStrResponse(): StrResponse = suspendCancellableCoroutine { block ->
         block.invokeOnCancellation {
-            runOnUI {
+            App.getHandler().post {
                 destroy()
             }
         }
@@ -51,7 +51,7 @@ class BackstageWebView(
                     block.cancel(error)
             }
         }
-        runOnUI {
+        App.getHandler().post {
             try {
                 load()
             } catch (error: Throwable) {
@@ -88,12 +88,12 @@ class BackstageWebView(
 
     @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     private fun createWebView(): WebView {
-        val webView = WebView(appCtx)
+        val webView = WebView(App.getmContext())
         val settings = webView.settings
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
         settings.blockNetworkImage = true
-        settings.userAgentString = headerMap?.get(AppConst.UA_NAME)
+        settings.userAgentString = headerMap?.get(APPCONST.UA_NAME)
         settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         if (sourceRegex.isNullOrEmpty()) {
             webView.webViewClient = HtmlWebViewClient()
