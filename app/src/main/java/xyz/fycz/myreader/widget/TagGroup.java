@@ -70,6 +70,9 @@ public class TagGroup extends ViewGroup {
     private final float default_horizontal_padding;
     private final float default_vertical_padding;
 
+    /** Indicate whether the tags are deleted by holding down. Default is false. */
+    private boolean isLongClickDelete;
+
     /** Indicates whether this TagGroup is set up to APPEND mode or DISPLAY mode. Default is false. */
     private boolean isAppendMode;
 
@@ -156,6 +159,7 @@ public class TagGroup extends ViewGroup {
         // Load styled attributes.
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TagGroup, defStyleAttr, R.style.TagGroup);
         try {
+            isLongClickDelete = a.getBoolean(R.styleable.TagGroup_atg_isLongClickDelete, false);
             isAppendMode = a.getBoolean(R.styleable.TagGroup_atg_isAppendMode, false);
             inputHint = a.getText(R.styleable.TagGroup_atg_inputHint);
             borderColor = a.getColor(R.styleable.TagGroup_atg_borderColor, default_border_color);
@@ -492,8 +496,15 @@ public class TagGroup extends ViewGroup {
             throw new IllegalStateException("Already has a INPUT tag in group.");
         }
 
-        final TagView newInputTag = new TagView(getContext(), TagView.STATE_INPUT, tag);
+        final TagView newInputTag = new TagView(getContext(), TagView.STATE_INPUT, tag, getChildCount());
         newInputTag.setOnClickListener(mInternalTagClickListener);
+        newInputTag.setOnLongClickListener(v -> {
+            if (isLongClickDelete) {
+                deleteTag(newInputTag);
+                return true;
+            }
+            return false;
+        });
         addView(newInputTag);
     }
 
@@ -503,8 +514,15 @@ public class TagGroup extends ViewGroup {
      * @param tag the tag to append.
      */
     protected void appendTag(CharSequence tag) {
-        final TagView newTag = new TagView(getContext(), TagView.STATE_NORMAL, tag);
+        final TagView newTag = new TagView(getContext(), TagView.STATE_NORMAL, tag, getChildCount());
         newTag.setOnClickListener(mInternalTagClickListener);
+        newTag.setOnLongClickListener(v -> {
+            if (isLongClickDelete) {
+                deleteTag(newTag);
+                return true;
+            }
+            return false;
+        });
         addView(newTag);
     }
 
@@ -532,10 +550,18 @@ public class TagGroup extends ViewGroup {
         mOnTagClickListener = l;
     }
 
+    /**
+     * Set up whether the tags are deleted by holding down.
+     * @param longClickDelete
+     */
+    public void setLongClickDelete(boolean longClickDelete) {
+        isLongClickDelete = longClickDelete;
+    }
+
     protected void deleteTag(TagView tagView) {
         removeView(tagView);
         if (mOnTagChangeListener != null) {
-            mOnTagChangeListener.onDelete(TagGroup.this, tagView.getText().toString());
+            mOnTagChangeListener.onDelete(TagGroup.this, tagView.getText().toString(), tagView.pos);
         }
     }
 
@@ -555,7 +581,7 @@ public class TagGroup extends ViewGroup {
          *
          * @param tag the deleted tag.
          */
-        void onDelete(TagGroup tagGroup, String tag);
+        void onDelete(TagGroup tagGroup, String tag, int pos);
     }
 
     /**
@@ -567,7 +593,7 @@ public class TagGroup extends ViewGroup {
          *
          * @param tag The tag text of the tag that was clicked.
          */
-        void onTagClick(String tag);
+        void onTagClick(String tag, int pos);
     }
 
     /**
@@ -630,6 +656,7 @@ public class TagGroup extends ViewGroup {
      * The tag view click listener for internal use.
      */
     class InternalTagClickListener implements OnClickListener {
+
         @Override
         public void onClick(View v) {
             final TagView tag = (TagView) v;
@@ -656,7 +683,7 @@ public class TagGroup extends ViewGroup {
                 }
             } else {
                 if (mOnTagClickListener != null) {
-                    mOnTagClickListener.onTagClick(tag.getText().toString());
+                    mOnTagClickListener.onTagClick(tag.getText().toString(), tag.pos);
                 }
             }
         }
@@ -668,6 +695,9 @@ public class TagGroup extends ViewGroup {
     class TagView extends androidx.appcompat.widget.AppCompatTextView {
         public static final int STATE_NORMAL = 1;
         public static final int STATE_INPUT = 2;
+
+        /** The position in the group. */
+        private int pos = -1;
 
         /** The offset to the text. */
         private static final int CHECKED_MARKER_OFFSET = 3;
@@ -724,8 +754,9 @@ public class TagGroup extends ViewGroup {
         }
 
 
-        public TagView(Context context, final int state, CharSequence text) {
+        public TagView(Context context, final int state, CharSequence text, int pos) {
             super(context);
+            this.pos = pos;
             setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
             setLayoutParams(new LayoutParams(
                     LayoutParams.WRAP_CONTENT,
@@ -788,7 +819,7 @@ public class TagGroup extends ViewGroup {
                                     if (lastNormalTagView.isChecked) {
                                         removeView(lastNormalTagView);
                                         if (mOnTagChangeListener != null) {
-                                            mOnTagChangeListener.onDelete(TagGroup.this, lastNormalTagView.getText().toString());
+                                            mOnTagChangeListener.onDelete(TagGroup.this, lastNormalTagView.getText().toString(), pos);
                                         }
                                     } else {
                                         final TagView checkedTagView = getCheckedTag();

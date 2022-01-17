@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF2196F3</color>
+    <color name="colorPrimary">@color/blue_bar</color>
     <color name="colorPrimaryDark">#3F51B5</color>
     <color name="colorAccent">#90cbf6</color>
 
@@ -102,6 +102,7 @@
 
     <color name="deep_blue">#18188a</color>
 
+    <color name="blue_bar">#FF2196F3</color>
 
     <!-- 浅蓝色 -->
 

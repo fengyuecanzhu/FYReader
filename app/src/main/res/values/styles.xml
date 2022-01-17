@@ -273,6 +273,7 @@
 
     <!--  TagGroup  -->
     <declare-styleable name="TagGroup">
+        <attr name="atg_isLongClickDelete" format="boolean" />
         <attr name="atg_isAppendMode" format="boolean" />
         <attr name="atg_inputHint" format="string" />
         <attr name="atg_borderColor" format="color" />

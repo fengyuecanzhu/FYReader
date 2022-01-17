@@ -49,6 +49,7 @@ import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.SearchHistory;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
+import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.SearchHistoryService;
 import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
@@ -65,6 +66,7 @@ import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.widget.TagGroup;
 
 /**
  * @author fengyue
@@ -76,13 +78,16 @@ public class SearchBookActivity extends BaseActivity {
 
     private SearchAdapter mSearchBookAdapter;
     private String searchKey;//搜索关键字
-    private List<SearchHistory> mSearchHistories = new ArrayList<>();
-    private List<CharSequence> mSuggestions = new ArrayList<>();
-    private List<CharSequence> mHotKeys = new ArrayList<>();
+    private List<SearchHistory> mSearchHistories;
+    private List<SearchHistory> mCurHistories = new ArrayList<>();
+    private final List<Book> mBookcase = new ArrayList<>();
+    private List<Book> mBooks;
+    private final List<CharSequence> mSuggestions = new ArrayList<>();
+    private final List<CharSequence> mHotKeys = new ArrayList<>();
+    private final List<CharSequence> mBookcaseNames = new ArrayList<>();
+    private final List<CharSequence> mHistoryNames = new ArrayList<>();
 
     private SearchHistoryService mSearchHistoryService;
-
-    private SearchHistoryAdapter mSearchHistoryAdapter;
 
     private int allThreadCount;
 
@@ -96,13 +101,19 @@ public class SearchBookActivity extends BaseActivity {
 
     private Disposable sugDis;
 
-    private boolean showBooks;
+    private Disposable hisDis;
 
+    private Disposable caseDis;
+
+    private boolean showBooks;
 
     private static String[] suggestion = {"第一序列", "大道朝天", "伏天氏", "终极斗罗", "我师兄实在太稳健了", "烂柯棋缘", "诡秘之主", "不朽凡人", "圣墟", "我是至尊", "龙王传说", "太古神王", "一念永恒", "雪鹰领主", "大主宰"};
 
     private boolean showHot;
 
+    private boolean foldBookcase;
+    private boolean foldSuggest;
+    private boolean foldHistory;
 
     @Override
     protected void bindView() {
@@ -120,7 +131,7 @@ public class SearchBookActivity extends BaseActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus && binding.etSearchKey.getText().length() == 0){
+        if (hasFocus && binding.etSearchKey.getText().length() == 0) {
             App.getHandler().postDelayed(() -> {
                 binding.etSearchKey.requestFocus();
                 InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -134,7 +145,11 @@ public class SearchBookActivity extends BaseActivity {
         super.initData(savedInstanceState);
         mSetting = SysManager.getSetting();
         mSearchHistoryService = SearchHistoryService.getInstance();
+        mBooks = BookService.getInstance().getAllBooksNoHide();
         showHot = !App.isDebug();
+        foldBookcase = SharedPreUtils.getInstance().getBoolean("foldBookcase");
+        foldSuggest = SharedPreUtils.getInstance().getBoolean("foldSuggest");
+        foldHistory = SharedPreUtils.getInstance().getBoolean("foldHistory");
         searchEngine = new SearchEngine();
         searchEngine.setOnSearchListener(new SearchEngine.OnSearchListener() {
             @Override
@@ -189,18 +204,13 @@ public class SearchBookActivity extends BaseActivity {
         }
 
         binding.rgSearchFilter.setOnCheckedChangeListener((group, checkedId) -> {
-            int searchFilter;
-            switch (checkedId) {
-                case R.id.rb_all_search:
-                default:
-                    searchFilter = 0;
-                    break;
-                case R.id.rb_fuzzy_search:
-                    searchFilter = 1;
-                    break;
-                case R.id.rb_precise_search:
-                    searchFilter = 2;
-                    break;
+            int searchFilter = 0;
+            if (checkedId == R.id.rb_all_search) {
+                searchFilter = 0;
+            } else if (checkedId == R.id.rb_fuzzy_search) {
+                searchFilter = 1;
+            } else if (checkedId == R.id.rb_precise_search) {
+                searchFilter = 2;
             }
             mSetting.setSearchFilter(searchFilter);
             SysManager.saveSetting(mSetting);
@@ -225,6 +235,8 @@ public class SearchBookActivity extends BaseActivity {
                 if (StringHelper.isEmpty(searchKey)) {
                     search();
                 }
+                searchBookcase();
+                initHistoryList();
                 initSuggestionList();
             }
 
@@ -237,6 +249,32 @@ public class SearchBookActivity extends BaseActivity {
             stopSearch();
             search();
         });
+
+        binding.tgBookcase.setVisibility(foldBookcase ? View.GONE : View.VISIBLE);
+        binding.tvFlattenBookcase.setText(foldBookcase ? R.string.unfold : R.string.fold);
+        binding.tgSuggestBook.setVisibility(foldSuggest ? View.GONE : View.VISIBLE);
+        binding.tvFlattenSuggest.setText(foldSuggest ? R.string.unfold : R.string.fold);
+        binding.tgHistoryBooks.setVisibility(foldHistory ? View.GONE : View.VISIBLE);
+        binding.tvFlattenHistory.setText(foldHistory ? R.string.unfold : R.string.fold);
+
+        binding.rlBookcaseBar.setOnClickListener(v -> {
+            foldBookcase = !foldBookcase;
+            binding.tgBookcase.setVisibility(foldBookcase ? View.GONE : View.VISIBLE);
+            binding.tvFlattenBookcase.setText(foldBookcase ? R.string.unfold : R.string.fold);
+            SharedPreUtils.getInstance().putBoolean("foldBookcase", foldBookcase);
+        });
+        binding.rlSuggestBar.setOnClickListener(v -> {
+            foldSuggest = !foldSuggest;
+            binding.tgSuggestBook.setVisibility(foldSuggest ? View.GONE : View.VISIBLE);
+            binding.tvFlattenSuggest.setText(foldSuggest ? R.string.unfold : R.string.fold);
+            SharedPreUtils.getInstance().putBoolean("foldSuggest", foldSuggest);
+        });
+        binding.rlHistoryBar.setOnClickListener(v -> {
+            foldHistory = !foldHistory;
+            binding.tgHistoryBooks.setVisibility(foldHistory ? View.GONE : View.VISIBLE);
+            binding.tvFlattenHistory.setText(foldHistory ? R.string.unfold : R.string.fold);
+            SharedPreUtils.getInstance().putBoolean("foldHistory", foldHistory);
+        });
         initHistoryList();
     }
 
@@ -244,35 +282,43 @@ public class SearchBookActivity extends BaseActivity {
     protected void initClick() {
         super.initClick();
 
-        //换一批点击事件
-        binding.llRefreshSuggestBooks.setOnClickListener(new RenewSuggestionBook());
-
         //搜索按钮点击事件
         binding.tvSearchConform.setOnClickListener(view -> search());
         //suggestion搜索事件
-        binding.tgSuggestBook.setOnTagClickListener(tag -> {
+        binding.tgSuggestBook.setOnTagClickListener((tag, pos) -> {
             binding.etSearchKey.setText(tag);
             binding.etSearchKey.setSelection(tag.length());
             search();
         });
         //历史记录搜索事件
-        binding.lvHistoryList.setOnItemClickListener((parent, view, position, id) -> {
-            binding.etSearchKey.setText(mSearchHistories.get(position).getContent());
-            binding.etSearchKey.setSelection(mSearchHistories.get(position).getContent().length());
+        binding.tgHistoryBooks.setOnTagClickListener((tag, pos) -> {
+            binding.etSearchKey.setText(tag);
+            binding.etSearchKey.setSelection(tag.length());
             search();
         });
         //清空历史记录
-        binding.llClearHistory.setOnClickListener(v -> {
-            mSearchHistoryService.clearHistory();
-            initHistoryList();
+        binding.tvClearHistory.setOnClickListener(v -> {
+            DialogCreator.createCommonDialog(this, "清除搜索记录", "确定要清除全部搜索记录吗？",
+                    true, (dialog, which) -> {
+                        mSearchHistoryService.clearHistory();
+                        initHistoryList();
+                    }, null);
         });
         //清除单个历史记录
-        binding.lvHistoryList.setOnItemLongClickListener((parent, view, position, id) -> {
-            if (mSearchHistories.get(position) != null) {
-                mSearchHistoryService.deleteHistory(mSearchHistories.get(position));
+        binding.tgHistoryBooks.setLongClickDelete(true);
+        binding.tgHistoryBooks.setOnTagChangeListener(new TagGroup.OnTagChangeListener() {
+            @Override
+            public void onAppend(TagGroup tagGroup, String tag) {
+
+            }
+
+            @Override
+            public void onDelete(TagGroup tagGroup, String tag, int pos) {
+                if (mCurHistories.get(pos) != null) {
+                    mSearchHistoryService.deleteHistory(mCurHistories.get(pos));
+                }
                 initHistoryList();
             }
-            return true;
         });
 
         binding.fabSearchStop.setOnClickListener(v -> {
@@ -445,7 +491,6 @@ public class SearchBookActivity extends BaseActivity {
                     initSuggestionList();
                 }
             });
-            ;
         }
     }
 
@@ -460,11 +505,10 @@ public class SearchBookActivity extends BaseActivity {
         mSuggestions.clear();
         if (StringHelper.isEmpty(searchKey)) {
             if (mHotKeys.isEmpty()) {
-                binding.llSuggestBooksView.setVisibility(View.GONE);
+                binding.llSuggestBook.setVisibility(View.GONE);
             } else {
-                binding.llSuggestBooksView.setVisibility(View.VISIBLE);
-                binding.llRefreshSuggestBooks.setVisibility(View.VISIBLE);
-                binding.tgSuggestBook.setTags2(mHotKeys.subList(0, mHotKeys.size() / 2));
+                binding.llSuggestBook.setVisibility(View.VISIBLE);
+                binding.tgSuggestBook.setTags2(mHotKeys);
             }
         } else {
             String url = "https://newzxautocmp.reader.qq.com/BookSuggAll?key=" + searchKey;
@@ -480,13 +524,18 @@ public class SearchBookActivity extends BaseActivity {
                 @Override
                 public void onSuccess(@NotNull String s) {
                     parseSuggListByKey(s);
-                    binding.llRefreshSuggestBooks.setVisibility(View.GONE);
+                    if (mSuggestions.isEmpty()) {
+                        binding.llSuggestBook.setVisibility(View.GONE);
+                        return;
+                    } else {
+                        binding.llSuggestBook.setVisibility(View.VISIBLE);
+                    }
                     binding.tgSuggestBook.setTags2(mSuggestions);
                 }
 
                 @Override
                 public void onError(Throwable e) {
-                    binding.llSuggestBooksView.setVisibility(View.GONE);
+                    binding.llSuggestBook.setVisibility(View.GONE);
                 }
             });
         }
@@ -527,32 +576,65 @@ public class SearchBookActivity extends BaseActivity {
         }
     }
 
-    private class RenewSuggestionBook implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            if (mHotKeys.size() > 0) {
-                String[] s = binding.tgSuggestBook.getTags();
-                if (s[0].equals(mHotKeys.get(0))) {
-                    binding.tgSuggestBook.setTags2(mHotKeys.subList(mHotKeys.size() / 2, mHotKeys.size()));
-                } else {
-                    binding.tgSuggestBook.setTags2(mHotKeys.subList(0, mHotKeys.size() / 2));
-                }
-            }
-        }
-    }
-
     /**
      * 初始化历史列表
      */
     private void initHistoryList() {
-        mSearchHistories = mSearchHistoryService.findAllSearchHistory();
-        if (mSearchHistories == null || mSearchHistories.size() == 0) {
-            binding.llHistoryView.setVisibility(View.GONE);
-        } else {
-            mSearchHistoryAdapter = new SearchHistoryAdapter(this, R.layout.listview_search_history_item, mSearchHistories);
-            binding.lvHistoryList.setAdapter(mSearchHistoryAdapter);
-            binding.llHistoryView.setVisibility(View.VISIBLE);
+        if (hisDis != null) {
+            hisDis.dispose();
         }
+        Single.create((SingleOnSubscribe<Boolean>) emitter -> {
+            mSearchHistories = mSearchHistoryService.findAllSearchHistory();
+            mHistoryNames.clear();
+            mCurHistories.clear();
+            if (mSearchHistories == null || mSearchHistories.size() == 0) {
+                emitter.onSuccess(false);
+            } else {
+                if (StringHelper.isEmpty(searchKey)) {
+                    mCurHistories.addAll(mSearchHistories);
+                    for (SearchHistory history : mSearchHistories) {
+                        mHistoryNames.add(history.getContent());
+                    }
+                } else {
+                    for (SearchHistory history : mSearchHistories) {
+                        String title = history.getContent();
+                        int start = title.indexOf(searchKey);
+                        if (start != -1) {
+                            SpannableString spannableString = new SpannableString(title);
+                            spannableString.setSpan(new ForegroundColorSpan(Color.RED),
+                                    start, start + searchKey.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                            mHistoryNames.add(spannableString);
+                            mCurHistories.add(history);
+                        }
+                    }
+                }
+                emitter.onSuccess(!mHistoryNames.isEmpty());
+            }
+        }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Boolean>() {
+
+            @Override
+            public void onSubscribe(Disposable d) {
+                addDisposable(d);
+                hisDis = d;
+            }
+
+            @Override
+            public void onSuccess(@NonNull Boolean aBoolean) {
+                if (aBoolean) {
+                    binding.llHistoryBooks.setVisibility(View.VISIBLE);
+                    binding.tgHistoryBooks.setTags2(mHistoryNames);
+                } else {
+                    binding.llHistoryBooks.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+                binding.llHistoryBooks.setVisibility(View.GONE);
+            }
+        });
+
     }
 
     /**
@@ -561,9 +643,67 @@ public class SearchBookActivity extends BaseActivity {
     private void initSearchList() {
         //initmBooksBean();
         binding.rvSearchBooksList.setVisibility(View.VISIBLE);
-        binding.llSuggestBooksView.setVisibility(View.GONE);
+        binding.llPreKeys.setVisibility(View.GONE);
     }
 
+    /**
+     * 搜索书架
+     */
+    private void searchBookcase() {
+        if (caseDis != null) {
+            caseDis.dispose();
+        }
+        if (StringHelper.isEmpty(searchKey)) {
+            binding.llBookcase.setVisibility(View.GONE);
+        } else {
+            Single.create((SingleOnSubscribe<Boolean>) emitter -> {
+                mBookcase.clear();
+                mBookcaseNames.clear();
+                for (Book book : mBooks) {
+                    String title = book.getName() + "-" + book.getAuthor();
+                    if ("本地书籍".equals(book.getType())) {
+                        title += "[本地]";
+                    }
+                    int start = title.indexOf(searchKey);
+                    if (start != -1) {
+                        SpannableString spannableString = new SpannableString(title);
+                        spannableString.setSpan(new ForegroundColorSpan(Color.RED),
+                                start, start + searchKey.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                        mBookcaseNames.add(spannableString);
+                        mBookcase.add(book);
+                    }
+                }
+                emitter.onSuccess(!mBookcase.isEmpty());
+            }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<Boolean>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    addDisposable(d);
+                    caseDis = d;
+                }
+
+                @Override
+                public void onSuccess(@NonNull Boolean aBoolean) {
+                    if (aBoolean) {
+                        binding.llBookcase.setVisibility(View.VISIBLE);
+                        binding.tgBookcase.setTags2(mBookcaseNames);
+                        binding.tgBookcase.setOnTagClickListener((tag, pos) -> {
+                            Intent intent = new Intent(SearchBookActivity.this, BookDetailedActivity.class);
+                            BitIntentDataManager.getInstance().putData(intent, mBookcase.get(pos));
+                            startActivity(intent);
+                        });
+                    } else {
+                        binding.llBookcase.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    e.printStackTrace();
+                    binding.llBookcase.setVisibility(View.GONE);
+                }
+            });
+        }
+    }
 
     /**
      * 获取搜索数据
@@ -595,7 +735,7 @@ public class SearchBookActivity extends BaseActivity {
             stopSearch();
             binding.rpb.setIsAutoLoading(false);
             binding.rvSearchBooksList.setVisibility(View.GONE);
-            binding.llSuggestBooksView.setVisibility(View.VISIBLE);
+            binding.llPreKeys.setVisibility(View.VISIBLE);
             binding.fabSearchStop.setVisibility(View.GONE);
             initHistoryList();
             binding.rvSearchBooksList.setAdapter(null);
@@ -606,8 +746,7 @@ public class SearchBookActivity extends BaseActivity {
             binding.rvSearchBooksList.setAdapter(mSearchBookAdapter);
             binding.srlSearchBookList.setEnableRefresh(true);
             binding.rvSearchBooksList.setVisibility(View.VISIBLE);
-            binding.llSuggestBooksView.setVisibility(View.GONE);
-            binding.llHistoryView.setVisibility(View.GONE);
+            binding.llPreKeys.setVisibility(View.GONE);
             binding.fabSearchStop.setVisibility(View.VISIBLE);
             getData();
             mSearchHistoryService.addOrUpadteHistory(searchKey);

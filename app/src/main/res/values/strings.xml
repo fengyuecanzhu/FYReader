@@ -518,6 +518,11 @@
     <string name="clear_result">清除搜索结果</string>
     <string name="get_email_code">发送验证码</string>
     <string name="re_get_email_code">重新发送%s</string>
+    <string name="recommend">推荐</string>
+    <string name="history_record">搜索记录(长按删除)</string>
+    <string name="clear_search">清除搜索记录</string>
+    <string name="fold">收起</string>
+    <string name="unfold">展开</string>
 
 
     <string-array name="reset_screen_time">
