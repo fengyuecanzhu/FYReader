@@ -114,6 +114,7 @@ public class SearchBookActivity extends BaseActivity {
     private boolean foldBookcase;
     private boolean foldSuggest;
     private boolean foldHistory;
+    private boolean needReGetHistory;
 
     @Override
     protected void bindView() {
@@ -150,6 +151,7 @@ public class SearchBookActivity extends BaseActivity {
         foldBookcase = SharedPreUtils.getInstance().getBoolean("foldBookcase");
         foldSuggest = SharedPreUtils.getInstance().getBoolean("foldSuggest");
         foldHistory = SharedPreUtils.getInstance().getBoolean("foldHistory");
+        needReGetHistory = true;
         searchEngine = new SearchEngine();
         searchEngine.setOnSearchListener(new SearchEngine.OnSearchListener() {
             @Override
@@ -317,6 +319,7 @@ public class SearchBookActivity extends BaseActivity {
                 if (mCurHistories.get(pos) != null) {
                     mSearchHistoryService.deleteHistory(mCurHistories.get(pos));
                 }
+                needReGetHistory = true;
                 initHistoryList();
             }
         });
@@ -584,7 +587,8 @@ public class SearchBookActivity extends BaseActivity {
             hisDis.dispose();
         }
         Single.create((SingleOnSubscribe<Boolean>) emitter -> {
-            mSearchHistories = mSearchHistoryService.findAllSearchHistory();
+            if (needReGetHistory)
+                mSearchHistories = mSearchHistoryService.findAllSearchHistory();
             mHistoryNames.clear();
             mCurHistories.clear();
             if (mSearchHistories == null || mSearchHistories.size() == 0) {
@@ -750,6 +754,7 @@ public class SearchBookActivity extends BaseActivity {
             binding.fabSearchStop.setVisibility(View.VISIBLE);
             getData();
             mSearchHistoryService.addOrUpadteHistory(searchKey);
+            needReGetHistory = true;
             //收起软键盘
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(binding.etSearchKey.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
