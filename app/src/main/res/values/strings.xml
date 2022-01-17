@@ -108,6 +108,7 @@
     <string name="this_github_url">https://github.com/fengyuecanzhu/FYReader</string>
     <string name="update">检查更新</string>
     <string name="thanks">致谢名单</string>
+    <string name="join_qq_channel">加入QQ频道</string>
 
 
     <!--file system-->
@@ -150,7 +151,7 @@
     <string name="common_search">搜索</string>
     <string name="theme_mode">主题模式</string>
     <string name="join_qq_group">加入QQ群</string>
-    <string name="mine_feedback">建议反馈</string>
+    <string name="mine_feedback">建议反馈(QQ频道)</string>
     <string name="menu_change_group">分组切换</string>
     <string name="menu_group_man">分组管理</string>
     <string name="menu_group_setting">设置分组</string>

@@ -22,9 +22,9 @@
 </table>
 
 * 官网：[https://reader.fycz.tk](https://reader.fycz.tk)
-* 反馈交流群:
+* 反馈交流:
   * QQ群：[1085028304](https://jq.qq.com/?_wv=1027&k=6pcq8YBk)
-  * Telegram：[https://t.me/FYReader](https://t.me/FYReader)
+  * QQ频道：[点击加入](https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&inviteCode=2aP6ZQ&from=246610&biz=ka)
 * [更新日志](./app/src/main/assets/updatelog.fy)
 * [免责声明](./app/src/main/assets/disclaimer.fy)
 

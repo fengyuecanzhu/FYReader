@@ -96,6 +96,12 @@ public class AboutActivity extends BaseActivity {
             mClipboardManager.setPrimaryClip(mClipData);
             ToastUtils.showSuccess("邮箱\"fengyuecanzhu@gmail.com\"已复制到剪切板");
         });
+        binding.il.rlJoinQqChannel.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&inviteCode=2aP6ZQ&from=246610&biz=ka"));
+            startActivity(intent);
+        });
+
         binding.il.rlShareLog.setOnClickListener(v -> DialogCreator.createCommonDialog(this, "分享崩溃日志",
                 "你是希望将日志上传到服务器，还是直接分享给他人？", true,
                 "上传服务器", "直接分享", (dialog, which) -> uploadCrashLog(), (dialog, which) -> shareCrashLog()));

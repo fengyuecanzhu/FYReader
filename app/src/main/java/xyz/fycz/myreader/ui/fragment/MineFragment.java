@@ -4,6 +4,7 @@ import static android.app.Activity.RESULT_OK;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -389,8 +390,9 @@ public class MineFragment extends BaseFragment {
         });
 
         binding.mineRlFeedback.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), FeedbackActivity.class);
-            getActivity().startActivity(intent);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&inviteCode=2aP6ZQ&from=246610&biz=ka"));
+            startActivity(intent);
         });
 
         binding.mineRlDonate.setOnClickListener(v -> startActivity(new Intent(getActivity(), DonateActivity.class)));
