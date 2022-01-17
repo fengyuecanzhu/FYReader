@@ -999,12 +999,15 @@ public class BookcasePresenter implements BasePresenter {
                         if (!isAutoSyn) {
                             DialogCreator.createTipDialog(mMainActivity, "成功将书架同步至网络！");
                         }
+                    } else if (result.getCode() == 216) {
+                        ToastUtils.showWarring("当前应用版本过旧，同步书架失败，请更新应用后重试");
                     } else {
                         if (!isAutoSyn) {
                             DialogCreator.createTipDialog(mMainActivity, "同步失败，请重试！");
                         }
                     }
                 }
+
                 @Override
                 public void onError(Throwable e) {
                     if (!isAutoSyn) {
