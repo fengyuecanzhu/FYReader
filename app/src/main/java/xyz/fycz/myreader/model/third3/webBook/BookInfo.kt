@@ -7,12 +7,13 @@ import io.legado.app.help.BookHelp
 import io.legado.app.model.Debug
 import io.legado.app.model.NoStackTraceException
 import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeRule
-import io.legado.app.utils.HtmlFormatter
 import io.legado.app.utils.NetworkUtils
 import io.legado.app.utils.StringUtils.wordCountFormat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import splitties.init.appCtx
+import xyz.fycz.myreader.greendao.entity.Book
+import xyz.fycz.myreader.greendao.entity.rule.BookSource
 
 /**
  * 获取详情
@@ -50,7 +51,7 @@ object BookInfo {
         redirectUrl: String,
         canReName: Boolean,
     ) {
-        val infoRule = bookSource.getBookInfoRule()
+        val infoRule = bookSource.infoRule
         infoRule.init?.let {
             if (it.isNotBlank()) {
                 scope.ensureActive()

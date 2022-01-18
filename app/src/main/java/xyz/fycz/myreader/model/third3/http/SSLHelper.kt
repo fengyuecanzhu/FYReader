@@ -1,4 +1,4 @@
-package io.legado.app.help.http
+package xyz.fycz.myreader.model.third3.http
 
 import android.annotation.SuppressLint
 import android.util.Log

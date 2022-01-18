@@ -2,7 +2,7 @@ package xyz.fycz.myreader.model.third3.analyzeRule
 
 interface RuleDataInterface {
 
-    val variableMap: HashMap<String, String>
+    val variableMap: Map<String, String>
 
     fun putVariable(key: String, value: String?)
 

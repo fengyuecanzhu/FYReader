@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.common;
 
 import android.os.Environment;
+import android.provider.Settings;
 
 import com.google.gson.reflect.TypeToken;
 import com.hjq.permissions.Permission;
@@ -132,5 +133,11 @@ public class APPCONST {
 
     public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36";
 
-    public static final String  UA_NAME = "User-Agent";
+    public static final String UA_NAME = "User-Agent";
+
+    public static final String androidId = getAndroidId();
+
+    public static String getAndroidId(){
+        return Settings.System.getString(App.getmContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
 }

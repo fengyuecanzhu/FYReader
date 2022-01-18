@@ -4,15 +4,18 @@ import android.net.Uri
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.Keep
-import io.legado.app.help.http.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import nl.siegmann.epublib.epub.PackageDocumentBase.dateFormat
 import org.jsoup.Connection
 import org.jsoup.Jsoup
+import xyz.fycz.myreader.application.App
+import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.greendao.entity.rule.BookSource
+import xyz.fycz.myreader.greendao.service.CacheManager
 import xyz.fycz.myreader.greendao.service.CookieStore
+import xyz.fycz.myreader.model.third3.http.*
 import xyz.fycz.myreader.util.ZipUtils
 import xyz.fycz.myreader.util.utils.*
 import java.io.ByteArrayInputStream
@@ -34,7 +37,7 @@ import java.util.zip.ZipInputStream
 @Suppress("unused")
 interface JsExtensions {
 
-    private val TAG: String?
+    val TAG: String?
         get() = JsExtensions::class.simpleName
 
     fun getSource(): BookSource?
@@ -271,7 +274,8 @@ interface JsExtensions {
     }
 
     fun htmlFormat(str: String): String {
-        return HtmlFormatter.formatKeepImg(str)
+        return HtmlFormatter.format(str)
+//        return HtmlFormatter.formatKeepImg(str)
     }
 
     //****************文件操作******************//
@@ -282,7 +286,7 @@ interface JsExtensions {
      * @return File
      */
     fun getFile(path: String): File {
-        val cachePath = appCtx.externalCache.absolutePath
+        val cachePath = FileUtils.getCachePath()
         val aPath = if (path.startsWith(File.separator)) {
             cachePath + path
         } else {
@@ -330,13 +334,16 @@ interface JsExtensions {
      */
     fun unzipFile(zipPath: String): String {
         if (zipPath.isEmpty()) return ""
-        val unzipPath = FileUtils.getCachePath() + File.separator + FileUtils.getNameExcludeExtension(zipPath)
+        val unzipPath = FileUtils.getPath(
+            FileUtils.getFile(FileUtils.getCachePath()),
+            FileUtils.getNameExcludeExtension(zipPath)
+        )
         FileUtils.deleteFile(unzipPath)
-        val zipFile = FileUtils.getFile(zipPath)
-        val unzipFolder = FileUtils.getFolder(unzipPath)
+        val zipFile = getFile(zipPath)
+        val unzipFolder = FileUtils.getFile(unzipPath)
         ZipUtils.unzipFile(zipFile, unzipFolder)
-        FileUtils.deleteFile(zipPath)
-        return unzipPath
+        FileUtils.deleteFile(zipFile.absolutePath)
+        return unzipPath.substring(FileUtils.getCachePath().length)
     }
 
     /**
@@ -437,7 +444,7 @@ interface JsExtensions {
                 }
                 return@runBlocking x
             }
-            str.isContentScheme() -> Uri.parse(str).readBytes(appCtx)
+            str.isContentScheme() -> DocumentUtil.readBytes(App.getmContext(), Uri.parse(str))
             str.startsWith("/storage") -> File(str).readBytes()
             else -> base64DecodeToByteArray(str)
         }
@@ -476,10 +483,10 @@ interface JsExtensions {
      * 输出调试日志
      */
     fun log(msg: String): String {
-        getSource()?.let {
-            Debug.log(it.getKey(), msg)
-        } ?: Debug.log(msg)
-        if (BuildConfig.DEBUG) {
+        /*getSource()?.let {
+            Debug.log(it.sourceUrl, msg)
+        } ?: Debug.log(msg)*/
+        if (App.isDebug()) {
             Log.e(TAG, msg)
         }
         return msg
@@ -549,7 +556,7 @@ interface JsExtensions {
                 iv.encodeToByteArray()
             )
         } catch (e: Exception) {
-            Log.e(TAG, r.toString())
+            Log.e(TAG, e.toString())
             log(e.localizedMessage ?: "aesDecodeToByteArrayERROR")
             null
         }
@@ -644,7 +651,7 @@ interface JsExtensions {
     }
 
     fun android(): String {
-        return AppConst.androidId
+        return APPCONST.androidId
     }
 
 }

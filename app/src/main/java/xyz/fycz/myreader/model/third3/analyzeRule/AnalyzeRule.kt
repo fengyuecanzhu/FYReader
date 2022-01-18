@@ -1,20 +1,19 @@
 package xyz.fycz.myreader.model.third3.analyzeRule
 
 import android.text.TextUtils
+import android.util.Log
 import androidx.annotation.Keep
-import io.legado.app.constant.AppConst.SCRIPT_ENGINE
-import io.legado.app.constant.AppPattern.JS_PATTERN
-import io.legado.app.data.entities.BaseBook
-import io.legado.app.data.entities.BaseSource
-import io.legado.app.data.entities.BookChapter
-import io.legado.app.help.CacheManager
-import io.legado.app.help.JsExtensions
-import io.legado.app.help.http.CookieStore
-import io.legado.app.utils.*
 import kotlinx.coroutines.runBlocking
 import org.jsoup.nodes.Entities
 import org.mozilla.javascript.NativeObject
-import timber.log.Timber
+import xyz.fycz.myreader.common.APPCONST.JS_PATTERN
+import xyz.fycz.myreader.common.APPCONST.SCRIPT_ENGINE
+import xyz.fycz.myreader.greendao.entity.Book
+import xyz.fycz.myreader.greendao.entity.Chapter
+import xyz.fycz.myreader.greendao.entity.rule.BookSource
+import xyz.fycz.myreader.greendao.service.CacheManager
+import xyz.fycz.myreader.greendao.service.CookieStore
+import xyz.fycz.myreader.util.utils.*
 import java.net.URL
 import java.util.*
 import java.util.regex.Pattern
@@ -28,12 +27,12 @@ import kotlin.collections.HashMap
 @Suppress("unused", "RegExpRedundantEscape", "MemberVisibilityCanBePrivate")
 class AnalyzeRule(
     val ruleData: RuleDataInterface,
-    private val source: BaseSource? = null
+    private val source: BookSource? = null
 ) : JsExtensions {
 
-    var book = if (ruleData is BaseBook) ruleData else null
+    var book = if (ruleData is Book) ruleData else null
 
-    var chapter: BookChapter? = null
+    var chapter: Chapter? = null
     var nextChapterUrl: String? = null
     var content: Any? = null
         private set
@@ -651,7 +650,7 @@ class AnalyzeRule(
         return SCRIPT_ENGINE.eval(jsStr, bindings)
     }
 
-    override fun getSource(): BaseSource? {
+    override fun getSource(): BookSource? {
         return source
     }
 
@@ -665,9 +664,9 @@ class AnalyzeRule(
                 analyzeUrl.getStrResponseAwait().body
             }.onFailure {
                 log("ajax(${urlStr}) error\n${it.stackTraceToString()}")
-                Timber.e(it)
+                Log.e(TAG, it.toString())
             }.getOrElse {
-                it.msg
+                it.message
             }
         }
     }

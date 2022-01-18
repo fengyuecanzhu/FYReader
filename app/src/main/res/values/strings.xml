@@ -377,6 +377,7 @@
     <string name="sort_url">分类Url</string>
     <string name="login_url">登录URL</string>
     <string name="comment">书源说明</string>
+    <string name="source_concurrent_rate">并发率</string>
     <string name="r_search_url">搜索地址</string>
     <string name="r_search_charset">搜索字符编码</string>
     <string name="r_find_url">发现地址规则</string>

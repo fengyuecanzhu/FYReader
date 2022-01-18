@@ -10,7 +10,6 @@ import io.legado.app.model.Debug
 import io.legado.app.model.NoStackTraceException
 import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeRule
 import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeUrl
-import io.legado.app.utils.HtmlFormatter
 import io.legado.app.utils.NetworkUtils
 import io.legado.app.utils.StringUtils.wordCountFormat
 import kotlinx.coroutines.CoroutineScope

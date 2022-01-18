@@ -1,4 +1,4 @@
-package io.legado.app.help.http
+package xyz.fycz.myreader.model.third3.http
 
 import okhttp3.*
 import okhttp3.Response.Builder

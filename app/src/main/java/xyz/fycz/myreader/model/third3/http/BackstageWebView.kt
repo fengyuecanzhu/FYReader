@@ -1,4 +1,4 @@
-package io.legado.app.help.http
+package xyz.fycz.myreader.model.third3.http
 
 import android.annotation.SuppressLint
 import android.os.Handler
@@ -40,7 +40,7 @@ class BackstageWebView(
                 destroy()
             }
         }
-        callback = object : BackstageWebView.Callback() {
+        callback = object : Callback() {
             override fun onResult(response: StrResponse) {
                 if (!block.isCompleted)
                     block.resume(response)

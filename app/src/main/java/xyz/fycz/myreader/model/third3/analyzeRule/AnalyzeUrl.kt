@@ -4,20 +4,18 @@ import android.annotation.SuppressLint
 import androidx.annotation.Keep
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
-import io.legado.app.constant.AppConst.SCRIPT_ENGINE
-import io.legado.app.constant.AppConst.UA_NAME
-import io.legado.app.constant.AppPattern.JS_PATTERN
-import io.legado.app.data.entities.BaseSource
-import io.legado.app.data.entities.Book
-import io.legado.app.data.entities.BookChapter
-import io.legado.app.help.AppConfig
-import io.legado.app.help.CacheManager
-import io.legado.app.help.JsExtensions
-import io.legado.app.help.http.*
-import io.legado.app.model.ConcurrentException
-import io.legado.app.utils.*
 import kotlinx.coroutines.runBlocking
 import okhttp3.Response
+import xyz.fycz.myreader.common.APPCONST.*
+import xyz.fycz.myreader.greendao.entity.Book
+import xyz.fycz.myreader.greendao.entity.Chapter
+import xyz.fycz.myreader.greendao.entity.rule.BookSource
+import xyz.fycz.myreader.greendao.service.CacheManager
+import xyz.fycz.myreader.greendao.service.CookieStore
+import xyz.fycz.myreader.model.third3.ConcurrentException
+import xyz.fycz.myreader.model.third3.http.*
+import xyz.fycz.myreader.util.utils.*
+import xyz.fycz.myreader.util.utils.UrlEncoderUtils
 import java.net.URLEncoder
 import java.util.*
 import java.util.regex.Pattern
@@ -38,9 +36,9 @@ class AnalyzeUrl(
     val speakText: String? = null,
     val speakSpeed: Int? = null,
     var baseUrl: String = "",
-    private val source: BaseSource? = null,
+    private val source: BookSource? = null,
     private val ruleData: RuleDataInterface? = null,
-    private val chapter: BookChapter? = null,
+    private val chapter: Chapter? = null,
     headerMapF: Map<String, String>? = null,
 ) : JsExtensions {
     companion object {
@@ -195,7 +193,7 @@ class AnalyzeUrl(
             }
         }
         headerMap[UA_NAME] ?: let {
-            headerMap[UA_NAME] = AppConfig.userAgent
+            headerMap[UA_NAME] = DEFAULT_USER_AGENT
         }
         urlNoQuery = url
         when (method) {
@@ -224,7 +222,7 @@ class AnalyzeUrl(
             val queryM = query.splitNotBlank("=")
             val value = if (queryM.size > 1) queryM[1] else ""
             if (charset.isNullOrEmpty()) {
-                if (NetworkUtils.hasUrlEncoded(value)) {
+                if (UrlEncoderUtils.hasUrlEncoded(value)) {
                     fieldMap[queryM[0]] = value
                 } else {
                     fieldMap[queryM[0]] = URLEncoder.encode(value, "UTF-8")
@@ -286,10 +284,10 @@ class AnalyzeUrl(
             return null
         }
         val rateIndex = concurrentRate.indexOf("/")
-        var fetchRecord = concurrentRecordMap[source.getKey()]
+        var fetchRecord = concurrentRecordMap[source.sourceUrl]
         if (fetchRecord == null) {
             fetchRecord = ConcurrentRecord(rateIndex > 0, System.currentTimeMillis(), 1)
-            concurrentRecordMap[source.getKey()] = fetchRecord
+            concurrentRecordMap[source.sourceUrl] = fetchRecord
             return fetchRecord
         }
         val waitTime: Int = synchronized(fetchRecord) {
@@ -354,7 +352,7 @@ class AnalyzeUrl(
             return StrResponse(url, StringUtils.byteToHexString(getByteArrayAwait()))
         }
         val concurrentRecord = fetchStart()
-        setCookie(source?.getKey())
+        setCookie(source?.sourceUrl)
         val strResponse: StrResponse
         if (this.useWebView && useWebView) {
             strResponse = when (method) {
@@ -371,7 +369,7 @@ class AnalyzeUrl(
                     BackstageWebView(
                         url = url,
                         html = body,
-                        tag = source?.getKey(),
+                        tag = source?.sourceUrl,
                         javaScript = webJs ?: jsStr,
                         sourceRegex = sourceRegex,
                         headerMap = headerMap
@@ -379,7 +377,7 @@ class AnalyzeUrl(
                 }
                 else -> BackstageWebView(
                     url = url,
-                    tag = source?.getKey(),
+                    tag = source?.sourceUrl,
                     javaScript = webJs ?: jsStr,
                     sourceRegex = sourceRegex,
                     headerMap = headerMap
@@ -421,7 +419,7 @@ class AnalyzeUrl(
      */
     suspend fun getResponseAwait(): Response {
         val concurrentRecord = fetchStart()
-        setCookie(source?.getKey())
+        setCookie(source?.sourceUrl)
         @Suppress("BlockingMethodInNonBlockingContext")
         val response = getProxyClient(proxy).newCallResponse(retry) {
             addHeaders(headerMap)
@@ -452,7 +450,7 @@ class AnalyzeUrl(
      */
     suspend fun getByteArrayAwait(): ByteArray {
         val concurrentRecord = fetchStart()
-        setCookie(source?.getKey())
+        setCookie(source?.sourceUrl)
         @Suppress("BlockingMethodInNonBlockingContext")
         val byteArray = getProxyClient(proxy).newCallResponseBody(retry) {
             addHeaders(headerMap)
@@ -522,14 +520,14 @@ class AnalyzeUrl(
     }
 
     fun getUserAgent(): String {
-        return headerMap[UA_NAME] ?: AppConfig.userAgent
+        return headerMap[UA_NAME] ?: DEFAULT_USER_AGENT
     }
 
     fun isPost(): Boolean {
         return method == RequestMethod.POST
     }
 
-    override fun getSource(): BaseSource? {
+    override fun getSource(): BookSource? {
         return source
     }
 

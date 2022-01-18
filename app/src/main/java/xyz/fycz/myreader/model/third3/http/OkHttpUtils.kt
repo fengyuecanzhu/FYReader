@@ -1,10 +1,5 @@
-package io.legado.app.help.http
+package xyz.fycz.myreader.model.third3.http
 
-import io.legado.app.constant.AppConst
-import io.legado.app.help.AppConfig
-import io.legado.app.utils.EncodingDetect
-import io.legado.app.utils.GSON
-import io.legado.app.utils.UTF8BOMFighter
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -13,6 +8,10 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import xyz.fycz.myreader.common.APPCONST
+import xyz.fycz.myreader.util.help.UTF8BOMFighter
+import xyz.fycz.myreader.util.utils.EncodingDetect
+import xyz.fycz.myreader.util.utils.GSON
 import java.io.File
 import java.io.IOException
 import java.nio.charset.Charset
@@ -25,7 +24,7 @@ suspend fun OkHttpClient.newCallResponse(
 ): Response {
     return withContext(IO) {
         val requestBuilder = Request.Builder()
-        requestBuilder.header(AppConst.UA_NAME, AppConfig.userAgent)
+        requestBuilder.header(APPCONST.UA_NAME, APPCONST.DEFAULT_USER_AGENT)
         requestBuilder.apply(builder)
         var response: Response? = null
         for (i in 0..retry) {
@@ -44,7 +43,7 @@ suspend fun OkHttpClient.newCallResponseBody(
 ): ResponseBody {
     return withContext(IO) {
         val requestBuilder = Request.Builder()
-        requestBuilder.header(AppConst.UA_NAME, AppConfig.userAgent)
+        requestBuilder.header(APPCONST.UA_NAME, APPCONST.DEFAULT_USER_AGENT)
         requestBuilder.apply(builder)
         var response: Response? = null
         for (i in 0..retry) {
@@ -63,7 +62,7 @@ suspend fun OkHttpClient.newCallStrResponse(
 ): StrResponse {
     return withContext(IO) {
         val requestBuilder = Request.Builder()
-        requestBuilder.header(AppConst.UA_NAME, AppConfig.userAgent)
+        requestBuilder.header(APPCONST.UA_NAME, APPCONST.DEFAULT_USER_AGENT)
         requestBuilder.apply(builder)
         var response: Response? = null
         for (i in 0..retry) {
@@ -108,15 +107,15 @@ fun ResponseBody.text(encode: String? = null): String {
     }
 
     //根据内容判断
-    charsetName = EncodingDetect.getHtmlEncode(responseBytes)
+    charsetName = EncodingDetect.getEncodeInHtml(responseBytes)
     return String(responseBytes, Charset.forName(charsetName))
 }
 
 fun Request.Builder.addHeaders(headers: Map<String, String>) {
     headers.forEach {
-        if (it.key == AppConst.UA_NAME) {
+        if (it.key == APPCONST.UA_NAME) {
             //防止userAgent重复
-            removeHeader(AppConst.UA_NAME)
+            removeHeader(APPCONST.UA_NAME)
         }
         addHeader(it.key, it.value)
     }

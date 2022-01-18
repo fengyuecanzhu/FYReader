@@ -1,17 +1,12 @@
 package xyz.fycz.myreader.model.third3.webBook
 
-import io.legado.app.data.entities.Book
-import io.legado.app.data.entities.BookChapter
-import io.legado.app.data.entities.BookSource
-import io.legado.app.data.entities.SearchBook
-import io.legado.app.help.coroutine.Coroutine
-import io.legado.app.help.http.StrResponse
-import io.legado.app.model.Debug
-import io.legado.app.model.NoStackTraceException
+import xyz.fycz.myreader.model.third3.http.StrResponse
 import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeUrl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
+import xyz.fycz.myreader.greendao.entity.Book
+import xyz.fycz.myreader.greendao.entity.rule.BookSource
 import kotlin.coroutines.CoroutineContext
 
 @Suppress("MemberVisibilityCanBePrivate")

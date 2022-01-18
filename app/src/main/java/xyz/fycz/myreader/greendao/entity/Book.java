@@ -3,6 +3,7 @@ package xyz.fycz.myreader.greendao.entity;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
@@ -13,6 +14,7 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.model.third3.analyzeRule.RuleDataInterface;
 import xyz.fycz.myreader.util.SharedPreUtils;
 
 import java.io.Serializable;
@@ -23,7 +25,7 @@ import java.util.Objects;
 import static xyz.fycz.myreader.common.APPCONST.MAP_STRING;
 
 @Entity
-public class Book implements Serializable {
+public class Book implements Serializable, RuleDataInterface {
     @Transient
     private static final long serialVersionUID = 1L;
 
@@ -378,7 +380,7 @@ public class Book implements Serializable {
         this.status = status;
     }
 
-    public void putVariable(String key, String value) {
+    public void putVariable(@NonNull String key, String value) {
         if (variableMap == null) {
             variableMap = new HashMap<>();
         }
@@ -386,6 +388,7 @@ public class Book implements Serializable {
         variable = new Gson().toJson(variableMap);
     }
 
+    @NonNull
     public Map<String, String> getVariableMap() {
         if (variableMap == null && !TextUtils.isEmpty(variable)) {
             variableMap = new Gson().fromJson(variable, MAP_STRING);
@@ -397,7 +400,6 @@ public class Book implements Serializable {
     public String getVariable() {
         return this.variable;
     }
-
 
     public void setVariable(String variable) {
         this.variable = variable;
@@ -429,5 +431,11 @@ public class Book implements Serializable {
 
     public void setReSeg(boolean reSeg) {
         this.reSeg = reSeg;
+    }
+
+    @Nullable
+    @Override
+    public String getVariable(@NonNull String key) {
+        return variableMap.get(key);
     }
 }

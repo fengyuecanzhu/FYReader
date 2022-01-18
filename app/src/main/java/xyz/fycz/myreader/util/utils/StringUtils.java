@@ -635,4 +635,32 @@ public class StringUtils {
         if (end < len) ++end;
         return ((start > 0) || (end < len)) ? s.substring(start, end) : s;
     }
+
+    public static String byteToHexString(byte[] bytes) {
+        if (bytes == null) return "";
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            int hex = 0xff & b;
+            if (hex < 16) {
+                sb.append('0');
+            }
+            sb.append(Integer.toHexString(hex));
+        }
+        return sb.toString();
+    }
+
+    public static byte[] hexStringToByte(String hexString) {
+        String hexStr = hexString.replace(" ", "");
+        int len = hexStr.length();
+        byte[] bytes = new byte[len / 2];
+        int i = 0;
+        while (i < len) {
+            // 两位一组，表示一个字节,把这样表示的16进制字符串，还原成一个字节
+            bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) +
+                    Character.digit(hexString.charAt(i+1), 16));
+            i += 2;
+        }
+        return bytes;
+    }
+
 }
