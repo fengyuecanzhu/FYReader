@@ -182,6 +182,15 @@ public class SourceEditActivity extends BaseActivity {
         } else if (item.getItemId() == R.id.action_clear_cookie) {
             DbManager.getDaoSession().getCookieBeanDao().deleteByKey(getSource().getSourceUrl());
             ToastUtils.showSuccess("Cookie清除成功");
+        } else if (item.getItemId() == R.id.action_delete) {
+            if (BookSourceManager.isBookSourceExist(source)) {
+                BookSourceManager.removeBookSource(source);
+                setResult(Activity.RESULT_OK);
+                ToastUtils.showSuccess("书源删除成功");
+                finish();
+            } else {
+                ToastUtils.showWarring("当前书源暂未保存，无法删除");
+            }
         }
         return super.onOptionsItemSelected(item);
     }

@@ -38,4 +38,9 @@
         android:title="@string/clear_cookie"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_delete"
+        android:title="@string/delete"
+        app:showAsAction="never" />
+
 </menu>
