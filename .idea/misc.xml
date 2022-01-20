@@ -21,7 +21,7 @@
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_more_setting.xml" value="0.264" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_read.xml" value="0.17028985507246377" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_register.xml" value="0.2796934865900383" />
-        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_search_book.xml" value="0.12132725430597771" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_search_book.xml" value="0.26904376012965964" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_search_word.xml" value="0.144" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/dialog_loading.xml" value="0.1" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/dialog_textview.xml" value="0.1947463768115942" />
@@ -41,7 +41,7 @@
         <entry key="..\:/android/FYReader/app/src/main/res/layout/item_search_word1.xml" value="0.2889273356401384" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/item_search_word2.xml" value="0.1947463768115942" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/item_search_word_1.xml" value="0.1947463768115942" />
-        <entry key="..\:/android/FYReader/app/src/main/res/layout/layout_about_content.xml" value="0.12132725430597771" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/layout_about_content.xml" value="0.176" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/layout_book_detail_header.xml" value="0.536" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/listview_search_book_item.xml" value="0.22010869565217392" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/search_book_item.xml" value="0.1947463768115942" />
@@ -52,6 +52,7 @@
         <entry key="..\:/android/FYReader/app/src/main/res/menu/menu_read.xml" value="0.24947916666666667" />
         <entry key="..\:/android/FYReader/app/src/main/res/menu/menu_rule.xml" value="0.24947916666666667" />
         <entry key="..\:/android/FYReader/app/src/main/res/menu/menu_search_word.xml" value="0.1425925925925926" />
+        <entry key="..\:/android/FYReader/app/src/main/res/menu/menu_source_edit.xml" value="0.2815533980582524" />
       </map>
     </option>
   </component>

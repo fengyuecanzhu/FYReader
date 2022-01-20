@@ -192,6 +192,10 @@ public class BookSourceManager {
         DbManager.getDaoSession().getBookSourceDao().deleteInTx(sources);
     }
 
+    public static boolean isBookSourceExist(BookSource source){
+        if (source == null) return false;
+        return DbManager.getDaoSession().getBookSourceDao().load(source.getSourceUrl()) != null;
+    }
 
     public static String getBookSourceSort() {
         switch (SharedPreUtils.getInstance().getInt("SourceSort", 0)) {

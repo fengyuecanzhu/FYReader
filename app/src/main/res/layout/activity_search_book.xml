@@ -87,102 +87,168 @@
         android:layout_height="3dp"
         android:visibility="visible" />
 
-    <LinearLayout
-        android:id="@+id/ll_suggest_books_view"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorForeground"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="5dp">
-
-        <xyz.fycz.myreader.widget.TagGroup
-            android:id="@+id/tg_suggest_book"
-            style="@style/TagGroup"
-            android:layout_marginTop="5dp"
-            android:paddingStart="5dp"
-            android:paddingEnd="5dp"
-            app:atg_backgroundColor="@color/colorBackground"
-            app:atg_borderColor="@color/colorForeground"
-            app:atg_horizontalPadding="5dp"
-            app:atg_textColor="@color/textPrimary"
-            app:atg_textSize="14sp"
-            app:atg_verticalSpacing="5dp" />
+        android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/ll_refresh_suggest_books"
+            android:id="@+id/ll_pre_keys"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:background="@color/colorForeground"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="5dp">
 
-            <ImageView
-                android:id="@+id/renew_image"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/ll_bookcase"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_refresh"
-                app:tint="@color/textPrimary" />
+                android:orientation="vertical"
+                android:paddingHorizontal="5dp"
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/renew_text"
-                android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:id="@+id/rl_bookcase_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:paddingVertical="2dp"
+                        android:text="@string/bookcase"
+                        android:textColor="@color/blue_bar"
+                        android:textSize="@dimen/text_default_size" />
+
+                    <TextView
+                        android:id="@+id/tv_flatten_bookcase"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/fold"
+                        android:textColor="@color/blue_bar"
+                        android:textSize="@dimen/text_default_size" />
+                </RelativeLayout>
+
+
+                <xyz.fycz.myreader.widget.TagGroup
+                    android:id="@+id/tg_bookcase"
+                    style="@style/TagGroup"
+                    app:atg_backgroundColor="@color/colorBackground"
+                    app:atg_borderColor="@color/colorForeground"
+                    app:atg_horizontalPadding="5dp"
+                    app:atg_textColor="@color/textPrimary"
+                    app:atg_textSize="14sp"
+                    app:atg_verticalSpacing="5dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_suggest_book"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="换一批"
-                android:textColor="@color/textPrimary"
-                android:textSize="14sp" />
+                android:orientation="vertical"
+                android:paddingHorizontal="5dp"
+                android:visibility="gone">
 
+                <RelativeLayout
+                    android:id="@+id/rl_suggest_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:paddingVertical="2dp"
+                        android:text="@string/recommend"
+                        android:textColor="@color/blue_bar"
+                        android:textSize="@dimen/text_default_size" />
+
+                    <TextView
+                        android:id="@+id/tv_flatten_suggest"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/fold"
+                        android:textColor="@color/blue_bar"
+                        android:textSize="@dimen/text_default_size" />
+                </RelativeLayout>
+
+
+                <xyz.fycz.myreader.widget.TagGroup
+                    android:id="@+id/tg_suggest_book"
+                    style="@style/TagGroup"
+                    app:atg_backgroundColor="@color/colorBackground"
+                    app:atg_borderColor="@color/colorForeground"
+                    app:atg_horizontalPadding="5dp"
+                    app:atg_textColor="@color/textPrimary"
+                    app:atg_textSize="14sp"
+                    app:atg_verticalSpacing="5dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_history_books"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="5dp"
+                android:visibility="visible">
+
+                <RelativeLayout
+                    android:id="@+id/rl_history_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentStart="true"
+                        android:text="@string/history_record"
+                        android:textColor="@color/blue_bar"
+                        android:textSize="@dimen/text_default_size" />
+
+
+                    <TextView
+                        android:id="@+id/tv_clear_history"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_toStartOf="@+id/tv_flatten_history"
+                        android:text="@string/clear_search"
+                        android:textColor="@color/blue_bar"
+                        android:textSize="@dimen/text_default_size" />
+
+                    <TextView
+                        android:id="@+id/tv_flatten_history"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/fold"
+                        android:textColor="@color/blue_bar"
+                        android:textSize="@dimen/text_default_size" />
+
+
+                </RelativeLayout>
+
+                <xyz.fycz.myreader.widget.TagGroup
+                    android:id="@+id/tg_history_books"
+                    style="@style/TagGroup"
+                    app:atg_backgroundColor="@color/colorBackground"
+                    app:atg_borderColor="@color/colorForeground"
+                    app:atg_horizontalPadding="5dp"
+                    app:atg_textColor="@color/textPrimary"
+                    app:atg_textSize="14sp"
+                    app:atg_verticalSpacing="5dp" />
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_history_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorForeground"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="5dp">
-
-        <ListView
-            android:id="@+id/lv_history_list"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:divider="@color/nothing"
-            android:fadingEdge="none"
-            android:overScrollMode="never"
-            android:scrollbars="none">
-
-        </ListView>
-
-        <LinearLayout
-            android:id="@+id/ll_clear_history"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                app:srcCompat="@drawable/ic_clear"
-                app:tint="@color/textPrimary" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="清空历史记录"
-                android:textColor="@color/textPrimary"
-                android:textSize="14sp" />
-
-
-        </LinearLayout>
-
-
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -231,12 +297,12 @@
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="30dp"
             android:layout_marginBottom="30dp"
+            android:contentDescription="@string/stop"
             android:src="@drawable/ic_stop_black_24dp"
             android:visibility="gone"
             app:elevation="5dp"
             app:fabSize="mini"
-            app:layout_anchorGravity="right|bottom"
-            android:contentDescription="@string/stop" />
+            app:layout_anchorGravity="right|bottom" />
     </RelativeLayout>
 </LinearLayout>
 

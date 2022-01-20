@@ -419,8 +419,10 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                             pagePos = pos;
                             saveLastChapterReadPosition();
                         }
-                        screenOffTimerStart();
-                        initMenu();
+                        mHandler.post(()->{
+                            screenOffTimerStart();
+                            initMenu();
+                        });
                         recordReadTime();
                         if (ReadAloudService.running) {
                             if (mPageLoader.hasChapterData(mChapters.get(mPageLoader.getChapterPos()))) {

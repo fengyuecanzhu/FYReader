@@ -108,6 +108,7 @@
     <string name="this_github_url">https://github.com/fengyuecanzhu/FYReader</string>
     <string name="update">检查更新</string>
     <string name="thanks">致谢名单</string>
+    <string name="join_qq_channel">加入QQ频道</string>
 
 
     <!--file system-->
@@ -150,7 +151,7 @@
     <string name="common_search">搜索</string>
     <string name="theme_mode">主题模式</string>
     <string name="join_qq_group">加入QQ群</string>
-    <string name="mine_feedback">建议反馈</string>
+    <string name="mine_feedback">建议反馈(QQ频道)</string>
     <string name="menu_change_group">分组切换</string>
     <string name="menu_group_man">分组管理</string>
     <string name="menu_group_setting">设置分组</string>
@@ -519,6 +520,11 @@
     <string name="clear_result">清除搜索结果</string>
     <string name="get_email_code">发送验证码</string>
     <string name="re_get_email_code">重新发送%s</string>
+    <string name="recommend">推荐</string>
+    <string name="history_record">搜索记录(长按删除)</string>
+    <string name="clear_search">清除搜索记录</string>
+    <string name="fold">收起</string>
+    <string name="unfold">展开</string>
 
 
     <!--error string start-->
