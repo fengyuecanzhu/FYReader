@@ -245,9 +245,9 @@
     <string name="set_timer">定时</string>
     <string name="read_aloud_pause">朗读暂停</string>
     <string name="read_aloud_timer">正在朗读(还剩%d分钟)</string>
-    <string name="read_aloud_timerlong">"正在朗读(还剩%d小时%d分)"</string>
+    <string name="read_aloud_timerlong" formatted="false">"正在朗读(还剩%d小时%d分)"</string>
     <string name="read_aloud_timerremaining">%d分钟</string>
-    <string name="read_aloud_timerremaininglong">"%d小时%d分"</string>
+    <string name="read_aloud_timerremaininglong" formatted="false">"%d小时%d分"</string>
     <string name="read_aloud_timerstop">"计时已取消"</string>
     <string name="show_status">显示状态栏</string>
     <string name="always_next">全屏点击翻下页</string>
@@ -453,7 +453,7 @@
     <string name="debug_toc">测试目录列表</string>
     <string name="debug_content">测试章节内容</string>
     <string name="debug">测试</string>
-    <string name="debug_desc">书源名称：%s\n书源URL：%s\n测试URL：%s</string>
+    <string name="debug_desc" formatted="false">书源名称：%s\n书源URL：%s\n测试URL：%s</string>
     <string name="enable_source">启用书源</string>
     <string name="parser">解析器</string>
     <string name="all_source">所有书源</string>
@@ -461,7 +461,7 @@
     <string name="ad_setting">广告设置</string>
     <string name="splash_ad">开屏广告</string>
     <string name="splash_ad_times">每日广告显示次数</string>
-    <string name="splash_cur_ad_times">当前次数:%s，今日已显示次数:%s</string>
+    <string name="splash_cur_ad_times" formatted="false">当前次数:%s，今日已显示次数:%s</string>
     <string name="ad">广告总开关</string>
     <string name="book_detail_ad">详情页广告</string>
     <string name="book_detail_ad_sc">详情页广告开关</string>

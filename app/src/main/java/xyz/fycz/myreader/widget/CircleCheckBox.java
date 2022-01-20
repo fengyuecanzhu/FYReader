@@ -98,7 +98,7 @@ public class CircleCheckBox extends View {
                     0, 0);
 
             try {
-                setTickColorHex(a.getString(R.styleable.CircleCheckbox_tickColor));
+                setTickColorHex(a.getString(R.styleable.CircleCheckbox_tick_Color));
                 setTextColorHex(a.getString(R.styleable.CircleCheckbox_textColor));
                 setShowOuterCircle(a.getBoolean(R.styleable.CircleCheckbox_showOuterCircle, true));
                 setInnerCircleColorHex(a.getString(R.styleable.CircleCheckbox_innerCircleColor));

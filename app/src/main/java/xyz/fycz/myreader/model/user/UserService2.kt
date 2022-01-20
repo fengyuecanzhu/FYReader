@@ -5,8 +5,10 @@ import io.reactivex.SingleOnSubscribe
 import io.reactivex.SingleSource
 import io.reactivex.functions.Function
 import net.lingala.zip4j.ZipFile
-import okhttp3.MediaType
-import okhttp3.RequestBody
+import net.lingala.zip4j.model.ZipParameters
+import net.lingala.zip4j.model.enums.EncryptionMethod
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.common.URLCONST
@@ -19,10 +21,6 @@ import xyz.fycz.myreader.util.utils.GSON
 import xyz.fycz.myreader.util.utils.OkHttpUtils
 import xyz.fycz.myreader.util.utils.RxUtils
 import java.io.File
-import net.lingala.zip4j.model.enums.EncryptionMethod
-
-import net.lingala.zip4j.model.ZipParameters
-import xyz.fycz.myreader.base.observer.MySingleObserver
 
 /**
  * @author fengyue
@@ -32,11 +30,11 @@ object UserService2 {
 
     fun login(user: User): Single<Result> {
         return Single.create(SingleOnSubscribe<Result> {
-            val mediaType = MediaType.parse("application/x-www-form-urlencoded")
+            val mediaType = "application/x-www-form-urlencoded".toMediaTypeOrNull()
             val body = "username=${user.userName}" +
                     "&password=${user.password}" +
                     makeAuth()
-            val requestBody = RequestBody.create(mediaType, body)
+            val requestBody = body.toRequestBody(mediaType)
             val ret = OkHttpUtils.getHtml(URLCONST.USER_URL + "/do/login", requestBody, "UTF-8")
             it.onSuccess(GSON.fromJson(ret, Result::class.java))
         }).compose { RxUtils.toSimpleSingle(it) }
@@ -44,7 +42,7 @@ object UserService2 {
 
     fun register(user: User, code: String, keyc: String): Single<Result> {
         return Single.create(SingleOnSubscribe<Result> {
-            val mediaType = MediaType.parse("application/x-www-form-urlencoded")
+            val mediaType = "application/x-www-form-urlencoded".toMediaTypeOrNull()
             val body = "username=${user.userName}" +
                     "&password=${user.password}" +
                     "&email=${user.email}" +
@@ -52,7 +50,7 @@ object UserService2 {
                     "&keyc=${keyc}" +
                     "&key=${CyptoUtils.encode(APPCONST.KEY, APPCONST.publicKey)}" +
                     makeAuth()
-            val requestBody = RequestBody.create(mediaType, body)
+            val requestBody = body.toRequestBody(mediaType)
             val ret = OkHttpUtils.getHtml(URLCONST.USER_URL + "/do/reg", requestBody, "UTF-8")
             it.onSuccess(GSON.fromJson(ret, Result::class.java))
         }).compose { RxUtils.toSimpleSingle(it) }
@@ -60,13 +58,13 @@ object UserService2 {
 
     fun bindEmail(user: User, code: String, keyc: String): Single<Result> {
         return Single.create(SingleOnSubscribe<Result> {
-            val mediaType = MediaType.parse("application/x-www-form-urlencoded")
+            val mediaType = "application/x-www-form-urlencoded".toMediaTypeOrNull()
             val body = "username=${user.userName}" +
                     "&email=${user.email}" +
                     "&code=${code}" +
                     "&keyc=${keyc}" +
                     makeAuth()
-            val requestBody = RequestBody.create(mediaType, body)
+            val requestBody = body.toRequestBody(mediaType)
             val ret = OkHttpUtils.getHtml(URLCONST.USER_URL + "/do/bindEmail", requestBody, "UTF-8")
             it.onSuccess(GSON.fromJson(ret, Result::class.java))
         }).compose { RxUtils.toSimpleSingle(it) }
@@ -74,13 +72,13 @@ object UserService2 {
 
     fun resetPwd(user: User, code: String, keyc: String): Single<Result> {
         return Single.create(SingleOnSubscribe<Result> {
-            val mediaType = MediaType.parse("application/x-www-form-urlencoded")
+            val mediaType = "application/x-www-form-urlencoded".toMediaTypeOrNull()
             val body = "email=${user.email}" +
                     "&password=${user.password}" +
                     "&code=${code}" +
                     "&keyc=${keyc}" +
                     makeAuth()
-            val requestBody = RequestBody.create(mediaType, body)
+            val requestBody = body.toRequestBody(mediaType)
             val ret = OkHttpUtils.getHtml(URLCONST.USER_URL + "/do/resetPwd", requestBody, "UTF-8")
             it.onSuccess(GSON.fromJson(ret, Result::class.java))
         }).compose { RxUtils.toSimpleSingle(it) }
@@ -88,12 +86,12 @@ object UserService2 {
 
     fun sendEmail(email: String, type: String, keyc: String = ""): Single<Result> {
         return Single.create(SingleOnSubscribe<Result> {
-            val mediaType = MediaType.parse("application/x-www-form-urlencoded")
+            val mediaType = "application/x-www-form-urlencoded".toMediaTypeOrNull()
             val body = "email=${email}" +
                     "&type=${type}" +
                     "&keyc=${keyc}" +
                     makeAuth()
-            val requestBody = RequestBody.create(mediaType, body)
+            val requestBody = body.toRequestBody(mediaType)
             val ret = OkHttpUtils.getHtml(URLCONST.USER_URL + "/do/sendEmail", requestBody, "UTF-8")
             it.onSuccess(GSON.fromJson(ret, Result::class.java))
         }).compose { RxUtils.toSimpleSingle(it) }
@@ -134,10 +132,10 @@ object UserService2 {
     fun webRestore(user: User): Single<Result> {
         return Single.create(SingleOnSubscribe<Result> {
             val zipFile = FileUtils.getFile(APPCONST.FILE_DIR + "webBackup.zip")
-            val mediaType = MediaType.parse("application/x-www-form-urlencoded")
+            val mediaType = "application/x-www-form-urlencoded".toMediaTypeOrNull()
             val body = "username=${user.userName}" +
                     makeAuth()
-            val requestBody = RequestBody.create(mediaType, body)
+            val requestBody = body.toRequestBody(mediaType)
             val input = OkHttpUtils.getInputStream(
                 URLCONST.USER_URL + "/do/ret", requestBody
             )
