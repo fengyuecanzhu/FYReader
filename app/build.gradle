@@ -44,7 +44,7 @@ def getVersionName(){
     def hun = (version / 100).toInteger()
     def ten = (version / 10).toInteger() % 10
     def one = version % 10
-    return hun + "." + ten + "." + one
+    return hun + "." + ten + "." + one + "-debug"
 }
 
 def versionN = getVersionName()
@@ -88,17 +88,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            ndk {
-                abiFilters "x86", "armeabi", "armeabi-v7a"
-            }
             if (keyPropsFile.exists()) {
                 signingConfig signingConfigs.myConifg
             }
         }
         debug {
-            ndk {
-                abiFilters "x86", "armeabi", "armeabi-v7a"
-            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             if (keyPropsFile.exists()) {
