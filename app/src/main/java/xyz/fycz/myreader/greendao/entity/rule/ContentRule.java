@@ -19,11 +19,13 @@ public class ContentRule implements Parcelable {
     private String content;
     private String contentBaseUrl;
     private String contentUrlNext;
+    private String replaceRegex;
 
     protected ContentRule(Parcel in) {
         content = in.readString();
         contentBaseUrl = in.readString();
         contentUrlNext = in.readString();
+        replaceRegex = in.readString();
     }
 
     @Override
@@ -31,6 +33,7 @@ public class ContentRule implements Parcelable {
         dest.writeString(content);
         dest.writeString(contentBaseUrl);
         dest.writeString(contentUrlNext);
+        dest.writeString(replaceRegex);
     }
 
     @Override
@@ -58,7 +61,8 @@ public class ContentRule implements Parcelable {
         ContentRule that = (ContentRule) o;
         return  stringEquals(content, that.content) &&
                 stringEquals(contentBaseUrl, that.contentBaseUrl) &&
-                stringEquals(contentUrlNext, that.contentUrlNext);
+                stringEquals(contentUrlNext, that.contentUrlNext) &&
+                stringEquals(replaceRegex, that.replaceRegex);
     }
 
 
@@ -89,5 +93,11 @@ public class ContentRule implements Parcelable {
         this.contentUrlNext = contentUrlNext;
     }
 
+    public String getReplaceRegex() {
+        return replaceRegex;
+    }
 
+    public void setReplaceRegex(String replaceRegex) {
+        this.replaceRegex = replaceRegex;
+    }
 }

@@ -67,7 +67,7 @@ public class ThirdSourceUtil {
 
         FindRule findRule = new FindRule();
         findRule.setUrl(bean.getRuleFindUrl());
-        findRule.setBookList(bean.getRuleFindList());
+        findRule.setList(bean.getRuleFindList());
         findRule.setName(bean.getRuleFindName());
         findRule.setAuthor(bean.getRuleFindAuthor());
         findRule.setType(bean.getRuleFindKind());

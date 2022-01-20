@@ -17,7 +17,7 @@ import static xyz.fycz.myreader.util.utils.StringUtils.stringEquals;
  * @author fengyue
  * @date 2021/2/8 17:48
  */
-public class SearchRule implements Parcelable {
+public class SearchRule implements Parcelable, BookListRule {
     private String searchUrl;
     private String charset;
     private String list;

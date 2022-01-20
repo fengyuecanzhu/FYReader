@@ -16,6 +16,7 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.FYReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.JsonPathCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.MatcherCrawler;
+import xyz.fycz.myreader.webapi.crawler.source.Third3Crawler;
 import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.XpathCrawler;
 
@@ -27,6 +28,7 @@ import java.util.ResourceBundle;
 
 import static xyz.fycz.myreader.common.APPCONST.JSON_PATH;
 import static xyz.fycz.myreader.common.APPCONST.MATCHER;
+import static xyz.fycz.myreader.common.APPCONST.THIRD_3_SOURCE;
 import static xyz.fycz.myreader.common.APPCONST.THIRD_SOURCE;
 import static xyz.fycz.myreader.common.APPCONST.XPATH;
 
@@ -178,6 +180,7 @@ public class ReadCrawlerUtil {
     public static ReadCrawler getReadCrawler(BookSource source) {
         return getReadCrawler(source, false);
     }
+
     public static ReadCrawler getReadCrawler(BookSource source, boolean isInfo) {
         try {
             if (StringHelper.isEmpty(source.getSourceEName())) {
@@ -196,6 +199,8 @@ public class ReadCrawlerUtil {
                         break;
                     case THIRD_SOURCE:
                         return new ThirdCrawler(source);
+                    case THIRD_3_SOURCE:
+                        return new Third3Crawler(source);
                 }
                 if (source.getSearchRule().isRelatedWithInfo() || isInfo) {
                     return crawler;

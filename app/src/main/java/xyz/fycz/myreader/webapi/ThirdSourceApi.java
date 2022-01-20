@@ -23,6 +23,7 @@ import xyz.fycz.myreader.model.third2.content.BookInfo;
 import xyz.fycz.myreader.model.third2.content.BookList;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
+import xyz.fycz.myreader.webapi.crawler.source.Third3Crawler;
 import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.find.ThirdFindCrawler;
 
@@ -43,6 +44,9 @@ public class ThirdSourceApi {
      * @return
      */
     protected static Observable<ConMVMap<SearchBookBean, Book>> searchByTC(String key, final ThirdCrawler rc) {
+        if (rc instanceof Third3Crawler) {
+            return Third3SourceApi.INSTANCE.searchByT3C(key, (Third3Crawler) rc);
+        }
         try {
             Map<String, String> headers = rc.getHeaders();
             headers.putAll(getCookies(rc.getNameSpace()));
@@ -61,6 +65,9 @@ public class ThirdSourceApi {
     }
 
     protected static Observable<Book> getBookInfoByTC(Book book, ThirdCrawler rc) {
+        if (rc instanceof Third3Crawler) {
+            return Third3SourceApi.INSTANCE.getBookInfoByT3C(book, (Third3Crawler) rc);
+        }
         BookSource source = rc.getSource();
         BookInfo bookInfo = new BookInfo(source.getSourceUrl(), source.getSourceName(), source);
         if (!TextUtils.isEmpty(book.getCathe("BookInfoHtml"))) {
@@ -79,6 +86,9 @@ public class ThirdSourceApi {
     }
 
     protected static Observable<List<Chapter>> getBookChaptersByTC(Book book, ThirdCrawler rc) {
+        if (rc instanceof Third3Crawler) {
+            return Third3SourceApi.INSTANCE.getBookChaptersByT3C(book, (Third3Crawler) rc);
+        }
         BookSource source = rc.getSource();
         Map<String, String> headers = rc.getHeaders();
         headers.putAll(getCookies(rc.getNameSpace()));
@@ -113,6 +123,9 @@ public class ThirdSourceApi {
     }
 
     protected static Observable<String> getChapterContentByTC(Chapter chapter, Book book, ThirdCrawler rc) {
+        if (rc instanceof Third3Crawler) {
+            return Third3SourceApi.INSTANCE.getChapterContentByT3C(chapter, book, (Third3Crawler) rc);
+        }
         BookSource source = rc.getSource();
         Map<String, String> headers = rc.getHeaders();
         headers.putAll(getCookies(rc.getNameSpace()));

@@ -37,6 +37,9 @@ public class Chapter implements RuleDataInterface {
     private int number;//章节序号
     private String title;//章节标题
     private String url;//章节链接(本地书籍为：字符编码)
+    private boolean isVip;//是否VIP
+    private boolean isPay;//是否已购买
+    private String updateTime;//更新时间
     @Nullable
     private String content;//章节正文
 
@@ -49,14 +52,19 @@ public class Chapter implements RuleDataInterface {
     @Transient
     private Map<String, String> variableMap;
 
-    @Generated(hash = 1398484308)
+
+    @Generated(hash = 1109296579)
     public Chapter(String id, String bookId, int number, String title, String url,
-            String content, long start, long end, String variable) {
+            boolean isVip, boolean isPay, String updateTime, String content,
+            long start, long end, String variable) {
         this.id = id;
         this.bookId = bookId;
         this.number = number;
         this.title = title;
         this.url = url;
+        this.isVip = isVip;
+        this.isPay = isPay;
+        this.updateTime = updateTime;
         this.content = content;
         this.start = start;
         this.end = end;
@@ -66,6 +74,7 @@ public class Chapter implements RuleDataInterface {
     @Generated(hash = 393170288)
     public Chapter() {
     }
+
 
     public String getId() {
         return this.id;
@@ -168,5 +177,29 @@ public class Chapter implements RuleDataInterface {
 
     public void setVariable(String variable) {
         this.variable = variable;
+    }
+    
+    public String getUpdateTime() {
+        return this.updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public boolean getIsVip() {
+        return this.isVip;
+    }
+
+    public void setIsVip(boolean isVip) {
+        this.isVip = isVip;
+    }
+
+    public boolean getIsPay() {
+        return this.isPay;
+    }
+
+    public void setIsPay(boolean isPay) {
+        this.isPay = isPay;
     }
 }

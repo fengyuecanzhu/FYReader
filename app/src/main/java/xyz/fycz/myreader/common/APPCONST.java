@@ -52,6 +52,7 @@ public class APPCONST {
     public static final String XPATH = "Xpath";
     public static final String JSON_PATH = "JsonPath";
     public static final String THIRD_SOURCE = "ThirdSource";
+    public static final String THIRD_3_SOURCE = "Third3Source";
 
     public static final String DATA_KEY = "data_key";
     public static final String FIND_CRAWLER = "findCrawler";

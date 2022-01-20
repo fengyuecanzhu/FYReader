@@ -147,9 +147,9 @@ public class BookList {
     }
 
     private void initRule() {
-        if (isFind && !TextUtils.isEmpty(bookSource.getFindRule().getBookList())) {
+        if (isFind && !TextUtils.isEmpty(bookSource.getFindRule().getList())) {
             FindRule findRule = bookSource.getFindRule();
-            ruleList = findRule.getBookList();
+            ruleList = findRule.getList();
             ruleName = findRule.getName();
             ruleAuthor = findRule.getAuthor();
             ruleKind = findRule.getType();

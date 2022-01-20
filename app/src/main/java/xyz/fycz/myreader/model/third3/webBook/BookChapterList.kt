@@ -1,14 +1,7 @@
 package xyz.fycz.myreader.model.third3.webBook
 
 import android.text.TextUtils
-import io.legado.app.R
-import io.legado.app.data.entities.Book
-import io.legado.app.data.entities.BookChapter
-import io.legado.app.data.entities.BookSource
-import xyz.fycz.myreader.model.third3.rule.TocRule
-import io.legado.app.model.Debug
-import io.legado.app.model.NoStackTraceException
-import io.legado.app.model.TocEmptyException
+import android.util.Log
 import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeRule
 import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeUrl
 import kotlinx.coroutines.CoroutineScope
@@ -16,7 +9,15 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import splitties.init.appCtx
+import xyz.fycz.myreader.R
+import xyz.fycz.myreader.application.App
+import xyz.fycz.myreader.greendao.entity.Book
+import xyz.fycz.myreader.greendao.entity.Chapter
+import xyz.fycz.myreader.greendao.entity.rule.BookSource
+import xyz.fycz.myreader.greendao.entity.rule.TocRule
+import xyz.fycz.myreader.model.third3.NoStackTraceException
+import xyz.fycz.myreader.model.third3.TocEmptyException
+
 
 /**
  * 获取目录
@@ -31,15 +32,15 @@ object BookChapterList {
         book: Book,
         redirectUrl: String,
         baseUrl: String,
-        body: String?
-    ): List<BookChapter> {
+        body: String?,
+    ): List<Chapter> {
         body ?: throw NoStackTraceException(
-            appCtx.getString(R.string.error_get_web_content, baseUrl)
+            App.getmContext().getString(R.string.error_get_web_content, baseUrl)
         )
-        val chapterList = ArrayList<BookChapter>()
-        Debug.log(bookSource.bookSourceUrl, "≡获取成功:${baseUrl}")
-        Debug.log(bookSource.bookSourceUrl, body, state = 30)
-        val tocRule = bookSource.getTocRule()
+        val chapterList = ArrayList<Chapter>()
+        Log.d(bookSource.sourceUrl, "≡获取成功:${baseUrl}")
+        Log.d(bookSource.sourceUrl, body)
+        val tocRule = bookSource.tocRule
         val nextUrlList = arrayListOf(baseUrl)
         var reverse = false
         var listRule = tocRule.chapterList ?: ""
@@ -66,7 +67,7 @@ object BookChapterList {
                         mUrl = nextUrl,
                         source = bookSource,
                         ruleData = book,
-                        headerMapF = bookSource.getHeaderMap()
+                        //headerMapF = bookSource.getHeaderMap()
                     ).getStrResponseAwait().body?.let { nextBody ->
                         chapterData = analyzeChapterList(
                             scope, book, nextUrl, nextUrl,
@@ -76,10 +77,10 @@ object BookChapterList {
                         chapterList.addAll(chapterData.first)
                     }
                 }
-                Debug.log(bookSource.bookSourceUrl, "◇目录总页数:${nextUrlList.size}")
+                Log.d(bookSource.sourceUrl, "◇目录总页数:${nextUrlList.size}")
             }
             else -> {
-                Debug.log(bookSource.bookSourceUrl, "◇并发解析目录,总页数:${chapterData.second.size}")
+                Log.d(bookSource.sourceUrl, "◇并发解析目录,总页数:${chapterData.second.size}")
                 withContext(IO) {
                     val asyncArray = Array(chapterData.second.size) {
                         async(IO) {
@@ -88,7 +89,7 @@ object BookChapterList {
                                 mUrl = urlStr,
                                 source = bookSource,
                                 ruleData = book,
-                                headerMapF = bookSource.getHeaderMap()
+                                //headerMapF = bookSource.getHeaderMap()
                             )
                             val res = analyzeUrl.getStrResponseAwait()
                             analyzeChapterList(
@@ -104,7 +105,7 @@ object BookChapterList {
             }
         }
         if (chapterList.isEmpty()) {
-            throw TocEmptyException(appCtx.getString(R.string.chapter_list_empty))
+            throw TocEmptyException(App.getmContext().getString(R.string.chapter_list_empty))
         }
         //去重
         if (!reverse) {
@@ -112,22 +113,22 @@ object BookChapterList {
         }
         val lh = LinkedHashSet(chapterList)
         val list = ArrayList(lh)
-        if (!book.getReverseToc()) {
+        /*if (!book.getReverseToc()) {
             list.reverse()
-        }
-        Debug.log(book.origin, "◇目录总数:${list.size}")
+        }*/
+        Log.d(book.source, "◇目录总数:${list.size}")
         list.forEachIndexed { index, bookChapter ->
-            bookChapter.index = index
+            bookChapter.number = index
         }
-        book.latestChapterTitle = list.last().title
-        book.durChapterTitle =
-            list.getOrNull(book.durChapterIndex)?.title ?: book.latestChapterTitle
-        if (book.totalChapterNum < list.size) {
-            book.lastCheckCount = list.size - book.totalChapterNum
-            book.latestChapterTime = System.currentTimeMillis()
+        book.newestChapterTitle = list.last().title
+        book.historyChapterId =
+            list.getOrNull(book.histtoryChapterNum)?.title ?: book.newestChapterTitle
+        if (book.chapterTotalNum < list.size) {
+            book.noReadNum = list.size - book.chapterTotalNum
+            book.lastReadTime = System.currentTimeMillis()
         }
-        book.lastCheckTime = System.currentTimeMillis()
-        book.totalChapterNum = list.size
+        book.lastReadTime = System.currentTimeMillis()
+        book.chapterTotalNum = list.size
         return list
     }
 
@@ -142,20 +143,20 @@ object BookChapterList {
         bookSource: BookSource,
         getNextUrl: Boolean = true,
         log: Boolean = false
-    ): Pair<List<BookChapter>, List<String>> {
+    ): Pair<List<Chapter>, List<String>> {
         val analyzeRule = AnalyzeRule(book, bookSource)
         analyzeRule.setContent(body).setBaseUrl(baseUrl)
         analyzeRule.setRedirectUrl(redirectUrl)
         //获取目录列表
-        val chapterList = arrayListOf<BookChapter>()
-        Debug.log(bookSource.bookSourceUrl, "┌获取目录列表", log)
+        val chapterList = arrayListOf<Chapter>()
+        if (log) Log.d(bookSource.sourceUrl, "┌获取目录列表")
         val elements = analyzeRule.getElements(listRule)
-        Debug.log(bookSource.bookSourceUrl, "└列表大小:${elements.size}", log)
+        if (log) Log.d(bookSource.sourceUrl, "└列表大小:${elements.size}",)
         //获取下一页链接
         val nextUrlList = arrayListOf<String>()
-        val nextTocRule = tocRule.nextTocUrl
+        val nextTocRule = tocRule.tocUrlNext
         if (getNextUrl && !nextTocRule.isNullOrEmpty()) {
-            Debug.log(bookSource.bookSourceUrl, "┌获取目录下一页列表", log)
+            if (log) Log.d(bookSource.sourceUrl, "┌获取目录下一页列表")
             analyzeRule.getStringList(nextTocRule, isUrl = true)?.let {
                 for (item in it) {
                     if (item != baseUrl) {
@@ -163,15 +164,11 @@ object BookChapterList {
                     }
                 }
             }
-            Debug.log(
-                bookSource.bookSourceUrl,
-                "└" + TextUtils.join("，\n", nextUrlList),
-                log
-            )
+            if (log) Log.d(bookSource.sourceUrl, "└" + TextUtils.join("，\n", nextUrlList),)
         }
         scope.ensureActive()
         if (elements.isNotEmpty()) {
-            Debug.log(bookSource.bookSourceUrl, "┌解析目录列表", log)
+            if (log) Log.d(bookSource.sourceUrl, "┌解析目录列表")
             val nameRule = analyzeRule.splitSourceRule(tocRule.chapterName)
             val urlRule = analyzeRule.splitSourceRule(tocRule.chapterUrl)
             val vipRule = analyzeRule.splitSourceRule(tocRule.isVip)
@@ -180,14 +177,15 @@ object BookChapterList {
             elements.forEachIndexed { index, item ->
                 scope.ensureActive()
                 analyzeRule.setContent(item)
-                val bookChapter = BookChapter(bookUrl = book.bookUrl, baseUrl = baseUrl)
+                //val bookChapter = Chapter(bookUrl = book.bookUrl, baseUrl = baseUrl)
+                val bookChapter = Chapter()
                 analyzeRule.chapter = bookChapter
                 bookChapter.title = analyzeRule.getString(nameRule)
                 bookChapter.url = analyzeRule.getString(urlRule)
-                bookChapter.tag = analyzeRule.getString(upTimeRule)
+                bookChapter.updateTime = analyzeRule.getString(upTimeRule)
                 if (bookChapter.url.isEmpty()) {
                     bookChapter.url = baseUrl
-                    Debug.log(bookSource.bookSourceUrl, "目录${index}未获取到url,使用baseUrl替代")
+                    if (log) Log.d(bookSource.sourceUrl, "目录${index}未获取到url,使用baseUrl替代")
                 }
                 if (bookChapter.title.isNotEmpty()) {
                     val isVip = analyzeRule.getString(vipRule)
@@ -201,13 +199,13 @@ object BookChapterList {
                     chapterList.add(bookChapter)
                 }
             }
-            Debug.log(bookSource.bookSourceUrl, "└目录列表解析完成", log)
-            Debug.log(bookSource.bookSourceUrl, "┌获取首章名称", log)
-            Debug.log(bookSource.bookSourceUrl, "└${chapterList[0].title}", log)
-            Debug.log(bookSource.bookSourceUrl, "┌获取首章链接", log)
-            Debug.log(bookSource.bookSourceUrl, "└${chapterList[0].url}", log)
-            Debug.log(bookSource.bookSourceUrl, "┌获取首章信息", log)
-            Debug.log(bookSource.bookSourceUrl, "└${chapterList[0].tag}", log)
+             if (log) Log.d(bookSource.sourceUrl, "└目录列表解析完成")
+             if (log) Log.d(bookSource.sourceUrl, "┌获取首章名称")
+             if (log) Log.d(bookSource.sourceUrl, "└${chapterList[0].title}")
+             if (log) Log.d(bookSource.sourceUrl, "┌获取首章链接")
+             if (log) Log.d(bookSource.sourceUrl, "└${chapterList[0].url}")
+             if (log) Log.d(bookSource.sourceUrl, "┌获取首章信息")
+             if (log) Log.d(bookSource.sourceUrl, "└${chapterList[0].updateTime}")
         }
         return Pair(chapterList, nextUrlList)
     }

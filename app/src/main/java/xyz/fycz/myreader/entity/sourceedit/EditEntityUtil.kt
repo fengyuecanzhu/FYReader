@@ -2,7 +2,6 @@ package xyz.fycz.myreader.entity.sourceedit
 
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.greendao.entity.rule.*
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -85,7 +84,7 @@ object EditEntityUtil {
             add(EditEntity("url", findRule?.url, R.string.r_find_url))
             add(
                 EditEntity(
-                    "bookList", findRule?.bookList, R.string.r_book_list,
+                    "bookList", findRule?.list, R.string.r_book_list,
                     "对于Matcher解析器：此处填写书籍列表所在区间，仅支持普通函数；" +
                             "\n对于Xpath/JsonPath解析器：此处填写书籍列表规则，仅支持列表函数"
                 )
@@ -156,6 +155,18 @@ object EditEntityUtil {
             )
             add(
                 EditEntity(
+                    "isVip", tocRule?.isVip, R.string.rule_is_vip,
+                    ""
+                )
+            )
+            add(
+                EditEntity(
+                    "updateTime", tocRule?.updateTime, R.string.rule_update_time,
+                    ""
+                )
+            )
+            add(
+                EditEntity(
                     "tocUrlNext", tocRule?.tocUrlNext, R.string.rule_next_toc_url,
                     "填写后获取目录时将会不断地从目录下一页获取章节，直至下一页URL为空时停止，注意：千万不要获取恒存在的URL，否则将出现死循环甚至崩溃"
                 )
@@ -178,6 +189,12 @@ object EditEntityUtil {
                 EditEntity(
                     "contentUrlNext", contentRule?.contentUrlNext, R.string.rule_next_content,
                     "填写后正文时将会不断地从下一页获取内容，直至下一页URL为空时停止，注意：千万不要获取恒存在的URL，否则将出现死循环甚至崩溃"
+                )
+            )
+            add(
+                EditEntity(
+                    "replaceRegex", contentRule?.replaceRegex, R.string.rule_replace_regex,
+                    ""
                 )
             )
         }
@@ -231,7 +248,7 @@ object EditEntityUtil {
         findEntities.forEach {
             when (it.key) {
                 "url" -> findRule.url = it.value
-                "bookList" -> findRule.bookList = it.value
+                "bookList" -> findRule.list = it.value
                 "name" -> findRule.name = it.value
                 "author" -> findRule.author = it.value
                 "type" -> findRule.type = it.value
@@ -277,6 +294,8 @@ object EditEntityUtil {
                 "chapterBaseUrl" -> tocRule.chapterBaseUrl = it.value
                 "chapterName" -> tocRule.chapterName = it.value
                 "chapterUrl" -> tocRule.chapterUrl = it.value
+                "isVip" -> tocRule.isVip = it.value
+                "updateTime" -> tocRule.updateTime = it.value
                 "tocUrlNext" -> tocRule.tocUrlNext = it.value
             }
         }
@@ -290,6 +309,7 @@ object EditEntityUtil {
                 "content" -> contentRule.content = it.value
                 "contentBaseUrl" -> contentRule.contentBaseUrl = it.value
                 "contentUrlNext" -> contentRule.contentUrlNext = it.value
+                "replaceRegex" -> contentRule.replaceRegex = it.value
             }
         }
         return contentRule

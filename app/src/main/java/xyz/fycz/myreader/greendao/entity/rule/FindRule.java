@@ -3,19 +3,15 @@ package xyz.fycz.myreader.greendao.entity.rule;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
-
 import static xyz.fycz.myreader.util.utils.StringUtils.stringEquals;
 
 /**
  * @author fengyue
  * @date 2021/2/10 8:57
  */
-public class FindRule implements Parcelable {
+public class FindRule implements Parcelable, BookListRule {
     private String url;
-    private String bookList;
+    private String list;
     private String name;
     private String author;
     private String type;
@@ -33,7 +29,7 @@ public class FindRule implements Parcelable {
 
     protected FindRule(Parcel in) {
         url = in.readString();
-        bookList = in.readString();
+        list = in.readString();
         name = in.readString();
         author = in.readString();
         type = in.readString();
@@ -50,7 +46,7 @@ public class FindRule implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(url);
-        dest.writeString(bookList);
+        dest.writeString(list);
         dest.writeString(name);
         dest.writeString(author);
         dest.writeString(type);
@@ -89,12 +85,12 @@ public class FindRule implements Parcelable {
         this.url = url;
     }
 
-    public String getBookList() {
-        return bookList;
+    public String getList() {
+        return list;
     }
 
-    public void setBookList(String bookList) {
-        this.bookList = bookList;
+    public void setList(String bookList) {
+        this.list = bookList;
     }
 
     public String getName() {
@@ -192,7 +188,7 @@ public class FindRule implements Parcelable {
         if (getClass() != o.getClass()) return false;
         FindRule findRule = (FindRule) o;
         return  stringEquals(url, findRule.url) &&
-                stringEquals(bookList, findRule.bookList) &&
+                stringEquals(list, findRule.list) &&
                 stringEquals(name, findRule.name) &&
                 stringEquals(author, findRule.author) &&
                 stringEquals(type, findRule.type) &&

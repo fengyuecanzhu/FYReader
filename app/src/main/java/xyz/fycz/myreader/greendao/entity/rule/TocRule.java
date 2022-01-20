@@ -22,6 +22,9 @@ public class TocRule implements Parcelable {
     private String chapterName;
     private String chapterUrl;
     private String tocUrlNext;
+    private String isVip;
+    private String isPay;
+    private String updateTime;
 
     protected TocRule(Parcel in) {
         chapterList = in.readString();
@@ -29,6 +32,9 @@ public class TocRule implements Parcelable {
         chapterName = in.readString();
         chapterUrl = in.readString();
         tocUrlNext = in.readString();
+        isVip = in.readString();
+        isPay = in.readString();
+        updateTime = in.readString();
     }
 
     @Override
@@ -38,6 +44,9 @@ public class TocRule implements Parcelable {
         dest.writeString(chapterName);
         dest.writeString(chapterUrl);
         dest.writeString(tocUrlNext);
+        dest.writeString(isVip);
+        dest.writeString(isPay);
+        dest.writeString(updateTime);
     }
 
     @Override
@@ -67,7 +76,10 @@ public class TocRule implements Parcelable {
                 stringEquals(chapterBaseUrl, tocRule.chapterBaseUrl) &&
                 stringEquals(chapterName, tocRule.chapterName) &&
                 stringEquals(chapterUrl, tocRule.chapterUrl) &&
-                stringEquals(tocUrlNext, tocRule.tocUrlNext);
+                stringEquals(tocUrlNext, tocRule.tocUrlNext) &&
+                stringEquals(isVip, tocRule.isVip) &&
+                stringEquals(isPay, tocRule.isPay) &&
+                stringEquals(updateTime, tocRule.updateTime);
     }
 
     public String getChapterList() {
@@ -108,6 +120,30 @@ public class TocRule implements Parcelable {
 
     public void setTocUrlNext(String tocUrlNext) {
         this.tocUrlNext = tocUrlNext;
+    }
+
+    public String getIsVip() {
+        return isVip;
+    }
+
+    public void setIsVip(String isVip) {
+        this.isVip = isVip;
+    }
+
+    public String getIsPay() {
+        return isPay;
+    }
+
+    public void setIsPay(String isPay) {
+        this.isPay = isPay;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 
     public TocRule() {

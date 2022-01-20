@@ -1,24 +1,25 @@
 package xyz.fycz.myreader.model.third3.webBook
 
-import io.legado.app.R
-import io.legado.app.data.appDb
-import io.legado.app.data.entities.Book
-import io.legado.app.data.entities.BookChapter
-import io.legado.app.data.entities.BookSource
-import io.legado.app.data.entities.rule.ContentRule
-import io.legado.app.help.BookHelp
-import io.legado.app.model.ContentEmptyException
-import io.legado.app.model.Debug
-import io.legado.app.model.NoStackTraceException
+import android.util.Log
 import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeRule
 import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeUrl
-import io.legado.app.utils.NetworkUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import splitties.init.appCtx
+import xyz.fycz.myreader.R
+import xyz.fycz.myreader.application.App
+import xyz.fycz.myreader.greendao.DbManager
+import xyz.fycz.myreader.greendao.entity.Book
+import xyz.fycz.myreader.greendao.entity.Chapter
+import xyz.fycz.myreader.greendao.entity.rule.BookSource
+import xyz.fycz.myreader.greendao.entity.rule.ContentRule
+import xyz.fycz.myreader.greendao.service.ChapterService
+import xyz.fycz.myreader.model.third3.ContentEmptyException
+import xyz.fycz.myreader.model.third3.NoStackTraceException
+import xyz.fycz.myreader.util.utils.HtmlFormatter
+import xyz.fycz.myreader.util.utils.NetworkUtils
 
 /**
  * 获取正文
@@ -30,25 +31,25 @@ object BookContent {
         scope: CoroutineScope,
         bookSource: BookSource,
         book: Book,
-        bookChapter: BookChapter,
+        bookChapter: Chapter,
         redirectUrl: String,
         baseUrl: String,
         body: String?,
         nextChapterUrl: String? = null
     ): String {
         body ?: throw NoStackTraceException(
-            appCtx.getString(R.string.error_get_web_content, baseUrl)
+            App.getmContext().getString(R.string.error_get_web_content, baseUrl)
         )
-        Debug.log(bookSource.bookSourceUrl, "≡获取成功:${baseUrl}")
-        Debug.log(bookSource.bookSourceUrl, body, state = 40)
+        Log.d(bookSource.sourceUrl, "≡获取成功:${baseUrl}")
+        Log.d(bookSource.sourceUrl, body)
         val mNextChapterUrl = if (!nextChapterUrl.isNullOrEmpty()) {
             nextChapterUrl
         } else {
-            appDb.bookChapterDao.getChapter(book.bookUrl, bookChapter.index + 1)?.url
+            ChapterService.getInstance().findBookAllChapterByBookId(book.id)[bookChapter.number + 1].url
         }
         val content = StringBuilder()
         val nextUrlList = arrayListOf(baseUrl)
-        val contentRule = bookSource.getContentRule()
+        val contentRule = bookSource.contentRule
         val analyzeRule = AnalyzeRule(book, bookSource).setContent(body, baseUrl)
         analyzeRule.setRedirectUrl(baseUrl)
         analyzeRule.nextChapterUrl = mNextChapterUrl
@@ -70,7 +71,7 @@ object BookContent {
                     mUrl = nextUrl,
                     source = bookSource,
                     ruleData = book,
-                    headerMapF = bookSource.getHeaderMap()
+                    //headerMapF = bookSource.getHeaderMap()
                 ).getStrResponseAwait()
                 res.body?.let { nextBody ->
                     contentData = analyzeContent(
@@ -82,9 +83,9 @@ object BookContent {
                     content.append("\n").append(contentData.first)
                 }
             }
-            Debug.log(bookSource.bookSourceUrl, "◇本章总页数:${nextUrlList.size}")
+            Log.d(bookSource.sourceUrl, "◇本章总页数:${nextUrlList.size}")
         } else if (contentData.second.size > 1) {
-            Debug.log(bookSource.bookSourceUrl, "◇并发解析目录,总页数:${contentData.second.size}")
+            Log.d(bookSource.sourceUrl, "◇并发解析目录,总页数:${contentData.second.size}")
             withContext(IO) {
                 val asyncArray = Array(contentData.second.size) {
                     async(IO) {
@@ -93,7 +94,7 @@ object BookContent {
                             mUrl = urlStr,
                             source = bookSource,
                             ruleData = book,
-                            headerMapF = bookSource.getHeaderMap()
+                            //headerMapF = bookSource.getHeaderMap()
                         )
                         val res = analyzeUrl.getStrResponseAwait()
                         analyzeContent(
@@ -113,14 +114,14 @@ object BookContent {
         if (!replaceRegex.isNullOrEmpty()) {
             contentStr = analyzeRule.getString(replaceRegex, contentStr)
         }
-        Debug.log(bookSource.bookSourceUrl, "┌获取章节名称")
-        Debug.log(bookSource.bookSourceUrl, "└${bookChapter.title}")
-        Debug.log(bookSource.bookSourceUrl, "┌获取正文内容")
-        Debug.log(bookSource.bookSourceUrl, "└\n$contentStr")
+        Log.d(bookSource.sourceUrl, "┌获取章节名称")
+        Log.d(bookSource.sourceUrl, "└${bookChapter.title}")
+        Log.d(bookSource.sourceUrl, "┌获取正文内容")
+        Log.d(bookSource.sourceUrl, "└\n$contentStr")
         if (contentStr.isBlank()) {
             throw ContentEmptyException("内容为空")
         }
-        BookHelp.saveContent(bookSource, book, bookChapter, contentStr)
+        //BookHelp.saveContent(bookSource, book, bookChapter, contentStr)
         return contentStr
     }
 
@@ -131,7 +132,7 @@ object BookContent {
         redirectUrl: String,
         body: String,
         contentRule: ContentRule,
-        chapter: BookChapter,
+        chapter: Chapter,
         bookSource: BookSource,
         nextChapterUrl: String?,
         printLog: Boolean = true
@@ -144,15 +145,16 @@ object BookContent {
         analyzeRule.chapter = chapter
         //获取正文
         var content = analyzeRule.getString(contentRule.content)
-        content = HtmlFormatter.formatKeepImg(content, rUrl)
+        //content = HtmlFormatter.formatKeepImg(content, rUrl)
+        content = HtmlFormatter.format(content)
         //获取下一页链接
-        val nextUrlRule = contentRule.nextContentUrl
+        val nextUrlRule = contentRule.contentUrlNext
         if (!nextUrlRule.isNullOrEmpty()) {
-            Debug.log(bookSource.bookSourceUrl, "┌获取正文下一页链接", printLog)
+            if (printLog) Log.d(bookSource.sourceUrl, "┌获取正文下一页链接")
             analyzeRule.getStringList(nextUrlRule, isUrl = true)?.let {
                 nextUrlList.addAll(it)
             }
-            Debug.log(bookSource.bookSourceUrl, "└" + nextUrlList.joinToString("，"), printLog)
+            if (printLog) Log.d(bookSource.sourceUrl, "└" + nextUrlList.joinToString("，"))
         }
         return Pair(content, nextUrlList)
     }

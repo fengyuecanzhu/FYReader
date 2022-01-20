@@ -120,6 +120,9 @@ public class SourceEditActivity extends BaseActivity {
             case APPCONST.THIRD_SOURCE:
                 sourceType = 3;
                 break;
+            case APPCONST.THIRD_3_SOURCE:
+                sourceType = 4;
+                break;
         }
         binding.sSourceType.setSelection(sourceType);
     }
@@ -285,6 +288,9 @@ public class SourceEditActivity extends BaseActivity {
                 break;
             case 3:
                 sourceType = APPCONST.THIRD_SOURCE;
+                break;
+            case 4:
+                sourceType = APPCONST.THIRD_3_SOURCE;
                 break;
         }
         source.setSourceType(sourceType);

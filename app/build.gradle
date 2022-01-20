@@ -154,6 +154,7 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
 
     //anko
     def anko_version = '0.10.8'

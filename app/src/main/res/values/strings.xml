@@ -521,6 +521,21 @@
     <string name="re_get_email_code">重新发送%s</string>
 
 
+    <!--error string start-->
+    <string name="error_no_source">没有书源</string>
+    <string name="error_get_book_info">书籍信息获取失败</string>
+    <string name="error_get_content">内容获取失败</string>
+    <string name="error_get_chapter_list">目录获取失败</string>
+    <string name="error_get_web_content">访问网站失败:%s</string>
+    <string name="error_read_file">文件读取失败</string>
+    <string name="error_load_toc">加载目录失败</string>
+    <string name="error_get_data">获取数据失败！</string>
+    <string name="error_load_msg">加载失败\n%s</string>
+    <string name="net_error_10001">没有网络</string>
+    <string name="net_error_10002">网络连接超时</string>
+    <string name="net_error_10003">数据解析失败</string>
+    <!--error string end-->
+
     <string-array name="reset_screen_time">
         <item>跟随系统</item>
         <item>常亮</item>
@@ -602,7 +617,8 @@
         <item>Matcher</item>
         <item>Xpath</item>
         <item>JsonPath</item>
-        <item>第三方</item>
+        <item>第三方-2.0</item>
+        <item>第三方-3.0</item>
     </string-array>
 
     <string-array name="select_folder">

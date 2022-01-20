@@ -15,7 +15,7 @@ import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
  * @date 2021/5/14 10:55
  */
 public class ThirdCrawler extends BaseReadCrawler implements BookInfoCrawler {
-    private BookSource source;
+    private final BookSource source;
 
     public ThirdCrawler(BookSource source) {
         this.source = source;

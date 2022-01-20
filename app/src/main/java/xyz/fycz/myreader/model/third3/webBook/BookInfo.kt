@@ -1,19 +1,17 @@
 package xyz.fycz.myreader.model.third3.webBook
 
-import io.legado.app.R
-import io.legado.app.data.entities.Book
-import io.legado.app.data.entities.BookSource
-import io.legado.app.help.BookHelp
-import io.legado.app.model.Debug
-import io.legado.app.model.NoStackTraceException
+
+import android.util.Log
 import xyz.fycz.myreader.model.third3.analyzeRule.AnalyzeRule
-import io.legado.app.utils.NetworkUtils
-import io.legado.app.utils.StringUtils.wordCountFormat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
-import splitties.init.appCtx
+import xyz.fycz.myreader.R
+import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.greendao.entity.Book
 import xyz.fycz.myreader.greendao.entity.rule.BookSource
+import xyz.fycz.myreader.model.third3.NoStackTraceException
+import xyz.fycz.myreader.util.utils.HtmlFormatter
+import xyz.fycz.myreader.util.utils.NetworkUtils
 
 /**
  * 获取详情
@@ -31,10 +29,10 @@ object BookInfo {
         canReName: Boolean,
     ) {
         body ?: throw NoStackTraceException(
-            appCtx.getString(R.string.error_get_web_content, baseUrl)
+            App.getmContext().getString(R.string.error_get_web_content, baseUrl)
         )
-        Debug.log(bookSource.bookSourceUrl, "≡获取成功:${baseUrl}")
-        Debug.log(bookSource.bookSourceUrl, body, state = 20)
+        Log.d(bookSource.sourceUrl, "≡获取成功:${baseUrl}")
+        Log.d(bookSource.sourceUrl, body)
         val analyzeRule = AnalyzeRule(book, bookSource)
         analyzeRule.setContent(body).setBaseUrl(baseUrl)
         analyzeRule.setRedirectUrl(redirectUrl)
@@ -55,87 +53,92 @@ object BookInfo {
         infoRule.init?.let {
             if (it.isNotBlank()) {
                 scope.ensureActive()
-                Debug.log(bookSource.bookSourceUrl, "≡执行详情页初始化规则")
+                Log.d(bookSource.sourceUrl, "≡执行详情页初始化规则")
                 analyzeRule.setContent(analyzeRule.getElement(it))
             }
         }
-        val mCanReName = canReName && !infoRule.canReName.isNullOrBlank()
+        //val mCanReName = canReName && !infoRule.canReName.isNullOrBlank()
+        val mCanReName = false
         scope.ensureActive()
-        Debug.log(bookSource.bookSourceUrl, "┌获取书名")
-        BookHelp.formatBookName(analyzeRule.getString(infoRule.name)).let {
+        Log.d(bookSource.sourceUrl, "┌获取书名")
+        BookList.formatBookName(analyzeRule.getString(infoRule.name)).let {
             if (it.isNotEmpty() && (mCanReName || book.name.isEmpty())) {
                 book.name = it
             }
-            Debug.log(bookSource.bookSourceUrl, "└${it}")
+            Log.d(bookSource.sourceUrl, "└${it}")
         }
         scope.ensureActive()
-        Debug.log(bookSource.bookSourceUrl, "┌获取作者")
-        BookHelp.formatBookAuthor(analyzeRule.getString(infoRule.author)).let {
+        Log.d(bookSource.sourceUrl, "┌获取作者")
+        BookList.formatBookAuthor(analyzeRule.getString(infoRule.author)).let {
             if (it.isNotEmpty() && (mCanReName || book.author.isEmpty())) {
                 book.author = it
             }
-            Debug.log(bookSource.bookSourceUrl, "└${it}")
+            Log.d(bookSource.sourceUrl, "└${it}")
         }
         scope.ensureActive()
-        Debug.log(bookSource.bookSourceUrl, "┌获取分类")
+        Log.d(bookSource.sourceUrl, "┌获取分类")
         try {
-            analyzeRule.getStringList(infoRule.kind)
+            analyzeRule.getStringList(infoRule.type)
                 ?.joinToString(",")
                 ?.let {
-                    if (it.isNotEmpty()) book.kind = it
+                    if (it.isNotEmpty()) book.type = it
                 }
-            Debug.log(bookSource.bookSourceUrl, "└${book.kind}")
+            Log.d(bookSource.sourceUrl, "└${book.type}")
         } catch (e: Exception) {
-            Debug.log(bookSource.bookSourceUrl, "└${e.localizedMessage}")
+            Log.d(bookSource.sourceUrl, "└${e.localizedMessage}")
         }
         scope.ensureActive()
-        Debug.log(bookSource.bookSourceUrl, "┌获取字数")
+        Log.d(bookSource.sourceUrl, "┌获取字数")
         try {
-            wordCountFormat(analyzeRule.getString(infoRule.wordCount)).let {
+            /*wordCountFormat(analyzeRule.getString(infoRule.wordCount)).let {
+                if (it.isNotEmpty()) book.wordCount = it
+            }*/
+            analyzeRule.getString(infoRule.wordCount).let {
                 if (it.isNotEmpty()) book.wordCount = it
             }
-            Debug.log(bookSource.bookSourceUrl, "└${book.wordCount}")
+            Log.d(bookSource.sourceUrl, "└${book.wordCount}")
         } catch (e: Exception) {
-            Debug.log(bookSource.bookSourceUrl, "└${e.localizedMessage}")
+            Log.d(bookSource.sourceUrl, "└${e.localizedMessage}")
         }
         scope.ensureActive()
-        Debug.log(bookSource.bookSourceUrl, "┌获取最新章节")
+        Log.d(bookSource.sourceUrl, "┌获取最新章节")
         try {
             analyzeRule.getString(infoRule.lastChapter).let {
-                if (it.isNotEmpty()) book.latestChapterTitle = it
+                if (it.isNotEmpty()) book.newestChapterTitle = it
             }
-            Debug.log(bookSource.bookSourceUrl, "└${book.latestChapterTitle}")
+            Log.d(bookSource.sourceUrl, "└${book.newestChapterTitle}")
         } catch (e: Exception) {
-            Debug.log(bookSource.bookSourceUrl, "└${e.localizedMessage}")
+            Log.d(bookSource.sourceUrl, "└${e.localizedMessage}")
         }
         scope.ensureActive()
-        Debug.log(bookSource.bookSourceUrl, "┌获取简介")
+        Log.d(bookSource.sourceUrl, "┌获取简介")
         try {
-            analyzeRule.getString(infoRule.intro).let {
-                if (it.isNotEmpty()) book.intro = HtmlFormatter.format(it)
+            analyzeRule.getString(infoRule.desc).let {
+                if (it.isNotEmpty()) book.desc = HtmlFormatter.format(it)
             }
-            Debug.log(bookSource.bookSourceUrl, "└${book.intro}")
+            Log.d(bookSource.sourceUrl, "└${book.desc}")
         } catch (e: Exception) {
-            Debug.log(bookSource.bookSourceUrl, "└${e.localizedMessage}")
+            Log.d(bookSource.sourceUrl, "└${e.localizedMessage}")
         }
         scope.ensureActive()
-        Debug.log(bookSource.bookSourceUrl, "┌获取封面链接")
+        Log.d(bookSource.sourceUrl, "┌获取封面链接")
         try {
-            analyzeRule.getString(infoRule.coverUrl).let {
-                if (it.isNotEmpty()) book.coverUrl = NetworkUtils.getAbsoluteURL(baseUrl, it)
+            analyzeRule.getString(infoRule.imgUrl).let {
+                if (it.isNotEmpty()) book.imgUrl = NetworkUtils.getAbsoluteURL(baseUrl, it)
             }
-            Debug.log(bookSource.bookSourceUrl, "└${book.coverUrl}")
+            Log.d(bookSource.sourceUrl, "└${book.imgUrl}")
         } catch (e: Exception) {
-            Debug.log(bookSource.bookSourceUrl, "└${e.localizedMessage}")
+            Log.d(bookSource.sourceUrl, "└${e.localizedMessage}")
         }
         scope.ensureActive()
-        Debug.log(bookSource.bookSourceUrl, "┌获取目录链接")
-        book.tocUrl = analyzeRule.getString(infoRule.tocUrl, isUrl = true)
-        if (book.tocUrl.isEmpty()) book.tocUrl = redirectUrl
-        if (book.tocUrl == redirectUrl) {
-            book.tocHtml = body
+        Log.d(bookSource.sourceUrl, "┌获取目录链接")
+        book.chapterUrl = analyzeRule.getString(infoRule.tocUrl, isUrl = true)
+        if (book.chapterUrl.isEmpty()) book.chapterUrl = redirectUrl
+        if (book.chapterUrl == redirectUrl) {
+            book.putCathe("tocHtml", body)
+            //book.tocHtml = body
         }
-        Debug.log(bookSource.bookSourceUrl, "└${book.tocUrl}")
+        Log.d(bookSource.sourceUrl, "└${book.chapterUrl}")
     }
 
 }
