@@ -25,6 +25,7 @@ import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.Third3Crawler;
 import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
+import xyz.fycz.myreader.webapi.crawler.source.find.Third3FindCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.find.ThirdFindCrawler;
 
 import static xyz.fycz.myreader.common.APPCONST.JS_PATTERN;
@@ -165,6 +166,9 @@ public class ThirdSourceApi {
      * 发现
      */
     public static Observable<List<Book>> findBook(String url, ThirdFindCrawler fc, int page) {
+        if (fc instanceof Third3FindCrawler){
+            return Third3SourceApi.INSTANCE.findBook(url, (Third3FindCrawler) fc, page);
+        }
         BookSource source = fc.getSource();
         Map<String, String> headers = getCookies(fc.getTag());
         BookList bookList = new BookList(source.getSourceUrl(), source.getSourceName(), source, true);

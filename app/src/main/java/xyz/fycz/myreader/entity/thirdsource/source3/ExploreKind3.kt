@@ -1,6 +1,6 @@
-package xyz.fycz.myreader.entity.thirdsource
+package xyz.fycz.myreader.entity.thirdsource.source3
 
-data class ExploreKind(
+data class ExploreKind3(
     val title: String,
     val url: String? = null,
     val style: Style? = null

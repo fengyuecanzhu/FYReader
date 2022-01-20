@@ -10,6 +10,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap
 import xyz.fycz.myreader.model.third3.webBook.WebBook
 import xyz.fycz.myreader.webapi.crawler.source.Third3Crawler
+import xyz.fycz.myreader.webapi.crawler.source.find.Third3FindCrawler
 
 /**
  * @author fengyue
@@ -55,7 +56,7 @@ object Third3SourceApi : AndroidViewModel(App.getApplication()) {
         }
     }
 
-    fun getBookChaptersByT3C(book: Book, rc: Third3Crawler): Observable<List<Chapter>>{
+    fun getBookChaptersByT3C(book: Book, rc: Third3Crawler): Observable<List<Chapter>> {
         return Observable.create { emitter ->
             WebBook.getChapterList(
                 scope,
@@ -71,13 +72,34 @@ object Third3SourceApi : AndroidViewModel(App.getApplication()) {
         }
     }
 
-    fun getChapterContentByT3C(chapter: Chapter, book: Book, rc: Third3Crawler): Observable<String>{
+    fun getChapterContentByT3C(
+        chapter: Chapter,
+        book: Book,
+        rc: Third3Crawler
+    ): Observable<String> {
         return Observable.create { emitter ->
             WebBook.getContent(
                 scope,
                 rc.source,
                 book,
                 chapter
+            ).onSuccess {
+                emitter.onNext(it)
+            }.onError {
+                emitter.onError(it)
+            }.onFinally {
+                emitter.onComplete()
+            }
+        }
+    }
+
+    fun findBook(url: String, fc: Third3FindCrawler, page: Int): Observable<List<Book>> {
+        return Observable.create { emitter ->
+            WebBook.exploreBook(
+                scope,
+                fc.source,
+                url,
+                page
             ).onSuccess {
                 emitter.onNext(it)
             }.onError {

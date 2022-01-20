@@ -19,6 +19,7 @@ import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.base.observer.MyObserver;
+import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityFindBookBinding;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.ui.adapter.TabFragmentPageAdapter;
@@ -27,6 +28,7 @@ import xyz.fycz.myreader.ui.fragment.FindBook1Fragment;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
+import xyz.fycz.myreader.webapi.crawler.source.find.Third3FindCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.find.ThirdFindCrawler;
 
 /**
@@ -60,7 +62,11 @@ public class FindBookActivity extends BaseActivity {
         Object obj = BitIntentDataManager.getInstance().getData(getIntent());
         if (obj instanceof BookSource) {
             source = (BookSource) obj;
-            findCrawler = new ThirdFindCrawler(source);
+            if (APPCONST.THIRD_3_SOURCE.equals(source.getSourceType())) {
+                findCrawler = new Third3FindCrawler(source);
+            } else {
+                findCrawler = new ThirdFindCrawler(source);
+            }
         } else if (obj instanceof FindCrawler) {
             findCrawler = (FindCrawler) obj;
         }

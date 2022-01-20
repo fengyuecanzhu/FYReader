@@ -58,7 +58,7 @@ object BookList {
         var reverse = false
         val bookListRule: BookListRule = when {
             isSearch -> bookSource.searchRule
-            bookSource.findRule.url.isNullOrBlank() -> bookSource.searchRule
+            bookSource.findRule.list.isNullOrBlank() -> bookSource.searchRule
             else -> bookSource.findRule
         }
         var ruleList: String = bookListRule.list ?: ""
