@@ -74,12 +74,12 @@ public class BookSource implements Parcelable, Cloneable {
     @Convert(converter = FindRuleConvert.class, columnType = String.class)
     private FindRule findRule;
 
-    @Generated(hash = 906128088)
+    @Generated(hash = 798251066)
     public BookSource(String sourceUrl, String sourceEName, String sourceName, String sourceGroup,
             String sourceCharset, String sourceType, String sourceHeaders, String loginUrl,
-            String sourceComment, String concurrentRate, Long lastUpdateTime, int orderNum, int weight,
-            boolean enable, SearchRule searchRule, InfoRule infoRule, TocRule tocRule,
-            ContentRule contentRule, FindRule findRule) {
+            String loginCheckJs, String sourceComment, String concurrentRate, Long lastUpdateTime,
+            int orderNum, int weight, boolean enable, SearchRule searchRule, InfoRule infoRule,
+            TocRule tocRule, ContentRule contentRule, FindRule findRule) {
         this.sourceUrl = sourceUrl;
         this.sourceEName = sourceEName;
         this.sourceName = sourceName;
@@ -88,6 +88,7 @@ public class BookSource implements Parcelable, Cloneable {
         this.sourceType = sourceType;
         this.sourceHeaders = sourceHeaders;
         this.loginUrl = loginUrl;
+        this.loginCheckJs = loginCheckJs;
         this.sourceComment = sourceComment;
         this.concurrentRate = concurrentRate;
         this.lastUpdateTime = lastUpdateTime;

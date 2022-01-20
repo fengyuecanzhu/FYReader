@@ -45,7 +45,12 @@ object BookContent {
         val mNextChapterUrl = if (!nextChapterUrl.isNullOrEmpty()) {
             nextChapterUrl
         } else {
-            ChapterService.getInstance().findBookAllChapterByBookId(book.id)[bookChapter.number + 1].url
+            val chapters = ChapterService.getInstance().findBookAllChapterByBookId(book.id)
+            if (chapters.size > bookChapter.number + 1) {
+                chapters[bookChapter.number + 1].url
+            } else {
+                null
+            }
         }
         val content = StringBuilder()
         val nextUrlList = arrayListOf(baseUrl)

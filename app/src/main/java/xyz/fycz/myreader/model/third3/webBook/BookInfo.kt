@@ -62,7 +62,8 @@ object BookInfo {
         scope.ensureActive()
         Log.d(bookSource.sourceUrl, "┌获取书名")
         BookList.formatBookName(analyzeRule.getString(infoRule.name)).let {
-            if (it.isNotEmpty() && (mCanReName || book.name.isEmpty())) {
+            //if (it.isNotEmpty() && (mCanReName || book.name.isEmpty())) {
+            if (it.isNotEmpty()) {
                 book.name = it
             }
             Log.d(bookSource.sourceUrl, "└${it}")
@@ -70,7 +71,8 @@ object BookInfo {
         scope.ensureActive()
         Log.d(bookSource.sourceUrl, "┌获取作者")
         BookList.formatBookAuthor(analyzeRule.getString(infoRule.author)).let {
-            if (it.isNotEmpty() && (mCanReName || book.author.isEmpty())) {
+            //if (it.isNotEmpty() && (mCanReName || book.author.isEmpty())) {
+            if (it.isNotEmpty()) {
                 book.author = it
             }
             Log.d(bookSource.sourceUrl, "└${it}")

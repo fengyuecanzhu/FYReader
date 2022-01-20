@@ -6,7 +6,7 @@ import androidx.annotation.Keep
 import kotlinx.coroutines.runBlocking
 import org.jsoup.nodes.Entities
 import org.mozilla.javascript.NativeObject
-import xyz.fycz.myreader.common.APPCONST.JS_PATTERN
+import xyz.fycz.myreader.common.APPCONST.JS_PATTERN_3
 import xyz.fycz.myreader.common.APPCONST.SCRIPT_ENGINE
 import xyz.fycz.myreader.greendao.entity.Book
 import xyz.fycz.myreader.greendao.entity.Chapter
@@ -394,7 +394,7 @@ class AnalyzeRule(
             mMode = Mode.Regex
         }
         var tmp: String
-        val jsMatcher = JS_PATTERN.matcher(ruleStr)
+        val jsMatcher = JS_PATTERN_3.matcher(ruleStr)
         while (jsMatcher.find()) {
             if (jsMatcher.start() > start) {
                 tmp = ruleStr.substring(start, jsMatcher.start()).trim { it <= ' ' }

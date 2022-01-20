@@ -39,12 +39,13 @@ public class ChapterService extends BaseService {
                 chapter.setBookId(cursor.getString(1));
                 chapter.setNumber(cursor.getInt(2));
                 chapter.setTitle(cursor.getString(3));
-                chapter.setIsVip(cursor.getInt(4) != 0);
-                chapter.setIsPay(cursor.getInt(5) != 0);
-                chapter.setUpdateTime(cursor.getString(6));
-                chapter.setContent(cursor.getString(7));
-                chapter.setStart(cursor.getInt(8));
-                chapter.setEnd(cursor.getInt(9));
+                chapter.setUrl(cursor.getString(4));
+                chapter.setIsVip(cursor.getInt(5) != 0);
+                chapter.setIsPay(cursor.getInt(6) != 0);
+                chapter.setUpdateTime(cursor.getString(7));
+                chapter.setContent(cursor.getString(8));
+                chapter.setStart(cursor.getInt(9));
+                chapter.setEnd(cursor.getInt(10));
                 chapters.add(chapter);
             }
         } catch (Exception e) {

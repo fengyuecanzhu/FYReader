@@ -116,6 +116,7 @@ object BookChapterList {
         /*if (!book.getReverseToc()) {
             list.reverse()
         }*/
+        list.reverse()
         Log.d(book.source, "◇目录总数:${list.size}")
         list.forEachIndexed { index, bookChapter ->
             bookChapter.number = index

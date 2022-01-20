@@ -23,11 +23,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 章节
- * Created by zhao on 2017/7/24.
- */
-
 @Entity
 public class Chapter implements RuleDataInterface {
     @Id

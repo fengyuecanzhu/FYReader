@@ -98,7 +98,7 @@ class AnalyzeUrl(
     private fun analyzeJs() {
         var start = 0
         var tmp: String
-        val jsMatcher = JS_PATTERN.matcher(ruleUrl)
+        val jsMatcher = JS_PATTERN_3.matcher(ruleUrl)
         while (jsMatcher.find()) {
             if (jsMatcher.start() > start) {
                 tmp =
