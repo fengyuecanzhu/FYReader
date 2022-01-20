@@ -487,7 +487,7 @@ interface JsExtensions {
             Debug.log(it.sourceUrl, msg)
         } ?: Debug.log(msg)*/
         if (App.isDebug()) {
-            Log.d(TAG, msg)
+            Log.d(TAG + "-" + getSource()?.sourceUrl, msg)
         }
         return msg
     }

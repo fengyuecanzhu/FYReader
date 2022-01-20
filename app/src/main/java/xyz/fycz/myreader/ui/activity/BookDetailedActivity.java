@@ -128,10 +128,12 @@ public class BookDetailedActivity extends BaseActivity {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         aBooks = mSourceDialog.getaBooks();
         Intent intent = new Intent();
-        if (aBooks != null) {
-            aBooks.set(mSourceDialog.getSourceIndex(), mBook);
+        if (aBooks != null && aBooks.size() > 0) {
+            int sourceIndex = mSourceDialog.getSourceIndex();
+            if (mSourceDialog.hasCurBookSource())
+                aBooks.set(sourceIndex, mBook);
             BitIntentDataManager.getInstance().putData(intent, aBooks);
-            intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
+            intent.putExtra(APPCONST.SOURCE_INDEX, sourceIndex);
         } else {
             BitIntentDataManager.getInstance().putData(intent, mBook);
         }
@@ -511,10 +513,12 @@ public class BookDetailedActivity extends BaseActivity {
         }
         Intent intent = new Intent(this, ReadActivity.class);
         aBooks = mSourceDialog.getaBooks();
-        if (aBooks != null) {
-            aBooks.set(mSourceDialog.getSourceIndex(), mBook);
+        if (aBooks != null && aBooks.size() > 0) {
+            int sourceIndex = mSourceDialog.getSourceIndex();
+            if (mSourceDialog.hasCurBookSource())
+                aBooks.set(sourceIndex, mBook);
             BitIntentDataManager.getInstance().putData(intent, aBooks);
-            intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
+            intent.putExtra(APPCONST.SOURCE_INDEX, sourceIndex);
         } else {
             BitIntentDataManager.getInstance().putData(intent, mBook);
         }

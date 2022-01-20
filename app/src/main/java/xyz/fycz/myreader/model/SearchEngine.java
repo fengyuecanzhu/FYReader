@@ -45,6 +45,7 @@ public class SearchEngine {
     private int searchSiteIndex;
     private int searchSuccessNum;
     private int searchFinishNum;
+    private boolean isFinish;
 
     private OnSearchListener searchListener;
 
@@ -70,6 +71,7 @@ public class SearchEngine {
     public void stopSearch() {
         if (compositeDisposable != null) compositeDisposable.dispose();
         compositeDisposable = new CompositeDisposable();
+        isFinish = true;
         searchListener.loadMoreFinish(true);
     }
 
@@ -109,6 +111,7 @@ public class SearchEngine {
         searchSuccessNum = 0;
         searchSiteIndex = -1;
         searchFinishNum = 0;
+        isFinish = false;
         for (int i = 0; i < Math.min(mSourceList.size(), threadsNum); i++) {
             searchOnEngine(keyword);
         }
@@ -130,6 +133,7 @@ public class SearchEngine {
         searchSuccessNum = 0;
         searchSiteIndex = -1;
         searchFinishNum = 0;
+        isFinish = false;
         for (int i = 0; i < Math.min(mSourceList.size(), threadsNum); i++) {
             searchOnEngine(title, author);
         }
@@ -170,8 +174,9 @@ public class SearchEngine {
 
                         }
                     });
-        } else {
+        } else if (!isFinish){
             if (searchFinishNum == mSourceList.size()) {
+                isFinish = true;
                 if (searchSuccessNum == 0) {
                     searchListener.searchBookError(new Throwable("未搜索到内容"));
                 }
@@ -220,13 +225,13 @@ public class SearchEngine {
 
                         }
                     });
-        } else {
+        } else if (!isFinish){
             if (searchFinishNum >= mSourceList.size()) {
+                isFinish = true;
                 if (searchSuccessNum == 0) {
                     searchListener.searchBookError(new Throwable("未搜索到内容"));
                 }
                 searchListener.loadMoreFinish(true);
-
             }
         }
 

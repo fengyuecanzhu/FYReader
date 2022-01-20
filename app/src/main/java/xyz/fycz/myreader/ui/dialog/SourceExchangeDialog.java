@@ -83,6 +83,11 @@ public class SourceExchangeDialog extends Dialog {
         }
         return sourceIndex == -1 ? 0 : sourceIndex;
     }
+
+    public boolean hasCurBookSource(){
+        return getSourceIndex() == sourceIndex;
+    }
+
     public void setOnSourceChangeListener(OnSourceChangeListener listener) {
         this.listener = listener;
     }
