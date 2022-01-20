@@ -43,6 +43,7 @@ public class BookSource implements Parcelable, Cloneable {
     private String sourceType;
     private String sourceHeaders;
     private String loginUrl;
+    private String loginCheckJs;
     private String sourceComment;
     private String concurrentRate;
     private Long lastUpdateTime;
@@ -114,6 +115,7 @@ public class BookSource implements Parcelable, Cloneable {
         sourceType = in.readString();
         sourceHeaders = in.readString();
         loginUrl = in.readString();
+        loginCheckJs = in.readString();
         sourceComment = in.readString();
         concurrentRate = in.readString();
         if (in.readByte() == 0) {
@@ -141,6 +143,7 @@ public class BookSource implements Parcelable, Cloneable {
         dest.writeString(sourceType);
         dest.writeString(sourceHeaders);
         dest.writeString(loginUrl);
+        dest.writeString(loginCheckJs);
         dest.writeString(sourceComment);
         dest.writeString(concurrentRate);
         if (lastUpdateTime == null) {
@@ -190,6 +193,7 @@ public class BookSource implements Parcelable, Cloneable {
                 stringEquals(sourceType, source.sourceType) &&
                 stringEquals(sourceHeaders, source.sourceHeaders) &&
                 stringEquals(loginUrl, source.loginUrl) &&
+                stringEquals(loginCheckJs, source.loginCheckJs) &&
                 stringEquals(sourceComment, source.sourceComment) &&
                 stringEquals(concurrentRate, source.concurrentRate) &&
                 Objects.equals(searchRule, source.searchRule) &&
@@ -400,6 +404,14 @@ public class BookSource implements Parcelable, Cloneable {
 
     public void setLoginUrl(String loginUrl) {
         this.loginUrl = loginUrl;
+    }
+
+    public String getLoginCheckJs() {
+        return loginCheckJs;
+    }
+
+    public void setLoginCheckJs(String loginCheckJs) {
+        this.loginCheckJs = loginCheckJs;
     }
 
     public String getConcurrentRate() {

@@ -51,11 +51,11 @@ object WebBook {
             )
             var res = analyzeUrl.getStrResponseAwait()
             //检测书源是否已登录
-            /*bookSource.loginCheckJs?.let { checkJs ->
+            bookSource.loginCheckJs?.let { checkJs ->
                 if (checkJs.isNotBlank()) {
                     res = analyzeUrl.evalJS(checkJs, res) as StrResponse
                 }
-            }*/
+            }
             return BookList.analyzeBookList(
                 scope,
                 bookSource,
@@ -101,11 +101,11 @@ object WebBook {
         )
         var res = analyzeUrl.getStrResponseAwait()
         //检测书源是否已登录
-        /*bookSource.loginCheckJs?.let { checkJs ->
+        bookSource.loginCheckJs?.let { checkJs ->
             if (checkJs.isNotBlank()) {
                 res = analyzeUrl.evalJS(checkJs, result = res) as StrResponse
             }
-        }*/
+        }
         return BookList.analyzeBookList(
             scope,
             bookSource,
@@ -159,11 +159,11 @@ object WebBook {
             )
             var res = analyzeUrl.getStrResponseAwait()
             //检测书源是否已登录
-            /*bookSource.loginCheckJs?.let { checkJs ->
+            bookSource.loginCheckJs?.let { checkJs ->
                 if (checkJs.isNotBlank()) {
                     res = analyzeUrl.evalJS(checkJs, result = res) as StrResponse
                 }
-            }*/
+            }
             BookInfo.analyzeBookInfo(
                 scope,
                 bookSource,
@@ -215,11 +215,11 @@ object WebBook {
             )
             var res = analyzeUrl.getStrResponseAwait()
             //检测书源是否已登录
-            /*bookSource.loginCheckJs?.let { checkJs ->
+            bookSource.loginCheckJs?.let { checkJs ->
                 if (checkJs.isNotBlank()) {
                     res = analyzeUrl.evalJS(checkJs, result = res) as StrResponse
                 }
-            }*/
+            }
             BookChapterList.analyzeChapterList(
                 scope,
                 bookSource,
@@ -284,11 +284,11 @@ object WebBook {
             )*/
             var res = analyzeUrl.getStrResponseAwait()
             //检测书源是否已登录
-            /*bookSource.loginCheckJs?.let { checkJs ->
+            bookSource.loginCheckJs?.let { checkJs ->
                 if (checkJs.isNotBlank()) {
                     res = analyzeUrl.evalJS(checkJs, result = res) as StrResponse
                 }
-            }*/
+            }
             BookContent.analyzeContent(
                 scope,
                 bookSource,

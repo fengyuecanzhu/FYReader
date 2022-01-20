@@ -18,10 +18,13 @@ import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.entity.thirdsource.BookSource3Bean;
 import xyz.fycz.myreader.entity.thirdsource.BookSourceBean;
 import xyz.fycz.myreader.entity.thirdsource.ThirdSourceUtil;
+import xyz.fycz.myreader.entity.thirdsource.source3.Source3;
+import xyz.fycz.myreader.entity.thirdsource.source3.Third3SourceUtil;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.DbManager;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.gen.BookSourceDao;
+import xyz.fycz.myreader.model.third3.SourceAnalyzer;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.FileUtils;
@@ -355,15 +358,16 @@ public class BookSourceManager {
                     return sources;
                 }
 
+                List<Source3> source3s = SourceAnalyzer.INSTANCE.jsonToBookSources(json);
+                String source3sJson = GsonExtensionsKt.getGSON().toJson(source3s);
+                if (source3s.size() > 0 && source3sJson.length() > source3s.size() * SOURCE_LENGTH) {
+                    return Third3SourceUtil.INSTANCE.source3sToSources(source3s);
+                }
+
                 List<BookSourceBean> source2s = GsonUtils.parseJArray(json, BookSourceBean.class);
                 String source2sJson = GsonExtensionsKt.getGSON().toJson(source2s);
                 if (source2s.size() > 0 && source2sJson.length() > source2s.size() * SOURCE_LENGTH) {
                     return ThirdSourceUtil.source2sToSources(source2s);
-                }
-                List<BookSource3Bean> source3s = GsonUtils.parseJArray(json, BookSource3Bean.class);
-                String source3sJson = GsonExtensionsKt.getGSON().toJson(source3s);
-                if (source3s.size() > 0 && source3sJson.length() > source3s.size() * SOURCE_LENGTH) {
-                    return ThirdSourceUtil.source3sToSources(source3s);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -379,6 +383,13 @@ public class BookSourceManager {
                     return sources;
                 }
 
+                Source3 source3 = SourceAnalyzer.INSTANCE.jsonToBookSource(json);
+                String source3Json = GsonExtensionsKt.getGSON().toJson(source3);
+                if (!StringHelper.isEmpty(source3Json) && source3Json.length() > SOURCE_LENGTH) {
+                    sources.add(Third3SourceUtil.INSTANCE.source3ToSource(source3));
+                    return sources;
+                }
+
                 BookSourceBean source2 = GsonUtils.parseJObject(json, BookSourceBean.class);
                 String source2Json = GsonExtensionsKt.getGSON().toJson(source2);
                 if (!StringHelper.isEmpty(source2Json) && source2Json.length() > SOURCE_LENGTH) {
@@ -386,12 +397,6 @@ public class BookSourceManager {
                     return sources;
                 }
 
-                BookSource3Bean source3 = GsonUtils.parseJObject(json, BookSource3Bean.class);
-                String source3Json = GsonExtensionsKt.getGSON().toJson(source3);
-                if (!StringHelper.isEmpty(source3Json) && source3Json.length() > SOURCE_LENGTH) {
-                    sources.add(ThirdSourceUtil.source3ToSource(source3));
-                    return sources;
-                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
