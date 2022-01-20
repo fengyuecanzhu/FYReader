@@ -471,20 +471,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         initBottomMenuClick();
 
         mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
-            Book bookTem = (Book) mBook.clone();
-            bookTem.clearCathe();
-            bookTem.setInfoUrl(bean.getInfoUrl());
-            bookTem.setChapterUrl(bean.getChapterUrl());
-            bookTem.setSource(bean.getSource());
-            if (!StringHelper.isEmpty(bean.getImgUrl())) {
-                bookTem.setImgUrl(bean.getImgUrl());
-            }
-            if (!StringHelper.isEmpty(bean.getType())) {
-                bookTem.setType(bean.getType());
-            }
-            if (!StringHelper.isEmpty(bean.getDesc())) {
-                bookTem.setDesc(bean.getDesc());
-            }
+            Book bookTem = mBook.changeSource(bean);
             mBookService.updateBook(mBook, bookTem);
             mBook = bookTem;
             aBooks = mSourceDialog.getaBooks();

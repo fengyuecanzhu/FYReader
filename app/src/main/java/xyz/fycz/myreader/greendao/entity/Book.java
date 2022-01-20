@@ -2,6 +2,7 @@ package xyz.fycz.myreader.greendao.entity;
 
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +17,8 @@ import org.greenrobot.greendao.annotation.Transient;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.model.third3.analyzeRule.RuleDataInterface;
 import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.help.StringHelper;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -385,15 +388,19 @@ public class Book implements Serializable, RuleDataInterface {
             variableMap = new HashMap<>();
         }
         variableMap.put(key, value);
-        variable = new Gson().toJson(variableMap);
+        variable = GsonExtensionsKt.getGSON().toJson(variableMap);
     }
 
     @NonNull
     public Map<String, String> getVariableMap() {
         if (variableMap == null && !TextUtils.isEmpty(variable)) {
-            variableMap = new Gson().fromJson(variable, MAP_STRING);
+            variableMap = GsonExtensionsKt.getGSON().fromJson(variable, MAP_STRING);
         }
         return variableMap;
+    }
+
+    public void setVariableMap(Map<String, String> variableMap) {
+        this.variableMap = variableMap;
     }
 
 
@@ -403,6 +410,10 @@ public class Book implements Serializable, RuleDataInterface {
 
     public void setVariable(String variable) {
         this.variable = variable;
+    }
+
+    public Map<String, String> getCatheMap() {
+        return catheMap;
     }
 
     public void putCathe(String key, String value) {
@@ -417,6 +428,10 @@ public class Book implements Serializable, RuleDataInterface {
             return "";
         }
         return catheMap.get(key);
+    }
+
+    public void setCatheMap(Map<String, String> catheMap) {
+        this.catheMap = catheMap;
     }
 
     public void clearCathe(){
@@ -436,6 +451,40 @@ public class Book implements Serializable, RuleDataInterface {
     @Nullable
     @Override
     public String getVariable(@NonNull String key) {
-        return variableMap.get(key);
+        return getVariableMap().get(key);
+    }
+
+    public Book changeSource(Book newBook){
+        Book bookTem = (Book) clone();
+        bookTem.clearCathe();
+        bookTem.setChapterUrl(newBook.getChapterUrl());
+        bookTem.setInfoUrl(newBook.getInfoUrl());
+        bookTem.setSource(newBook.getSource());
+        if (!StringHelper.isEmpty(newBook.getImgUrl())) {
+            bookTem.setImgUrl(newBook.getImgUrl());
+        }
+        if (!StringHelper.isEmpty(newBook.getType())) {
+            bookTem.setType(newBook.getType());
+        }
+        if (!StringHelper.isEmpty(newBook.getDesc())) {
+            bookTem.setDesc(newBook.getDesc());
+        }
+        if (!StringHelper.isEmpty(newBook.getUpdateDate())) {
+            bookTem.setUpdateDate(newBook.getUpdateDate());
+        }
+        if (!StringHelper.isEmpty(newBook.getWordCount())) {
+            bookTem.setWordCount(newBook.getWordCount());
+        }
+        if (!StringHelper.isEmpty(newBook.getStatus())) {
+            bookTem.setStatus(newBook.getStatus());
+        }
+        if (!StringHelper.isEmpty(newBook.getVariable())) {
+            bookTem.setVariable(newBook.getVariable());
+            bookTem.setVariableMap(newBook.getVariableMap());
+        }
+        if (newBook.getCatheMap() != null){
+            bookTem.setCatheMap(newBook.getCatheMap());
+        }
+        return bookTem;
     }
 }

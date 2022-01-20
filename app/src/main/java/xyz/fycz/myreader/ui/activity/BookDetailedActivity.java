@@ -293,29 +293,7 @@ public class BookDetailedActivity extends BaseActivity {
 
         //换源对话框
         mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
-            Book bookTem = (Book) mBook.clone();
-            bookTem.clearCathe();
-            bookTem.setChapterUrl(bean.getChapterUrl());
-            bookTem.setInfoUrl(bean.getInfoUrl());
-            bookTem.setSource(bean.getSource());
-            if (!StringHelper.isEmpty(bean.getImgUrl())) {
-                bookTem.setImgUrl(bean.getImgUrl());
-            }
-            if (!StringHelper.isEmpty(bean.getType())) {
-                bookTem.setType(bean.getType());
-            }
-            if (!StringHelper.isEmpty(bean.getDesc())) {
-                bookTem.setDesc(bean.getDesc());
-            }
-            if (!StringHelper.isEmpty(bean.getUpdateDate())) {
-                bookTem.setUpdateDate(bean.getUpdateDate());
-            }
-            if (!StringHelper.isEmpty(bean.getWordCount())) {
-                bookTem.setWordCount(bean.getWordCount());
-            }
-            if (!StringHelper.isEmpty(bean.getStatus())) {
-                bookTem.setStatus(bean.getStatus());
-            }
+            Book bookTem = mBook.changeSource(bean);
             if (isCollected) {
                 mBookService.updateBook(mBook, bookTem);
             }

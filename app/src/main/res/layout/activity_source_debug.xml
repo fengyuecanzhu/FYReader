@@ -1,64 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <include layout="@layout/toolbar" />
 
-    <TextView
-        android:id="@+id/tv_tip"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorForeground"
-        android:padding="10dp"
-        android:textColor="@color/textSecondary"
-        android:textSize="13sp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:background="@color/colorForeground"
-        android:elevation="3dp"
-        app:tabSelectedTextColor="@color/colorAccent">
+        <include layout="@layout/toolbar" />
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/tv_tip"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/parse_result" />
+            android:background="@color/colorForeground"
+            android:padding="10dp"
+            android:textColor="@color/textSecondary"
+            android:textSize="13sp" />
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/source_code" />
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:background="@color/colorForeground"
+            android:elevation="3dp"
+            app:tabSelectedTextColor="@color/colorAccent">
 
-    </com.google.android.material.tabs.TabLayout>
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/parse_result" />
 
-    <RelativeLayout
-        android:background="#474949"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/source_code" />
 
-        <xyz.fycz.myreader.widget.codeview.CodeView
-            android:id="@+id/rv_parse_result"
+        </com.google.android.material.tabs.TabLayout>
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            app:cv_font_size="10"
-            app:cv_zoom_enable="true"
-            android:visibility="visible" />
+            android:background="#474949">
 
-        <xyz.fycz.myreader.widget.codeview.CodeView
-            android:id="@+id/rv_source_code"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            app:cv_font_size="10"
-            app:cv_zoom_enable="true"
-            android:visibility="gone" />
-    </RelativeLayout>
+            <xyz.fycz.myreader.widget.codeview.CodeView
+                android:id="@+id/rv_parse_result"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                android:visibility="visible"
+                app:cv_font_size="10"
+                app:cv_zoom_enable="true" />
+
+            <xyz.fycz.myreader.widget.codeview.CodeView
+                android:id="@+id/rv_source_code"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                android:visibility="gone"
+                app:cv_font_size="10"
+                app:cv_zoom_enable="true" />
+        </RelativeLayout>
 
 
-</LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

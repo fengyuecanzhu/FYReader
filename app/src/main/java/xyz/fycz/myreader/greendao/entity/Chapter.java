@@ -4,6 +4,7 @@ package xyz.fycz.myreader.greendao.entity;
 import static xyz.fycz.myreader.common.APPCONST.MAP_STRING;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +19,7 @@ import org.greenrobot.greendao.annotation.Transient;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.model.third3.analyzeRule.RuleDataInterface;
 import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 
 import java.io.File;
 import java.util.HashMap;
@@ -144,18 +146,18 @@ public class Chapter implements RuleDataInterface {
         this.end = end;
     }
 
-    public void putVariable(String key, String value) {
+    public void putVariable(@NonNull String key, String value) {
         if (variableMap == null) {
             variableMap = new HashMap<>();
         }
         variableMap.put(key, value);
-        variable = new Gson().toJson(variableMap);
+        variable = GsonExtensionsKt.getGSON().toJson(variableMap);
     }
 
     @NonNull
     public Map<String, String> getVariableMap() {
         if (variableMap == null && !TextUtils.isEmpty(variable)) {
-            variableMap = new Gson().fromJson(variable, MAP_STRING);
+            variableMap = GsonExtensionsKt.getGSON().fromJson(variable, MAP_STRING);
         }
         return variableMap;
     }
@@ -163,7 +165,7 @@ public class Chapter implements RuleDataInterface {
     @Nullable
     @Override
     public String getVariable(@NonNull String key) {
-        return variableMap.get(key);
+        return getVariableMap().get(key);
     }
 
     public String getVariable() {
