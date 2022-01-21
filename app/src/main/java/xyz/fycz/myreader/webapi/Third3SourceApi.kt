@@ -8,6 +8,7 @@ import xyz.fycz.myreader.entity.SearchBookBean
 import xyz.fycz.myreader.greendao.entity.Book
 import xyz.fycz.myreader.greendao.entity.Chapter
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap
+import xyz.fycz.myreader.model.third3.NoStackTraceException
 import xyz.fycz.myreader.model.third3.webBook.WebBook
 import xyz.fycz.myreader.webapi.crawler.source.Third3Crawler
 import xyz.fycz.myreader.webapi.crawler.source.find.Third3FindCrawler
@@ -95,6 +96,10 @@ object Third3SourceApi : AndroidViewModel(App.getApplication()) {
 
     fun findBook(url: String, fc: Third3FindCrawler, page: Int): Observable<List<Book>> {
         return Observable.create { emitter ->
+            if (!url.contains("{{page}}") && page > 1){
+                emitter.onError(NoStackTraceException("没有下一页"))
+                return@create
+            }
             WebBook.exploreBook(
                 scope,
                 fc.source,
