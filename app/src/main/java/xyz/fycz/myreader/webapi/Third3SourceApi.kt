@@ -3,6 +3,8 @@ package xyz.fycz.myreader.webapi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.reactivex.Observable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.entity.SearchBookBean
 import xyz.fycz.myreader.greendao.entity.Book
@@ -12,6 +14,7 @@ import xyz.fycz.myreader.model.third3.NoStackTraceException
 import xyz.fycz.myreader.model.third3.webBook.WebBook
 import xyz.fycz.myreader.webapi.crawler.source.Third3Crawler
 import xyz.fycz.myreader.webapi.crawler.source.find.Third3FindCrawler
+import java.util.concurrent.ExecutorService
 
 /**
  * @author fengyue
@@ -22,7 +25,8 @@ object Third3SourceApi : AndroidViewModel(App.getApplication()) {
 
     fun searchByT3C(
         key: String,
-        rc: Third3Crawler
+        rc: Third3Crawler,
+        searchPool: ExecutorService? = null
     ): Observable<ConMVMap<SearchBookBean, Book>> {
         return Observable.create { emitter ->
             WebBook.searchBook(
@@ -30,6 +34,7 @@ object Third3SourceApi : AndroidViewModel(App.getApplication()) {
                 rc.source,
                 key,
                 1,
+                searchPool?.asCoroutineDispatcher() ?: Dispatchers.IO
             ).timeout(30000L)
                 .onSuccess {
                     emitter.onNext(rc.getBooks(it))

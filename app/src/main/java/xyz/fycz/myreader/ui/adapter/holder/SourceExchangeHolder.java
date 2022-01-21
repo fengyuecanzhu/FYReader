@@ -43,7 +43,8 @@ public class SourceExchangeHolder extends ViewHolderImpl<Book> {
         sourceTvTitle.setText(BookSourceManager.getSourceNameByStr(data.getSource()));
         sourceTvChapter.setText(data.getNewestChapterTitle());
         if ((data.getInfoUrl() != null && data.getInfoUrl().equals(dialog.getmShelfBook().getInfoUrl())||
-                data.getChapterUrl() != null && data.getChapterUrl().equals(dialog.getmShelfBook().getChapterUrl()))) {
+                data.getChapterUrl() != null && data.getChapterUrl().equals(dialog.getmShelfBook().getChapterUrl()))&&
+                (data.getSource() != null && data.getSource().equals(dialog.getmShelfBook().getSource()))) {
             sourceIv.setVisibility(View.VISIBLE);
             dialog.setSourceIndex(pos);
         } else {

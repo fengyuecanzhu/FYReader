@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 
 import io.reactivex.Observable;
@@ -45,8 +46,11 @@ public class ThirdSourceApi {
      * @return
      */
     protected static Observable<ConMVMap<SearchBookBean, Book>> searchByTC(String key, final ThirdCrawler rc) {
+        return searchByTC(key, rc, null);
+    }
+    protected static Observable<ConMVMap<SearchBookBean, Book>> searchByTC(String key, final ThirdCrawler rc, ExecutorService searchPool) {
         if (rc instanceof Third3Crawler) {
-            return Third3SourceApi.INSTANCE.searchByT3C(key, (Third3Crawler) rc);
+            return Third3SourceApi.INSTANCE.searchByT3C(key, (Third3Crawler) rc, searchPool);
         }
         try {
             Map<String, String> headers = rc.getHeaders();

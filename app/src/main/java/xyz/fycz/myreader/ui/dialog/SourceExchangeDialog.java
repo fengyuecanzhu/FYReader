@@ -64,15 +64,16 @@ public class SourceExchangeDialog extends Dialog {
         this.mShelfBook = mShelfBook;
     }
 
-    public void setABooks(List<Book> aBooks){
+    public void setABooks(List<Book> aBooks) {
         this.aBooks = aBooks;
     }
 
-    public void setSourceIndex(int sourceIndex){
+    public void setSourceIndex(int sourceIndex) {
         this.sourceIndex = sourceIndex;
     }
+
     public int getSourceIndex() {
-        if (sourceIndex == -1){
+        if (sourceIndex == -1) {
             for (int i = 0; i < aBooks.size(); i++) {
                 Book book = aBooks.get(i);
                 if (book.getSource().equals(mShelfBook.getSource())) {
@@ -84,7 +85,7 @@ public class SourceExchangeDialog extends Dialog {
         return sourceIndex == -1 ? 0 : sourceIndex;
     }
 
-    public boolean hasCurBookSource(){
+    public boolean hasCurBookSource() {
         return getSourceIndex() == sourceIndex;
     }
 
@@ -92,7 +93,9 @@ public class SourceExchangeDialog extends Dialog {
         this.listener = listener;
     }
 
-    public List<Book> getaBooks(){return aBooks;}
+    public List<Book> getaBooks() {
+        return aBooks;
+    }
 
     public Book getmShelfBook() {
         return mShelfBook;
@@ -115,7 +118,7 @@ public class SourceExchangeDialog extends Dialog {
         if (aBooks.size() == 0) {
             searchEngine.search(mShelfBook.getName(), mShelfBook.getAuthor());
             binding.rpb.setIsAutoLoading(true);
-        }else {
+        } else {
             if (mAdapter.getItemCount() == 0) {
                 mAdapter.addItems(aBooks);
             }
@@ -182,7 +185,7 @@ public class SourceExchangeDialog extends Dialog {
                     if (TextUtils.isEmpty(sourceSearchStr)) {
                         mAdapter.addItem(bean);
                     } else {
-                        if (BookSourceManager.getSourceNameByStr(bean.getSource()).contains(sourceSearchStr)){
+                        if (BookSourceManager.getSourceNameByStr(bean.getSource()).contains(sourceSearchStr)) {
                             mAdapter.addItem(bean);
                         }
                     }
@@ -205,8 +208,10 @@ public class SourceExchangeDialog extends Dialog {
                 searchEngine.stopSearch();
                 return;
             }
-            if ((mShelfBook.getInfoUrl() != null && mShelfBook.getInfoUrl().equals(newBook.getInfoUrl())||
-                    mShelfBook.getChapterUrl() != null && mShelfBook.getChapterUrl().equals(newBook.getChapterUrl()))) return;
+            if ((mShelfBook.getInfoUrl() != null && mShelfBook.getInfoUrl().equals(newBook.getInfoUrl()) ||
+                    mShelfBook.getChapterUrl() != null && mShelfBook.getChapterUrl().equals(newBook.getChapterUrl())) &&
+                    (mShelfBook.getSource() != null && mShelfBook.getSource().equals(newBook.getSource())))
+                return;
             mShelfBook = newBook;
             listener.onSourceChanged(newBook, pos);
             mAdapter.getItem(pos).setNewestChapterId("true");
@@ -245,7 +250,7 @@ public class SourceExchangeDialog extends Dialog {
         });
     }
 
-    public void stopSearch(){
+    public void stopSearch() {
         if (searchEngine != null) {
             searchEngine.stopSearch();
         }

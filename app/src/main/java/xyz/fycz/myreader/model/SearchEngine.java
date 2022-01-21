@@ -143,7 +143,7 @@ public class SearchEngine {
         searchSiteIndex++;
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
-            BookApi.search(keyword, crawler)
+            BookApi.search(keyword, crawler, executorService)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<ConMVMap<SearchBookBean, Book>>() {
@@ -191,7 +191,7 @@ public class SearchEngine {
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
             String searchKey = title;
-            BookApi.search(searchKey, crawler)
+            BookApi.search(searchKey, crawler, executorService)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<ConMVMap<SearchBookBean, Book>>() {

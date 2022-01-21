@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
@@ -30,14 +31,20 @@ import static xyz.fycz.myreader.util.utils.OkHttpUtils.getCookies;
 
 
 public class BookApi {
+
+
     /**
      * 搜索小说
      *
      * @param key
      */
     public static Observable<ConMVMap<SearchBookBean, Book>> search(String key, final ReadCrawler rc) {
+        return search(key, rc, null);
+    }
+
+    public static Observable<ConMVMap<SearchBookBean, Book>> search(String key, final ReadCrawler rc, ExecutorService searchPool) {
         if (rc instanceof ThirdCrawler) {
-            return ThirdSourceApi.searchByTC(key, (ThirdCrawler) rc);
+            return ThirdSourceApi.searchByTC(key, (ThirdCrawler) rc, searchPool);
         }
         String charset = "utf-8";
         if (rc instanceof TianLaiReadCrawler) {
@@ -147,10 +154,11 @@ public class BookApi {
 
 
     public static Observable<List<Book>> findBooks(FindKind kind, FindCrawler findCrawler, int page) {
-        if (findCrawler instanceof ThirdFindCrawler){
+        if (findCrawler instanceof ThirdFindCrawler) {
             return ThirdSourceApi.findBook(kind.getUrl(), (ThirdFindCrawler) findCrawler, page);
         }
-        if (kind.getMaxPage() > 0 && page > kind.getMaxPage()) return Observable.just(Collections.EMPTY_LIST);
+        if (kind.getMaxPage() > 0 && page > kind.getMaxPage())
+            return Observable.just(Collections.EMPTY_LIST);
         String url = kind.getUrl().replace("{page}", page + "");
         return Observable.create((ObservableOnSubscribe<StrResponse>) emitter -> {
             emitter.onNext(OkHttpUtils.getStrResponse(url, null, null));
