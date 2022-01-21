@@ -205,7 +205,8 @@ public class SourceExchangeDialog extends Dialog {
                 searchEngine.stopSearch();
                 return;
             }
-            if (mShelfBook.getSource().equals(newBook.getSource())) return;
+            if ((mShelfBook.getInfoUrl() != null && mShelfBook.getInfoUrl().equals(newBook.getInfoUrl())||
+                    mShelfBook.getChapterUrl() != null && mShelfBook.getChapterUrl().equals(newBook.getChapterUrl()))) return;
             mShelfBook = newBook;
             listener.onSourceChanged(newBook, pos);
             mAdapter.getItem(pos).setNewestChapterId("true");

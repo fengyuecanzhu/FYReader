@@ -92,11 +92,11 @@ public class Book implements Serializable, RuleDataInterface {
 
     @Generated(hash = 1472063028)
     public Book(String id, String name, String chapterUrl, String infoUrl, String imgUrl, String desc, String author,
-            String type, String updateDate, String wordCount, String status, String newestChapterId,
-            String newestChapterTitle, String historyChapterId, int histtoryChapterNum, int sortCode, int noReadNum,
-            int chapterTotalNum, int lastReadPosition, String source, boolean isCloseUpdate, boolean isDownLoadAll,
-            String groupId, int groupSort, boolean reSeg, String tag, Boolean replaceEnable, long lastReadTime,
-            String variable) {
+                String type, String updateDate, String wordCount, String status, String newestChapterId,
+                String newestChapterTitle, String historyChapterId, int histtoryChapterNum, int sortCode, int noReadNum,
+                int chapterTotalNum, int lastReadPosition, String source, boolean isCloseUpdate, boolean isDownLoadAll,
+                String groupId, int groupSort, boolean reSeg, String tag, Boolean replaceEnable, long lastReadTime,
+                String variable) {
         this.id = id;
         this.name = name;
         this.chapterUrl = chapterUrl;
@@ -306,8 +306,11 @@ public class Book implements Serializable, RuleDataInterface {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
+        boolean flag = chapterUrl == null ?
+                (infoUrl == null || infoUrl.equals(book.infoUrl)) :
+                chapterUrl.equals(book.chapterUrl);
         return name.equals(book.name) &&
-                chapterUrl.equals(book.chapterUrl) &&
+                flag && author != null &&
                 author.equals(book.author) &&
                 source.equals(book.source);
     }
@@ -396,6 +399,9 @@ public class Book implements Serializable, RuleDataInterface {
         if (variableMap == null && !TextUtils.isEmpty(variable)) {
             variableMap = GsonExtensionsKt.getGSON().fromJson(variable, MAP_STRING);
         }
+        if (variableMap == null) {
+            variableMap = new HashMap<>();
+        }
         return variableMap;
     }
 
@@ -423,8 +429,8 @@ public class Book implements Serializable, RuleDataInterface {
         catheMap.put(key, value);
     }
 
-    public String getCathe(String key){
-        if (catheMap == null){
+    public String getCathe(String key) {
+        if (catheMap == null) {
             return "";
         }
         return catheMap.get(key);
@@ -434,7 +440,7 @@ public class Book implements Serializable, RuleDataInterface {
         this.catheMap = catheMap;
     }
 
-    public void clearCathe(){
+    public void clearCathe() {
         if (catheMap != null) {
             catheMap.clear();
         }
@@ -454,7 +460,7 @@ public class Book implements Serializable, RuleDataInterface {
         return getVariableMap().get(key);
     }
 
-    public Book changeSource(Book newBook){
+    public Book changeSource(Book newBook) {
         Book bookTem = (Book) clone();
         bookTem.clearCathe();
         bookTem.setChapterUrl(newBook.getChapterUrl());
@@ -482,9 +488,11 @@ public class Book implements Serializable, RuleDataInterface {
             bookTem.setVariable(newBook.getVariable());
             bookTem.setVariableMap(newBook.getVariableMap());
         }
-        if (newBook.getCatheMap() != null){
+        if (newBook.getCatheMap() != null) {
             bookTem.setCatheMap(newBook.getCatheMap());
         }
         return bookTem;
     }
+
+    public void setReverseToc(boolean reverseToc){}
 }

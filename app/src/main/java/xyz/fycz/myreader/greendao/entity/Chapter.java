@@ -159,6 +159,9 @@ public class Chapter implements RuleDataInterface {
         if (variableMap == null && !TextUtils.isEmpty(variable)) {
             variableMap = GsonExtensionsKt.getGSON().fromJson(variable, MAP_STRING);
         }
+        if (variableMap == null) {
+            variableMap = new HashMap<>();
+        }
         return variableMap;
     }
 
