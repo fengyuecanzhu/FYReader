@@ -448,6 +448,7 @@
     <string name="share_all">分享所有</string>
     <string name="parse_result">解析结果</string>
     <string name="source_code">网页源码</string>
+    <string name="debug_log">调试日志</string>
     <string name="re_request">重新请求</string>
     <string name="debug_search">测试搜索配置</string>
     <string name="debug_info">测试书籍详情</string>
@@ -540,6 +541,7 @@
     <string name="net_error_10001">没有网络</string>
     <string name="net_error_10002">网络连接超时</string>
     <string name="net_error_10003">数据解析失败</string>
+    <string name="copy_source">拷贝书源</string>
     <!--error string end-->
 
     <string-array name="reset_screen_time">

@@ -12,10 +12,10 @@ import org.jsoup.Connection
 import org.jsoup.Jsoup
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.common.APPCONST
-import xyz.fycz.myreader.greendao.entity.rule.BookSource
 import xyz.fycz.myreader.greendao.service.CacheManager
 import xyz.fycz.myreader.greendao.service.CookieStore
 import xyz.fycz.myreader.model.third3.BaseSource
+import xyz.fycz.myreader.model.third3.Debug
 import xyz.fycz.myreader.model.third3.http.*
 import xyz.fycz.myreader.util.ZipUtils
 import xyz.fycz.myreader.util.utils.*
@@ -484,9 +484,9 @@ interface JsExtensions {
      * 输出调试日志
      */
     fun log(msg: String): String {
-        /*getSource()?.let {
-            Debug.log(it.sourceUrl, msg)
-        } ?: Debug.log(msg)*/
+        getSource()?.let {
+            Debug.log(it.getKey(), msg)
+        } ?: Debug.log(msg)
         if (App.isDebug()) {
             Log.d(TAG + "-" + getSource()?.getKey(), msg)
         }

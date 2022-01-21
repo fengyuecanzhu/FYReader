@@ -9,7 +9,6 @@ import okhttp3.Response
 import xyz.fycz.myreader.common.APPCONST.*
 import xyz.fycz.myreader.greendao.entity.Book
 import xyz.fycz.myreader.greendao.entity.Chapter
-import xyz.fycz.myreader.greendao.entity.rule.BookSource
 import xyz.fycz.myreader.greendao.service.CacheManager
 import xyz.fycz.myreader.greendao.service.CookieStore
 import xyz.fycz.myreader.model.third3.BaseSource
@@ -280,7 +279,7 @@ class AnalyzeUrl(
      */
     private fun fetchStart(): ConcurrentRecord? {
         source ?: return null
-        val concurrentRate = source.concurrentRate
+        val concurrentRate = source.getConcurrentRateKt()
         if (concurrentRate.isNullOrEmpty()) {
             return null
         }

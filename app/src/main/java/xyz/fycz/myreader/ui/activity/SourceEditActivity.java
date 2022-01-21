@@ -1,6 +1,9 @@
 package xyz.fycz.myreader.ui.activity;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -30,6 +33,7 @@ import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.webapi.crawler.source.MatcherCrawler;
 
 /**
@@ -182,6 +186,14 @@ public class SourceEditActivity extends BaseActivity {
             } else {
                 ToastUtils.showWarring("当前书源没有配置登录地址");
             }
+        } else if (item.getItemId() == R.id.action_copy_source) {
+            ClipboardManager mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            //数据
+            ClipData mClipData = ClipData.newPlainText("Label",
+                    GsonExtensionsKt.getGSON().toJson(getSource()));
+            //把数据设置到剪切板上
+            mClipboardManager.setPrimaryClip(mClipData);
+            ToastUtils.showSuccess("拷贝成功");
         } else if (item.getItemId() == R.id.action_clear_cookie) {
             DbManager.getDaoSession().getCookieBeanDao().deleteByKey(getSource().getSourceUrl());
             ToastUtils.showSuccess("Cookie清除成功");

@@ -425,14 +425,21 @@ public class BookSource extends BaseSource implements Parcelable, Cloneable {
         this.concurrentRate = concurrentRate;
     }
 
+    @Nullable
     @Override
-    public String getHeader() {
-        return sourceHeaders;
+    public String getConcurrentRateKt() {
+        return concurrentRate;
+    }
+
+    @Nullable
+    @Override
+    public String getLoginUrlKt() {
+        return loginUrl;
     }
 
     @Override
-    public void setHeader(@Nullable String header) {
-        this.sourceHeaders = header;
+    public String getHeader() {
+        return sourceHeaders;
     }
 
     @NonNull

@@ -10,7 +10,6 @@ import xyz.fycz.myreader.common.APPCONST.JS_PATTERN_3
 import xyz.fycz.myreader.common.APPCONST.SCRIPT_ENGINE
 import xyz.fycz.myreader.greendao.entity.Book
 import xyz.fycz.myreader.greendao.entity.Chapter
-import xyz.fycz.myreader.greendao.entity.rule.BookSource
 import xyz.fycz.myreader.greendao.service.CacheManager
 import xyz.fycz.myreader.greendao.service.CookieStore
 import xyz.fycz.myreader.model.third3.BaseSource

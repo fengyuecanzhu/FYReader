@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.ui.activity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,6 +28,7 @@ import okhttp3.RequestBody;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.observer.MyObserver;
+import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySourceDebugBinding;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.StrResponse;
@@ -36,7 +38,9 @@ import xyz.fycz.myreader.entity.sourcedebug.DebugEntity;
 import xyz.fycz.myreader.entity.sourcedebug.ListResult;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
+import xyz.fycz.myreader.model.third3.Debug;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -63,6 +67,8 @@ public class SourceDebugActivity extends BaseActivity {
     private ReadCrawler rc;
     private Disposable disposable;
     private LoadingDialog loadingDialog;
+    private boolean isThird3;
+    private StringBuilder logSb;
 
     @Override
     protected void bindView() {
@@ -96,12 +102,20 @@ public class SourceDebugActivity extends BaseActivity {
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
         debugEntity = getIntent().getParcelableExtra("debugEntity");
-        rc = ReadCrawlerUtil.getReadCrawler(debugEntity.getBookSource(), true);
+        if (debugEntity == null) finish();
+        BookSource source = debugEntity.getBookSource();
+        isThird3 = APPCONST.THIRD_3_SOURCE.equals(source.getSourceType());
+        rc = ReadCrawlerUtil.getReadCrawler(source, true);
         loadingDialog = new LoadingDialog(this, "正在请求", () -> {
             if (disposable != null && !disposable.isDisposed()) {
                 disposable.dispose();
             }
         });
+        if (isThird3) {
+            binding.tabLayout.getTabAt(1).setText(R.string.debug_log);
+            logSb = new StringBuilder();
+            Debug.INSTANCE.setCallback(msg -> logSb.append(msg).append("\n"));
+        }
     }
 
     @Override
@@ -112,7 +126,7 @@ public class SourceDebugActivity extends BaseActivity {
                 debugEntity.getBookSource().getSourceUrl(),
                 debugEntity.getUrl()));
         binding.rvParseResult.setLanguage(Language.JSON);
-        binding.rvSourceCode.setLanguage(Language.HTML);
+        binding.rvSourceCode.setLanguage(Language.AUTO);
         binding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -141,6 +155,9 @@ public class SourceDebugActivity extends BaseActivity {
     protected void onDestroy() {
         if (loadingDialog != null) {
             loadingDialog.dismiss();
+        }
+        if (isThird3) {
+            Debug.INSTANCE.setCallback(null);
         }
         super.onDestroy();
     }
@@ -196,7 +213,11 @@ public class SourceDebugActivity extends BaseActivity {
             @Override
             public void onNext(@NonNull Boolean flag) {
                 binding.rvParseResult.setCode(debugEntity.getParseResult()).apply();
-                binding.rvSourceCode.setCode(debugEntity.getHtml()).apply();
+                if (!isThird3) {
+                    binding.rvSourceCode.setCode(debugEntity.getHtml()).apply();
+                } else {
+                    binding.rvSourceCode.setCode(logSb.toString()).apply();
+                }
                 loadingDialog.dismiss();
             }
 
@@ -204,7 +225,11 @@ public class SourceDebugActivity extends BaseActivity {
             public void onError(Throwable e) {
                 binding.rvParseResult.setCode(String.format("{\n\b\b\b\b\"result\": \"error\", \n\b\b\b\b\"msg\": \"%s\"\n}"
                         , e.getLocalizedMessage().replace("\"", "\\\""))).apply();
-                binding.rvSourceCode.setCode(debugEntity.getHtml()).apply();
+                if (!isThird3) {
+                    binding.rvSourceCode.setCode(debugEntity.getHtml()).apply();
+                } else {
+                    binding.rvSourceCode.setCode(logSb.toString()).apply();
+                }
                 loadingDialog.dismiss();
             }
         });

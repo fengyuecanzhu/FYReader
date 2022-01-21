@@ -17,10 +17,16 @@ import javax.script.SimpleBindings
 @Suppress("unused")
 abstract class BaseSource : JsExtensions {
 
-    open var concurrentRate: String? = null // 并发率
-    open var loginUrl: String? = null       // 登录地址
-    //var loginUi: String?   // 登录UI
-    open var header: String? = null         // 请求头
+    //var concurrentRate: String? // 并发率
+    //var loginUrl: String?       // 登录地址
+    //var loginUi: String?       // 登录UI
+    //var header: String?        // 请求头
+
+    open fun getConcurrentRateKt(): String? = null // 并发率
+
+    open fun getLoginUrlKt(): String? = null  // 登录地址
+
+    open fun getHeader(): String? = null //  请求头
 
     open fun getTag(): String = ""
 
@@ -31,7 +37,7 @@ abstract class BaseSource : JsExtensions {
     }*/
 
     fun getLoginJs(): String? {
-        val loginJs = loginUrl
+        val loginJs = getLoginUrlKt()
         return when {
             loginJs == null -> null
             loginJs.startsWith("@js:") -> loginJs.substring(4)
@@ -52,7 +58,7 @@ abstract class BaseSource : JsExtensions {
      */
     fun getHeaderMap(hasLoginHeader: Boolean = false) = HashMap<String, String>().apply {
         this[APPCONST.UA_NAME] = APPCONST.DEFAULT_USER_AGENT
-        header?.let {
+        getHeader()?.let {
             GSON.fromJsonObject<Map<String, String>>(
                 when {
                     it.startsWith("@js:", true) ->

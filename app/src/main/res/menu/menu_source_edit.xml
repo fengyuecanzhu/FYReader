@@ -32,7 +32,10 @@
         android:id="@+id/action_login"
         android:title="@string/text_login"
         app:showAsAction="never" />
-
+    <item
+        android:id="@+id/action_copy_source"
+        android:title="@string/copy_source"
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_clear_cookie"
         android:title="@string/clear_cookie"
