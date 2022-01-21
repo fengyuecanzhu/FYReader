@@ -93,7 +93,7 @@ class SearchAdapter(
         if (payload == null) {
             bind(binding, item)
         } else {
-            val books = mBooks.getValues(item)
+            val books = mBooks.getValues(item) ?: arrayListOf()
             books2SearchBookBean(item, books)
             bindChange(binding, item, payload)
         }

@@ -24,8 +24,8 @@ import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 
 
 public class ShuHaiGeReadCrawler extends BaseReadCrawler implements BookInfoCrawler {
-    public static final String NAME_SPACE = "https://www.xinshuhaige.org";
-    public static final String NOVEL_SEARCH = "https://www.xinshuhaige.org/search.html,searchkey={key}&searchtype=all";
+    public static final String NAME_SPACE = "https://www.xinshuhaige.cc";
+    public static final String NOVEL_SEARCH = "https://www.xinshuhaige.cc/search.html,searchkey={key}&searchtype=all";
     public static final String CHARSET = "utf-8";
     public static final String SEARCH_CHARSET = "utf-8";
 
@@ -56,8 +56,7 @@ public class ShuHaiGeReadCrawler extends BaseReadCrawler implements BookInfoCraw
 
     @Override
     public Map<String, String> getHeaders() {
-        String cookie = "Hm_lvt_46329db612a10d9ae3a668a40c152e0e=1612793811,1612795781,1613200980,1613218588; "
-                + "__cfduid=d0ebd0275436b7b0c3ccf4c9eb7394abd1619231977 ";
+        String cookie = "Hm_lvt_7729c158621a96ffef4197e08613177a=1642731311; Hm_lpvt_7729c158621a96ffef4197e08613177a=1642731315";
         Map<String, String> headers = new HashMap<>();
         headers.put("Cookie", cookie);
         return headers;

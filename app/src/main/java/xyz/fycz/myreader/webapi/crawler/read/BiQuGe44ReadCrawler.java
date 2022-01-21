@@ -20,9 +20,9 @@ import java.util.ArrayList;
 
 
 public class BiQuGe44ReadCrawler extends BaseReadCrawler implements BookInfoCrawler {
-//    public static final String NAME_SPACE = "http://www.wqge.net";
-    public static final String NAME_SPACE = "https://www.wqge.cc";
-    public static final String NOVEL_SEARCH = "https://www.wqge.cc/modules/article/search.php?searchkey={key}";
+    public static final String NAME_SPACE = "http://www.wqge.net";
+//    public static final String NAME_SPACE = "https://www.wqge.cc";
+    public static final String NOVEL_SEARCH = "https://www.wqge.net/modules/article/search.php?searchkey={key}";
     public static final String CHARSET = "GBK";
     public static final String SEARCH_CHARSET = "utf-8";
 

@@ -17,7 +17,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
-
+@Deprecated
 public class ShiGuangReadCrawler extends BaseReadCrawler {
     public static final String NAME_SPACE = "https://www.youxs.org";
     public static final String NOVEL_SEARCH = "https://www.youxs.org/search.php?key={key}";

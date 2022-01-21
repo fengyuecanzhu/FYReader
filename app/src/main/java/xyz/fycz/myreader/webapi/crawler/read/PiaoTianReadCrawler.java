@@ -74,7 +74,7 @@ public class PiaoTianReadCrawler extends BaseReadCrawler implements BookInfoCraw
         ArrayList<Chapter> chapters = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         String readUrl = doc.select("meta[property=og:novel:read_url]").attr("content");
-        Element ul = doc.getElementsByClass("chapterlist").get(1);
+        Element ul = doc.getElementsByClass("ttname").first();
         Elements elementsByTag = ul.getElementsByTag("a");
         int i = 0;
         for (int j = 0; j < elementsByTag.size(); j++) {

@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 
@@ -24,6 +25,7 @@ import xyz.fycz.myreader.greendao.convert.FindRuleConvert;
 import xyz.fycz.myreader.greendao.convert.InfoRuleConvert;
 import xyz.fycz.myreader.greendao.convert.SearchRuleConvert;
 import xyz.fycz.myreader.greendao.convert.TocRuleConvert;
+import xyz.fycz.myreader.model.third3.BaseSource;
 
 import static xyz.fycz.myreader.util.utils.StringUtils.stringEquals;
 
@@ -32,7 +34,7 @@ import static xyz.fycz.myreader.util.utils.StringUtils.stringEquals;
  * @date 2021/2/8 17:37
  */
 @Entity
-public class BookSource implements Parcelable, Cloneable {
+public class BookSource extends BaseSource implements Parcelable, Cloneable {
     //基本信息
     @Id
     private String sourceUrl;
@@ -421,5 +423,32 @@ public class BookSource implements Parcelable, Cloneable {
 
     public void setConcurrentRate(String concurrentRate) {
         this.concurrentRate = concurrentRate;
+    }
+
+    @Override
+    public String getHeader() {
+        return sourceHeaders;
+    }
+
+    @Override
+    public void setHeader(@Nullable String header) {
+        this.sourceHeaders = header;
+    }
+
+    @NonNull
+    @Override
+    public String getTag() {
+        return sourceName;
+    }
+
+    @NonNull
+    @Override
+    public String getKey() {
+        return sourceUrl;
+    }
+
+    @Override
+    public BookSource getSource() {
+        return this;
     }
 }

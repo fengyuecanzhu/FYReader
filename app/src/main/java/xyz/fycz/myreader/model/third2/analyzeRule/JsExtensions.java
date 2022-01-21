@@ -252,7 +252,7 @@ public interface JsExtensions {
      * @param transformation AES加密的方式
      * @param iv             ECB模式的偏移向量
      */
-    default byte[] aesDecodeToByteArray(String str, String key, String transformation, String iv) {
+    default byte[] aesDecodeToByteArray(String str, String key, String transformation, String iv) throws Exception {
 
         return EncoderUtils.INSTANCE.decryptAES(
                 str.getBytes(StandardCharsets.UTF_8),
@@ -262,7 +262,7 @@ public interface JsExtensions {
         );
     }
 
-    default byte[] aesDecodeToByteArray(String str, String key, String transformation) {
+    default byte[] aesDecodeToByteArray(String str, String key, String transformation) throws Exception {
         return aesDecodeToByteArray(str, key, transformation, "");
     }
 
@@ -275,7 +275,7 @@ public interface JsExtensions {
      * @param iv             ECB模式的偏移向量
      */
 
-    default String aesDecodeToString(String str, String key, String transformation, String iv) {
+    default String aesDecodeToString(String str, String key, String transformation, String iv) throws Exception {
         byte[] bytes = aesDecodeToByteArray(str, key, transformation, iv);
         if (bytes == null) {
             return "";
@@ -283,7 +283,7 @@ public interface JsExtensions {
         return new String(bytes);
     }
 
-    default String aesDecodeToString(String str, String key, String transformation) {
+    default String aesDecodeToString(String str, String key, String transformation) throws Exception {
         return aesDecodeToString(str, key, transformation, "");
     }
 
@@ -296,7 +296,7 @@ public interface JsExtensions {
      * @param iv             ECB模式的偏移向量
      */
 
-    default byte[] aesBase64DecodeToByteArray(String str, String key, String transformation, String iv) {
+    default byte[] aesBase64DecodeToByteArray(String str, String key, String transformation, String iv) throws Exception {
         return EncoderUtils.INSTANCE.decryptBase64AES(
                 str.getBytes(StandardCharsets.UTF_8),
                 key.getBytes(StandardCharsets.UTF_8),
@@ -305,7 +305,7 @@ public interface JsExtensions {
         );
     }
 
-    default byte[] aesBase64DecodeToByteArray(String str, String key, String transformation) {
+    default byte[] aesBase64DecodeToByteArray(String str, String key, String transformation) throws Exception {
         return aesBase64DecodeToByteArray(str, key, transformation, "");
     }
 
@@ -319,7 +319,7 @@ public interface JsExtensions {
      * @param iv             ECB模式的偏移向量
      */
 
-    default String aesBase64DecodeToString(String str, String key, String transformation, String iv) {
+    default String aesBase64DecodeToString(String str, String key, String transformation, String iv) throws Exception {
         byte[] bytes = aesBase64DecodeToByteArray(str, key, transformation, iv);
         if (bytes == null) {
             return "";
@@ -327,7 +327,7 @@ public interface JsExtensions {
         return new String(bytes);
     }
 
-    default String aesBase64DecodeToString(String str, String key, String transformation) {
+    default String aesBase64DecodeToString(String str, String key, String transformation) throws Exception {
         return aesBase64DecodeToString(str, key, transformation, "");
     }
 
@@ -339,7 +339,7 @@ public interface JsExtensions {
      * @param transformation AES加密的方式
      * @param iv             ECB模式的偏移向量
      */
-    default byte[] aesEncodeToByteArray(String data, String key, String transformation, String iv) {
+    default byte[] aesEncodeToByteArray(String data, String key, String transformation, String iv) throws Exception {
         return EncoderUtils.INSTANCE.encryptAES(
                 data.getBytes(StandardCharsets.UTF_8),
                 key.getBytes(StandardCharsets.UTF_8),
@@ -348,7 +348,7 @@ public interface JsExtensions {
         );
     }
 
-    default byte[] aesEncodeToByteArray(String data, String key, String transformation) {
+    default byte[] aesEncodeToByteArray(String data, String key, String transformation) throws Exception {
         return aesEncodeToByteArray(data, key, transformation, "");
     }
 
@@ -360,7 +360,7 @@ public interface JsExtensions {
      * @param transformation AES加密的方式
      * @param iv             ECB模式的偏移向量
      */
-    default String aesEncodeToString(String data, String key, String transformation, String iv) {
+    default String aesEncodeToString(String data, String key, String transformation, String iv) throws Exception {
         byte[] bytes = aesEncodeToByteArray(data, key, transformation, iv);
         if (bytes == null) {
             return "";
@@ -368,7 +368,7 @@ public interface JsExtensions {
         return new String(bytes);
     }
 
-    default String aesEncodeToString(String str, String key, String transformation) {
+    default String aesEncodeToString(String str, String key, String transformation) throws Exception {
         return aesEncodeToString(str, key, transformation, "");
     }
 
@@ -380,7 +380,7 @@ public interface JsExtensions {
      * @param transformation AES加密的方式
      * @param iv             ECB模式的偏移向量
      */
-    default byte[] aesEncodeToBase64ByteArray(String data, String key, String transformation, String iv) {
+    default byte[] aesEncodeToBase64ByteArray(String data, String key, String transformation, String iv) throws Exception {
         return EncoderUtils.INSTANCE.encryptAES2Base64(
                 data.getBytes(StandardCharsets.UTF_8),
                 key.getBytes(StandardCharsets.UTF_8),
@@ -389,7 +389,7 @@ public interface JsExtensions {
         );
     }
 
-    default byte[] aesEncodeToBase64ByteArray(String data, String key, String transformation) {
+    default byte[] aesEncodeToBase64ByteArray(String data, String key, String transformation) throws Exception {
         return aesEncodeToBase64ByteArray(data, key, transformation, "");
     }
 
@@ -401,7 +401,7 @@ public interface JsExtensions {
      * @param transformation AES加密的方式
      * @param iv             ECB模式的偏移向量
      */
-    default String aesEncodeToBase64String(String data, String key, String transformation, String iv) {
+    default String aesEncodeToBase64String(String data, String key, String transformation, String iv) throws Exception {
         byte[] bytes = aesEncodeToBase64ByteArray(data, key, transformation, iv);
         if (bytes == null) {
             return "";
@@ -409,7 +409,7 @@ public interface JsExtensions {
         return new String(bytes);
     }
 
-    default String aesEncodeToBase64String(String str, String key, String transformation) {
+    default String aesEncodeToBase64String(String str, String key, String transformation) throws Exception {
         return aesEncodeToBase64String(str, key, transformation, "");
     }
 }

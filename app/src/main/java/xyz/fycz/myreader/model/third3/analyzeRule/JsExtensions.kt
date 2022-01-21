@@ -15,6 +15,7 @@ import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.greendao.entity.rule.BookSource
 import xyz.fycz.myreader.greendao.service.CacheManager
 import xyz.fycz.myreader.greendao.service.CookieStore
+import xyz.fycz.myreader.model.third3.BaseSource
 import xyz.fycz.myreader.model.third3.http.*
 import xyz.fycz.myreader.util.ZipUtils
 import xyz.fycz.myreader.util.utils.*
@@ -40,7 +41,7 @@ interface JsExtensions {
     val TAG: String?
         get() = JsExtensions::class.simpleName
 
-    fun getSource(): BookSource?
+    fun getSource(): BaseSource?
 
     /**
      * 访问网络,返回String
@@ -487,7 +488,7 @@ interface JsExtensions {
             Debug.log(it.sourceUrl, msg)
         } ?: Debug.log(msg)*/
         if (App.isDebug()) {
-            Log.d(TAG + "-" + getSource()?.sourceUrl, msg)
+            Log.d(TAG + "-" + getSource()?.getKey(), msg)
         }
         return msg
     }

@@ -144,7 +144,7 @@ object BookList {
             baseUrl,
             false
         )
-        if (book.name.isNotBlank()) {
+        if (book.name.isNullOrBlank()) {
             //return book.toSearchBook()
             return book
         }

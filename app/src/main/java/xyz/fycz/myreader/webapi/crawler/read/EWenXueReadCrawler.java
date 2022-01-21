@@ -18,7 +18,7 @@ import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 
-
+@Deprecated
 public class EWenXueReadCrawler extends BaseReadCrawler implements BookInfoCrawler {
     public static final String NAME_SPACE = "http://ewenxue.org";
     public static final String NOVEL_SEARCH = "http://ewenxue.org/search.htm?keyword={key}";

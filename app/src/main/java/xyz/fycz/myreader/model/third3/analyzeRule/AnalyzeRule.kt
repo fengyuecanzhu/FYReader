@@ -13,6 +13,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter
 import xyz.fycz.myreader.greendao.entity.rule.BookSource
 import xyz.fycz.myreader.greendao.service.CacheManager
 import xyz.fycz.myreader.greendao.service.CookieStore
+import xyz.fycz.myreader.model.third3.BaseSource
 import xyz.fycz.myreader.util.utils.*
 import java.net.URL
 import java.util.*
@@ -27,7 +28,7 @@ import kotlin.collections.HashMap
 @Suppress("unused", "RegExpRedundantEscape", "MemberVisibilityCanBePrivate")
 class AnalyzeRule(
     val ruleData: RuleDataInterface,
-    private val source: BookSource? = null
+    private val source: BaseSource? = null
 ) : JsExtensions {
 
     var book = if (ruleData is Book) ruleData else null
@@ -650,7 +651,7 @@ class AnalyzeRule(
         return SCRIPT_ENGINE.eval(jsStr, bindings)
     }
 
-    override fun getSource(): BookSource? {
+    override fun getSource(): BaseSource? {
         return source
     }
 

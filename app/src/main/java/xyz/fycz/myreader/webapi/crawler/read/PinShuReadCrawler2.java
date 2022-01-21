@@ -21,6 +21,7 @@ import java.util.ArrayList;
  * @author fengyue
  * @date 2020/5/19 19:50
  */
+@Deprecated
 public class PinShuReadCrawler2 extends BaseReadCrawler implements BookInfoCrawler {
     public static final String NAME_SPACE = "https://www.vodtw.la";
     public static final String NOVEL_SEARCH = "https://www.vodtw.la/search.html";

@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /**
  * 风月小说网html解析工具
  */
-
+@Deprecated
 public class FYReadCrawler extends BaseReadCrawler {
     public static final String NAME_SPACE = "https://novel.fycz.xyz";
     public static final String NOVEL_SEARCH  = "https://novel.fycz.xyz/search.html?keyword={key}";

@@ -193,6 +193,18 @@ object EditEntityUtil {
             )
             add(
                 EditEntity(
+                    "webJs", contentRule?.webJs, R.string.rule_web_js,
+                    ""
+                )
+            )
+            add(
+                EditEntity(
+                    "sourceRegex", contentRule?.sourceRegex, R.string.rule_source_regex,
+                    ""
+                )
+            )
+            add(
+                EditEntity(
                     "replaceRegex", contentRule?.replaceRegex, R.string.rule_replace_regex,
                     ""
                 )
@@ -309,6 +321,8 @@ object EditEntityUtil {
                 "content" -> contentRule.content = it.value
                 "contentBaseUrl" -> contentRule.contentBaseUrl = it.value
                 "contentUrlNext" -> contentRule.contentUrlNext = it.value
+                "webJs" -> contentRule.webJs = it.value
+                "sourceRegex" -> contentRule.sourceRegex = it.value
                 "replaceRegex" -> contentRule.replaceRegex = it.value
             }
         }

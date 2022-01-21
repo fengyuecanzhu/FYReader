@@ -20,8 +20,8 @@ import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 
 
 public class XS7ReadCrawler2 extends BaseReadCrawler implements BookInfoCrawler {
-    public static final String NAME_SPACE = "https://www.xs7.co";
-    public static final String NOVEL_SEARCH = "https://www.xs7.co/modules/article/search.php?searchkey={key}&submit=%CB%D1%CB%F7";
+    public static final String NAME_SPACE = "https://www.xs7.la";
+    public static final String NOVEL_SEARCH = "https://www.xs7.la/modules/article/search.php?searchkey={key}&submit=%CB%D1%CB%F7";
     public static final String CHARSET = "GBK";
     public static final String SEARCH_CHARSET = "GBK";
 

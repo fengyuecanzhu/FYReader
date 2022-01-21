@@ -17,7 +17,7 @@ import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 
 import java.util.ArrayList;
 
-
+@Deprecated
 public class ZuoPinReadCrawler extends BaseReadCrawler implements BookInfoCrawler {
     public static final String NAME_SPACE = "http://zuopinj.com";
     public static final String NOVEL_SEARCH = "http://so.zuopinj.com/search/index.php,tbname=bookname&show=title&tempid=3&keyboard={key}";

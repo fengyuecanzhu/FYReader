@@ -22,8 +22,8 @@ import java.util.ArrayList;
  */
 
 public class TianLaiReadCrawler extends BaseReadCrawler {
-    public static final String NAME_SPACE = "https://www.23txt.com";
-    public static final String NOVEL_SEARCH = "https://www.23txt.com/search.php?q={key}";
+    public static final String NAME_SPACE = "https://xs.23sk.com";
+    public static final String NOVEL_SEARCH = "https://xs.23sk.com/search.php?q={key}";
     public static final String CHARSET = "GBK";
     public static final String SEARCH_CHARSET = "utf-8";
 

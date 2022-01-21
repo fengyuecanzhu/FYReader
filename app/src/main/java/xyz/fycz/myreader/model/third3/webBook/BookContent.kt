@@ -76,7 +76,7 @@ object BookContent {
                     mUrl = nextUrl,
                     source = bookSource,
                     ruleData = book,
-                    //headerMapF = bookSource.getHeaderMap()
+                    headerMapF = bookSource.getHeaderMap()
                 ).getStrResponseAwait()
                 res.body?.let { nextBody ->
                     contentData = analyzeContent(
@@ -99,7 +99,7 @@ object BookContent {
                             mUrl = urlStr,
                             source = bookSource,
                             ruleData = book,
-                            //headerMapF = bookSource.getHeaderMap()
+                            headerMapF = bookSource.getHeaderMap()
                         )
                         val res = analyzeUrl.getStrResponseAwait()
                         analyzeContent(

@@ -45,7 +45,7 @@ object WebBook {
                 key = key,
                 page = page,
                 baseUrl = bookSource.sourceUrl,
-                //headerMapF = bookSource.getHeaderMap(true),
+                headerMapF = bookSource.getHeaderMap(true),
                 source = bookSource,
                 ruleData = variableBook,
             )
@@ -97,7 +97,7 @@ object WebBook {
             baseUrl = bookSource.sourceUrl,
             source = bookSource,
             ruleData = variableBook,
-            //headerMapF = bookSource.getHeaderMap(true)
+            headerMapF = bookSource.getHeaderMap(true)
         )
         var res = analyzeUrl.getStrResponseAwait()
         //检测书源是否已登录
@@ -155,7 +155,7 @@ object WebBook {
                 baseUrl = bookSource.sourceUrl,
                 source = bookSource,
                 ruleData = book,
-                //headerMapF = bookSource.getHeaderMap(true)
+                headerMapF = bookSource.getHeaderMap(true)
             )
             var res = analyzeUrl.getStrResponseAwait()
             //检测书源是否已登录
@@ -212,6 +212,7 @@ object WebBook {
                 baseUrl = book.infoUrl,
                 source = bookSource,
                 ruleData = book,
+                headerMapF = bookSource.getHeaderMap(true)
             )
             var res = analyzeUrl.getStrResponseAwait()
             //检测书源是否已登录
@@ -277,12 +278,12 @@ object WebBook {
                 source = bookSource,
                 ruleData = book,
                 chapter = bookChapter,
+                headerMapF = bookSource.getHeaderMap(true)
             )
-            /*var res = analyzeUrl.getStrResponseAwait(
+            var res = analyzeUrl.getStrResponseAwait(
                 jsStr = bookSource.contentRule.webJs,
                 sourceRegex = bookSource.contentRule.sourceRegex
-            )*/
-            var res = analyzeUrl.getStrResponseAwait()
+            )
             //检测书源是否已登录
             bookSource.loginCheckJs?.let { checkJs ->
                 if (checkJs.isNotBlank()) {

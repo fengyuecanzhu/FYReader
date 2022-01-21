@@ -12,6 +12,7 @@ import xyz.fycz.myreader.greendao.entity.Chapter
 import xyz.fycz.myreader.greendao.entity.rule.BookSource
 import xyz.fycz.myreader.greendao.service.CacheManager
 import xyz.fycz.myreader.greendao.service.CookieStore
+import xyz.fycz.myreader.model.third3.BaseSource
 import xyz.fycz.myreader.model.third3.ConcurrentException
 import xyz.fycz.myreader.model.third3.http.*
 import xyz.fycz.myreader.util.utils.*
@@ -36,7 +37,7 @@ class AnalyzeUrl(
     val speakText: String? = null,
     val speakSpeed: Int? = null,
     var baseUrl: String = "",
-    private val source: BookSource? = null,
+    private val source: BaseSource? = null,
     private val ruleData: RuleDataInterface? = null,
     private val chapter: Chapter? = null,
     headerMapF: Map<String, String>? = null,
@@ -284,10 +285,10 @@ class AnalyzeUrl(
             return null
         }
         val rateIndex = concurrentRate.indexOf("/")
-        var fetchRecord = concurrentRecordMap[source.sourceUrl]
+        var fetchRecord = concurrentRecordMap[source.getKey()]
         if (fetchRecord == null) {
             fetchRecord = ConcurrentRecord(rateIndex > 0, System.currentTimeMillis(), 1)
-            concurrentRecordMap[source.sourceUrl] = fetchRecord
+            concurrentRecordMap[source.getKey()] = fetchRecord
             return fetchRecord
         }
         val waitTime: Int = synchronized(fetchRecord) {
@@ -352,7 +353,7 @@ class AnalyzeUrl(
             return StrResponse(url, StringUtils.byteToHexString(getByteArrayAwait()))
         }
         val concurrentRecord = fetchStart()
-        setCookie(source?.sourceUrl)
+        setCookie(source?.getKey())
         val strResponse: StrResponse
         if (this.useWebView && useWebView) {
             strResponse = when (method) {
@@ -369,7 +370,7 @@ class AnalyzeUrl(
                     BackstageWebView(
                         url = url,
                         html = body,
-                        tag = source?.sourceUrl,
+                        tag = source?.getKey(),
                         javaScript = webJs ?: jsStr,
                         sourceRegex = sourceRegex,
                         headerMap = headerMap
@@ -377,7 +378,7 @@ class AnalyzeUrl(
                 }
                 else -> BackstageWebView(
                     url = url,
-                    tag = source?.sourceUrl,
+                    tag = source?.getKey(),
                     javaScript = webJs ?: jsStr,
                     sourceRegex = sourceRegex,
                     headerMap = headerMap
@@ -419,7 +420,7 @@ class AnalyzeUrl(
      */
     suspend fun getResponseAwait(): Response {
         val concurrentRecord = fetchStart()
-        setCookie(source?.sourceUrl)
+        setCookie(source?.getKey())
         @Suppress("BlockingMethodInNonBlockingContext")
         val response = getProxyClient(proxy).newCallResponse(retry) {
             addHeaders(headerMap)
@@ -450,7 +451,7 @@ class AnalyzeUrl(
      */
     suspend fun getByteArrayAwait(): ByteArray {
         val concurrentRecord = fetchStart()
-        setCookie(source?.sourceUrl)
+        setCookie(source?.getKey())
         @Suppress("BlockingMethodInNonBlockingContext")
         val byteArray = getProxyClient(proxy).newCallResponseBody(retry) {
             addHeaders(headerMap)
@@ -527,7 +528,7 @@ class AnalyzeUrl(
         return method == RequestMethod.POST
     }
 
-    override fun getSource(): BookSource? {
+    override fun getSource(): BaseSource? {
         return source
     }
 

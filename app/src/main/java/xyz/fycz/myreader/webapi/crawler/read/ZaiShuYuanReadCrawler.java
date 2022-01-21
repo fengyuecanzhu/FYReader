@@ -18,8 +18,8 @@ import xyz.fycz.myreader.webapi.crawler.base.BaseReadCrawler;
 
 
 public class ZaiShuYuanReadCrawler extends BaseReadCrawler {
-    public static final String NAME_SPACE = "https://www.zhaishuyuan.com";
-    public static final String NOVEL_SEARCH = "https://www.zhaishuyuan.com/search/,key={key}";
+    public static final String NAME_SPACE = "https://www.zhaishuyuan.org";
+    public static final String NOVEL_SEARCH = "https://www.zhaishuyuan.org/search/,searchkey={key}&submit=";
     public static final String CHARSET = "gbk";
     public static final String SEARCH_CHARSET = "gbk";
 
