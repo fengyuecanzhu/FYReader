@@ -33,7 +33,7 @@ object EditEntityUtil {
             )
             add(EditEntity("loginUrl", source?.loginUrl, R.string.login_url, ""))
             add(EditEntity("sourceComment", source?.sourceComment, R.string.comment, "这是您留给使用者的说明"))
-            add(EditEntity("concurrentRate", source?.concurrentRate, R.string.comment, ""))
+            add(EditEntity("concurrentRate", source?.concurrentRate, R.string.source_concurrent_rate, ""))
         }
         return sourceEntities
     }

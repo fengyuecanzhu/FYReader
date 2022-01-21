@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
@@ -54,12 +55,16 @@ public class SourceLoginActivity extends BaseActivity {
     }
 
     @Override
+    @SuppressLint("SetJavaScriptEnabled")
     protected void initWidget() {
         WebSettings settings = binding.webView.getSettings();
         settings.setSupportZoom(true);
         settings.setBuiltInZoomControls(true);
         settings.setDefaultTextEncodingName("UTF-8");
-        //settings.setUserAgentString(APPCONST.DEFAULT_USER_AGENT);
+        settings.setLoadWithOverviewMode(true);
+        if (bookSource.getHeaderMap(false).containsKey(APPCONST.UA_NAME)){
+            settings.setUserAgentString(bookSource.getHeaderMap(false).get(APPCONST.UA_NAME));
+        }
         settings.setJavaScriptEnabled(true);
         CookieManager cookieManager = CookieManager.getInstance();
         binding.webView.setWebViewClient(new WebViewClient() {
