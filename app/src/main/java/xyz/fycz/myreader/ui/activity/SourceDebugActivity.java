@@ -113,7 +113,7 @@ public class SourceDebugActivity extends BaseActivity {
         });
         if (isThird3) {
             binding.tabLayout.getTabAt(1).setText(R.string.debug_log);
-            logSb = new StringBuilder();
+            logSb = new StringBuilder("-----仅输出使用java.log()函数打印的日志-----\n");
             Debug.INSTANCE.setCallback(msg -> logSb.append(msg).append("\n"));
         }
     }
