@@ -3,9 +3,12 @@ package xyz.fycz.myreader.ui.activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +36,7 @@ import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
+import xyz.fycz.myreader.webapi.LanZouApi;
 
 /**
  * @author fengyue
@@ -59,6 +63,7 @@ public class AboutActivity extends BaseActivity {
     protected void initWidget() {
         super.initWidget();
         binding.il.tvVersionName.setText(String.format("风月读书v%s", App.getStrVersionName()));
+        binding.il.rlLanZou.setVisibility(App.isDebug() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -110,6 +115,37 @@ public class AboutActivity extends BaseActivity {
                 .showFullWebViewDia(this, "file:///android_asset/PrivacyPolicy.html",
                         false, null));
         binding.il.rlDisclaimer.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "免责声明", "disclaimer.fy"));
+        binding.il.rlLanZou.setOnClickListener(v -> {
+            String[] str = new String[1];
+            MyAlertDialog.createInputDia(this, getString(R.string.lan_zou_parse),
+                    "格式：链接+逗号+密码(没有密码就不用填)", "", true,
+                    100, text -> str[0] = text, (dialog, which) -> {
+                        String url, pwd = "";
+                        if (str[0].contains(",") || str[0].contains("，")) {
+                            String[] strs = str[0].split("[,，]");
+                            url = strs[0];
+                            pwd = strs[1];
+                        } else {
+                            url = str[0];
+                        }
+                        LanZouApi.INSTANCE.getUrl(url, pwd)
+                                .compose(RxUtils::toSimpleSingle)
+                                .subscribe(new MyObserver<String>() {
+                                    @Override
+                                    public void onNext(@NonNull String s) {
+                                        ToastUtils.showInfo(s);
+                                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                                        intent.setData(Uri.parse(s));
+                                        startActivity(intent);
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        ToastUtils.showError("" + e.getLocalizedMessage());
+                                    }
+                                });
+                    });
+        });
     }
 
     void openIntent(String intentName, String address) {

@@ -542,6 +542,7 @@
     <string name="net_error_10002">网络连接超时</string>
     <string name="net_error_10003">数据解析失败</string>
     <string name="copy_source">拷贝书源</string>
+    <string name="lan_zou_parse">蓝奏云直链解析</string>
     <!--error string end-->
 
     <string-array name="reset_screen_time">
