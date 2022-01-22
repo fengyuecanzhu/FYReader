@@ -5,8 +5,11 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.jsoup.Jsoup
 import xyz.fycz.myreader.common.URLCONST
+import xyz.fycz.myreader.entity.LanZouBean
 import xyz.fycz.myreader.util.help.StringHelper
+import xyz.fycz.myreader.util.utils.GSON
 import xyz.fycz.myreader.util.utils.OkHttpUtils
+import xyz.fycz.myreader.util.utils.fromJsonObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
@@ -32,7 +35,11 @@ object LanZouApi {
             } else {
                 getUrl2(StringHelper.getSubString(html, "sign=", "&"), url, password)
             }
-            it.onNext(getRedirectUrl(url2))
+            if (url2.contains("file")) {
+                it.onNext(getRedirectUrl(url2))
+            } else {
+                it.onError(Throwable(url2))
+            }
             it.onComplete()
         }
     }
@@ -74,7 +81,7 @@ object LanZouApi {
     }
 
     private fun getUrl2(o: String): String {
-        val info = o.split(",").toTypedArray()
+        /*val info = o.split(",").toTypedArray()
         val zt = info[0].substring(info[0].indexOf(":") + 1)
         if (!"1".endsWith(zt)) {
             return ""
@@ -82,8 +89,16 @@ object LanZouApi {
         var dom = info[1].substring(info[1].indexOf(":") + 2, info[1].lastIndexOf("\""))
         var url = info[2].substring(info[2].indexOf(":") + 2, info[2].lastIndexOf("\""))
         dom = dom.replace("\\", "")
-        url = url.replace("\\", "")
-        return "$dom/file/$url"
+        url = url.replace("\\", "")*/
+        val lanZouBean = GSON.fromJsonObject<LanZouBean>(o)
+        lanZouBean?.run {
+            return if (zt == 1) {
+                "$dom/file/$url"
+            } else {
+                inf
+            }
+        }
+        return ""
     }
 
     /**
