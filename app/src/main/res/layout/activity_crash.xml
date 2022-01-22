@@ -26,7 +26,8 @@
                 android:id="@+id/iv_crash_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
+                android:padding="5dp"
+                android:layout_marginHorizontal="5dp"
                 android:background="?android:attr/selectableItemBackground"
                 app:srcCompat="@drawable/ic_info"
                 app:tint="@color/textPrimary"/>
@@ -49,7 +50,8 @@
                 android:id="@+id/iv_crash_share"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
+                android:layout_marginHorizontal="5dp"
+                android:padding="5dp"
                 android:background="?android:attr/selectableItemBackground"
                 app:srcCompat="@drawable/ic_share"
                 app:tint="@color/textPrimary"/>
@@ -58,7 +60,8 @@
                 android:id="@+id/iv_crash_restart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
+                android:padding="5dp"
+                android:layout_marginHorizontal="5dp"
                 android:background="?android:attr/selectableItemBackground"
                 app:srcCompat="@drawable/ic_exit"
                 app:tint="@color/textPrimary"/>

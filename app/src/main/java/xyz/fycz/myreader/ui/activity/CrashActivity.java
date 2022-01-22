@@ -176,6 +176,11 @@ public class CrashActivity extends BaseActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        binding.ivCrashRestart.performClick();
+    }
+
     /**
      * 判断当前设备是否是平板
      */
