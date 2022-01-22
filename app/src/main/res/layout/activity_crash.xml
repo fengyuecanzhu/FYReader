@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@color/colorBackground"
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
         android:paddingVertical="10dp"
@@ -27,6 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
+                android:background="?android:attr/selectableItemBackground"
                 app:srcCompat="@drawable/ic_info"
                 app:tint="@color/textPrimary"/>
 
@@ -49,6 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
+                android:background="?android:attr/selectableItemBackground"
                 app:srcCompat="@drawable/ic_share"
                 app:tint="@color/textPrimary"/>
 
@@ -57,6 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
+                android:background="?android:attr/selectableItemBackground"
                 app:srcCompat="@drawable/ic_exit"
                 app:tint="@color/textPrimary"/>
 
@@ -86,7 +89,7 @@
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/white">
+        android:background="@color/colorBackground">
 
         <LinearLayout
             android:id="@+id/ll_crash_info"
@@ -101,7 +104,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:text="详细信息"
-                android:textColor="@color/black80"
+                android:textColor="@color/textPrimary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -111,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="15dp"
                 android:lineSpacingExtra="5dp"
-                android:textColor="@color/black60"
+                android:textColor="@color/textSecondary"
                 android:textSize="14sp" />
 
         </LinearLayout>
