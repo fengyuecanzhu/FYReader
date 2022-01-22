@@ -3,15 +3,20 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/android/FYReader/app/src/main/res/drawable/ic_about.xml" value="0.20925925925925926" />
         <entry key="..\:/android/FYReader/app/src/main/res/drawable/ic_delete.xml" value="0.18518518518518517" />
+        <entry key="..\:/android/FYReader/app/src/main/res/drawable/ic_exit.xml" value="0.20925925925925926" />
         <entry key="..\:/android/FYReader/app/src/main/res/drawable/ic_online_syn.xml" value="0.19074074074074074" />
         <entry key="..\:/android/FYReader/app/src/main/res/drawable/ic_re_seg.xml" value="0.1962962962962963" />
         <entry key="..\:/android/FYReader/app/src/main/res/drawable/ic_restore.xml" value="0.19074074074074074" />
         <entry key="..\:/android/FYReader/app/src/main/res/drawable/ic_search_word.xml" value="0.21944444444444444" />
+        <entry key="..\:/android/FYReader/app/src/main/res/drawable/info_ic.xml" value="0.20925925925925926" />
         <entry key="..\:/android/FYReader/app/src/main/res/drawable/login_btn_selector.xml" value="0.17777777777777778" />
+        <entry key="..\:/android/FYReader/app/src/main/res/drawable/reboot_ic.xml" value="0.20925925925925926" />
         <entry key="..\:/android/FYReader/app/src/main/res/drawable/selector_btn_add.xml" value="0.17777777777777778" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_about.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_auth_email.xml" value="0.1897644927536232" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_crash.xml" value="0.264" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_donate.xml" value="0.536" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_feedback.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_file_picker.xml" value="0.2318840579710145" />

@@ -122,6 +122,8 @@
         <activity android:name=".ui.activity.GroupManagerActivity" />
         <activity android:name=".ui.activity.SearchWordActivity" />
         <activity android:name=".ui.activity.AuthEmailActivity" />
+        <activity android:name=".ui.activity.RestartActivity" />
+        <activity android:name=".ui.activity.CrashActivity" />
 
         <receiver android:name=".util.notification.NotificationClickReceiver" />
         <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver" />

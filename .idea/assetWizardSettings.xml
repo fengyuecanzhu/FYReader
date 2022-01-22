@@ -14,8 +14,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_search_word" />
-                            <entry key="sourceFile" value="F:\SVG图标\搜索_o.svg" />
+                            <entry key="outputName" value="ic_info" />
+                            <entry key="sourceFile" value="F:\SVG图标\info.svg" />
                           </map>
                         </option>
                       </PersistentState>
