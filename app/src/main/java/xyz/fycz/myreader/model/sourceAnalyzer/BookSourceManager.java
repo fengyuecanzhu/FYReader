@@ -325,7 +325,7 @@ public class BookSourceManager {
         } else if (new File(string).isFile()) {
             return importSource(FileUtils.readText(string));
         }
-        if (string.contains("lanzou")) {
+        if (string.matches("https://.+\\.lanzou[a-z]\\.com/[\\s\\S]*")) {
             return LanZouApi.INSTANCE.getUrl(string)
                     .flatMap((Function<String, ObservableSource<String>>) s -> Observable.create(emitter -> {
                         emitter.onNext(OkHttpUtils.getHtml(s));

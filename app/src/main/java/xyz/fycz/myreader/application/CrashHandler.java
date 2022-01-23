@@ -39,6 +39,7 @@ import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.ui.activity.CrashActivity;
 import xyz.fycz.myreader.ui.activity.RestartActivity;
 import xyz.fycz.myreader.ui.activity.SplashActivity;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 
@@ -93,8 +94,10 @@ public final class CrashHandler implements Thread.UncaughtExceptionHandler {
         boolean deadlyCrash = currentCrashTime - lastCrashTime < 1000 * 60 * 5;
         // 如果是致命的异常，或者是调试模式下
         if (deadlyCrash || App.isDebug()) {
+            ToastUtils.showError("程序发生致命错误");
             CrashActivity.start(mApplication, throwable, logFilePath);
         } else {
+            ToastUtils.showError("程序发生错误，正在为您重启");
             RestartActivity.Companion.start(mApplication);
         }
 

@@ -33,6 +33,7 @@ import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.databinding.ActivityCrashBinding;
 import xyz.fycz.myreader.util.ShareUtils;
+import xyz.fycz.myreader.util.ToastUtils;
 
 /**
  * @author fengyue
@@ -171,6 +172,7 @@ public class CrashActivity extends BaseActivity {
         });
         binding.ivCrashRestart.setOnClickListener(v -> {
             // 重启应用
+            ToastUtils.showInfo("重启应用");
             RestartActivity.Companion.restart(this);
             finish();
         });
