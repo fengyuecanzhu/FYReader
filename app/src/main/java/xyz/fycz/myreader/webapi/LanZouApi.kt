@@ -10,6 +10,7 @@ import xyz.fycz.myreader.util.help.StringHelper
 import xyz.fycz.myreader.util.utils.GSON
 import xyz.fycz.myreader.util.utils.OkHttpUtils
 import xyz.fycz.myreader.util.utils.fromJsonObject
+import xyz.fycz.myreader.util.utils.splitNotBlank
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
@@ -19,13 +20,27 @@ import java.util.*
  * @date 2022/1/22 18:50
  */
 object LanZouApi {
+
+    fun getUrl(url: String): Observable<String> {
+        url.replace("\\s".toRegex(), "").let {
+            val regex = ",|，|密码:".toRegex()
+            if (it.contains(regex)) {
+                it.split(regex).let { arr ->
+                    return getUrl(arr[0], arr[1])
+                }
+            } else {
+                return getUrl(it, "")
+            }
+        }
+    }
+
     /**
      * 通过api获取蓝奏云可下载直链
      *
      * @param url
      * @param password
      */
-    fun getUrl(url: String, password: String = ""): Observable<String> {
+    private fun getUrl(url: String, password: String = ""): Observable<String> {
         return Observable.create {
             val html = OkHttpUtils.getHtml(url)
             val url2 = if (password.isEmpty()) {

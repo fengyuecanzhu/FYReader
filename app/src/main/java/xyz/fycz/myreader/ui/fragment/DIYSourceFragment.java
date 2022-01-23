@@ -257,7 +257,7 @@ public class DIYSourceFragment extends BaseFragment {
 
                 @Override
                 public void onError(Throwable e) {
-                    ToastUtils.showError("书源格式错误，请导入正确的书源");
+                    ToastUtils.showError("书源格式错误，请导入正确的书源\n" + e.getLocalizedMessage());
                     dialog.dismiss();
                 }
             });

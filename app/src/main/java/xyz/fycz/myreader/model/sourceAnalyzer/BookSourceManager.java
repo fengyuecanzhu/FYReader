@@ -4,6 +4,8 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,8 +13,10 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
+import io.reactivex.functions.Function;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.entity.thirdsource.BookSource3Bean;
@@ -34,6 +38,7 @@ import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
+import xyz.fycz.myreader.webapi.LanZouApi;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 
 
@@ -192,7 +197,7 @@ public class BookSourceManager {
         DbManager.getDaoSession().getBookSourceDao().deleteInTx(sources);
     }
 
-    public static boolean isBookSourceExist(BookSource source){
+    public static boolean isBookSourceExist(BookSource source) {
         if (source == null) return false;
         return DbManager.getDaoSession().getBookSourceDao().load(source.getSourceUrl()) != null;
     }
@@ -319,6 +324,14 @@ public class BookSourceManager {
                     .compose(RxUtils::toSimpleSingle);
         } else if (new File(string).isFile()) {
             return importSource(FileUtils.readText(string));
+        }
+        if (string.contains("lanzou")) {
+            return LanZouApi.INSTANCE.getUrl(string)
+                    .flatMap((Function<String, ObservableSource<String>>) s -> Observable.create(emitter -> {
+                        emitter.onNext(OkHttpUtils.getHtml(s));
+                        emitter.onComplete();
+                    })).flatMap(BookSourceManager::importBookSourceFromJson)
+                    .compose(RxUtils::toSimpleSingle);
         }
         if (NetworkUtils.isUrl(string)) {
             String finalString = string;

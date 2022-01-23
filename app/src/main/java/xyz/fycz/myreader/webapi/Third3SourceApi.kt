@@ -101,7 +101,7 @@ object Third3SourceApi : AndroidViewModel(App.getApplication()) {
 
     fun findBook(url: String, fc: Third3FindCrawler, page: Int): Observable<List<Book>> {
         return Observable.create { emitter ->
-            if (!url.contains("{{page}}") && page > 1){
+            if (!url.contains("page") && page > 1){
                 emitter.onError(NoStackTraceException("没有下一页"))
                 return@create
             }

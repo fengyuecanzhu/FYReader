@@ -119,16 +119,8 @@ public class AboutActivity extends BaseActivity {
             String[] str = new String[1];
             MyAlertDialog.createInputDia(this, getString(R.string.lan_zou_parse),
                     "格式：链接+逗号+密码(没有密码就不用填)", "", true,
-                    100, text -> str[0] = text.replaceAll("\\s", ""), (dialog, which) -> {
-                        String url, pwd = "";
-                        if (str[0].contains(",") || str[0].contains("，") || str[0].contains("密码:")) {
-                            String[] strs = str[0].split(",|，|密码:");
-                            url = strs[0];
-                            pwd = strs[1];
-                        } else {
-                            url = str[0];
-                        }
-                        LanZouApi.INSTANCE.getUrl(url, pwd)
+                    100, text -> str[0] = text, (dialog, which) -> {
+                        LanZouApi.INSTANCE.getUrl(str[0])
                                 .compose(RxUtils::toSimpleSingle)
                                 .subscribe(new MyObserver<String>() {
                                     @Override
