@@ -81,6 +81,7 @@ public class CrashActivity extends BaseActivity {
 
     @Override
     protected void initData(Bundle savedInstanceState) {
+        ToastUtils.showError("程序发生致命错误");
         Throwable throwable = (Throwable) getIntent().getSerializableExtra(INTENT_CRASH_KEY);
         logFilePath = getIntent().getStringExtra(INTENT_LOG_KEY);
         if (throwable == null) {

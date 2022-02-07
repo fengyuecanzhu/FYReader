@@ -124,12 +124,12 @@ object BookChapterList {
         book.newestChapterTitle = list.last().title
         book.historyChapterId =
             list.getOrNull(book.histtoryChapterNum)?.title ?: book.newestChapterTitle
-        if (book.chapterTotalNum < list.size) {
+        /*if (book.chapterTotalNum < list.size) {
             book.noReadNum = list.size - book.chapterTotalNum
             book.lastReadTime = System.currentTimeMillis()
         }
         book.lastReadTime = System.currentTimeMillis()
-        book.chapterTotalNum = list.size
+        book.chapterTotalNum = list.size*/
         return list
     }
 

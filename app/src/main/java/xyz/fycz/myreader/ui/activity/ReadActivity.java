@@ -13,6 +13,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -421,7 +422,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                             pagePos = pos;
                             saveLastChapterReadPosition();
                         }
-                        mHandler.post(()->{
+                        mHandler.post(() -> {
                             screenOffTimerStart();
                             initMenu();
                         });
@@ -1065,7 +1066,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 保存最后阅读章节的进度
      */
     public void saveLastChapterReadPosition() {
-        if (!StringHelper.isEmpty(mBook.getId()) && mPageLoader.getPageStatus() == PageLoader.STATUS_FINISH) {
+        if (mBook != null && !StringHelper.isEmpty(mBook.getId()) && mPageLoader.getPageStatus() == PageLoader.STATUS_FINISH) {
             mBook.setLastReadPosition(pagePos);
             mBook.setHisttoryChapterNum(chapterPos);
             mBookService.updateEntity(mBook);
@@ -1384,28 +1385,32 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private void changeNightAndDaySetting(boolean isNight) {
         mSetting.setDayStyle(!isNight);
         SysManager.saveSetting(mSetting);
-        toggleMenu(true);
-        mHandler.postDelayed(() -> {
-            Intent intent = new Intent(this, ReadActivity.class);
-            if (aBooks != null) {
-                intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
-                BitIntentDataManager.getInstance().putData(intent, aBooks);
-            } else {
-                BitIntentDataManager.getInstance().putData(intent, mBook);
-            }
-            if (!isCollected) {
-                intent.putExtra("isCollected", false);
-            }
-            exit();
+        if (Build.VERSION.SDK_INT >= 31) {
+            toggleMenu(true);
+            mHandler.postDelayed(() -> {
+                Intent intent = new Intent(this, ReadActivity.class);
+                if (aBooks != null) {
+                    intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
+                    BitIntentDataManager.getInstance().putData(intent, aBooks);
+                } else {
+                    BitIntentDataManager.getInstance().putData(intent, mBook);
+                }
+                if (!isCollected) {
+                    intent.putExtra("isCollected", false);
+                }
+                exit();
+                App.getApplication().setNightTheme(isNight);
+                startActivity(intent);
+            }, mBottomOutAnim.getDuration());
+        } else {
             App.getApplication().setNightTheme(isNight);
-            startActivity(intent);
-        }, mBottomOutAnim.getDuration());
-        /*mHandler.postDelayed(() -> {
-            AppCompatActivity activity = ActivityManage.getByClass(this.getClass());
-            if (activity != null) {
-                BaseDialog.initActivityContext(activity);
-            }
-        }, 1000);*/
+            mHandler.postDelayed(() -> {
+                AppCompatActivity activity = ActivityManage.getByClass(this.getClass());
+                if (activity != null) {
+                    BaseDialog.initActivityContext(activity);
+                }
+            }, 1000);
+        }
         //mPageLoader.setPageStyle(!isCurDayStyle);
     }
 

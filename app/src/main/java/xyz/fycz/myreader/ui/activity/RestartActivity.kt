@@ -26,6 +26,7 @@ class RestartActivity : BaseActivity() {
         }
 
         fun restart(context: Context) {
+            ToastUtils.showError("程序发生错误，正在为您重启")
             val intent = Intent(context, MainActivity::class.java)
             if (context !is Activity) {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
