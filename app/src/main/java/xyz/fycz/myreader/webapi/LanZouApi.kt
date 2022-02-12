@@ -61,7 +61,7 @@ object LanZouApi {
 
     private fun getUrl1(html: String): String {
         val doc = Jsoup.parse(html)
-        return URLCONST.LAN_ZOUS_URL + doc.getElementsByClass("ifr2").attr("src")
+        return URLCONST.LAN_ZOUS_URL + doc.getElementsByTag("iframe").attr("src")
     }
 
     private fun getKey(html: String): String {
@@ -110,7 +110,7 @@ object LanZouApi {
             return if (zt == 1) {
                 "$dom/file/$url"
             } else {
-                inf
+                "解析失败\n信息：$inf"
             }
         }
         return ""
