@@ -8,11 +8,14 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import androidx.annotation.NonNull;
+
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.signature.ObjectKey;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.XXPermissions;
+import com.weaction.ddsdk.ad.DdSdkSplashAd;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,6 +25,7 @@ import java.util.List;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySplashBinding;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
@@ -30,6 +34,7 @@ import xyz.fycz.myreader.util.IOUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.DateHelper;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.util.utils.MD5Utils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
@@ -146,19 +151,19 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void start() {
-        startNoAd();
+        //startNoAd();
         /*if (adTimes >= 0 && todayAdCount >= adTimes) {
             startNoAd();
-        } else {
-            App.getHandler().postDelayed(() -> {
+        } else {*/
+            /*App.getHandler().postDelayed(() -> {
                 binding.tvSkip.setVisibility(View.VISIBLE);
-            }, 2000);
+            }, 2000);*/
             AdUtils.checkHasAd()
                     .subscribe(new MySingleObserver<Boolean>() {
                         @Override
                         public void onSuccess(@NonNull Boolean aBoolean) {
                             if (aBoolean) {
-                                AdUtils.initAd();
+                                //AdUtils.initAd();
                                 startWithAd();
                                 binding.ivSplash.setVisibility(View.GONE);
                                 binding.llAd.setVisibility(View.VISIBLE);
@@ -173,7 +178,7 @@ public class SplashActivity extends BaseActivity {
                             startNoAd();
                         }
                     });
-        }*/
+        //}
     }
 
     private void startNoAd() {
@@ -208,7 +213,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void startWithAd() {
-        /*try {
+        try {
             new DdSdkSplashAd().show(binding.flAd, this, new DdSdkSplashAd.CountdownCallback() {
                 // 展示成功
                 @Override
@@ -216,7 +221,7 @@ public class SplashActivity extends BaseActivity {
                     Log.d(TAG, "广告展示成功");
                     AdUtils.adRecord("splash", "adShow");
                     countTodayAd();
-                    countTime.start();
+                    //countTime.start();
                 }
 
                 // 广告被点击
@@ -248,7 +253,7 @@ public class SplashActivity extends BaseActivity {
             e.printStackTrace();
             WAIT_INTERVAL = 1500;
             startNormal();
-        }*/
+        }
     }
 
 

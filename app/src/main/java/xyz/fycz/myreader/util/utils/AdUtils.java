@@ -2,6 +2,9 @@ package xyz.fycz.myreader.util.utils;
 
 import android.util.Log;
 
+import com.weaction.ddsdk.base.DdSdkHelper;
+import com.weaction.ddsdk.bean.DDSDK;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +14,7 @@ import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.model.user.UserService;
@@ -118,8 +122,27 @@ public class AdUtils {
     }
 
     public static void initAd() {
-        if (!hasInitAd) {
+        /*if (!hasInitAd) {
             hasInitAd = true;
-        }
+            DdSdkHelper.init(new DDSDK.Builder()
+                    .setUserId("1234")
+                    .setAppId("216")
+                    .setAppKey("51716a16fbdf50905704b6575b1b3b60")
+                    .setCsjAppId("5273043")
+                    .setApp(App.getApplication())
+                    .setShowLog(App.isDebug())
+                    .create()
+            );
+        }*/
+        DdSdkHelper.init(new DDSDK.Builder()
+                .setUserId("1234")
+                .setAppId("216")
+                .setAppKey("51716a16fbdf50905704b6575b1b3b60")
+                .setCsjAppId("5273043")
+                .setApp(App.getApplication())
+                .setShowLog(App.isDebug())
+                .setCustomRequestPermission(true)
+                .create()
+        );
     }
 }

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
+import com.weaction.ddsdk.ad.DdSdkFlowAd;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -55,6 +57,7 @@ import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.BlurTransformation;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
@@ -254,7 +257,40 @@ public class BookDetailedActivity extends BaseActivity {
         }
         mSourceDialog.setABooks(aBooks);
         mSourceDialog.setSourceIndex(sourceIndex);
+
+        //initAd();
     }
+
+    private void initAd() {
+        AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
+            @Override
+            public void onSuccess(@NonNull Boolean aBoolean) {
+                if (aBoolean) {
+                    new DdSdkFlowAd().getFlowViews(BookDetailedActivity.this, 1, new DdSdkFlowAd.FlowCallback() {
+                        // 信息流广告拉取完毕后返回的 views
+                        @Override
+                        public void getFlowView(View view) {
+                            binding.ic.getRoot().addView(view, 2);
+                        }
+
+                        // 信息流广告展示后调用
+                        @Override
+                        public void show() {
+                            AdUtils.adRecord("flow", "adShow");
+                            Log.d(TAG, "信息流广告展示成功");
+                        }
+
+                        // 广告拉取失败调用
+                        @Override
+                        public void error(String msg) {
+                            Log.d(TAG, "广告拉取失败\n" + msg);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
 
     @Override
     protected void initClick() {

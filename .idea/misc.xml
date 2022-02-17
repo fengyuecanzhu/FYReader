@@ -16,8 +16,9 @@
         <entry key="..\:/android/FYReader/app/src/main/res/drawable/selector_btn_add.xml" value="0.17777777777777778" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_about.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_auth_email.xml" value="0.1897644927536232" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_book_detail.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_crash.xml" value="0.264" />
-        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_donate.xml" value="0.536" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_donate.xml" value="0.32698961937716264" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_feedback.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_file_picker.xml" value="0.2318840579710145" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_group_manager.xml" value="0.12132725430597771" />
@@ -49,6 +50,7 @@
         <entry key="..\:/android/FYReader/app/src/main/res/layout/item_search_word2.xml" value="0.1947463768115942" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/item_search_word_1.xml" value="0.1947463768115942" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/layout_about_content.xml" value="0.176" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/layout_book_detail_content.xml" value="0.17889492753623187" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/layout_book_detail_header.xml" value="0.536" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/listview_search_book_item.xml" value="0.22010869565217392" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/search_book_item.xml" value="0.1947463768115942" />
