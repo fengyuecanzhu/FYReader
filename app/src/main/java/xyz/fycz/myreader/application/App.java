@@ -1,13 +1,15 @@
 package xyz.fycz.myreader.application;
 
 
-import android.annotation.SuppressLint;
+import static android.provider.ContactsContract.Directory.PACKAGE_NAME;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -34,15 +36,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import io.reactivex.internal.functions.Functions;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -51,18 +47,14 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
-import xyz.fycz.myreader.ui.activity.MainActivity;
-import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
-import xyz.fycz.myreader.util.help.SSLSocketClient;
+import xyz.fycz.myreader.ui.dialog.UpdateDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.help.SSLSocketClient;
+import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.AdUtils;
-import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
-import xyz.fycz.myreader.ui.dialog.UpdateDialog;
 
 
 public class App extends Application {
@@ -72,6 +64,7 @@ public class App extends Application {
     private static App application;
     private ExecutorService mFixedThreadPool;
     private static boolean debug;
+    public static boolean isBackground = false;
 
     @Override
     public void onCreate() {
@@ -92,7 +85,6 @@ public class App extends Application {
                         .readTimeout(15_000) // set read timeout.
                 ))
                 .commit();
-//        handleSSLHandshake();
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
         }
@@ -152,31 +144,6 @@ public class App extends Application {
         setting.setDayStyle(!isNightMode);
         SysManager.saveSetting(setting);
         App.getApplication().initNightTheme();
-    }
-
-    @SuppressLint("TrulyRandom")
-    public static void handleSSLHandshake() {
-        try {
-            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-
-                @Override
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
-            }};
-
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
-        } catch (Exception ignored) {
-        }
     }
 
 
@@ -478,4 +445,5 @@ public class App extends Application {
     public ExecutorService getmFixedThreadPool() {
         return mFixedThreadPool;
     }
+
 }

@@ -62,7 +62,7 @@ public class DonateActivity extends BaseActivity {
 
     private void initAd() {
         binding.llAdSupport.setVisibility(View.VISIBLE);
-        new DdSdkFlowAd().getFlowViews(DonateActivity.this, 4,  new DdSdkFlowAd.FlowCallback() {
+        /*new DdSdkFlowAd().getFlowViews(DonateActivity.this, 4,  new DdSdkFlowAd.FlowCallback() {
                 // 信息流广告拉取完毕后返回的 views
                 @Override
                 public void getFlowView(View view) {
@@ -81,7 +81,7 @@ public class DonateActivity extends BaseActivity {
                 public void error(String msg) {
                     Log.d(TAG, "广告拉取失败\n" + msg);
                 }
-            });
+            });*/
         }
 
     @Override

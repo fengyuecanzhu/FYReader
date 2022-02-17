@@ -34,7 +34,7 @@
             android:layout_marginTop="20dp"
             android:drawablePadding="10dp"
             app:counterEnabled="true"
-            app:counterMaxLength="14">
+            app:counterMaxLength="100">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"

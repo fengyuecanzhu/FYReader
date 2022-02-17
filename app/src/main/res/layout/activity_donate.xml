@@ -139,6 +139,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="25dp"
                 android:background="@color/colorForeground"
+                android:visibility="gone"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp">
 

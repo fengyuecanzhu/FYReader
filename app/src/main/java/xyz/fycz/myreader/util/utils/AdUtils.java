@@ -17,7 +17,9 @@ import okhttp3.RequestBody;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
+import xyz.fycz.myreader.entity.AdBean;
 import xyz.fycz.myreader.model.user.UserService;
+import xyz.fycz.myreader.model.user.UserService2;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.help.DateHelper;
 
@@ -28,28 +30,44 @@ import xyz.fycz.myreader.util.help.DateHelper;
 public class AdUtils {
     public static final String TAG = AdUtils.class.getSimpleName();
     private static boolean hasInitAd = false;
+    public static AdBean adConfig;
+
+    static {
+        String config = SharedPreUtils.getInstance(true).getString("adConfig");
+        adConfig = GsonExtensionsKt.getGSON().fromJson(config, AdBean.class);
+        if (adConfig == null || adConfig.getBackAdTime() == 0) {
+            adConfig = new AdBean(false, 20, 60);
+        }
+    }
 
     public static Single<Boolean> checkHasAd() {
         return Single.create((SingleOnSubscribe<Boolean>) emitter -> {
-            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-            String body = "type=hasAd" + UserService.makeSignalParam();
-            RequestBody requestBody = RequestBody.create(mediaType, body);
-            String jsonStr = OkHttpUtils.getHtml(URLCONST.AD_URL, requestBody, "UTF-8");
             boolean hasAd = false;
-            try {
-                JSONObject jsonObject = new JSONObject(jsonStr);
-                int code = jsonObject.getInt("code");
-                if (code > 200) {
-                    Log.e(TAG, "checkHasAd-->errorCode：" + code);
-                    if (code == 213) {
-                        hasAd = true;
+            if (!adConfig.isCloud()) {
+                MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+                String body = "type=adConfig" + UserService2.INSTANCE.makeAuth();
+                RequestBody requestBody = RequestBody.create(mediaType, body);
+                String jsonStr = OkHttpUtils.getHtml(URLCONST.AD_URL, requestBody, "UTF-8");
+                try {
+                    JSONObject jsonObject = new JSONObject(jsonStr);
+                    int code = jsonObject.getInt("code");
+                    if (code > 200) {
+                        Log.e(TAG, "checkHasAd-->errorCode：" + code);
+                        if (code == 213) {
+                            hasAd = true;
+                        }
+                    } else {
+                        String res = jsonObject.getString("result");
+                        SharedPreUtils.getInstance(true).putString("adConfig", res);
+                        adConfig = GsonExtensionsKt.getGSON().fromJson(res, AdBean.class);
+                        hasAd = adConfig.isHasAd();
                     }
-                } else {
-                    hasAd = jsonObject.getBoolean("result");
+                    Log.i(TAG, "hasAd：" + hasAd);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                Log.i(TAG, "hasAd：" + hasAd);
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } else {
+                hasAd = adConfig.isHasAd();
             }
             emitter.onSuccess(hasAd);
         }).compose(RxUtils::toSimpleSingle);
@@ -58,7 +76,7 @@ public class AdUtils {
     public static void adRecord(String type, String name) {
         Single.create((SingleOnSubscribe<Boolean>) emitter -> {
             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-            String body = "adType=" + type + "&type=" + name + UserService.makeSignalParam();
+            String body = "adType=" + type + "&type=" + name + UserService2.INSTANCE.makeAuth();
             RequestBody requestBody = RequestBody.create(mediaType, body);
             OkHttpUtils.getHtml(URLCONST.AD_URL, requestBody, "UTF-8");
             emitter.onSuccess(true);
@@ -78,7 +96,7 @@ public class AdUtils {
     public static Single<int[]> adTimes() {
         return Single.create((SingleOnSubscribe<int[]>) emitter -> {
             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-            String body = "type=adTimes" + UserService.makeSignalParam();
+            String body = "type=adTimes" + UserService2.INSTANCE.makeAuth();
             RequestBody requestBody = RequestBody.create(mediaType, body);
             String jsonStr = OkHttpUtils.getHtml(URLCONST.AD_URL, requestBody, "UTF-8");
             JSONObject jsonObject = new JSONObject(jsonStr);
@@ -119,6 +137,19 @@ public class AdUtils {
             todayAdCount = 0;
         }
         return adTimes < 0 || todayAdCount < adTimes || bookDetailAd;
+    }
+
+    public static void backTime() {
+        SharedPreUtils.getInstance(true).putLong("backTime", System.currentTimeMillis());
+    }
+
+    public static boolean backSplashAd() {
+        SharedPreUtils sp = SharedPreUtils.getInstance(true);
+        Long splashAdTime = sp.getLong("splashAdTime");
+        Long backTime = sp.getLong("backTime");
+        Long currentTime = System.currentTimeMillis();
+        return currentTime - splashAdTime >= adConfig.getIntervalAdTime() * 60L * 1000 ||
+                currentTime - backTime >= adConfig.getBackAdTime() * 60L * 1000;
     }
 
     public static void initAd() {

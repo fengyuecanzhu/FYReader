@@ -1,10 +1,8 @@
 package xyz.fycz.myreader.application;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -12,36 +10,21 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.util.DisplayMetrics;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.functions.Function;
 import xyz.fycz.myreader.common.APPCONST;
-import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.ui.activity.CrashActivity;
 import xyz.fycz.myreader.ui.activity.RestartActivity;
-import xyz.fycz.myreader.ui.activity.SplashActivity;
-import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
-import xyz.fycz.myreader.util.utils.OkHttpUtils;
 
 /**
  * @author fengyue

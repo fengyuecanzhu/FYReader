@@ -9,6 +9,8 @@ public class ActivityManage {
 
     private static ArrayList<AppCompatActivity> activities = new ArrayList<>();
 
+    public static int mResumeActivityCount = 0;
+
     public static void addActivity(AppCompatActivity activity){
         activities.add(activity);
     }

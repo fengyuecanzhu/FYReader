@@ -1,5 +1,7 @@
 package xyz.fycz.myreader.ui.activity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,6 +52,9 @@ public class SplashActivity extends BaseActivity {
     private int todayAdCount;
     private int adTimes;
     private boolean hasStart = false;
+    private boolean startToAd = false;
+    private static final String INTENT_TO_AD = "startToAd";
+
 
     //创建子线程
     private Runnable start = () -> {
@@ -85,6 +90,15 @@ public class SplashActivity extends BaseActivity {
         }
     };
 
+    public static void start(Context context) {
+        Intent intent = new Intent(context, SplashActivity.class);
+        if (!(context instanceof Activity)) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+        intent.putExtra(INTENT_TO_AD, true);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void bindView() {
         binding = ActivitySplashBinding.inflate(getLayoutInflater());
@@ -95,7 +109,7 @@ public class SplashActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // 避免从桌面启动程序后，会重新实例化入口类的activity
-        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
+        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0 && !startToAd) {
             finish();
             return;
         }
@@ -122,6 +136,7 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initData(Bundle savedInstanceState) {
+        startToAd = getIntent().getBooleanExtra(INTENT_TO_AD, false);
         spu = SharedPreUtils.getInstance();
         String splashAdCount = spu.getString("splashAdCount");
         adTimes = spu.getInt("curAdTimes", 3);
@@ -158,26 +173,25 @@ public class SplashActivity extends BaseActivity {
             /*App.getHandler().postDelayed(() -> {
                 binding.tvSkip.setVisibility(View.VISIBLE);
             }, 2000);*/
-            AdUtils.checkHasAd()
-                    .subscribe(new MySingleObserver<Boolean>() {
-                        @Override
-                        public void onSuccess(@NonNull Boolean aBoolean) {
-                            if (aBoolean) {
-                                //AdUtils.initAd();
-                                startWithAd();
-                                binding.ivSplash.setVisibility(View.GONE);
-                                binding.llAd.setVisibility(View.VISIBLE);
-                            } else {
-                                startNoAd();
-                            }
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
+        AdUtils.checkHasAd()
+                .subscribe(new MySingleObserver<Boolean>() {
+                    @Override
+                    public void onSuccess(@NonNull Boolean aBoolean) {
+                        if (aBoolean) {
+                            //AdUtils.initAd();
+                            startWithAd();
+                            binding.ivSplash.setVisibility(View.GONE);
+                            binding.llAd.setVisibility(View.VISIBLE);
+                        } else {
                             startNoAd();
                         }
-                    });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        startNoAd();
+                    }
+                });
         //}
     }
 
@@ -193,6 +207,10 @@ public class SplashActivity extends BaseActivity {
 
     private void startNormal() {
         if (!App.isDestroy(this)) {
+            if (startToAd) {
+                finish();
+                return;
+            }
             if (BookGroupService.getInstance().curGroupIsPrivate()) {
                 App.runOnUiThread(() -> {
                     MyAlertDialog.showPrivateVerifyDia(SplashActivity.this, needGoTo -> {
@@ -218,6 +236,7 @@ public class SplashActivity extends BaseActivity {
                 // 展示成功
                 @Override
                 public void show() {
+                    SharedPreUtils.getInstance(true).putLong("splashAdTime", System.currentTimeMillis());
                     Log.d(TAG, "广告展示成功");
                     AdUtils.adRecord("splash", "adShow");
                     countTodayAd();

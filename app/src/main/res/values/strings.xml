@@ -95,7 +95,7 @@
     <string name="et_email">请输入邮箱</string>
     <string name="et_rp_captcha">请输入验证码</string>
     <string name="et_email_captcha">请输入邮箱验证码</string>
-    <string name="et_account_tip">请输入用户名</string>
+    <string name="et_account_tip">请输入用户名/邮箱</string>
     <string name="text_register">注册</string>
     <string name="text_agreement_tip">我已阅读并同意《<a href="https://shimo.im/docs/RgkDpd3D3Gp6t3rD">用户服务协议</a>》</string>
 

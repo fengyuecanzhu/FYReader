@@ -195,7 +195,7 @@ object UserService2 {
         return readConfig() != null
     }
 
-    private fun makeAuth(): String {
+    public fun makeAuth(): String {
         return "&signal=" + AppInfoUtils.getSingInfo(
             App.getmContext(),
             App.getApplication().packageName,

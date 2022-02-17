@@ -30,6 +30,7 @@ import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.CodeUtil;
 import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 
@@ -112,6 +113,12 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
                     if (result.getCode() == 102) {
                         loginSuccess();
                         ToastUtils.showSuccess(result.getResult().toString());
+                    } else if (result.getCode() == 109) {
+                        user.setUserName(GsonExtensionsKt.getGSON()
+                                .fromJson(result.getResult().toString(), User.class)
+                                .getUserName());
+                        loginSuccess();
+                        ToastUtils.showSuccess("登录成功");
                     } else if (result.getCode() == 301) {
                         Intent intent = new Intent(LoginActivity.this, AuthEmailActivity.class);
                         BitIntentDataManager.getInstance().putData(intent, user);
