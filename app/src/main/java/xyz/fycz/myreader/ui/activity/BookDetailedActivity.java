@@ -257,8 +257,9 @@ public class BookDetailedActivity extends BaseActivity {
         }
         mSourceDialog.setABooks(aBooks);
         mSourceDialog.setSourceIndex(sourceIndex);
-
-        //initAd();
+        if (AdUtils.getAdConfig().isHasAd() && AdUtils.getAdConfig().isShowFlowAd()){
+            initAd();
+        }
     }
 
     private void initAd() {

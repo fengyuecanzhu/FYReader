@@ -16,6 +16,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.signature.ObjectKey;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 import com.weaction.ddsdk.ad.DdSdkSplashAd;
 
@@ -350,6 +351,11 @@ public class SplashActivity extends BaseActivity {
     private void requestPermission() {
         //获取读取和写入SD卡的权限
         XXPermissions.with(this)
+                /*.permission(new String[]{Permission.READ_PHONE_STATE,
+                        Permission.WRITE_EXTERNAL_STORAGE,
+                        Permission.READ_EXTERNAL_STORAGE,
+                        Permission.ACCESS_FINE_LOCATION,
+                        Permission.ACCESS_COARSE_LOCATION})*/
                 .permission(APPCONST.STORAGE_PERMISSIONS)
                 .request(new OnPermissionCallback() {
                     @Override
@@ -359,7 +365,8 @@ public class SplashActivity extends BaseActivity {
 
                     @Override
                     public void onDenied(List<String> permissions, boolean never) {
-                        ToastUtils.showWarring("储存权限被拒绝，部分功能可能无法正常运行！");
+                        if (permissions.contains(Permission.WRITE_EXTERNAL_STORAGE))
+                            ToastUtils.showWarring("储存权限被拒绝，部分功能可能无法正常运行！");
                         start();
                     }
                 });

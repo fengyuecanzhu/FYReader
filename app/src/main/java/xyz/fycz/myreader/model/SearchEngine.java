@@ -50,7 +50,7 @@ public class SearchEngine {
     private OnSearchListener searchListener;
 
     public SearchEngine() {
-        threadsNum = SharedPreUtils.getInstance().getInt(App.getmContext().getString(R.string.threadNum), 8);
+        threadsNum = SharedPreUtils.getInstance().getInt(App.getmContext().getString(R.string.threadNum), 16);
     }
 
     public void setOnSearchListener(OnSearchListener searchListener) {
@@ -143,7 +143,8 @@ public class SearchEngine {
         searchSiteIndex++;
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
-            BookApi.search(keyword, crawler, executorService)
+            //BookApi.search(keyword, crawler, executorService)
+            BookApi.search(keyword, crawler)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<ConMVMap<SearchBookBean, Book>>() {
@@ -191,7 +192,8 @@ public class SearchEngine {
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
             String searchKey = title;
-            BookApi.search(searchKey, crawler, executorService)
+            //BookApi.search(searchKey, crawler, executorService)
+            BookApi.search(searchKey, crawler)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<ConMVMap<SearchBookBean, Book>>() {

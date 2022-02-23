@@ -19,7 +19,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityRegisterBinding;
 import xyz.fycz.myreader.model.user.Result;
 import xyz.fycz.myreader.model.user.User;
-import xyz.fycz.myreader.model.user.UserService2;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.CodeUtil;
@@ -153,7 +153,7 @@ public class RegisterActivity extends BaseActivity {
             }
             dialog.show();
             dialog.setmMessage("正在发送");
-            UserService2.INSTANCE.sendEmail(email, "reg", keyc).subscribe(new MySingleObserver<Result>() {
+            UserService.INSTANCE.sendEmail(email, "reg", keyc).subscribe(new MySingleObserver<Result>() {
                 @Override
                 public void onSubscribe(Disposable d) {
                     addDisposable(d);
@@ -202,7 +202,7 @@ public class RegisterActivity extends BaseActivity {
                 dialog.show();
                 dialog.setmMessage("正在注册");
                 User user = new User(username, CyptoUtils.encode(APPCONST.KEY, password), email);
-                UserService2.INSTANCE.register(user, emailCode, keyc).subscribe(new MySingleObserver<Result>() {
+                UserService.INSTANCE.register(user, emailCode, keyc).subscribe(new MySingleObserver<Result>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         addDisposable(d);
@@ -212,7 +212,7 @@ public class RegisterActivity extends BaseActivity {
                     @Override
                     public void onSuccess(@NonNull Result result) {
                         if (result.getCode() == 101) {
-                            UserService2.INSTANCE.writeUsername(user.getUserName());
+                            UserService.INSTANCE.writeUsername(user.getUserName());
                             ToastUtils.showSuccess(result.getResult().toString());
                             finish();
                         } else {

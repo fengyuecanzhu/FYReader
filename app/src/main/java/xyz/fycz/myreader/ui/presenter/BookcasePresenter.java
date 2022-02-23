@@ -56,7 +56,7 @@ import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.model.user.Result;
-import xyz.fycz.myreader.model.user.UserService2;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.activity.FileSystemActivity;
 import xyz.fycz.myreader.ui.activity.GroupManagerActivity;
 import xyz.fycz.myreader.ui.activity.MainActivity;
@@ -175,7 +175,7 @@ public class BookcasePresenter implements BasePresenter {
 
         getData();
 
-        if (mSetting.isAutoSyn() && UserService2.INSTANCE.isLogin()) {
+        if (mSetting.isAutoSyn() && UserService.INSTANCE.isLogin()) {
             synBookcaseToWeb(true);
         }
 
@@ -986,7 +986,7 @@ public class BookcasePresenter implements BasePresenter {
         SharedPreUtils spb = SharedPreUtils.getInstance();
         String synTime = spb.getString(mMainActivity.getString(R.string.synTime));
         if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
-            UserService2.INSTANCE.webBackup(UserService2.INSTANCE.readConfig()).subscribe(new MySingleObserver<Result>() {
+            UserService.INSTANCE.webBackup(UserService.INSTANCE.readConfig()).subscribe(new MySingleObserver<Result>() {
                 @Override
                 public void onSubscribe(Disposable d) {
                     mMainActivity.addDisposable(d);

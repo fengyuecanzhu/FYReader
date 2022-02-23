@@ -13,6 +13,8 @@ public class AdBean {
     private int backAdTime;
     //应用回到前台展示广告间隔(单位：分钟)
     private int intervalAdTime;
+    //是否在详情页展示信息流广告
+    private boolean showFlowAd;
 
     public AdBean() {
     }
@@ -21,6 +23,13 @@ public class AdBean {
         this.hasAd = hasAd;
         this.backAdTime = backAdTime;
         this.intervalAdTime = intervalAdTime;
+    }
+
+    public AdBean(boolean hasAd, int backAdTime, int intervalAdTime, boolean showFlowAd) {
+        this.hasAd = hasAd;
+        this.backAdTime = backAdTime;
+        this.intervalAdTime = intervalAdTime;
+        this.showFlowAd = showFlowAd;
     }
 
     public boolean isCloud() {
@@ -53,5 +62,13 @@ public class AdBean {
 
     public void setIntervalAdTime(int intervalAdTime) {
         this.intervalAdTime = intervalAdTime;
+    }
+
+    public boolean isShowFlowAd() {
+        return showFlowAd;
+    }
+
+    public void setShowFlowAd(boolean showFlowAd) {
+        this.showFlowAd = showFlowAd;
     }
 }

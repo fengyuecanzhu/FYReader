@@ -45,12 +45,11 @@ import xyz.fycz.myreader.model.storage.Restore;
 import xyz.fycz.myreader.model.storage.WebDavHelp;
 import xyz.fycz.myreader.model.user.Result;
 import xyz.fycz.myreader.model.user.User;
-import xyz.fycz.myreader.model.user.UserService2;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.activity.AboutActivity;
 import xyz.fycz.myreader.ui.activity.AdSettingActivity;
 import xyz.fycz.myreader.ui.activity.BookSourceActivity;
 import xyz.fycz.myreader.ui.activity.DonateActivity;
-import xyz.fycz.myreader.ui.activity.FeedbackActivity;
 import xyz.fycz.myreader.ui.activity.LoginActivity;
 import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
@@ -109,7 +108,7 @@ public class MineFragment extends BaseFragment {
     @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
-        user = UserService2.INSTANCE.readConfig();
+        user = UserService.INSTANCE.readConfig();
         isLogin = user != null && !TextUtils.isEmpty(user.getUserName());
         mSetting = SysManager.getSetting();
         webSynMenu = new String[]{
@@ -502,7 +501,7 @@ public class MineFragment extends BaseFragment {
         String synTime = spb.getString(getString(R.string.synTime));
         if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
             dialog.show();
-            UserService2.INSTANCE.webBackup(user).subscribe(new MySingleObserver<Result>() {
+            UserService.INSTANCE.webBackup(user).subscribe(new MySingleObserver<Result>() {
                 @Override
                 public void onSubscribe(Disposable d) {
                     addDisposable(d);
@@ -548,17 +547,8 @@ public class MineFragment extends BaseFragment {
         DialogCreator.createCommonDialog(getContext(), "确认同步吗?", "将书架从网络同步至本地会覆盖原有书架！", true,
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
-                        /*if (UserService.webRestore()) {
-                            mHandler.sendMessage(mHandler.obtainMessage(7));
-//                                    DialogCreator.createTipDialog(mMainActivity,
-//                                            "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");、
-                            mSetting = SysManager.getSetting();
-                            ToastUtils.showSuccess("成功将书架从网络同步至本地！");
-                        } else {
-                            DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！");
-                        }*/
                     dialog.show();
-                    UserService2.INSTANCE.webRestore(user).subscribe(new MySingleObserver<Result>() {
+                    UserService.INSTANCE.webRestore(user).subscribe(new MySingleObserver<Result>() {
                         @Override
                         public void onSubscribe(Disposable d) {
                             addDisposable(d);
@@ -600,7 +590,7 @@ public class MineFragment extends BaseFragment {
                 case APPCONST.REQUEST_LOGIN:
                     assert data != null;
                     isLogin = data.getBooleanExtra("isLogin", false);
-                    user = UserService2.INSTANCE.readConfig();
+                    user = UserService.INSTANCE.readConfig();
                     if (isLogin && user != null) {
                         binding.tvUser.setText(user.getUserName());
                     }

@@ -24,7 +24,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityLoginBinding;
 import xyz.fycz.myreader.model.user.Result;
 import xyz.fycz.myreader.model.user.User;
-import xyz.fycz.myreader.model.user.UserService2;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.CodeUtil;
@@ -73,7 +73,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
     protected void initWidget() {
         super.initWidget();
         createCaptcha();
-        String username = UserService2.INSTANCE.readUsername();
+        String username = UserService.INSTANCE.readUsername();
         binding.etUser.getEditText().setText(username);
         binding.etUser.getEditText().requestFocus(username.length());
         //监听内容改变 -> 控制按钮的点击状态
@@ -101,7 +101,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
             String loginPwd = binding.etPassword.getEditText().getText().toString();
             user = new User(loginName, CyptoUtils.encode(APPCONST.KEY, loginPwd));
             dialog.show();
-            UserService2.INSTANCE.login(user).subscribe(new MySingleObserver<Result>() {
+            UserService.INSTANCE.login(user).subscribe(new MySingleObserver<Result>() {
                 @Override
                 public void onSubscribe(Disposable d) {
                     addDisposable(d);
@@ -154,8 +154,8 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
     }
 
     private void loginSuccess() {
-        UserService2.INSTANCE.writeConfig(user);
-        UserService2.INSTANCE.writeUsername(user.getUserName());
+        UserService.INSTANCE.writeConfig(user);
+        UserService.INSTANCE.writeUsername(user.getUserName());
         Intent intent = new Intent();
         intent.putExtra("isLogin", true);
         setResult(Activity.RESULT_OK, intent);

@@ -26,7 +26,7 @@ import java.io.File
  * @author fengyue
  * @date 2021/12/9 10:17
  */
-object UserService2 {
+object UserService {
 
     fun login(user: User): Single<Result> {
         return Single.create(SingleOnSubscribe<Result> {
@@ -200,6 +200,6 @@ object UserService2 {
             App.getmContext(),
             App.getApplication().packageName,
             AppInfoUtils.SHA1
-        ) + "&appVersion=" + App.getVersionCode()
+        ) + "&appVersion=" + App.getVersionCode() + "&isDebug=" + App.isDebug()
     }
 }
