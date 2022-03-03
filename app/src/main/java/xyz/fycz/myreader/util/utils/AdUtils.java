@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.util.utils;
 
 import android.app.Activity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -14,6 +15,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
@@ -26,6 +32,7 @@ import xyz.fycz.myreader.entity.ad.AdBean;
 import xyz.fycz.myreader.entity.ad.AdConfig;
 import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.DateHelper;
 
 /**
@@ -36,6 +43,7 @@ public class AdUtils {
     public static final String TAG = AdUtils.class.getSimpleName();
     private static boolean hasInitAd = false;
     private static AdConfig adConfig;
+    public static final DateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
     static {
         String config = getSp().getString("adConfig");
@@ -51,6 +59,7 @@ public class AdUtils {
     }
 
     public static Single<Boolean> checkHasAd() {
+        if (hasRemoveAdReward()) return Single.just(false);
         initAd();
         return Single.create((SingleOnSubscribe<Boolean>) emitter -> {
             boolean hasAd = false;
@@ -175,7 +184,7 @@ public class AdUtils {
         return currentTime - adConfigTime >= adConfig.getExpireTime() * 60L * 1000;
     }
 
-    public static boolean adTime(String adTag, AdBean adBean){
+    public static boolean adTime(String adTag, AdBean adBean) {
         if (adBean.getStatus() == 0) return false;
         long adTime = getSp().getLong(adTag + "Time");
         long currentTime = System.currentTimeMillis();
@@ -291,6 +300,64 @@ public class AdUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void removeAdReward() {
+        if (canAddReward()) {
+            try {
+                String rewardTime = getSp().getString("rewardLastTime");
+                long current = System.currentTimeMillis();
+                long rewardLastTime = System.currentTimeMillis();
+                if (!TextUtils.isEmpty(rewardTime)) {
+                    rewardLastTime = SDF.parse(rewardTime).getTime();
+                }
+                if (rewardLastTime < current) rewardLastTime = current;
+                rewardLastTime += adConfig.getRemoveAdTime() * 60L * 60 * 1000;
+                getSp().putString("rewardLastTime", SDF.format(rewardLastTime));
+                rewardCountPlus();
+            } catch (ParseException e) {
+                e.printStackTrace();
+                ToastUtils.showError("" + e.getLocalizedMessage());
+            }
+            ToastUtils.showSuccess("奖励获取成功");
+        } else {
+            ToastUtils.showWarring("已达到单日最大获得奖励次数");
+        }
+    }
+
+    private static void rewardCountPlus() {
+        String today = DateHelper.getYearMonthDay1();
+        String[] rewardCount = getSp().getString("rewardCount").split(":");
+        int count;
+        if (today.equals(rewardCount[0])) {
+            count = Integer.parseInt(rewardCount[1]);
+        } else {
+            count = 0;
+        }
+        count++;
+        getSp().putString("rewardCount", today + ":" + count);
+    }
+
+    public static boolean canAddReward() {
+        String today = DateHelper.getYearMonthDay1();
+        String[] rewardCount = getSp().getString("rewardCount").split(":");
+        if (today.equals(rewardCount[0]) && rewardCount.length > 1) {
+            return Integer.parseInt(rewardCount[1]) < adConfig.getMaxRemove();
+        }
+        return true;
+    }
+
+    public static boolean hasRemoveAdReward() {
+        String rewardTime = getSp().getString("rewardLastTime");
+        long rewardLastTime = 0;
+        try {
+            if (!TextUtils.isEmpty(rewardTime)) {
+                rewardLastTime = SDF.parse(rewardTime).getTime();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return rewardLastTime > System.currentTimeMillis();
     }
 
     public static AdConfig getAdConfig() {

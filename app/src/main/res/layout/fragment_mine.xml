@@ -368,8 +368,7 @@
                 android:textSize="@dimen/text_normal_size" />
         </RelativeLayout>
         <RelativeLayout
-            android:id="@+id/mine_rl_ad_setting"
-            android:visibility="gone"
+            android:id="@+id/mine_rl_remove_ad"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@drawable/selector_common_bg"
@@ -377,7 +376,7 @@
             android:paddingRight="20dp">
 
             <ImageView
-                android:id="@+id/iv_ad_setting"
+                android:id="@+id/iv_remove_ad"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_alignParentStart="true"
@@ -392,8 +391,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="16dp"
-                android:layout_toEndOf="@id/iv_ad_setting"
-                android:text="@string/ad_setting"
+                android:layout_toEndOf="@id/iv_remove_ad"
+                android:text="@string/remove_ad"
                 android:textColor="@color/textSecondary"
                 android:textSize="@dimen/text_normal_size" />
 

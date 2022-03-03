@@ -57,6 +57,7 @@ import xyz.fycz.myreader.ui.activity.LoginActivity;
 import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
 import xyz.fycz.myreader.ui.activity.ReadRecordActivity;
+import xyz.fycz.myreader.ui.activity.RemoveAdActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
@@ -408,7 +409,7 @@ public class MineFragment extends BaseFragment {
                     }).setCancelButton(R.string.cancel);
         });
 
-        binding.mineRlAdSetting.setOnClickListener(v -> startActivity(new Intent(getActivity(), AdSettingActivity.class)));
+        binding.mineRlRemoveAd.setOnClickListener(v -> startActivity(new Intent(getActivity(), RemoveAdActivity.class)));
 
         binding.mineRlAbout.setOnClickListener(v -> {
             Intent aboutIntent = new Intent(getActivity(), AboutActivity.class);
