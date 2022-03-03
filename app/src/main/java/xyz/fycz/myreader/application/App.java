@@ -33,16 +33,23 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.reactivex.internal.functions.Functions;
 import io.reactivex.plugins.RxJavaPlugins;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
+import kotlin.jvm.functions.Function3;
+import kotlinx.coroutines.CoroutineScope;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.entity.lanzou.LanZouFile;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
+import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.UpdateDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -51,6 +58,7 @@ import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.webapi.LanZouApi;
 
 
 public class App extends Application {
@@ -68,7 +76,6 @@ public class App extends Application {
         application = this;
         debug = isApkInDebug(this);
         CrashHandler.register(this);
-        firstInit();
         SSLSocketClient.trustAllHosts();//信任所有证书
         RxJavaPlugins.setErrorHandler(Functions.emptyConsumer());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -91,14 +98,6 @@ public class App extends Application {
         AdUtils.initAd();
     }
 
-
-    private void firstInit() {
-        SharedPreUtils sru = SharedPreUtils.getInstance();
-        if (!sru.getBoolean("firstInit")) {
-            BookSourceManager.initDefaultSources();
-            sru.putBoolean("firstInit", true);
-        }
-    }
 
     private void initDialogX() {
         DialogX.init(this);

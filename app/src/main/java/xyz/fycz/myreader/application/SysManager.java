@@ -7,12 +7,16 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookcaseStyle;
 import xyz.fycz.myreader.enums.LocalBookSource;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.util.CacheHelper;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 
 import static xyz.fycz.myreader.application.App.getVersionCode;
+
+import java.util.List;
 
 
 public class SysManager {
@@ -137,7 +141,12 @@ public class SysManager {
             case 6:
                 SharedPreUtils.getInstance().putString(App.getmContext().getString(R.string.searchSource), "");
                 Log.d("SourceVersion", "" + 5);
-                break;
+            case 7:
+                List<BookSource> sources = BookSourceManager.getAllLocalSource();
+                for (BookSource source : sources){
+                    source.setEnable(false);
+                }
+                BookSourceManager.addBookSource(sources);
         }
         setting.setSourceVersion(APPCONST.SOURCE_VERSION);
         saveSetting(setting);

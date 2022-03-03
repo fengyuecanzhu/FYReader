@@ -1,5 +1,7 @@
 package xyz.fycz.myreader.webapi
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import com.google.gson.JsonParser
 import io.reactivex.Observable
@@ -10,11 +12,15 @@ import org.jsoup.Jsoup
 import xyz.fycz.myreader.common.URLCONST
 import xyz.fycz.myreader.entity.lanzou.LanZouFile
 import xyz.fycz.myreader.entity.lanzou.LanZouParseBean
+import xyz.fycz.myreader.greendao.DbManager
 import xyz.fycz.myreader.model.third3.Coroutine
 import xyz.fycz.myreader.model.third3.http.getProxyClient
 import xyz.fycz.myreader.model.third3.http.newCallResponseBody
 import xyz.fycz.myreader.model.third3.http.postForm
 import xyz.fycz.myreader.model.third3.http.text
+import xyz.fycz.myreader.ui.activity.SourceSubscribeActivity
+import xyz.fycz.myreader.ui.dialog.DialogCreator
+import xyz.fycz.myreader.util.SharedPreUtils
 import xyz.fycz.myreader.util.ToastUtils
 import xyz.fycz.myreader.util.help.StringHelper
 import xyz.fycz.myreader.util.utils.*
@@ -30,6 +36,41 @@ import kotlin.collections.HashMap
  */
 object LanZouApi {
     private val paramCathe = mutableMapOf<String, HashMap<String, Any>>()
+
+    fun checkSubscribeUpdate(context: Context) {
+        if (!SharedPreUtils.getInstance().getBoolean("checkSubscribeUpdate", true)) return
+        if (DbManager.getDaoSession().subscribeFileDao.count() == 0L) return
+        getFoldFiles(URLCONST.SUB_SOURCE_URL, 1, "fm9a")
+            .onSuccess {
+                it?.let {
+                    for (file in it) {
+                        val param = file.name_all.removeSuffix(".txt").split("#")
+                        val subscribed = DbManager.getDaoSession().subscribeFileDao.load(param[0])
+                        subscribed?.let { sub ->
+                            if (sub.date < param[2]) {
+                                DialogCreator.createThreeButtonDialog(context,
+                                    "书源订阅更新", "发现有更新的订阅书源，是否前往更新？",
+                                    true, "关闭订阅更新提醒", "取消",
+                                    "确定", { _, _ ->
+                                        SharedPreUtils.getInstance()
+                                            .putBoolean("checkSubscribeUpdate", false)
+                                        ToastUtils.showSuccess("自动检查订阅更新已关闭")
+                                    }, null, { _, _ ->
+                                        context.startActivity(
+                                            Intent(
+                                                context,
+                                                SourceSubscribeActivity::class.java
+                                            )
+                                        )
+                                    }
+                                )
+                                return@onSuccess
+                            }
+                        }
+                    }
+                }
+            }
+    }
 
     fun getFoldFiles(
         foldUrl: String,

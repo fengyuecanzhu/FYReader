@@ -25,6 +25,8 @@ public class AdConfig {
     private int maxRemove;
     //累计最高去除时间(单位：小时)
     private int totalRemove;
+    //获取订阅书源是否需要看广告
+    private boolean subSource;
     //详情页广告配置
     private AdBean detail;
     //搜索页广告配置
@@ -33,7 +35,7 @@ public class AdConfig {
     public AdConfig() {
     }
 
-    public AdConfig(boolean hasAd, int expireTime, int backAdTime, int intervalAdTime, int removeAdTime, int maxRemove, int totalRemove) {
+    public AdConfig(boolean hasAd, int expireTime, int backAdTime, int intervalAdTime, int removeAdTime, int maxRemove, int totalRemove, boolean subSource) {
         this.hasAd = hasAd;
         this.expireTime = expireTime;
         this.backAdTime = backAdTime;
@@ -41,6 +43,7 @@ public class AdConfig {
         this.removeAdTime = removeAdTime;
         this.maxRemove = maxRemove;
         this.totalRemove = totalRemove;
+        this.subSource = subSource;
     }
 
     public boolean isCloud() {
@@ -127,6 +130,14 @@ public class AdConfig {
 
     public void setSearch(AdBean search) {
         this.search = search;
+    }
+
+    public boolean isSubSource() {
+        return subSource;
+    }
+
+    public void setSubSource(boolean subSource) {
+        this.subSource = subSource;
     }
 
     @NonNull

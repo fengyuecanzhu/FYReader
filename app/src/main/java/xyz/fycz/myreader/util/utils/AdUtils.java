@@ -50,7 +50,8 @@ public class AdUtils {
         adConfig = GsonExtensionsKt.getGSON().fromJson(config, AdConfig.class);
         if (adConfig == null || adConfig.getBackAdTime() == 0) {
             adConfig = new AdConfig(false, 60, 20,
-                    60, 6, 3, 48);
+                    60, 6, 3, 48,
+                    true);
         }
     }
 

@@ -280,17 +280,16 @@ public class SearchBookActivity extends BaseActivity {
         });
         initHistoryList();
         adBean = AdUtils.getAdConfig().getSearch();
-        if (AdUtils.getAdConfig().isHasAd() && AdUtils.adTime("search", adBean)) {
-            initAd();
-        }
+        initAd();
     }
+
     private void initAd() {
         AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
             @Override
             public void onSuccess(@NonNull Boolean aBoolean) {
-                if (aBoolean) {
+                if (aBoolean && AdUtils.adTime("search", adBean)) {
                     if (adBean.getStatus() == 1) {
-                        AdUtils.getFlowAd(SearchBookActivity.this, 1, view ->{
+                        AdUtils.getFlowAd(SearchBookActivity.this, 1, view -> {
                             binding.getRoot().addView(view, 6);
                         }, "search");
                     } else if (adBean.getStatus() == 2) {

@@ -261,16 +261,14 @@ public class BookDetailedActivity extends BaseActivity {
         mSourceDialog.setABooks(aBooks);
         mSourceDialog.setSourceIndex(sourceIndex);
         adBean = AdUtils.getAdConfig().getDetail();
-        if (AdUtils.getAdConfig().isHasAd() && AdUtils.adTime("detail", adBean)) {
-            initAd();
-        }
+        initAd();
     }
 
     private void initAd() {
         AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
             @Override
             public void onSuccess(@NonNull Boolean aBoolean) {
-                if (aBoolean) {
+                if (aBoolean && AdUtils.adTime("detail", adBean)) {
                     if (adBean.getStatus() == 1) {
                         AdUtils.getFlowAd(BookDetailedActivity.this, 1,
                                 view -> binding.ic.getRoot().addView(view, 2), "detail");

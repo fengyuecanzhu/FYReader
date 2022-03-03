@@ -223,7 +223,7 @@ public class DIYSourceFragment extends BaseFragment {
             }
         });
         dialog.show();
-        Observable<List<BookSource>> observable = BookSourceManager.importSource(text);
+        Observable<List<BookSource>> observable = BookSourceManager.importSource(text, "");
         if (observable != null) {
             observable.subscribe(new MyObserver<List<BookSource>>() {
                 @Override

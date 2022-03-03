@@ -103,6 +103,7 @@ public class APPCONST {
     public static final int REQUEST_SEARCH_WORD = 1015;
     public static final int REQUEST_AUTH_EMAIL = 1016;
     public static final int REQUEST_SETTING = 1017;
+    public static final int REQUEST_SUBSCRIBE = 1018;
 
     public static final int REQUEST_READ = 1;
 
@@ -113,7 +114,7 @@ public class APPCONST {
     //设置版本号
     public static final int SETTING_VERSION = 11;
 
-    public static final int SOURCE_VERSION = 7;
+    public static final int SOURCE_VERSION = 8;
 
     public static final String FORMAT_FILE_DATE = "yyyy-MM-dd";
 

@@ -23,6 +23,7 @@ import xyz.fycz.myreader.entity.thirdsource.source3.Source3;
 import xyz.fycz.myreader.entity.thirdsource.source3.Third3SourceUtil;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.DbManager;
+import xyz.fycz.myreader.greendao.entity.SubscribeFile;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.gen.BookSourceDao;
 import xyz.fycz.myreader.model.third3.SourceAnalyzer;
@@ -167,6 +168,15 @@ public class BookSourceManager {
                 .list();
     }
 
+
+    public static List<BookSource> getAllSubSource() {
+        return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
+                .where(BookSourceDao.Properties.SourceEName.isNotNull())
+                .where(BookSourceDao.Properties.SourceType.isNotNull())
+                .orderAsc(BookSourceDao.Properties.OrderNum)
+                .list();
+    }
+
     /**
      * 获取所有导入书源
      *
@@ -175,6 +185,19 @@ public class BookSourceManager {
     public static List<BookSource> getAllNoLocalSource() {
         return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                 .where(BookSourceDao.Properties.SourceEName.isNull())
+                .orderAsc(BookSourceDao.Properties.OrderNum)
+                .list();
+    }
+
+    public static void removeSourceBySubscribe(SubscribeFile file) {
+        DbManager.getDaoSession().getBookSourceDao().queryBuilder()
+                .where(BookSourceDao.Properties.SourceEName.eq("订阅书源:" + file.getId()))
+                .buildDelete().executeDeleteWithoutDetachingEntities();
+    }
+
+    public static List<BookSource> getSourceBySubscribe(SubscribeFile file) {
+        return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
+                .where(BookSourceDao.Properties.SourceEName.eq("订阅书源:" + file.getId()))
                 .orderAsc(BookSourceDao.Properties.OrderNum)
                 .list();
     }
@@ -301,7 +324,7 @@ public class BookSourceManager {
             if (TextUtils.isEmpty(group) || TextUtils.isEmpty(group.trim())) continue;
             for (String item : group.split("\\s*[,;，；]\\s*")) {
                 if (isSubscribe) {
-                    if (TextUtils.isEmpty(eName) || TextUtils.isEmpty(item) || groupList.contains(item))
+                    if (TextUtils.isEmpty(eName) || TextUtils.isEmpty(item) || groupList.contains(item) || item.equals("内置书源"))
                         continue;
                 } else {
                     if (!TextUtils.isEmpty(eName) || TextUtils.isEmpty(item) || groupList.contains(item) || item.equals("内置书源"))
@@ -314,44 +337,50 @@ public class BookSourceManager {
         return groupList;
     }
 
-    public static Observable<List<BookSource>> importSource(String string) {
+    public static Observable<List<BookSource>> importSource(String string, String subscribeId) {
         if (StringHelper.isEmpty(string)) return null;
         string = string.trim();
         if (NetworkUtils.isIPv4Address(string)) {
             string = String.format("http://%s:65501", string);
         }
         if (StringUtils.isJsonType(string)) {
-            return importBookSourceFromJson(string.trim())
+            return importBookSourceFromJson(string.trim(), subscribeId)
                     .compose(RxUtils::toSimpleSingle);
         } else if (StringUtils.isCompressJsonType(string)) {
-            return importBookSourceFromJson(StringUtils.unCompressJson(string))
+            return importBookSourceFromJson(StringUtils.unCompressJson(string), subscribeId)
                     .compose(RxUtils::toSimpleSingle);
         } else if (new File(string).isFile()) {
-            return importSource(FileUtils.readText(string));
+            return importSource(FileUtils.readText(string), subscribeId);
         }
         if (string.matches("https://.+\\.lanzou[a-z]\\.com/[\\s\\S]*")) {
             return LanZouApi.INSTANCE.getFileUrl(string)
                     .flatMap((Function<String, ObservableSource<String>>) s -> Observable.create(emitter -> {
                         emitter.onNext(OkHttpUtils.getHtml(s));
                         emitter.onComplete();
-                    })).flatMap(BookSourceManager::importBookSourceFromJson)
+                    })).flatMap(json -> importBookSourceFromJson(json, subscribeId))
                     .compose(RxUtils::toSimpleSingle);
         }
         if (NetworkUtils.isUrl(string)) {
             String finalString = string;
             return Observable.create((ObservableEmitter<String> e) -> e.onNext(OkHttpUtils.getHtml(finalString)))
-                    .flatMap(BookSourceManager::importBookSourceFromJson)
+                    .flatMap(json -> importBookSourceFromJson(json, subscribeId))
                     .compose(RxUtils::toSimpleSingle);
         }
         return Observable.error(new Exception("不是Json或Url格式或文件路径"));
     }
 
     private static Observable<List<BookSource>> importBookSourceFromJson(String json) {
+        return importBookSourceFromJson(json, "");
+    }
+
+    private static Observable<List<BookSource>> importBookSourceFromJson(String json, String subscribeId) {
         return Observable.create(emitter -> {
             List<BookSource> successImportSources = new ArrayList<>();
             List<BookSource> bookSources = importSources(json);
             if (bookSources != null) {
                 for (BookSource bookSource : bookSources) {
+                    if (!TextUtils.isEmpty(subscribeId))
+                        bookSource.setSourceEName("订阅书源:" + subscribeId);
                     if (bookSource.containsGroup("删除")) {
                         DbManager.getDaoSession().getBookSourceDao().queryBuilder()
                                 .where(BookSourceDao.Properties.SourceUrl.eq(bookSource.getSourceUrl()))

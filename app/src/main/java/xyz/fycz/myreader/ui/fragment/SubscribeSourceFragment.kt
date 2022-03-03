@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.ui.fragment
 
+import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +13,7 @@ import xyz.fycz.myreader.R
 import xyz.fycz.myreader.base.BaseFragment
 import xyz.fycz.myreader.base.adapter2.onClick
 import xyz.fycz.myreader.base.observer.MySingleObserver
+import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.databinding.FragmentSubscribeSourceBinding
 import xyz.fycz.myreader.greendao.DbManager
 import xyz.fycz.myreader.greendao.entity.rule.BookSource
@@ -20,6 +22,7 @@ import xyz.fycz.myreader.ui.activity.BookSourceActivity
 import xyz.fycz.myreader.ui.activity.SourceSubscribeActivity
 import xyz.fycz.myreader.ui.adapter.SubscribeSourceAdapter
 import xyz.fycz.myreader.ui.dialog.DialogCreator
+import xyz.fycz.myreader.ui.dialog.MyAlertDialog
 import xyz.fycz.myreader.util.ToastUtils
 import xyz.fycz.myreader.util.utils.RxUtils
 import xyz.fycz.myreader.widget.DividerItemDecoration
@@ -41,8 +44,12 @@ class SubscribeSourceFragment(private val sourceActivity: BookSourceActivity) : 
 
     override fun initData(savedInstanceState: Bundle?) {
         super.initData(savedInstanceState)
+        getSources()
+    }
+
+    private fun getSources(){
         Single.create { emitter: SingleEmitter<List<BookSource>> ->
-            emitter.onSuccess(BookSourceManager.getAllLocalSource())
+            emitter.onSuccess(BookSourceManager.getAllSubSource())
         }.compose { RxUtils.toSimpleSingle(it) }
             .subscribe(object : MySingleObserver<List<BookSource>>() {
                 override fun onSuccess(sources: List<BookSource>) {
@@ -81,7 +88,8 @@ class SubscribeSourceFragment(private val sourceActivity: BookSourceActivity) : 
     override fun initClick() {
         super.initClick()
         binding.tvSubscribeSource.onClick {
-            startActivity(Intent(context, SourceSubscribeActivity::class.java))
+            startActivityForResult(Intent(context, SourceSubscribeActivity::class.java),
+                APPCONST.REQUEST_SUBSCRIBE)
         }
         binding.ivGroup.setOnClickListener { view: View? ->
             showSourceGroupMenu(view)
@@ -91,6 +99,9 @@ class SubscribeSourceFragment(private val sourceActivity: BookSourceActivity) : 
                 initFeaturesMenu(v)
             }
             featuresMenu?.show()
+        }
+        binding.tvSubscribeSourceTip.onClick {
+            MyAlertDialog.showTipDialogWithLink(context, getString(R.string.subscribe_source_tip), R.string.subscribe_source_detail_tip)
         }
     }
 
@@ -198,5 +209,14 @@ class SubscribeSourceFragment(private val sourceActivity: BookSourceActivity) : 
 
     fun startSearch(newText: String?) {
         mAdapter?.filter?.filter(newText)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == APPCONST.REQUEST_SUBSCRIBE) {
+                getSources()
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }
