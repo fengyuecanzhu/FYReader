@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
@@ -13,13 +12,18 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/mine_ll_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="25dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp">
 
-            <TextView
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
@@ -27,8 +31,8 @@
                     android:textColor="@color/textPrimary"
                     android:text="用户"/>
 
-        </RelativeLayout>
-        <RelativeLayout
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/mine_rl_user"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -36,7 +40,7 @@
                 android:paddingRight="20dp"
                 android:background="@drawable/selector_common_bg">
 
-            <ImageView
+                <ImageView
                     android:id="@+id/iv_user"
                     android:layout_alignParentStart="true"
                     android:layout_width="wrap_content"
@@ -44,124 +48,134 @@
                     android:layout_centerVertical="true"
                     app:tint="@color/textPrimary"
                     android:src="@drawable/ic_user"
-            />
+                    />
 
-            <TextView
-                android:id="@+id/tv_user"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="15dp"
-                android:layout_toEndOf="@id/iv_user"
-                android:text="登录/注册"
-                android:textColor="@color/textSecondary"
-                android:textSize="@dimen/text_normal_size" />
+                <TextView
+                    android:id="@+id/tv_user"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="15dp"
+                    android:layout_toEndOf="@id/iv_user"
+                    android:text="登录/注册"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_normal_size" />
 
-        </RelativeLayout>
-        <RelativeLayout
-            android:id="@+id/mine_rl_syn"
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/mine_rl_syn"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/selector_common_bg"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <ImageView
+                    android:id="@+id/iv_syn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_online_syn"
+                    app:tint="@color/textPrimary" />
+
+                <TextView
+                    android:id="@+id/tv_syn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="15dp"
+                    android:layout_toEndOf="@id/iv_syn"
+                    android:text="@string/menu_bookcase_syn"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_normal_size" />
+
+            </RelativeLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/mine_ll_cloud"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/selector_common_bg"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp">
 
-            <ImageView
-                android:id="@+id/iv_syn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_online_syn"
-                app:tint="@color/textPrimary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerInParent="true"
+                    android:text="WebDav云服务"
+                    android:textColor="@color/textPrimary" />
 
-            <TextView
-                android:id="@+id/tv_syn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="15dp"
-                android:layout_toEndOf="@id/iv_syn"
-                android:text="@string/menu_bookcase_syn"
-                android:textColor="@color/textSecondary"
-                android:textSize="@dimen/text_normal_size" />
+            </RelativeLayout>
 
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp">
+            <RelativeLayout
+                android:id="@+id/mine_rl_webdav"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/selector_common_bg"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerInParent="true"
-                android:text="WebDav云服务"
-                android:textColor="@color/textPrimary" />
+                <ImageView
+                    android:id="@+id/iv_webdav"
+                    android:layout_width="21dp"
+                    android:layout_height="21dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_yun"
+                    app:tint="@color/textPrimary" />
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/tv_webdav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="18dp"
+                    android:layout_toEndOf="@id/iv_webdav"
+                    android:text="@string/webdav_setting"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_normal_size" />
 
-        <RelativeLayout
-            android:id="@+id/mine_rl_webdav"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/selector_common_bg"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            </RelativeLayout>
 
-            <ImageView
-                android:id="@+id/iv_webdav"
-                android:layout_width="21dp"
-                android:layout_height="21dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_yun"
-                app:tint="@color/textPrimary" />
+            <RelativeLayout
+                android:id="@+id/mine_rl_syn_webdav"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/selector_common_bg"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-            <TextView
-                android:id="@+id/tv_webdav"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="18dp"
-                android:layout_toEndOf="@id/iv_webdav"
-                android:text="@string/webdav_setting"
-                android:textColor="@color/textSecondary"
-                android:textSize="@dimen/text_normal_size" />
+                <ImageView
+                    android:id="@+id/iv_syn_webdav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_restore"
+                    app:tint="@color/textPrimary" />
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/tv_syn_webdav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="15dp"
+                    android:layout_toEndOf="@id/iv_syn_webdav"
+                    android:text="@string/webdav_restore_tip"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="@dimen/text_normal_size" />
 
-        <RelativeLayout
-            android:id="@+id/mine_rl_syn_webdav"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/selector_common_bg"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            </RelativeLayout>
+        </LinearLayout>
 
-            <ImageView
-                android:id="@+id/iv_syn_webdav"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_restore"
-                app:tint="@color/textPrimary" />
-
-            <TextView
-                android:id="@+id/tv_syn_webdav"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="15dp"
-                android:layout_toEndOf="@id/iv_syn_webdav"
-                android:text="@string/webdav_restore_tip"
-                android:textColor="@color/textSecondary"
-                android:textSize="@dimen/text_normal_size" />
-
-        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"

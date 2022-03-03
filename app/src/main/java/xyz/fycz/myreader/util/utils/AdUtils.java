@@ -1,7 +1,12 @@
 package xyz.fycz.myreader.util.utils;
 
+import android.app.Activity;
 import android.util.Log;
+import android.view.View;
 
+import com.weaction.ddsdk.ad.DdSdkFlowAd;
+import com.weaction.ddsdk.ad.DdSdkInterAd;
+import com.weaction.ddsdk.ad.DdSdkRewardAd;
 import com.weaction.ddsdk.base.DdSdkHelper;
 import com.weaction.ddsdk.bean.DDSDK;
 
@@ -17,7 +22,8 @@ import okhttp3.RequestBody;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
-import xyz.fycz.myreader.entity.AdBean;
+import xyz.fycz.myreader.entity.ad.AdBean;
+import xyz.fycz.myreader.entity.ad.AdConfig;
 import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.help.DateHelper;
@@ -29,20 +35,26 @@ import xyz.fycz.myreader.util.help.DateHelper;
 public class AdUtils {
     public static final String TAG = AdUtils.class.getSimpleName();
     private static boolean hasInitAd = false;
-    private static AdBean adConfig;
+    private static AdConfig adConfig;
 
     static {
-        String config = SharedPreUtils.getInstance(true).getString("adConfig");
-        adConfig = GsonExtensionsKt.getGSON().fromJson(config, AdBean.class);
+        String config = getSp().getString("adConfig");
+        adConfig = GsonExtensionsKt.getGSON().fromJson(config, AdConfig.class);
         if (adConfig == null || adConfig.getBackAdTime() == 0) {
-            adConfig = new AdBean(false, 20, 60);
+            adConfig = new AdConfig(false, 60, 20,
+                    60, 6, 3, 48);
         }
     }
 
+    public static SharedPreUtils getSp() {
+        return SharedPreUtils.getInstance(true);
+    }
+
     public static Single<Boolean> checkHasAd() {
+        initAd();
         return Single.create((SingleOnSubscribe<Boolean>) emitter -> {
             boolean hasAd = false;
-            if (!adConfig.isCloud()) {
+            if (!adConfig.isCloud() || isExpire()) {
                 MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                 String body = "type=adConfig" + UserService.INSTANCE.makeAuth();
                 RequestBody requestBody = RequestBody.create(mediaType, body);
@@ -57,12 +69,13 @@ public class AdUtils {
                         }
                     } else {
                         String res = jsonObject.getString("result");
-                        SharedPreUtils.getInstance(true).putString("adConfig", res);
-                        adConfig = GsonExtensionsKt.getGSON().fromJson(res, AdBean.class);
+                        adConfig = GsonExtensionsKt.getGSON().fromJson(res, AdConfig.class);
                         adConfig.setCloud(true);
                         hasAd = adConfig.isHasAd();
+                        getSp().putString("adConfig", res);
+                        getSp().putLong("adConfigTime", System.currentTimeMillis());
                     }
-                    Log.i(TAG, "hasAd：" + hasAd);
+                    Log.i(TAG, "adConfig：" + adConfig);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -140,25 +153,152 @@ public class AdUtils {
     }
 
     public static void backTime() {
-        SharedPreUtils.getInstance(true).putLong("backTime", System.currentTimeMillis());
+        getSp().putLong("backTime", System.currentTimeMillis());
     }
 
     public static boolean backSplashAd() {
         if (!adConfig.isHasAd()) return false;
-        SharedPreUtils sp = SharedPreUtils.getInstance(true);
-        Long splashAdTime = sp.getLong("splashAdTime");
-        Long backTime = sp.getLong("backTime");
-        Long currentTime = System.currentTimeMillis();
+        long splashAdTime = getSp().getLong("splashAdTime");
+        long backTime = getSp().getLong("backTime");
+        long currentTime = System.currentTimeMillis();
+        Log.d(TAG, "currentTime - splashAdTime=" + (currentTime - splashAdTime));
+        Log.d(TAG, "currentTime - backTime=" + (currentTime - splashAdTime));
+        Log.d(TAG, "adConfig.getIntervalAdTime()=" + (adConfig.getIntervalAdTime() * 60L * 1000));
+        Log.d(TAG, "adConfig.getBackAdTime()=" + (adConfig.getBackAdTime() * 60L * 1000));
         return currentTime - splashAdTime >= adConfig.getIntervalAdTime() * 60L * 1000 ||
                 currentTime - backTime >= adConfig.getBackAdTime() * 60L * 1000;
     }
 
-    public static AdBean getAdConfig() {
+    private static boolean isExpire() {
+        long adConfigTime = getSp().getLong("adConfigTime");
+        long currentTime = System.currentTimeMillis();
+        return currentTime - adConfigTime >= adConfig.getExpireTime() * 60L * 1000;
+    }
+
+    public static boolean adTime(String adTag, AdBean adBean){
+        if (adBean.getStatus() == 0) return false;
+        long adTime = getSp().getLong(adTag + "Time");
+        long currentTime = System.currentTimeMillis();
+        return currentTime - adTime >= adBean.getInterval() * 60L * 1000;
+    }
+
+    /**
+     * @param activity
+     * @param type     1小、4中
+     * @param flowAd
+     */
+    public static void getFlowAd(Activity activity, int type, FlowAd flowAd, String adTag) {
+        try {
+            new DdSdkFlowAd().getFlowViews(activity, type, new DdSdkFlowAd.FlowCallback() {
+                // 信息流广告拉取完毕后返回的 views
+                @Override
+                public void getFlowView(View view) {
+                    flowAd.getView(view);
+                }
+
+                // 信息流广告展示后调用
+                @Override
+                public void show() {
+                    AdUtils.adRecord("flow", "adShow");
+                    Log.d(TAG, "信息流广告展示成功");
+                    if (adTag != null) {
+                        getSp().putLong(adTag + "Time", System.currentTimeMillis());
+                    }
+                }
+
+                // 广告拉取失败调用
+                @Override
+                public void error(String msg) {
+                    Log.d(TAG, "广告拉取失败\n" + msg);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void showInterAd(Activity activity, String adTag) {
+        /*
+         * 参数 1  activity
+         * 参数 2  marginDp (float)，插屏默认 margin 全屏幕的 24dp，此处允许开发者手动调节 margin 大小，单位为 dp，允许范围为 0dp (全屏) ~ 48dp，请开发者按需填写
+         */
+        try {
+            DdSdkInterAd.show(activity, 48f, new DdSdkInterAd.Callback() {
+                @Override
+                public void show() {
+                    Log.i(TAG, "插屏广告展示成功");
+                    AdUtils.adRecord("inter", "adShow");
+                    if (adTag != null) {
+                        getSp().putLong(adTag + "Time", System.currentTimeMillis());
+                    }
+                }
+
+                @Override
+                public void click() {
+                    Log.i(TAG, "插屏广告");
+                    AdUtils.adRecord("inter", "adClick");
+                }
+
+                @Override
+                public void error(String msg) {
+                }
+
+                @Override
+                public void close() {
+                    Log.i(TAG, "插屏广告被关闭");
+                    AdUtils.adRecord("inter", "adClose");
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void showRewardVideoAd(Activity activity, RewardAd rewardAd) {
+        try {
+            DdSdkRewardAd.show(activity, new DdSdkRewardAd.DdSdkRewardCallback() {
+                @Override
+                public void show() {
+                    Log.i(TAG, "激励视频展示成功");
+                    AdUtils.adRecord("rewardVideo", "adShow");
+                }
+
+                @Override
+                public void click() {
+                    Log.i(TAG, "激励视频被点击");
+                    AdUtils.adRecord("rewardVideo", "adClick");
+                }
+
+                @Override
+                public void error(String msg) {
+                }
+
+                @Override
+                public void skip() {
+                    Log.i(TAG, "激励视频被跳过");
+                    AdUtils.adRecord("rewardVideo", "adSkip");
+                }
+
+                @Override
+                public void reward() {
+                    if (rewardAd != null) {
+                        rewardAd.reward();
+                    }
+                    Log.i(TAG, "激励视频计时完成");
+                    AdUtils.adRecord("rewardVideo", "adFinishCount");
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static AdConfig getAdConfig() {
         return adConfig;
     }
 
     public static void initAd() {
-        /*if (!hasInitAd) {
+        if (!hasInitAd) {
             hasInitAd = true;
             DdSdkHelper.init(new DDSDK.Builder()
                     .setUserId("1234")
@@ -167,18 +307,17 @@ public class AdUtils {
                     .setCsjAppId("5273043")
                     .setApp(App.getApplication())
                     .setShowLog(App.isDebug())
+                    .setCustomRequestPermission(true)
                     .create()
             );
-        }*/
-        DdSdkHelper.init(new DDSDK.Builder()
-                .setUserId("1234")
-                .setAppId("216")
-                .setAppKey("51716a16fbdf50905704b6575b1b3b60")
-                .setCsjAppId("5273043")
-                .setApp(App.getApplication())
-                .setShowLog(App.isDebug())
-                .setCustomRequestPermission(true)
-                .create()
-        );
+        }
+    }
+
+    public interface FlowAd {
+        void getView(View view);
+    }
+
+    public interface RewardAd {
+        void reward();
     }
 }

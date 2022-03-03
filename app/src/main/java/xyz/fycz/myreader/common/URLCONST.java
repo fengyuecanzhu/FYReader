@@ -6,9 +6,11 @@ public class URLCONST {
 
     public static final String OFFICIAL_WEB = "https://reader." + getDefaultDomain() + "/";
 
-    public static String APP_DIR_UR = "https://www.lanzous.com/b00ngso7e";
+    public static String LAN_ZOU_URL = "https://fycz.lanzoum.com";
 
-    public static String LAN_ZOUS_URL = "https://fycz.lanzoui.com";
+    public static String APP_DIR_URL = LAN_ZOU_URL + "/b00ngso7e";
+
+    public static final String SUB_SOURCE_URL = LAN_ZOU_URL + "/b00pfkkgh";
 
     //字体下载
     public static final String FONT_DOWNLOAD_URL = "https://novel." + getDefaultDomain() + "/app/fonts/";

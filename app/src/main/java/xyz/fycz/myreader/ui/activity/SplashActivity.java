@@ -179,7 +179,6 @@ public class SplashActivity extends BaseActivity {
                     @Override
                     public void onSuccess(@NonNull Boolean aBoolean) {
                         if (aBoolean) {
-                            //AdUtils.initAd();
                             startWithAd();
                             binding.ivSplash.setVisibility(View.GONE);
                             binding.llAd.setVisibility(View.VISIBLE);

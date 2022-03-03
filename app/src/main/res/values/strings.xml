@@ -434,7 +434,9 @@
     <string name="check">校验</string>
     <string name="new_source">新建书源</string>
     <string name="import_source">导入书源</string>
+    <string name="subscribe_source">书源订阅</string>
     <string name="source_tip">书源说明</string>
+    <string name="subscribe_source_tip">订阅书源说明</string>
     <string name="cancle_select_all">取消全选</string>
     <string name="delete_ban_source">删除禁用书源</string>
     <string name="reverse_source">反转书源可用性</string>
@@ -526,6 +528,13 @@
     <string name="clear_search">清除搜索记录</string>
     <string name="fold">收起</string>
     <string name="unfold">展开</string>
+    <string name="copy_source">拷贝书源</string>
+    <string name="lan_zou_parse">蓝奏云直链解析</string>
+    <string name="mine_show_mode">我的界面显示方式</string>
+    <string name="show_user_only">仅显示用户</string>
+    <string name="show_cloud_only">仅显示云服务</string>
+    <string name="show_user_cloud">显示用户及云服务</string>
+    <string name="hide_user_cloud">隐藏用户及云服务</string>
 
 
     <!--error string start-->
@@ -541,9 +550,8 @@
     <string name="net_error_10001">没有网络</string>
     <string name="net_error_10002">网络连接超时</string>
     <string name="net_error_10003">数据解析失败</string>
-    <string name="copy_source">拷贝书源</string>
-    <string name="lan_zou_parse">蓝奏云直链解析</string>
     <!--error string end-->
+
 
     <string-array name="reset_screen_time">
         <item>跟随系统</item>
@@ -633,5 +641,12 @@
     <string-array name="select_folder">
         <item>默认路径</item>
         <item>系统文件夹选择器</item>
+    </string-array>
+
+    <string-array name="mine_show">
+        <item>@string/show_user_only</item>
+        <item>@string/show_cloud_only</item>
+        <item>@string/show_user_cloud</item>
+        <item>@string/hide_user_cloud</item>
     </string-array>
 </resources>

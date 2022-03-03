@@ -53,7 +53,7 @@ class BookWCEstimate {
                 cachedChapterSize++
             }
         }
-        if (cachedChapterSize < 20 && chapters.size > 50) return -2
+        if ((cachedChapterSize < 20 && chapters.size > 50) || cachedChapterSize == 0) return -2
         chapters.forEach { chapter ->
             if (ChapterService.isChapterCached(chapter.bookId, chapter.title)) {
                 sum += countChar(

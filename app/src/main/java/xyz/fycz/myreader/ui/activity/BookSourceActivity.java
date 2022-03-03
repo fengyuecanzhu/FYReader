@@ -23,6 +23,7 @@ import xyz.fycz.myreader.base.BaseTabActivity;
 import xyz.fycz.myreader.databinding.ActivityBooksourceBinding;
 import xyz.fycz.myreader.ui.fragment.DIYSourceFragment;
 import xyz.fycz.myreader.ui.fragment.LocalSourceFragment;
+import xyz.fycz.myreader.ui.fragment.SubscribeSourceFragment;
 
 /**
  * @author fengyue
@@ -42,13 +43,13 @@ public class BookSourceActivity extends BaseTabActivity {
 
     @Override
     protected List<Fragment> createTabFragments() {
-        return Arrays.asList(new LocalSourceFragment(this),
+        return Arrays.asList(new SubscribeSourceFragment(this),
                 new DIYSourceFragment(this));
     }
 
     @Override
     protected List<String> createTabTitles() {
-        return Arrays.asList("内置书源", "DIY书源");
+        return Arrays.asList("订阅书源", "DIY书源");
     }
 
     @Override
@@ -73,7 +74,7 @@ public class BookSourceActivity extends BaseTabActivity {
                         List<Fragment> fragments = getSupportFragmentManager().getFragments();
                         switch (tab.getPosition()) {
                             case 0:
-                                ((LocalSourceFragment) fragments.get(0)).startSearch("");
+                                ((SubscribeSourceFragment) fragments.get(0)).startSearch("");
                                 break;
                             case 1:
                                 ((DIYSourceFragment) fragments.get(1)).startSearch("");
@@ -112,7 +113,7 @@ public class BookSourceActivity extends BaseTabActivity {
                 List<Fragment> fragments = getSupportFragmentManager().getFragments();
                 switch (binding.tabVp.getCurrentItem()) {
                     case 0:
-                        ((LocalSourceFragment) fragments.get(0)).startSearch(newText);
+                        ((SubscribeSourceFragment) fragments.get(0)).startSearch(newText);
                         break;
                     case 1:
                         ((DIYSourceFragment) fragments.get(1)).startSearch(newText);

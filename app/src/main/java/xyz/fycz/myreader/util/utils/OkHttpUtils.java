@@ -41,6 +41,7 @@ import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.CookieStore;
 import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
+import xyz.fycz.myreader.model.third3.http.HttpHelperKt;
 
 import static xyz.fycz.myreader.util.help.SSLSocketClient.createSSLSocketFactory;
 import static xyz.fycz.myreader.util.help.SSLSocketClient.createTrustAllManager;
@@ -48,22 +49,8 @@ import static xyz.fycz.myreader.util.help.SSLSocketClient.getHeaderInterceptor;
 
 public class OkHttpUtils {
 
-    public static OkHttpClient mClient;
-
-    public static synchronized OkHttpClient getOkHttpClient() {
-        if (mClient == null) {
-            OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.connectTimeout(5, TimeUnit.SECONDS)
-                    .readTimeout(10, TimeUnit.SECONDS)
-                    .writeTimeout(10, TimeUnit.SECONDS)
-                    .sslSocketFactory(createSSLSocketFactory(), createTrustAllManager())
-                    .hostnameVerifier((hostname, session) -> true)
-                    .protocols(Collections.singletonList(Protocol.HTTP_1_1))
-                    .addInterceptor(getHeaderInterceptor());
-            mClient = builder
-                    .build();
-        }
-        return mClient;
+    public static OkHttpClient getOkHttpClient() {
+        return HttpHelperKt.getOkHttpClient();
     }
 
     /**

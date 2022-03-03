@@ -133,13 +133,13 @@ fun Request.Builder.get(url: String, queryMap: Map<String, String>, encoded: Boo
     url(httpBuilder.build())
 }
 
-fun Request.Builder.postForm(form: Map<String, String>, encoded: Boolean = false) {
+fun Request.Builder.postForm(form: Map<String, Any>, encoded: Boolean = false) {
     val formBody = FormBody.Builder()
     form.forEach {
         if (encoded) {
-            formBody.addEncoded(it.key, it.value)
+            formBody.addEncoded(it.key, it.value.toString())
         } else {
-            formBody.add(it.key, it.value)
+            formBody.add(it.key, it.value.toString())
         }
     }
     post(formBody.build())

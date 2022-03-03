@@ -129,6 +129,7 @@
         <activity android:name=".ui.activity.AuthEmailActivity" />
         <activity android:name=".ui.activity.RestartActivity" />
         <activity android:name=".ui.activity.CrashActivity" />
+        <activity android:name=".ui.activity.SourceSubscribeActivity" />
 
         <receiver android:name=".util.notification.NotificationClickReceiver" />
         <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver" />

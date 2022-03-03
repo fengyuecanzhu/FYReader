@@ -42,6 +42,7 @@ import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityBookDetailBinding;
+import xyz.fycz.myreader.entity.ad.AdBean;
 import xyz.fycz.myreader.experiment.BookWCEstimate;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -55,6 +56,7 @@ import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
+import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.AdUtils;
@@ -91,6 +93,7 @@ public class BookDetailedActivity extends BaseActivity {
     private List<String> tagList = new ArrayList<>();
     private Disposable chaptersDis;
     private Disposable wcDis;
+    private AdBean adBean;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -257,7 +260,8 @@ public class BookDetailedActivity extends BaseActivity {
         }
         mSourceDialog.setABooks(aBooks);
         mSourceDialog.setSourceIndex(sourceIndex);
-        if (AdUtils.getAdConfig().isHasAd() && AdUtils.getAdConfig().isShowFlowAd()){
+        adBean = AdUtils.getAdConfig().getDetail();
+        if (AdUtils.getAdConfig().isHasAd() && AdUtils.adTime("detail", adBean)) {
             initAd();
         }
     }
@@ -267,26 +271,12 @@ public class BookDetailedActivity extends BaseActivity {
             @Override
             public void onSuccess(@NonNull Boolean aBoolean) {
                 if (aBoolean) {
-                    new DdSdkFlowAd().getFlowViews(BookDetailedActivity.this, 1, new DdSdkFlowAd.FlowCallback() {
-                        // 信息流广告拉取完毕后返回的 views
-                        @Override
-                        public void getFlowView(View view) {
-                            binding.ic.getRoot().addView(view, 2);
-                        }
-
-                        // 信息流广告展示后调用
-                        @Override
-                        public void show() {
-                            AdUtils.adRecord("flow", "adShow");
-                            Log.d(TAG, "信息流广告展示成功");
-                        }
-
-                        // 广告拉取失败调用
-                        @Override
-                        public void error(String msg) {
-                            Log.d(TAG, "广告拉取失败\n" + msg);
-                        }
-                    });
+                    if (adBean.getStatus() == 1) {
+                        AdUtils.getFlowAd(BookDetailedActivity.this, 1,
+                                view -> binding.ic.getRoot().addView(view, 2), "detail");
+                    } else if (adBean.getStatus() == 2) {
+                        AdUtils.showInterAd(BookDetailedActivity.this, "detail");
+                    }
                 }
             }
         });

@@ -46,6 +46,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySearchBookBinding;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.entity.ad.AdBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.SearchHistory;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
@@ -55,13 +56,12 @@ import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.SearchAdapter;
-import xyz.fycz.myreader.ui.adapter.SearchBookAdapter;
-import xyz.fycz.myreader.ui.adapter.SearchHistoryAdapter;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -115,6 +115,7 @@ public class SearchBookActivity extends BaseActivity {
     private boolean foldSuggest;
     private boolean foldHistory;
     private boolean needReGetHistory;
+    private AdBean adBean;
 
     @Override
     protected void bindView() {
@@ -278,6 +279,26 @@ public class SearchBookActivity extends BaseActivity {
             SharedPreUtils.getInstance().putBoolean("foldHistory", foldHistory);
         });
         initHistoryList();
+        adBean = AdUtils.getAdConfig().getSearch();
+        if (AdUtils.getAdConfig().isHasAd() && AdUtils.adTime("search", adBean)) {
+            initAd();
+        }
+    }
+    private void initAd() {
+        AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
+            @Override
+            public void onSuccess(@NonNull Boolean aBoolean) {
+                if (aBoolean) {
+                    if (adBean.getStatus() == 1) {
+                        AdUtils.getFlowAd(SearchBookActivity.this, 1, view ->{
+                            binding.getRoot().addView(view, 6);
+                        }, "search");
+                    } else if (adBean.getStatus() == 2) {
+                        AdUtils.showInterAd(SearchBookActivity.this, "search");
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -397,16 +418,17 @@ public class SearchBookActivity extends BaseActivity {
         String searchGroup = SharedPreUtils.getInstance().getString("searchGroup");
         menu.removeGroup(R.id.source_group);
         MenuItem item = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.all_source);
-        MenuItem localItem = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.local_source);
-        if ("".equals(searchGroup)) {
-            item.setChecked(true);
-        } else if (getString(R.string.local_source).equals(searchGroup)) {
-            localItem.setChecked(true);
-        }
-        List<String> groupList = BookSourceManager.getEnableNoLocalGroupList();
+        boolean hasChecked = false;
+        List<String> groupList = BookSourceManager.getEnableGroupList();
         for (String groupName : groupList) {
             item = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, groupName);
-            if (groupName.equals(searchGroup)) item.setChecked(true);
+            if (groupName.equals(searchGroup)) {
+                item.setChecked(true);
+                hasChecked = true;
+            }
+        }
+        if (!hasChecked || "".equals(searchGroup)) {
+            item.setChecked(true);
         }
         menu.setGroupCheckable(R.id.source_group, true, true);
     }

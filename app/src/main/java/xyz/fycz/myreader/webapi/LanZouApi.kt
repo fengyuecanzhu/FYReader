@@ -1,35 +1,94 @@
 package xyz.fycz.myreader.webapi
 
+import android.util.Log
+import com.google.gson.JsonParser
 import io.reactivex.Observable
+import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.jsoup.Jsoup
 import xyz.fycz.myreader.common.URLCONST
-import xyz.fycz.myreader.entity.LanZouBean
+import xyz.fycz.myreader.entity.lanzou.LanZouFile
+import xyz.fycz.myreader.entity.lanzou.LanZouParseBean
+import xyz.fycz.myreader.model.third3.Coroutine
+import xyz.fycz.myreader.model.third3.http.getProxyClient
+import xyz.fycz.myreader.model.third3.http.newCallResponseBody
+import xyz.fycz.myreader.model.third3.http.postForm
+import xyz.fycz.myreader.model.third3.http.text
+import xyz.fycz.myreader.util.ToastUtils
 import xyz.fycz.myreader.util.help.StringHelper
-import xyz.fycz.myreader.util.utils.GSON
-import xyz.fycz.myreader.util.utils.OkHttpUtils
-import xyz.fycz.myreader.util.utils.fromJsonObject
-import xyz.fycz.myreader.util.utils.splitNotBlank
+import xyz.fycz.myreader.util.utils.*
+import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * @author fengyue
  * @date 2022/1/22 18:50
  */
 object LanZouApi {
+    private val paramCathe = mutableMapOf<String, HashMap<String, Any>>()
 
-    fun getUrl(url: String): Observable<String> {
+    fun getFoldFiles(
+        foldUrl: String,
+        page: Int,
+        pwd: String? = null
+    ): Coroutine<List<LanZouFile>?> {
+        return Coroutine.async {
+            val params = if (page == 1) {
+                getFoldParams(OkHttpUtils.getHtml(foldUrl), page, pwd)
+            } else {
+                paramCathe[foldUrl] ?: getFoldParams(OkHttpUtils.getHtml(foldUrl), page, pwd)
+            }
+            params["pg"] = page
+            paramCathe[foldUrl] = params
+            val res = getProxyClient().newCallResponseBody {
+                url(URLCONST.LAN_ZOU_URL + "/filemoreajax.php")
+                postForm(params)
+            }.text()
+            Log.d("getFoldFiles", params.toString())
+            val json = JsonParser.parseString(res).asJsonObject
+            val zt = json["zt"].asInt
+            val info = json["info"].asString
+            if (zt == 1) {
+                val file = json["text"].toString()
+                GSON.fromJsonArray(file)
+            } else {
+                throw Exception(info)
+            }
+        }
+    }
+
+    private fun getFoldParams(html: String, page: Int, pwd: String? = null): HashMap<String, Any> {
+        val params = HashMap<String, Any>()
+        params["lx"] = 2
+        params["pg"] = page
+        params["fid"] = StringUtils.getSubString(html, "'fid':", ",")
+        params["uid"] = StringUtils.getSubString(html, "'uid':'", "',")
+        params["rep"] = 0
+        val t = StringUtils.getSubString(html, "'t':", ",")
+        val k = StringUtils.getSubString(html, "'k':", ",")
+        params["t"] = StringUtils.getSubString(html, "var $t = '", "';")
+        params["k"] = StringUtils.getSubString(html, "var $k = '", "';")
+        params["up"] = 1
+        pwd?.let {
+            params["ls"] = 1
+            params["pwd"] = pwd
+        }
+        return params
+    }
+
+    fun getFileUrl(url: String): Observable<String> {
         url.replace("\\s".toRegex(), "").let {
             val regex = ",|，|密码:".toRegex()
             if (it.contains(regex)) {
                 it.split(regex).let { arr ->
-                    return getUrl(arr[0], arr[1])
+                    return getFileUrl(arr[0], arr[1])
                 }
             } else {
-                return getUrl(it, "")
+                return getFileUrl(it, "")
             }
         }
     }
@@ -40,7 +99,7 @@ object LanZouApi {
      * @param url
      * @param password
      */
-    private fun getUrl(url: String, password: String = ""): Observable<String> {
+    private fun getFileUrl(url: String, password: String = ""): Observable<String> {
         return Observable.create {
             val html = OkHttpUtils.getHtml(url)
             val url2 = if (password.isEmpty()) {
@@ -61,7 +120,7 @@ object LanZouApi {
 
     private fun getUrl1(html: String): String {
         val doc = Jsoup.parse(html)
-        return URLCONST.LAN_ZOUS_URL + doc.getElementsByTag("iframe").attr("src")
+        return URLCONST.LAN_ZOU_URL + doc.getElementsByTag("iframe").attr("src")
     }
 
     private fun getKey(html: String): String {
@@ -89,7 +148,7 @@ object LanZouApi {
         headers["Referer"] = referer
 
         val html = OkHttpUtils.getHtml(
-            URLCONST.LAN_ZOUS_URL + "/ajaxm.php", requestBody,
+            URLCONST.LAN_ZOU_URL + "/ajaxm.php", requestBody,
             "UTF-8", headers
         )
         return getUrl2(html)
@@ -105,7 +164,7 @@ object LanZouApi {
         var url = info[2].substring(info[2].indexOf(":") + 2, info[2].lastIndexOf("\""))
         dom = dom.replace("\\", "")
         url = url.replace("\\", "")*/
-        val lanZouBean = GSON.fromJsonObject<LanZouBean>(o)
+        val lanZouBean = GSON.fromJsonObject<LanZouParseBean>(o)
         lanZouBean?.run {
             return if (zt == 1) {
                 "$dom/file/$url"

@@ -3,7 +3,6 @@ package xyz.fycz.myreader.ui.activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
@@ -33,7 +32,6 @@ import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.ZipUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
-import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.LanZouApi;
@@ -74,7 +72,7 @@ public class AboutActivity extends BaseActivity {
         binding.il.rlUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));
 
         binding.il.rlShare.setOnClickListener(v -> ShareUtils.share(this, getString(R.string.share_text) +
-                SharedPreUtils.getInstance().getString(getString(R.string.downloadLink), URLCONST.LAN_ZOUS_URL)));
+                SharedPreUtils.getInstance().getString(getString(R.string.downloadLink), URLCONST.LAN_ZOU_URL)));
         binding.il.rlQq.setOnClickListener(v -> {
             if (!App.joinQQGroup(this, "8PIOnHFuH6A38hgxvD_Rp2Bu-Ke1ToBn")) {
                 //数据
@@ -120,7 +118,7 @@ public class AboutActivity extends BaseActivity {
             MyAlertDialog.createInputDia(this, getString(R.string.lan_zou_parse),
                     "格式：链接+逗号+密码(没有密码就不用填)", "", true,
                     100, text -> str[0] = text, (dialog, which) -> {
-                        LanZouApi.INSTANCE.getUrl(str[0])
+                        LanZouApi.INSTANCE.getFileUrl(str[0])
                                 .compose(RxUtils::toSimpleSingle)
                                 .subscribe(new MyObserver<String>() {
                                     @Override

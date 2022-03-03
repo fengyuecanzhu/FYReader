@@ -208,6 +208,9 @@ public class ReadCrawlerUtil {
                     return new BaseSourceCrawlerNoInfo(crawler);
                 }
             } else {
+                if (THIRD_3_SOURCE.equals(source.getSourceType())) {
+                    return new Third3Crawler(source);
+                }
                 Class clz = Class.forName(source.getSourceUrl());
                 return (ReadCrawler) clz.newInstance();
             }

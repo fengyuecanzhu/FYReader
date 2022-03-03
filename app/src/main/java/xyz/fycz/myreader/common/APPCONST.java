@@ -102,6 +102,7 @@ public class APPCONST {
     public static final int REQUEST_GROUP_MANAGER = 1014;
     public static final int REQUEST_SEARCH_WORD = 1015;
     public static final int REQUEST_AUTH_EMAIL = 1016;
+    public static final int REQUEST_SETTING = 1017;
 
     public static final int REQUEST_READ = 1;
 

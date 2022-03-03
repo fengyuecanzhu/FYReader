@@ -4,8 +4,6 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +17,6 @@ import io.reactivex.SingleOnSubscribe;
 import io.reactivex.functions.Function;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
-import xyz.fycz.myreader.entity.thirdsource.BookSource3Bean;
 import xyz.fycz.myreader.entity.thirdsource.BookSourceBean;
 import xyz.fycz.myreader.entity.thirdsource.ThirdSourceUtil;
 import xyz.fycz.myreader.entity.thirdsource.source3.Source3;
@@ -271,7 +268,7 @@ public class BookSourceManager {
         }).compose(RxUtils::toSimpleSingle);
     }
 
-    public static List<String> getEnableNoLocalGroupList() {
+    public static List<String> getEnableGroupList() {
         List<String> groupList = new ArrayList<>();
         String sql = "SELECT DISTINCT "
                 + BookSourceDao.Properties.SourceGroup.columnName
@@ -292,17 +289,24 @@ public class BookSourceManager {
         return groupList;
     }
 
-    public static List<String> getNoLocalGroupList() {
+    public static List<String> getGroupList(boolean isSubscribe) {
         List<String> groupList = new ArrayList<>();
-        String sql = "SELECT DISTINCT " + BookSourceDao.Properties.SourceGroup.columnName + " FROM " + BookSourceDao.TABLENAME;
+        String sql = "SELECT DISTINCT " + BookSourceDao.Properties.SourceGroup.columnName + ","
+                + BookSourceDao.Properties.SourceEName.columnName + " FROM " + BookSourceDao.TABLENAME;
         Cursor cursor = DbManager.getDaoSession().getDatabase().rawQuery(sql, null);
         if (!cursor.moveToFirst()) return groupList;
         do {
             String group = cursor.getString(0);
+            String eName = cursor.getString(1);
             if (TextUtils.isEmpty(group) || TextUtils.isEmpty(group.trim())) continue;
             for (String item : group.split("\\s*[,;，；]\\s*")) {
-                if (TextUtils.isEmpty(item) || groupList.contains(item) || item.equals("内置书源"))
-                    continue;
+                if (isSubscribe) {
+                    if (TextUtils.isEmpty(eName) || TextUtils.isEmpty(item) || groupList.contains(item))
+                        continue;
+                } else {
+                    if (!TextUtils.isEmpty(eName) || TextUtils.isEmpty(item) || groupList.contains(item) || item.equals("内置书源"))
+                        continue;
+                }
                 groupList.add(item);
             }
         } while (cursor.moveToNext());
@@ -326,7 +330,7 @@ public class BookSourceManager {
             return importSource(FileUtils.readText(string));
         }
         if (string.matches("https://.+\\.lanzou[a-z]\\.com/[\\s\\S]*")) {
-            return LanZouApi.INSTANCE.getUrl(string)
+            return LanZouApi.INSTANCE.getFileUrl(string)
                     .flatMap((Function<String, ObservableSource<String>>) s -> Observable.create(emitter -> {
                         emitter.onNext(OkHttpUtils.getHtml(s));
                         emitter.onComplete();

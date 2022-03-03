@@ -1,15 +1,12 @@
 package xyz.fycz.myreader.application;
 
 
-import static android.provider.ContactsContract.Directory.PACKAGE_NAME;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -36,7 +33,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -92,7 +88,8 @@ public class App extends Application {
         initNightTheme();
 //        LLog.init(APPCONST.LOG_DIR);
         initDialogX();
-        AdUtils.initAd();
+        if (!debug)
+            AdUtils.initAd();
     }
 
 
@@ -312,7 +309,7 @@ public class App extends Application {
                 if (!StringHelper.isEmpty(downloadLink)) {
                     spu.putString(getmContext().getString(R.string.downloadLink), downloadLink);
                 } else {
-                    spu.putString(getmContext().getString(R.string.downloadLink), URLCONST.APP_DIR_UR);
+                    spu.putString(getmContext().getString(R.string.downloadLink), URLCONST.APP_DIR_URL);
                 }
                 String[] updateContents = updateContent.split("/");
                 for (String string : updateContents) {
@@ -364,7 +361,7 @@ public class App extends Application {
     private void goDownload(Activity activity, String url) {
         String downloadLink = url;
         if (url == null || "".equals(url)) {
-            downloadLink = URLCONST.APP_DIR_UR;
+            downloadLink = URLCONST.APP_DIR_URL;
         }
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);

@@ -3,6 +3,7 @@ package xyz.fycz.myreader.ui.fragment;
 import static android.app.Activity.RESULT_OK;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -136,6 +139,29 @@ public class MineFragment extends BaseFragment {
             binding.tvUser.setText(user.getUserName());
         }
         binding.tvThemeModeSelect.setText(themeModeArr[themeMode]);
+        initShowMode();
+    }
+
+    private void initShowMode() {
+        int showMode = SharedPreUtils.getInstance().getInt("mineShowMode", 0);
+        switch (showMode){
+            case 1:
+                binding.mineLlUser.setVisibility(View.GONE);
+                binding.mineLlCloud.setVisibility(View.VISIBLE);
+                break;
+            case 2:
+                binding.mineLlUser.setVisibility(View.VISIBLE);
+                binding.mineLlCloud.setVisibility(View.VISIBLE);
+                break;
+            case 3:
+                binding.mineLlUser.setVisibility(View.GONE);
+                binding.mineLlCloud.setVisibility(View.GONE);
+                break;
+            default:
+                binding.mineLlUser.setVisibility(View.VISIBLE);
+                binding.mineLlCloud.setVisibility(View.GONE);
+                break;
+        }
     }
 
     @Override
@@ -312,9 +338,10 @@ public class MineFragment extends BaseFragment {
         binding.mineRlReadRecord.setOnClickListener(v -> {
             startActivity(new Intent(getContext(), ReadRecordActivity.class));
         });
+
         binding.mineRlSetting.setOnClickListener(v -> {
-            Intent settingIntent = new Intent(getActivity(), MoreSettingActivity.class);
-            startActivity(settingIntent);
+            Intent intent = new Intent(getActivity(), MoreSettingActivity.class);
+            startActivityForResult(intent, APPCONST.REQUEST_SETTING);
         });
         binding.mineRlThemeMode.setOnClickListener(v -> {
             /*if (themeModeDia != null) {
@@ -586,13 +613,20 @@ public class MineFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK) {
+            if (data == null) {
+                return;
+            }
             switch (requestCode) {
                 case APPCONST.REQUEST_LOGIN:
-                    assert data != null;
                     isLogin = data.getBooleanExtra("isLogin", false);
                     user = UserService.INSTANCE.readConfig();
                     if (isLogin && user != null) {
                         binding.tvUser.setText(user.getUserName());
+                    }
+                    break;
+                case APPCONST.REQUEST_SETTING:
+                    if (data.getBooleanExtra(APPCONST.RESULT_NEED_REFRESH, false)){
+                        initShowMode();
                     }
                     break;
             }

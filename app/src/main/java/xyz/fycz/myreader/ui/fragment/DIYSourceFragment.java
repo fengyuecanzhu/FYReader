@@ -3,9 +3,7 @@ package xyz.fycz.myreader.ui.fragment;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -19,18 +17,12 @@ import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.hjq.permissions.OnPermissionCallback;
-import com.hjq.permissions.XXPermissions;
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -52,13 +44,11 @@ import xyz.fycz.myreader.ui.activity.BookSourceActivity;
 import xyz.fycz.myreader.ui.activity.SourceEditActivity;
 import xyz.fycz.myreader.ui.adapter.BookSourceAdapter;
 import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
-import xyz.fycz.myreader.ui.adapter.helper.OnStartDragListener;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.UriFileUtil;
 import xyz.fycz.myreader.util.utils.ClipBoardUtil;
 import xyz.fycz.myreader.util.utils.DocumentUtil;
 import xyz.fycz.myreader.util.utils.FileUtils;
@@ -70,7 +60,6 @@ import xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout;
 
 import static android.app.Activity.RESULT_OK;
 import static android.text.TextUtils.isEmpty;
-import static xyz.fycz.myreader.util.UriFileUtil.getPath;
 
 /**
  * @author fengyue
@@ -364,7 +353,7 @@ public class DIYSourceFragment extends BaseFragment {
      */
     public void showSourceGroupMenu(View view) {
         PopupMenu popupMenu = new PopupMenu(sourceActivity, view, Gravity.END);
-        List<String> groupList = BookSourceManager.getNoLocalGroupList();
+        List<String> groupList = BookSourceManager.getGroupList(false);
         popupMenu.getMenu().add(0, 0, 0, "所有书源");
         for (int i = 0; i < groupList.size(); i++) {
             popupMenu.getMenu().add(0, 0, i + 1, groupList.get(i));

@@ -133,7 +133,7 @@ public class LanZousApi {
             HashMap<String, String> headers = new HashMap<>();
             headers.put("Referer", referer);
 
-            String html = OkHttpUtils.getHtml(URLCONST.LAN_ZOUS_URL + "/ajaxm.php", requestBody,
+            String html = OkHttpUtils.getHtml(URLCONST.LAN_ZOU_URL + "/ajaxm.php", requestBody,
                     "UTF-8", headers);
             emitter.onSuccess(getUrl2(html));
         }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<String>() {
@@ -151,7 +151,7 @@ public class LanZousApi {
 
     private static String getUrl1(String html) {
         Document doc = Jsoup.parse(html);
-        return URLCONST.LAN_ZOUS_URL + doc.getElementsByClass("ifr2").attr("src");
+        return URLCONST.LAN_ZOU_URL + doc.getElementsByClass("ifr2").attr("src");
     }
 
     private static String getKey(String html) {

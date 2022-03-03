@@ -67,7 +67,7 @@ public class ShareBookUtil {
         ToastUtils.showInfo("正在生成分享图片");
         Single.create((SingleOnSubscribe<File>) emitter -> {
             // 使用url
-            String url = SharedPreUtils.getInstance().getString(context.getString(R.string.downloadLink), URLCONST.LAN_ZOUS_URL);
+            String url = SharedPreUtils.getInstance().getString(context.getString(R.string.downloadLink), URLCONST.LAN_ZOU_URL);
             if (url == null)
                 url = "";
 

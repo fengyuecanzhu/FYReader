@@ -71,6 +71,7 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
     private boolean upMenu;
 
     private Setting mSetting;
+    private int mineShowMode;
     private boolean isVolumeTurnPage;
     private int resetScreenTime;
     private int sortStyle;
@@ -115,6 +116,7 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
         super.initData(savedInstanceState);
         needRefresh = false;
         mSetting = SysManager.getSetting();
+        mineShowMode = SharedPreUtils.getInstance().getInt("mineShowMode", 0);
         isVolumeTurnPage = mSetting.isVolumeTurnPage();
         alwaysNext = mSetting.isAlwaysNext();
         resetScreenTime = mSetting.getResetScreen();
@@ -155,6 +157,7 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
     protected void initWidget() {
         super.initWidget();
         initSwitchStatus();
+        initMineShowMode();
         if (sortStyle == 1) {
             binding.tvBookSort.setText(getString(R.string.time_sort));
         } else if (sortStyle == 2) {
@@ -167,6 +170,23 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
             binding.rlMatchChapterSuitability.setVisibility(View.GONE);
         }
         binding.tvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
+    }
+
+    private void initMineShowMode() {
+        switch (mineShowMode){
+            case 1:
+                binding.tvMineShow.setText(getString(R.string.show_cloud_only));
+                break;
+            case 2:
+                binding.tvMineShow.setText(getString(R.string.show_user_cloud));
+                break;
+            case 3:
+                binding.tvMineShow.setText(getString(R.string.hide_user_cloud));
+                break;
+            default:
+                binding.tvMineShow.setText(getString(R.string.show_user_only));
+                break;
+        }
     }
 
     @Override
@@ -232,6 +252,18 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
             ft.commit();
             curFragment = mWebDavFragment;
             setUpToolbar();
+        });
+
+        binding.llMineShow.setOnClickListener(v -> {
+            BottomMenu.show(getString(R.string.mine_show_mode), getResources().getStringArray(R.array.mine_show))
+                    .setSelection(mineShowMode)
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        mineShowMode = which;
+                        SharedPreUtils.getInstance().putInt("mineShowMode", mineShowMode);
+                        initMineShowMode();
+                        needRefresh = true;
+                        return false;
+                    }).setCancelButton(R.string.cancel);
         });
 
         binding.rlVolume.setOnClickListener(
