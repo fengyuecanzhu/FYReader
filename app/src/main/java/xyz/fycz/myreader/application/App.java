@@ -95,7 +95,7 @@ public class App extends Application {
         initNightTheme();
 //        LLog.init(APPCONST.LOG_DIR);
         initDialogX();
-        AdUtils.initAd();
+        //AdUtils.initAd();
     }
 
 

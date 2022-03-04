@@ -27,9 +27,8 @@ import xyz.fycz.myreader.util.utils.FileUtils;
  * @author fengyue
  * @date 2021/4/23 12:51
  */
-public class AdSettingActivity extends BaseActivity {
+public class AdSettingActivity extends BaseActivity<ActivityAdSettingBinding> {
 
-    private ActivityAdSettingBinding binding;
     private LoadingDialog loadingDialog;
     private SharedPreUtils spu;
     private int curAdTimes;

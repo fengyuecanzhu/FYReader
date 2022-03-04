@@ -35,14 +35,17 @@ import xyz.fycz.myreader.util.utils.AdUtils;
  * @author fengyue
  * @date 2020/8/12 20:02
  */
-public abstract class BaseActivity extends SwipeBackActivity {
+public abstract class BaseActivity<VB> extends SwipeBackActivity {
     private static final int INVALID_VAL = -1;
+
+    protected VB binding;
 
     protected static final String INTENT = "intent";
 
     protected CompositeDisposable mDisposable;
 
     protected Toolbar mToolbar;
+
 
     /****************************abstract area*************************************/
     /**

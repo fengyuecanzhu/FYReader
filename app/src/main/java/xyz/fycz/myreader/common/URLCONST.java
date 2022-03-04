@@ -26,9 +26,9 @@ public class URLCONST {
 
     public static final String FY_READER_URL = "https://fyreader." + getDefaultDomain();
 
-    public static final String LOG_UPLOAD_URL = FY_READER_URL + "/logUpload";
-    public static final String THANKS_URL = FY_READER_URL + "/thanks/";
     public static final String USER_URL = "http://101.43.83.105:12123";
+    public static final String LOG_UPLOAD_URL = USER_URL + "/do/logUpload";
+    public static final String THANKS_URL = FY_READER_URL + "/thanks/";
     public static final String AD_URL = USER_URL + "/do/ad";
 
     public static final String DONATE = "https://gitee.com/fengyuecanzhu/Donate/raw/master";

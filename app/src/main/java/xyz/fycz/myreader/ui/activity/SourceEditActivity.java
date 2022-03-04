@@ -40,9 +40,7 @@ import xyz.fycz.myreader.webapi.crawler.source.MatcherCrawler;
  * @author fengyue
  * @date 2021/2/9 10:54
  */
-public class SourceEditActivity extends BaseActivity {
-    private ActivitySourceEditBinding binding;
-
+public class SourceEditActivity extends BaseActivity<ActivitySourceEditBinding> {
     private BookSource source;
     private List<EditEntity> sourceEntities;
     private List<EditEntity> searchEntities;

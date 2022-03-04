@@ -29,10 +29,8 @@ import xyz.fycz.myreader.util.utils.FileUtils;
  * @date 2020/8/12 20:02
  */
 
-public class FileSystemActivity extends BaseTabActivity {
+public class FileSystemActivity extends BaseTabActivity<ActivityFileSystemBinding> {
     private static final String TAG = "FileSystemActivity";
-
-    private ActivityFileSystemBinding binding;
 
     private LocalBookFragment mLocalFragment;
     private FileCategoryFragment mCategoryFragment;

@@ -15,8 +15,7 @@ import xyz.fycz.myreader.util.utils.AdUtils
  * @author fengyue
  * @date 2022/3/3 17:04
  */
-class RemoveAdActivity : BaseActivity() {
-    private lateinit var binding: ActivityRemoveAdBinding
+class RemoveAdActivity : BaseActivity<ActivityRemoveAdBinding>() {
     private var rewardLastTime = 0L
 
     override fun bindView() {

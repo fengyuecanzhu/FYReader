@@ -35,8 +35,7 @@ import xyz.fycz.myreader.webapi.crawler.source.find.ThirdFindCrawler;
  * @author fengyue
  * @date 2021/7/21 20:10
  */
-public class FindBookActivity extends BaseActivity {
-    private ActivityFindBookBinding binding;
+public class FindBookActivity extends BaseActivity<ActivityFindBookBinding> {
     private BookSource source;
     private FindCrawler findCrawler;
     private List<String> groups;

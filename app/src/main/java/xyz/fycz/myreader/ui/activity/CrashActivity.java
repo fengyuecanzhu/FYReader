@@ -39,9 +39,7 @@ import xyz.fycz.myreader.util.ToastUtils;
  * @author fengyue
  * @date 2022/1/22 9:15
  */
-public class CrashActivity extends BaseActivity {
-    private ActivityCrashBinding binding;
-
+public class CrashActivity extends BaseActivity<ActivityCrashBinding> {
     /**
      * 报错代码行数正则表达式
      */

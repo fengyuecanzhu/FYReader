@@ -21,6 +21,7 @@ import xyz.fycz.myreader.util.utils.GSON
 import xyz.fycz.myreader.util.utils.OkHttpUtils
 import xyz.fycz.myreader.util.utils.RxUtils
 import java.io.File
+import java.util.*
 
 /**
  * @author fengyue
@@ -93,6 +94,42 @@ object UserService {
                     makeAuth()
             val requestBody = body.toRequestBody(mediaType)
             val ret = OkHttpUtils.getHtml(URLCONST.USER_URL + "/do/sendEmail", requestBody, "UTF-8")
+            it.onSuccess(GSON.fromJson(ret, Result::class.java))
+        }).compose { RxUtils.toSimpleSingle(it) }
+    }
+
+    fun getInfo(user: User): Single<Result> {
+        return Single.create(SingleOnSubscribe<Result> {
+            val mediaType = "application/x-www-form-urlencoded".toMediaTypeOrNull()
+            val body = "username=${user.userName}" +
+                    "&password=${user.password}" +
+                    makeAuth()
+            val requestBody = body.toRequestBody(mediaType)
+            val ret = OkHttpUtils.getHtml(URLCONST.USER_URL + "/do/getInfo", requestBody, "UTF-8")
+            it.onSuccess(GSON.fromJson(ret, Result::class.java))
+        }).compose { RxUtils.toSimpleSingle(it) }
+    }
+
+    fun bindId(username: String): Single<Result> {
+        return Single.create(SingleOnSubscribe<Result> {
+            val mediaType = "application/x-www-form-urlencoded".toMediaTypeOrNull()
+            val body = "username=${username}" +
+                    "&deviceId=${getUUID()}" +
+                    makeAuth()
+            val requestBody = body.toRequestBody(mediaType)
+            val ret = OkHttpUtils.getHtml(URLCONST.USER_URL + "/do/bindId", requestBody, "UTF-8")
+            it.onSuccess(GSON.fromJson(ret, Result::class.java))
+        }).compose { RxUtils.toSimpleSingle(it) }
+    }
+
+    fun bindCammy(username: String, cammy: String): Single<Result> {
+        return Single.create(SingleOnSubscribe<Result> {
+            val mediaType = "application/x-www-form-urlencoded".toMediaTypeOrNull()
+            val body = "username=${username}" +
+                    "&cammy=$cammy" +
+                    makeAuth()
+            val requestBody = body.toRequestBody(mediaType)
+            val ret = OkHttpUtils.getHtml(URLCONST.USER_URL + "/do/bindCammy", requestBody, "UTF-8")
             it.onSuccess(GSON.fromJson(ret, Result::class.java))
         }).compose { RxUtils.toSimpleSingle(it) }
     }
@@ -195,11 +232,22 @@ object UserService {
         return readConfig() != null
     }
 
-    public fun makeAuth(): String {
+    fun getUUID(): String {
+        val file = FileUtils.getFile(APPCONST.QQ_DATA_DIR + "monId")
+        var uuid = file.readText()
+        if (uuid.isEmpty()) {
+            uuid = UUID.randomUUID().toString()
+            file.writeText(uuid)
+        }
+        return uuid
+    }
+
+    fun makeAuth(): String {
         return "&signal=" + AppInfoUtils.getSingInfo(
             App.getmContext(),
             App.getApplication().packageName,
             AppInfoUtils.SHA1
-        ) + "&appVersion=" + App.getVersionCode() + "&isDebug=" + App.isDebug()
+        ) + "&appVersion=" + App.getVersionCode() +
+                "&deviceId=" + getUUID() + "&isDebug=" + App.isDebug()
     }
 }

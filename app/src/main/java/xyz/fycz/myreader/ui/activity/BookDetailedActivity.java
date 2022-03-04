@@ -73,9 +73,8 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
  * @author fengyue
  * @date 2020/8/17 11:39
  */
-public class BookDetailedActivity extends BaseActivity {
+public class BookDetailedActivity extends BaseActivity<ActivityBookDetailBinding> {
 
-    private ActivityBookDetailBinding binding;
     private static final String TAG = BookDetailedActivity.class.getSimpleName();
 
     private Book mBook;

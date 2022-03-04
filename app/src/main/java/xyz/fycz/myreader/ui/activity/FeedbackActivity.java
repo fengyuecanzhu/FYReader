@@ -20,9 +20,7 @@ import xyz.fycz.myreader.ui.dialog.DialogCreator;
  * @author fengyue
  * @date 2020/12/24 20:48
  */
-public class FeedbackActivity extends BaseActivity {
-
-    private ActivityFeedbackBinding binding;
+public class FeedbackActivity extends BaseActivity<ActivityFeedbackBinding> {
 
     @Override
     protected void bindView() {

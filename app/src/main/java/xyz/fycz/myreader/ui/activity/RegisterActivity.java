@@ -31,9 +31,7 @@ import xyz.fycz.myreader.util.utils.StringUtils;
  * @author fengyue
  * @date 2020/9/18 22:37
  */
-public class RegisterActivity extends BaseActivity {
-
-    private ActivityRegisterBinding binding;
+public class RegisterActivity extends BaseActivity<ActivityRegisterBinding> {
 
     private String code;
     private String username = "";

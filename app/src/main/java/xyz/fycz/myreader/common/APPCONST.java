@@ -104,6 +104,8 @@ public class APPCONST {
     public static final int REQUEST_AUTH_EMAIL = 1016;
     public static final int REQUEST_SETTING = 1017;
     public static final int REQUEST_SUBSCRIBE = 1018;
+    public static final int REQUEST_LOGOUT = 1019;
+    public static final int REQUEST_RESET_PWD = 1020;
 
     public static final int REQUEST_READ = 1;
 

@@ -60,9 +60,7 @@ import static xyz.fycz.myreader.util.utils.OkHttpUtils.getCookies;
  * @author fengyue
  * @date 2021/2/12 18:55
  */
-public class SourceDebugActivity extends BaseActivity {
-    private ActivitySourceDebugBinding binding;
-
+public class SourceDebugActivity extends BaseActivity<ActivitySourceDebugBinding> {
     private DebugEntity debugEntity;
     private ReadCrawler rc;
     private Disposable disposable;

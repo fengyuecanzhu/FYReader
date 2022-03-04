@@ -58,11 +58,14 @@ import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
 import xyz.fycz.myreader.ui.activity.ReadRecordActivity;
 import xyz.fycz.myreader.ui.activity.RemoveAdActivity;
+import xyz.fycz.myreader.ui.activity.UserInfoActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
 
 /**
  * @author fengyue
@@ -141,6 +144,22 @@ public class MineFragment extends BaseFragment {
         }
         binding.tvThemeModeSelect.setText(themeModeArr[themeMode]);
         initShowMode();
+        AdUtils.checkHasAd(true, true).compose(RxUtils::toSimpleSingle)
+                .subscribe(new MySingleObserver<Boolean>() {
+                    @Override
+                    public void onSuccess(@NonNull Boolean aBoolean) {
+                        if (aBoolean && AdUtils.getAdConfig().getRemoveAdTime() > 0){
+                            binding.mineRlRemoveAd.setVisibility(View.VISIBLE);
+                        }else {
+                            binding.mineRlRemoveAd.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        binding.mineRlRemoveAd.setVisibility(View.GONE);
+                    }
+                });
     }
 
     private void initShowMode() {
@@ -170,19 +189,8 @@ public class MineFragment extends BaseFragment {
         super.initClick();
         binding.mineRlUser.setOnClickListener(v -> {
             if (isLogin) {
-                DialogCreator.createCommonDialog(getActivity(), "退出登录", "确定要退出登录吗？"
-                        , true, (dialog, which) -> {
-                            File file = App.getApplication().getFileStreamPath("userConfig.fy");
-                            if (file.delete()) {
-                                ToastUtils.showSuccess("退出成功");
-                                isLogin = false;
-                                mHandler.sendEmptyMessage(1);
-                                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                                getActivity().startActivityForResult(intent, APPCONST.REQUEST_LOGIN);
-                            } else {
-                                ToastUtils.showError("退出失败(Error：file.delete())");
-                            }
-                        }, (dialog, which) -> dialog.dismiss());
+                Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+                startActivityForResult(intent, APPCONST.REQUEST_LOGOUT);
             } else {
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 getActivity().startActivityForResult(intent, APPCONST.REQUEST_LOGIN);
@@ -614,11 +622,11 @@ public class MineFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK) {
-            if (data == null) {
-                return;
-            }
             switch (requestCode) {
                 case APPCONST.REQUEST_LOGIN:
+                    if (data == null) {
+                        return;
+                    }
                     isLogin = data.getBooleanExtra("isLogin", false);
                     user = UserService.INSTANCE.readConfig();
                     if (isLogin && user != null) {
@@ -626,9 +634,16 @@ public class MineFragment extends BaseFragment {
                     }
                     break;
                 case APPCONST.REQUEST_SETTING:
+                    if (data == null) {
+                        return;
+                    }
                     if (data.getBooleanExtra(APPCONST.RESULT_NEED_REFRESH, false)){
                         initShowMode();
                     }
+                    break;
+                case APPCONST.REQUEST_LOGOUT:
+                    isLogin = false;
+                    mHandler.sendEmptyMessage(1);
                     break;
             }
         }

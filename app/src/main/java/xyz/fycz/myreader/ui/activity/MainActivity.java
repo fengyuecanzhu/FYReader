@@ -58,10 +58,8 @@ import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CU
  * @author fengyue
  * @date 2020/9/13 13:03
  */
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity<ActivityMainBinding> {
     public static final String TAG = MainActivity.class.getSimpleName();
-
-    private ActivityMainBinding binding;
 
     private List<Fragment> mFragments = new ArrayList<>();
     private String[] titles;

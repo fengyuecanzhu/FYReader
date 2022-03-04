@@ -21,10 +21,8 @@ import xyz.fycz.myreader.ui.fragment.CatalogFragment;
 /**
  * 书籍目录activity
  */
-public class CatalogActivity extends BaseActivity {
+public class CatalogActivity extends BaseActivity<ActivityCatalogBinding> {
 
-
-    private ActivityCatalogBinding binding;
     private SearchView searchView;
 
     private Book mBook;

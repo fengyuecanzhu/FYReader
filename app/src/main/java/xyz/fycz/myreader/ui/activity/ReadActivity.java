@@ -124,11 +124,8 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
  * @author fengyue
  * @date 2020/10/21 16:46
  */
-public class ReadActivity extends BaseActivity implements ColorPickerDialogListener, View.OnTouchListener {
+public class ReadActivity extends BaseActivity<ActivityReadBinding> implements ColorPickerDialogListener, View.OnTouchListener {
     private static final String TAG = ReadActivity.class.getSimpleName();
-
-    /*****************************View***********************************/
-    private ActivityReadBinding binding;
 
     /***************************variable*****************************/
     private Book mBook;

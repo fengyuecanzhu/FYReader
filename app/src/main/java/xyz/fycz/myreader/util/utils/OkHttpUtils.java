@@ -42,6 +42,7 @@ import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.CookieStore;
 import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
 import xyz.fycz.myreader.model.third3.http.HttpHelperKt;
+import xyz.fycz.myreader.model.user.UserService;
 
 import static xyz.fycz.myreader.util.help.SSLSocketClient.createSSLSocketFactory;
 import static xyz.fycz.myreader.util.help.SSLSocketClient.createTrustAllManager;
@@ -333,7 +334,7 @@ public class OkHttpUtils {
                 .build();
 
         Request request = new Request.Builder()
-                .header("Authorization", "Client-ID " + UUID.randomUUID())
+                .header("Authorization", "Client-ID " + UserService.INSTANCE.getUUID())
                 .url(url)
                 .post(requestBody)
                 .build();

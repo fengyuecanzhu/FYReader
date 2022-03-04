@@ -41,8 +41,7 @@ import xyz.fycz.myreader.widget.DividerItemDecoration;
  * @author fengyue
  * @date 2021/6/1 19:07
  */
-public class ReadRecordActivity extends BaseActivity {
-    private ActivityReadRecordBinding binding;
+public class ReadRecordActivity extends BaseActivity<ActivityReadRecordBinding> {
     private List<ReadRecord> records;
     private long allTime;
     private BaseListAdapter<ReadRecord> mAdapter;

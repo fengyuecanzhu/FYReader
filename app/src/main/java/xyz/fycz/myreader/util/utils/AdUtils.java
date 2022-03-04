@@ -30,6 +30,7 @@ import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.ad.AdBean;
 import xyz.fycz.myreader.entity.ad.AdConfig;
+import xyz.fycz.myreader.model.user.User;
 import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -49,7 +50,7 @@ public class AdUtils {
         String config = getSp().getString("adConfig");
         adConfig = GsonExtensionsKt.getGSON().fromJson(config, AdConfig.class);
         if (adConfig == null || adConfig.getBackAdTime() == 0) {
-            adConfig = new AdConfig(false, 60, 20,
+            adConfig = new AdConfig(false, false, false, 60, 20,
                     60, 6, 3, 48,
                     true);
         }
@@ -60,13 +61,23 @@ public class AdUtils {
     }
 
     public static Single<Boolean> checkHasAd() {
-        if (hasRemoveAdReward()) return Single.just(false);
+        return checkHasAd(false, true);
+    }
+
+    public static Single<Boolean> checkHasAd(boolean noRemove, boolean isUser) {
+        if (!noRemove && hasRemoveAdReward()) return Single.just(false);
         initAd();
         return Single.create((SingleOnSubscribe<Boolean>) emitter -> {
             boolean hasAd = false;
             if (!adConfig.isCloud() || isExpire()) {
                 MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                 String body = "type=adConfig" + UserService.INSTANCE.makeAuth();
+                if (UserService.INSTANCE.isLogin()) {
+                    User user = UserService.INSTANCE.readConfig();
+                    if (user != null) {
+                        body += "&user=" + user.getUserName();
+                    }
+                }
                 RequestBody requestBody = RequestBody.create(mediaType, body);
                 String jsonStr = OkHttpUtils.getHtml(URLCONST.AD_URL, requestBody, "UTF-8");
                 try {
@@ -81,7 +92,7 @@ public class AdUtils {
                         String res = jsonObject.getString("result");
                         adConfig = GsonExtensionsKt.getGSON().fromJson(res, AdConfig.class);
                         adConfig.setCloud(true);
-                        hasAd = adConfig.isHasAd();
+                        hasAd = isUser ? adConfig.isUserHasAd() : adConfig.isHasAd();
                         getSp().putString("adConfig", res);
                         getSp().putLong("adConfigTime", System.currentTimeMillis());
                     }
@@ -90,7 +101,7 @@ public class AdUtils {
                     e.printStackTrace();
                 }
             } else {
-                hasAd = adConfig.isHasAd();
+                hasAd = isUser ? adConfig.isUserHasAd() : adConfig.isHasAd();
             }
             emitter.onSuccess(hasAd);
         }).compose(RxUtils::toSimpleSingle);
@@ -167,7 +178,7 @@ public class AdUtils {
     }
 
     public static boolean backSplashAd() {
-        if (!adConfig.isHasAd()) return false;
+        if (!adConfig.isUserHasAd()) return false;
         long splashAdTime = getSp().getLong("splashAdTime");
         long backTime = getSp().getLong("backTime");
         long currentTime = System.currentTimeMillis();

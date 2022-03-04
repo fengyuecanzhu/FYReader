@@ -29,9 +29,8 @@ import xyz.fycz.myreader.util.utils.AdUtils;
  * @author fengyue
  * @date 2021/4/23 21:23
  */
-public class DonateActivity extends BaseActivity {
+public class DonateActivity extends BaseActivity<ActivityDonateBinding> {
 
-    private ActivityDonateBinding binding;
     private static final String TAG = DonateActivity.class.getSimpleName();
 
     @Override

@@ -38,9 +38,8 @@ import xyz.fycz.myreader.util.utils.StringUtils;
  * @author fengyue
  * @date 2020/9/18 22:27
  */
-public class LoginActivity extends BaseActivity implements TextWatcher {
+public class LoginActivity extends BaseActivity<ActivityLoginBinding> implements TextWatcher {
 
-    private ActivityLoginBinding binding;
     private String code;
     private Disposable loginDisp;
     private LoadingDialog dialog;

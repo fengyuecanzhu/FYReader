@@ -30,9 +30,8 @@ import java.util.*
  * @author fengyue
  * @date 2021/12/9 15:20
  */
-class AuthEmailActivity : BaseActivity(), SingleObserver<Result> {
+class AuthEmailActivity : BaseActivity<ActivityAuthEmailBinding>(), SingleObserver<Result> {
 
-    private lateinit var binding: ActivityAuthEmailBinding
     private var email = ""
     private var password = ""
     private var emailCode = ""

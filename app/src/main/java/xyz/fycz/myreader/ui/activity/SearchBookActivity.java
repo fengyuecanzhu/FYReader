@@ -72,9 +72,7 @@ import xyz.fycz.myreader.widget.TagGroup;
  * @author fengyue
  * @date 2020/9/18 21:58
  */
-public class SearchBookActivity extends BaseActivity {
-
-    private ActivitySearchBookBinding binding;
+public class SearchBookActivity extends BaseActivity<ActivitySearchBookBinding> {
 
     private SearchAdapter mSearchBookAdapter;
     private String searchKey;//搜索关键字
@@ -416,9 +414,10 @@ public class SearchBookActivity extends BaseActivity {
         if (menu == null) return;
         String searchGroup = SharedPreUtils.getInstance().getString("searchGroup");
         menu.removeGroup(R.id.source_group);
-        MenuItem item = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.all_source);
+        MenuItem first = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.all_source);
         boolean hasChecked = false;
         List<String> groupList = BookSourceManager.getEnableGroupList();
+        MenuItem item;
         for (String groupName : groupList) {
             item = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, groupName);
             if (groupName.equals(searchGroup)) {
@@ -427,7 +426,7 @@ public class SearchBookActivity extends BaseActivity {
             }
         }
         if (!hasChecked || "".equals(searchGroup)) {
-            item.setChecked(true);
+            first.setChecked(true);
         }
         menu.setGroupCheckable(R.id.source_group, true, true);
     }

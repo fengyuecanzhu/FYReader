@@ -59,9 +59,7 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
  * @author fengyue
  * @date 2021/1/19 10:02
  */
-public class ReplaceRuleActivity extends BaseActivity {
-
-    private ActivityReplaceRuleBinding binding;
+public class ReplaceRuleActivity extends BaseActivity<ActivityReplaceRuleBinding> {
 
     private SearchView searchView;
     private List<ReplaceRuleBean> mReplaceRules;

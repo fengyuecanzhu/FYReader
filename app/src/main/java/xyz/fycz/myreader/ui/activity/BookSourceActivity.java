@@ -29,9 +29,8 @@ import xyz.fycz.myreader.ui.fragment.SubscribeSourceFragment;
  * @author fengyue
  * @date 2021/2/10 9:14
  */
-public class BookSourceActivity extends BaseTabActivity {
+public class BookSourceActivity extends BaseTabActivity<ActivityBooksourceBinding> {
 
-    private ActivityBooksourceBinding binding;
     private SearchView searchView;
 
     @Override

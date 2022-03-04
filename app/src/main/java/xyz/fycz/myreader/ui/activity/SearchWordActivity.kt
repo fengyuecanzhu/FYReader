@@ -31,9 +31,7 @@ import xyz.fycz.myreader.widget.page.PageLoader
  * @author fengyue
  * @date 2021/12/5 19:57
  */
-class SearchWordActivity : BaseActivity() {
-
-    private lateinit var binding: ActivitySearchWordBinding
+class SearchWordActivity : BaseActivity<ActivitySearchWordBinding>() {
     private lateinit var book: Book
     private lateinit var chapters: List<Chapter>
     private lateinit var pageLoader: PageLoader

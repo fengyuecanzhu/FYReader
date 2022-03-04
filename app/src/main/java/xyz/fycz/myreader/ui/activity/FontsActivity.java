@@ -34,8 +34,7 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
  * @author fengyue
  * @date 2020/9/19 12:04
  */
-public class FontsActivity extends BaseActivity {
-    private ActivityFontsBinding binding;
+public class FontsActivity extends BaseActivity<ActivityFontsBinding> {
     private ArrayList<Font> mFonts;
     private FontsAdapter mFontsAdapter;
 

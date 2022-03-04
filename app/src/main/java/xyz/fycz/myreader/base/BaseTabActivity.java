@@ -17,7 +17,7 @@ import xyz.fycz.myreader.R;
  * @date 2020/8/12 20:02
  */
 
-public abstract class BaseTabActivity extends BaseActivity {
+public abstract class BaseTabActivity<VB> extends BaseActivity<VB> {
     /**************View***************/
     protected TabLayout mTlIndicator;
     protected ViewPager mVp;

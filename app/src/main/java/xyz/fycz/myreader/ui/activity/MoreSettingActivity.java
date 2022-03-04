@@ -63,9 +63,7 @@ import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
  * 阅读界面的更多设置
  */
 
-public class MoreSettingActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
-
-    private ActivityMoreSettingBinding binding;
+public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding> implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private boolean needRefresh;
     private boolean upMenu;

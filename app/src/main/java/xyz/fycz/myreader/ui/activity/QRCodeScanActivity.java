@@ -37,10 +37,7 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
  * @date 2020/11/30 8:31
  */
 
-public class QRCodeScanActivity extends BaseActivity implements QRCodeView.Delegate {
-
-
-    private ActivityQrcodeCaptureBinding binding;
+public class QRCodeScanActivity extends BaseActivity<ActivityQrcodeCaptureBinding> implements QRCodeView.Delegate {
 
     private final int REQUEST_QR_IMAGE = 202;
     private boolean flashlightIsOpen;

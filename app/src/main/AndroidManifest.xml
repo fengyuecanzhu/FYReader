@@ -131,6 +131,7 @@
         <activity android:name=".ui.activity.CrashActivity" />
         <activity android:name=".ui.activity.SourceSubscribeActivity" />
         <activity android:name=".ui.activity.RemoveAdActivity" />
+        <activity android:name=".ui.activity.UserInfoActivity" />
 
         <receiver android:name=".util.notification.NotificationClickReceiver" />
         <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver" />

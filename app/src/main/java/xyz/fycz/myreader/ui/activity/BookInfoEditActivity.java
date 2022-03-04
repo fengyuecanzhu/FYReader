@@ -28,8 +28,7 @@ import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
  * @author fengyue
  * @date 2021/4/24 15:05
  */
-public class BookInfoEditActivity extends BaseActivity {
-    private ActivityBookInfoEditBinding binding;
+public class BookInfoEditActivity extends BaseActivity<ActivityBookInfoEditBinding> {
     private Book mBook;
     private String imgUrl;
     private String bookName;

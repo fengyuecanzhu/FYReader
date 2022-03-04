@@ -40,8 +40,7 @@ import xyz.fycz.myreader.webapi.LanZouApi;
  * @author fengyue
  * @date 2020/9/18 22:21
  */
-public class AboutActivity extends BaseActivity {
-    private ActivityAboutBinding binding;
+public class AboutActivity extends BaseActivity<ActivityAboutBinding> {
 
     @Override
     protected void bindView() {

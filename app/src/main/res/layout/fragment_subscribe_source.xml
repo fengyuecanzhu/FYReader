@@ -25,7 +25,7 @@
                 android:gravity="center_vertical"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:text="@string/subscribe_source"
+                android:text="@string/add_subscribe"
                 android:textColor="@color/colorAccent"
                 android:textSize="@dimen/text_small_size" />
 
@@ -72,15 +72,38 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/colorBackground" />
+    <LinearLayout
+        android:id="@+id/ll_no_data_tips"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:visibility="gone">
 
+        <ImageView
+            android:id="@+id/iv_no_data_tips"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:srcCompat="@drawable/ic_vector_add_bookcase"
+            app:tint="@color/textSecondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="当前无任何订阅书源，点击添加"
+            android:textColor="@color/textSecondary"
+            android:textSize="16sp" />
+    </LinearLayout>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <xyz.fycz.myreader.widget.scroller.FastScrollRecyclerView
             android:id="@+id/recycler_view"
-            android:background="@color/colorForeground"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="@color/colorForeground" />
     </RelativeLayout>
 </LinearLayout>

@@ -43,12 +43,11 @@ import xyz.fycz.myreader.util.utils.MD5Utils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.SystemBarUtils;
 
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     /*************Constant**********/
     public static final String TAG = SplashActivity.class.getSimpleName();
     public static int WAIT_INTERVAL = 0;
 
-    private ActivitySplashBinding binding;
     private SharedPreUtils spu;
     private int todayAdCount;
     private int adTimes;

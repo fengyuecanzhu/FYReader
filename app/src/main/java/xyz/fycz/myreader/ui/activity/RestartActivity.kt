@@ -13,7 +13,7 @@ import xyz.fycz.myreader.util.ToastUtils
  * @author fengyue
  * @date 2022/1/22 8:57
  */
-class RestartActivity : BaseActivity() {
+class RestartActivity<VB> : BaseActivity<VB>() {
     override fun bindView() {}
 
     companion object {

@@ -25,8 +25,7 @@ import xyz.fycz.myreader.util.SharedPreUtils
  * @author fengyue
  * @date 2021/8/30 12:48
  */
-class GroupManagerActivity : BaseActivity() {
-    private lateinit var binding: ActivityGroupManagerBinding
+class GroupManagerActivity : BaseActivity<ActivityGroupManagerBinding>() {
 
     private lateinit var adapter: BookGroupAdapter
 

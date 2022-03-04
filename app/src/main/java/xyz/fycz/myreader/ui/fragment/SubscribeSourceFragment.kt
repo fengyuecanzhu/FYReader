@@ -12,6 +12,7 @@ import io.reactivex.SingleEmitter
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.base.BaseFragment
 import xyz.fycz.myreader.base.adapter2.onClick
+import xyz.fycz.myreader.base.adapter2.onLongClick
 import xyz.fycz.myreader.base.observer.MySingleObserver
 import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.databinding.FragmentSubscribeSourceBinding
@@ -47,7 +48,7 @@ class SubscribeSourceFragment(private val sourceActivity: BookSourceActivity) : 
         getSources()
     }
 
-    private fun getSources(){
+    private fun getSources() {
         Single.create { emitter: SingleEmitter<List<BookSource>> ->
             emitter.onSuccess(BookSourceManager.getAllSubSource())
         }.compose { RxUtils.toSimpleSingle(it) }
@@ -79,6 +80,14 @@ class SubscribeSourceFragment(private val sourceActivity: BookSourceActivity) : 
         //设置分割线
         binding.recyclerView.addItemDecoration(DividerItemDecoration(context))
         mAdapter?.refreshItems(mBookSources)
+
+        if (mBookSources.isNullOrEmpty()) {
+            binding.llNoDataTips.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+        } else {
+            binding.llNoDataTips.visibility = View.GONE
+            binding.recyclerView.visibility = View.VISIBLE
+        }
     }
 
     override fun initWidget(savedInstanceState: Bundle?) {
@@ -87,9 +96,14 @@ class SubscribeSourceFragment(private val sourceActivity: BookSourceActivity) : 
 
     override fun initClick() {
         super.initClick()
+        binding.ivNoDataTips.onClick {
+            binding.tvSubscribeSource.performClick()
+        }
         binding.tvSubscribeSource.onClick {
-            startActivityForResult(Intent(context, SourceSubscribeActivity::class.java),
-                APPCONST.REQUEST_SUBSCRIBE)
+            startActivityForResult(
+                Intent(context, SourceSubscribeActivity::class.java),
+                APPCONST.REQUEST_SUBSCRIBE
+            )
         }
         binding.ivGroup.setOnClickListener { view: View? ->
             showSourceGroupMenu(view)
@@ -101,7 +115,11 @@ class SubscribeSourceFragment(private val sourceActivity: BookSourceActivity) : 
             featuresMenu?.show()
         }
         binding.tvSubscribeSourceTip.onClick {
-            MyAlertDialog.showTipDialogWithLink(context, getString(R.string.subscribe_source_tip), R.string.subscribe_source_detail_tip)
+            MyAlertDialog.showTipDialogWithLink(
+                context,
+                getString(R.string.subscribe_source_tip),
+                R.string.subscribe_source_detail_tip
+            )
         }
     }
 
@@ -111,7 +129,7 @@ class SubscribeSourceFragment(private val sourceActivity: BookSourceActivity) : 
     private fun showSourceGroupMenu(view: View?) {
         val popupMenu = PopupMenu(sourceActivity, view, Gravity.END)
         val groupList = BookSourceManager.getGroupList(true)
-        popupMenu.menu.add(0, 0, 0, "所有书源")
+        popupMenu.menu.add(0, 0, 0, R.string.all_source)
         for (i in groupList.indices) {
             popupMenu.menu.add(0, 0, i + 1, groupList[i])
         }

@@ -2,6 +2,8 @@ package xyz.fycz.myreader.entity.ad;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.Gson;
+
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 
 /**
@@ -11,8 +13,10 @@ import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 public class AdConfig {
     //是否云控
     private boolean isCloud;
-    //是否有广告
+    //是否有广告（总开关）
     private boolean hasAd;
+    //是否有广告（用户）
+    private boolean userHasAd;
     //配置过期时间
     private int expireTime;
     //应用处于后台一段时间展示开屏广告(单位：分钟)
@@ -35,8 +39,10 @@ public class AdConfig {
     public AdConfig() {
     }
 
-    public AdConfig(boolean hasAd, int expireTime, int backAdTime, int intervalAdTime, int removeAdTime, int maxRemove, int totalRemove, boolean subSource) {
+    public AdConfig(boolean isCloud, boolean hasAd, boolean userHasAd, int expireTime, int backAdTime, int intervalAdTime, int removeAdTime, int maxRemove, int totalRemove, boolean subSource) {
+        this.isCloud = isCloud;
         this.hasAd = hasAd;
+        this.userHasAd = userHasAd;
         this.expireTime = expireTime;
         this.backAdTime = backAdTime;
         this.intervalAdTime = intervalAdTime;
@@ -138,6 +144,14 @@ public class AdConfig {
 
     public void setSubSource(boolean subSource) {
         this.subSource = subSource;
+    }
+
+    public boolean isUserHasAd() {
+        return userHasAd;
+    }
+
+    public void setUserHasAd(boolean userHasAd) {
+        this.userHasAd = userHasAd;
     }
 
     @NonNull

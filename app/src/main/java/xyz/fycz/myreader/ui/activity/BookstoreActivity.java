@@ -43,8 +43,7 @@ import xyz.fycz.myreader.webapi.crawler.find.QiDianMobileRank;
  * @author fengyue
  * @date 2020/9/13 21:11
  */
-public class BookstoreActivity extends BaseActivity {
-    private ActiityBookstoreBinding binding;
+public class BookstoreActivity extends BaseActivity<ActiityBookstoreBinding> {
 
     private FindCrawler3 findCrawler3;
     private LinearLayoutManager mLinearLayoutManager;

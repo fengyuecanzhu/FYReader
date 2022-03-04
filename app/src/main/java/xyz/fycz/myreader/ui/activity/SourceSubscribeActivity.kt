@@ -34,8 +34,7 @@ import xyz.fycz.myreader.webapi.LanZouApi
  * @author fengyue
  * @date 2022/3/3 9:56
  */
-class SourceSubscribeActivity : BaseActivity() {
-    private lateinit var binding: ActivitySourceSubscribeBinding
+class SourceSubscribeActivity : BaseActivity<ActivitySourceSubscribeBinding>() {
     private lateinit var fileAdapter: BaseListAdapter<SubscribeFile>
     private var page = 1
     private var subscribeDis: Disposable? = null

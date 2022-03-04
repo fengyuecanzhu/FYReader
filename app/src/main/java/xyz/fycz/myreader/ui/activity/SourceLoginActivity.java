@@ -24,8 +24,7 @@ import xyz.fycz.myreader.util.ToastUtils;
  * @author fengyue
  * @date 2021/5/15 10:43
  */
-public class SourceLoginActivity extends BaseActivity {
-    private ActivitySourceLoginBinding binding;
+public class SourceLoginActivity extends BaseActivity<ActivitySourceLoginBinding> {
     private BookSource bookSource;
     private boolean checking = false;
 
