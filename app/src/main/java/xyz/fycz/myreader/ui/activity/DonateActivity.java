@@ -48,7 +48,7 @@ public class DonateActivity extends BaseActivity<ActivityDonateBinding> {
 
     @Override
     protected void initWidget() {
-        AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
+        AdUtils.checkHasAd(true, false).subscribe(new MySingleObserver<Boolean>() {
             @Override
             public void onSuccess(@NonNull Boolean aBoolean) {
                 if (aBoolean) {

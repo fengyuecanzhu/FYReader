@@ -155,7 +155,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
                         override fun onSuccess(t: Result) {
                             if (t.code < 200) {
                                 user?.noAdId = UserService.getUUID()
-                                ToastUtils.showSuccess("设备绑定成功")
+                                ToastUtils.showSuccess(t.result.toString())
                                 binding.tvNoAdDevice.text = "已绑定此设备"
                             } else {
                                 ToastUtils.showError(t.result.toString())
@@ -174,7 +174,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         binding.rlCammyEnter.onClick {
             var cammy = ""
             MyAlertDialog.createInputDia(this, getString(R.string.cammy_enter),
-                "请输入卡密", "", true, 25, {
+                "请输入兑换码", "", true, 25, {
                     cammy = it
                 }, { _, _ ->
                     dialog.show()
@@ -187,7 +187,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
 
                             override fun onSuccess(t: Result) {
                                 if (t.code < 200) {
-                                    ToastUtils.showSuccess("卡密绑定成功，免广告服务重启后生效")
+                                    ToastUtils.showSuccess(t.result.toString())
                                     dialog.dismiss()
                                     initData()
                                 } else {
@@ -197,7 +197,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
                             }
 
                             override fun onError(e: Throwable) {
-                                ToastUtils.showError("卡密绑定成功\n" + e.localizedMessage)
+                                ToastUtils.showError("兑换码使用失败\n" + e.localizedMessage)
                                 dialog.dismiss()
                             }
                         })
