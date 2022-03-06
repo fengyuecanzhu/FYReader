@@ -35,6 +35,10 @@ public class AdConfig {
     private AdBean detail;
     //搜索页广告配置
     private AdBean search;
+    //阅读页广告配置
+    private AdBean read;
+    //发现页广告配置
+    private AdBean find;
 
     public AdConfig() {
     }
@@ -136,6 +140,28 @@ public class AdConfig {
 
     public void setSearch(AdBean search) {
         this.search = search;
+    }
+
+    public AdBean getRead() {
+        if (read == null) {
+            read = new AdBean(0, 60);
+        }
+        return read;
+    }
+
+    public void setRead(AdBean read) {
+        this.read = read;
+    }
+
+    public AdBean getFind() {
+        if (find == null) {
+            find = new AdBean(0, 60);
+        }
+        return find;
+    }
+
+    public void setFind(AdBean find) {
+        this.find = find;
     }
 
     public boolean isSubSource() {

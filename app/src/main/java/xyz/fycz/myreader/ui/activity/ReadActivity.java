@@ -61,10 +61,12 @@ import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.base.observer.MyObserver;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityReadBinding;
 import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.entity.ad.AdBean;
 import xyz.fycz.myreader.enums.Font;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.DbManager;
@@ -101,6 +103,7 @@ import xyz.fycz.myreader.util.help.DateHelper;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
 import xyz.fycz.myreader.util.notification.NotificationUtil;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.ColorUtil;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -576,6 +579,22 @@ public class ReadActivity extends BaseActivity<ActivityReadBinding> implements C
         //保存最近阅读时间
         mBook.setLastReadTime(DateHelper.getLongDate());
         init();
+
+        initAd();
+    }
+
+    private void initAd() {
+        AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
+            @Override
+            public void onSuccess(@NonNull Boolean aBoolean) {
+                AdBean adBean = AdUtils.getAdConfig().getRead();
+                if (aBoolean && AdUtils.adTime("read", adBean)) {
+                    if (adBean.getStatus() > 0) {
+                        AdUtils.showInterAd(ReadActivity.this, "read");
+                    }
+                }
+            }
+        });
     }
 
 
