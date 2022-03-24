@@ -541,7 +541,7 @@
     <string name="show_user_cloud">显示用户及云服务</string>
     <string name="hide_user_cloud">隐藏用户及云服务</string>
     <string name="subscribe_source_detail_tip">1、由于作者没时间维护内置书源导致大部分内置书源已经没法使用，故推出订阅书源
-    \n\n2、订阅书源全部搜集自网络，将会每月更新一次\n\n3、订阅书源目前处于测试阶段，如出现bug，请前往QQ频道或QQ群(1085028304)进行反馈</string>
+    \n\n2、订阅书源全部搜集自网络，将会每月更新一次\n\n3、订阅书源目前处于测试阶段，如出现bug，请前往<a href="https://qun.qq.com/qqweb/qunpro/share?_wv=3&amp;_wwv=128&amp;inviteCode=2aP6ZQ&amp;from=246610&amp;biz=ka">QQ频道</a>或QQ群(1085028304)进行反馈</string>
     <string name="userinfo">个人中心</string>
     <string name="username">用户名</string>
     <string name="email">邮箱</string>
@@ -552,6 +552,12 @@
     <string name="basic_service">基础服务</string>
     <string name="no_ad_service">免广告服务</string>
     <string name="cammy_enter">兑换码输入</string>
+    <string name="cammy_get_method">兑换码获取方式</string>
+    <string name="cammy_tip">
+        1、从2022/04开始，每月将在<a href="https://qun.qq.com/qqweb/qunpro/share?_wv=3&amp;_wwv=128&amp;inviteCode=2aP6ZQ&amp;from=246610&amp;biz=ka">QQ频道</a>发放(当月有效)；
+        \n\n2、反馈bug或提出有效建议；
+        \n\n3、捐赠获取(带截图私聊作者，之前捐赠的用户也一样)
+    </string>
     <string name="logout">退出登录</string>
 
 
@@ -580,6 +586,7 @@
     <string name="no_proxy_sources">禁用代理的书源</string>
     <string name="no_proxy_sources_tip">选择需要禁用代理的书源</string>
     <string name="enable_proxy">启用代理</string>
+    <string name="edit">编辑</string>
 
     <string-array name="reset_screen_time">
         <item>跟随系统</item>

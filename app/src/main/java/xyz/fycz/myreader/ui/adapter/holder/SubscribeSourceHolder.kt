@@ -1,20 +1,21 @@
 package xyz.fycz.myreader.ui.adapter.holder
 
+import android.content.Intent
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import io.reactivex.ObservableOnSubscribe
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.base.adapter.ViewHolderImpl
 import xyz.fycz.myreader.base.adapter2.onClick
 import xyz.fycz.myreader.base.observer.MyObserver
+import xyz.fycz.myreader.common.APPCONST
 import xyz.fycz.myreader.greendao.DbManager
 import xyz.fycz.myreader.greendao.entity.rule.BookSource
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager
+import xyz.fycz.myreader.ui.activity.SourceEditActivity
 import xyz.fycz.myreader.ui.adapter.SubscribeSourceAdapter
 import xyz.fycz.myreader.util.ToastUtils
 import xyz.fycz.myreader.util.help.StringHelper
@@ -26,13 +27,14 @@ import java.util.*
  * @date 2022/3/3 12:11
  */
 class SubscribeSourceHolder(
+    val fragment: Fragment,
     private val mCheckMap: HashMap<BookSource, Boolean>,
     private val onDelListener: SubscribeSourceAdapter.OnDelListener
 ) : ViewHolderImpl<BookSource>() {
 
     private var cbSource: CheckBox? = null
-    private var tvEnable: TextView? = null
-    private var tvDisable: TextView? = null
+    private var tvEdit: TextView? = null
+    private var tvEnOrDisable: TextView? = null
     private var tvDelete: TextView? = null
 
     override fun getItemLayoutId(): Int {
@@ -41,21 +43,21 @@ class SubscribeSourceHolder(
 
     override fun initView() {
         cbSource = findById(R.id.cb_source)
-        tvEnable = findById(R.id.tv_enable)
-        tvDisable = findById(R.id.tv_disable)
+        tvEdit = findById(R.id.tv_edit)
+        tvEnOrDisable = findById(R.id.tv_en_or_disable)
         tvDelete = findById(R.id.tv_delete)
     }
 
     override fun onBind(holder: RecyclerView.ViewHolder, data: BookSource, pos: Int) {
         banOrUse(data)
         cbSource?.isChecked = mCheckMap[data] == true
-        tvEnable?.onClick {
-            data.enable = true
-            banOrUse(data)
-            DbManager.getDaoSession().bookSourceDao.insertOrReplace(data)
+        tvEdit?.onClick {
+            val intent = Intent(fragment.context, SourceEditActivity::class.java)
+            intent.putExtra(APPCONST.BOOK_SOURCE, data)
+            fragment.startActivityForResult(intent, APPCONST.REQUEST_EDIT_BOOK_SOURCE)
         }
-        tvDisable?.onClick {
-            data.enable = false
+        tvEnOrDisable?.onClick {
+            data.enable = !data.enable
             banOrUse(data)
             DbManager.getDaoSession().bookSourceDao.insertOrReplace(data)
         }
@@ -84,6 +86,7 @@ class SubscribeSourceHolder(
             } else {
                 cbSource?.text = data.sourceName
             }
+            tvEnOrDisable?.setText(R.string.ban)
         } else {
             cbSource?.setTextColor(context.resources.getColor(R.color.textSecondary))
             if (!StringHelper.isEmpty(data.sourceGroup)) {
@@ -91,6 +94,7 @@ class SubscribeSourceHolder(
             } else {
                 cbSource?.text = String.format("(禁用中)%s", data.sourceName)
             }
+            tvEnOrDisable?.setText(R.string.enable_use)
         }
     }
 }

@@ -204,6 +204,14 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
                 })
         }
 
+        binding.rlCammyTip.onClick {
+            MyAlertDialog.showTipDialogWithLink(
+                this,
+                getString(R.string.cammy_get_method),
+                R.string.cammy_tip
+            )
+        }
+
         binding.tvLogout.onClick {
             val file = App.getApplication().getFileStreamPath("userConfig.fy")
             if (file.delete()) {

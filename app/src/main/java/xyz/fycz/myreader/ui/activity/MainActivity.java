@@ -38,6 +38,7 @@ import xyz.fycz.myreader.entity.SharedBook;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.model.storage.BackupRestoreUi;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -236,6 +237,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private void firstInit() {
         SharedPreUtils sru = SharedPreUtils.getInstance();
         if (!sru.getBoolean("firstInit")) {
+            BookSourceManager.initDefaultSources();
             DialogCreator.createCommonDialog(this, "首次使用书源订阅提醒",
                     "感谢您选择风月读书，当前应用没有任何书源，" +
                             "建议前往书源订阅界面获取书源(也可自行前往书源管理导入书源)，是否前往订阅书源？",

@@ -513,7 +513,7 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
             });
             tvEditSource.setOnClickListener(v -> {
                 BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
-                if (!TextUtils.isEmpty(source.getSourceEName())) {
+                if (TextUtils.isEmpty(source.getSourceType())) {
                     ToastUtils.showWarring("内置书源无法编辑！");
                 } else {
                     Intent sourceIntent = new Intent(mContext, SourceEditActivity.class);

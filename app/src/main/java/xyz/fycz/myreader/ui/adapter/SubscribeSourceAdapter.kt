@@ -1,6 +1,8 @@
 package xyz.fycz.myreader.ui.adapter
 
 import android.widget.Filter
+import androidx.fragment.app.Fragment
+import xyz.fycz.myreader.base.BaseFragment
 import xyz.fycz.myreader.base.adapter.IViewHolder
 import xyz.fycz.myreader.greendao.entity.rule.BookSource
 import xyz.fycz.myreader.ui.adapter.holder.SubscribeSourceHolder
@@ -11,11 +13,12 @@ import java.util.*
  * @date 2022/3/3 12:08
  */
 class SubscribeSourceAdapter(
+    val fragment: Fragment,
     val sources: List<BookSource>,
     private val onDelListener: OnDelListener
 ) : BaseSourceAdapter() {
     override fun createViewHolder(viewType: Int): IViewHolder<BookSource> {
-        return SubscribeSourceHolder(checkMap, onDelListener)
+        return SubscribeSourceHolder(fragment, checkMap, onDelListener)
     }
 
     override fun getFilter(): Filter {

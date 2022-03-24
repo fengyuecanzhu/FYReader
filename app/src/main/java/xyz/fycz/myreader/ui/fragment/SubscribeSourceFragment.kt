@@ -66,7 +66,7 @@ class SubscribeSourceFragment(private val sourceActivity: BookSourceActivity) : 
 
     private fun initSourceList() {
         mAdapter =
-            SubscribeSourceAdapter(mBookSources!!, object : SubscribeSourceAdapter.OnDelListener {
+            SubscribeSourceAdapter(this, mBookSources!!, object : SubscribeSourceAdapter.OnDelListener {
                 override fun onDel(which: Int, source: BookSource) {
                     mBookSources?.remove(source)
                     mAdapter?.removeItem(which)
@@ -231,7 +231,7 @@ class SubscribeSourceFragment(private val sourceActivity: BookSourceActivity) : 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == APPCONST.REQUEST_SUBSCRIBE) {
+            if (requestCode == APPCONST.REQUEST_SUBSCRIBE || requestCode == APPCONST.REQUEST_EDIT_BOOK_SOURCE) {
                 getSources()
             }
         }

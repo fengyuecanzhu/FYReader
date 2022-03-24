@@ -780,7 +780,7 @@ public class ReadActivity extends BaseActivity<ActivityReadBinding> implements C
             download();
         } else if (itemId == R.id.action_edit_source) {
             BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
-            if (!TextUtils.isEmpty(source.getSourceEName())) {
+            if (TextUtils.isEmpty(source.getSourceType())) {
                 ToastUtils.showWarring("内置书源无法编辑！");
             } else {
                 Intent sourceIntent = new Intent(this, SourceEditActivity.class);

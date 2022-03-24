@@ -179,9 +179,8 @@ public class ReadCrawlerUtil {
 
     public static ReadCrawler getReadCrawler(BookSource source, boolean isInfo) {
         try {
-            if (StringHelper.isEmpty(source.getSourceEName())) {
+            if (!StringHelper.isEmpty(source.getSourceType())) {
                 BaseSourceCrawler crawler;
-                if (source.getSourceType() == null) source.setSourceType(MATCHER);
                 switch (source.getSourceType()) {
                     case MATCHER:
                     default:
@@ -206,6 +205,8 @@ public class ReadCrawlerUtil {
             } else {
                 if (THIRD_3_SOURCE.equals(source.getSourceType())) {
                     return new Third3Crawler(source);
+                } else if (THIRD_SOURCE.equals(source.getSourceType())) {
+                    return new ThirdCrawler(source);
                 }
                 Class clz = Class.forName(source.getSourceUrl());
                 return (ReadCrawler) clz.newInstance();

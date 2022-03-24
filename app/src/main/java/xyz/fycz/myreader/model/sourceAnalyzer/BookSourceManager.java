@@ -178,13 +178,13 @@ public class BookSourceManager {
     }
 
     /**
-     * 获取所有导入书源
+     * 获取所有非内置书源
      *
      * @return
      */
     public static List<BookSource> getAllNoLocalSource() {
         return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
-                .where(BookSourceDao.Properties.SourceEName.isNull())
+                .where(BookSourceDao.Properties.SourceType.isNotNull())
                 .orderAsc(BookSourceDao.Properties.OrderNum)
                 .list();
     }
@@ -458,14 +458,13 @@ public class BookSourceManager {
         Log.d("initDefaultSources", "execute");
         DbManager.getDaoSession().getBookSourceDao().deleteAll();
         String searchSource = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.searchSource));
-        boolean isEmpty = StringHelper.isEmpty(searchSource);
         for (LocalBookSource source : LocalBookSource.values()) {
             if (source == LocalBookSource.local || source == LocalBookSource.fynovel) continue;
             BookSource source1 = new BookSource();
             source1.setSourceEName(source.toString());
             source1.setSourceName(source.text);
             source1.setSourceGroup("内置书源");
-            source1.setEnable(isEmpty || searchSource.contains(source.toString()));
+            source1.setEnable(false);
             source1.setSourceUrl(ReadCrawlerUtil.getReadCrawlerClz(source.toString()));
             source1.setOrderNum(0);
             DbManager.getDaoSession().getBookSourceDao().insertOrReplace(source1);

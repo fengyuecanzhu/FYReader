@@ -144,7 +144,7 @@ class ProxyFragment : BaseFragment() {
                 mNoProxySourcesDia?.show()
                 return@onClick
             }
-            val sources = BookSourceManager.getAllBookSourceByOrderNum()
+            val sources = BookSourceManager.getAllNoLocalSource()
             val mSourcesName = arrayOfNulls<CharSequence>(sources.size)
             val isNoProxy = BooleanArray(sources.size)
             var dSourceCount = 0
