@@ -158,10 +158,9 @@ public class AdUtils {
     }
 
     public static boolean checkTodayShowAd() {
-        SharedPreUtils spu = SharedPreUtils.getInstance();
-        String splashAdCount = spu.getString("splashAdCount");
-        boolean bookDetailAd = spu.getBoolean("bookDetailAd", true);
-        int adTimes = spu.getInt("curAdTimes", 3);
+        String splashAdCount = SharedPreUtils.getInstance().getString("splashAdCount");
+        boolean bookDetailAd = SharedPreUtils.getInstance().getBoolean("bookDetailAd", true);
+        int adTimes = SharedPreUtils.getInstance().getInt("curAdTimes", 3);
         String[] splashAdCounts = splashAdCount.split(":");
         String today = DateHelper.getYearMonthDay1();
         int todayAdCount;

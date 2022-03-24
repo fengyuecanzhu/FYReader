@@ -30,7 +30,6 @@ import xyz.fycz.myreader.util.utils.FileUtils;
 public class AdSettingActivity extends BaseActivity<ActivityAdSettingBinding> {
 
     private LoadingDialog loadingDialog;
-    private SharedPreUtils spu;
     private int curAdTimes;
     private int curAdCount;
     private boolean bookDetailAd;
@@ -51,9 +50,8 @@ public class AdSettingActivity extends BaseActivity<ActivityAdSettingBinding> {
 
     @Override
     protected void initData(Bundle savedInstanceState) {
-        spu = SharedPreUtils.getInstance();
-        curAdTimes = spu.getInt("curAdTimes", 3);
-        String splashAdCount = spu.getString("splashAdCount");
+        curAdTimes = SharedPreUtils.getInstance().getInt("curAdTimes", 3);
+        String splashAdCount = SharedPreUtils.getInstance().getString("splashAdCount");
         String[] splashAdCounts = splashAdCount.split(":");
         String today = DateHelper.getYearMonthDay1();
         if (today.equals(splashAdCounts[0])){
@@ -61,7 +59,7 @@ public class AdSettingActivity extends BaseActivity<ActivityAdSettingBinding> {
         }else {
             curAdCount = 0;
         }
-        bookDetailAd = spu.getBoolean("bookDetailAd", false);
+        bookDetailAd = SharedPreUtils.getInstance().getBoolean("bookDetailAd", false);
     }
 
     @Override
@@ -135,7 +133,7 @@ public class AdSettingActivity extends BaseActivity<ActivityAdSettingBinding> {
                             .setTitle(getString(R.string.splash_ad_times))
                             .setSingleChoiceItems(adTimes, checked, (dialog, which) -> {
                                 curAdTimes = ints[which];
-                                spu.putInt("curAdTimes", curAdTimes);
+                                SharedPreUtils.getInstance().putInt("curAdTimes", curAdTimes);
                                 binding.tvSplashCurAdTimes.setText(getString(R.string.splash_cur_ad_times, adTimes[which],  curAdCount + "次"));
                                 dialog.dismiss();
                             }).setNegativeButton("取消", null).show();*/
@@ -143,7 +141,7 @@ public class AdSettingActivity extends BaseActivity<ActivityAdSettingBinding> {
                             .setSelection(checked)
                             .setOnMenuItemClickListener((dialog, text, which) -> {
                                 curAdTimes = ints[which];
-                                spu.putInt("curAdTimes", curAdTimes);
+                                SharedPreUtils.getInstance().putInt("curAdTimes", curAdTimes);
                                 binding.tvSplashCurAdTimes.setText(getString(R.string.splash_cur_ad_times, adTimes[which],  curAdCount + "次"));
                                 return false;
                             }).setCancelButton(R.string.cancel);
@@ -157,7 +155,7 @@ public class AdSettingActivity extends BaseActivity<ActivityAdSettingBinding> {
         });
         binding.rlBookDetailAd.setOnClickListener(v -> {
             bookDetailAd = !bookDetailAd;
-            spu.putBoolean("bookDetailAd", bookDetailAd);
+            SharedPreUtils.getInstance().putBoolean("bookDetailAd", bookDetailAd);
             binding.scBookDetailAd.setChecked(bookDetailAd);
         });
         binding.rlDeleteAdFile.setOnClickListener(v -> {

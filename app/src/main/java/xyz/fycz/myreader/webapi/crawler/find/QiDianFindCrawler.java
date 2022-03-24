@@ -147,8 +147,7 @@ public class QiDianFindCrawler extends BaseFindCrawler {
                 kind.setMaxPage(5);
             }
             url = url.replace("{sex}", !isFemale ? sex[0] : sex[1]);
-            SharedPreUtils spu = SharedPreUtils.getInstance();
-            String cookie = spu.getString(App.getmContext().getString(R.string.qdCookie), "");
+            String cookie = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.qdCookie), "");
             if (!cookie.equals("")) {
                 url = url.replace("{cookie}", StringHelper.getSubString(cookie, "_csrfToken=", ";"));
             } else {

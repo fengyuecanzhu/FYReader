@@ -277,7 +277,7 @@ dependencies {
 }
 
 greendao {
-    schemaVersion 34
+    schemaVersion 35
     daoPackage 'xyz.fycz.myreader.greendao.gen'
 //    targetGenDir 'src/main/java'
 }

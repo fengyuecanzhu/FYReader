@@ -41,21 +41,20 @@ public class ReadCrawlerUtil {
     }
 
     public static ArrayList<ReadCrawler> getReadCrawlers() {
-        SharedPreUtils spu = SharedPreUtils.getInstance();
-        String searchSource = spu.getString(App.getmContext().getString(R.string.searchSource), null);
+        String searchSource = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.searchSource), null);
         ArrayList<ReadCrawler> readCrawlers = new ArrayList<>();
         if (searchSource == null) {
             StringBuilder sb = new StringBuilder();
             for (LocalBookSource bookSource : LocalBookSource.values()) {
                 if (bookSource.equals(LocalBookSource.fynovel) || bookSource.equals(LocalBookSource.local))
                     continue;
-                sb.append(bookSource.toString());
+                sb.append(bookSource);
                 sb.append(",");
                 readCrawlers.add(getReadCrawler(bookSource.toString()));
             }
             sb.deleteCharAt(sb.lastIndexOf(","));
             searchSource = sb.toString();
-            spu.putString(App.getmContext().getString(R.string.searchSource), searchSource);
+            SharedPreUtils.getInstance().putString(App.getmContext().getString(R.string.searchSource), searchSource);
         } else if (!"".equals(searchSource)) {
             String[] sources = searchSource.split(",");
             for (String source : sources) {
@@ -76,8 +75,7 @@ public class ReadCrawlerUtil {
     }
 
     public static HashMap<CharSequence, Boolean> getDisableSources() {
-        SharedPreUtils spu = SharedPreUtils.getInstance();
-        String searchSource = spu.getString(App.getmContext().getString(R.string.searchSource), null);
+        String searchSource = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.searchSource), null);
         HashMap<CharSequence, Boolean> mSources = new LinkedHashMap<>();
         if (searchSource == null) {
             for (LocalBookSource bookSource : LocalBookSource.values()) {
@@ -116,8 +114,7 @@ public class ReadCrawlerUtil {
     }
 
     public synchronized static void addReadCrawler(LocalBookSource... bookSources) {
-        SharedPreUtils spu = SharedPreUtils.getInstance();
-        String searchSource = spu.getString(App.getmContext().getString(R.string.searchSource));
+        String searchSource = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.searchSource));
         if ("".equals(searchSource)) {
             resetReadCrawlers();
             return;
@@ -131,8 +128,7 @@ public class ReadCrawlerUtil {
     }
 
     public synchronized static void removeReadCrawler(String... bookSources) {
-        SharedPreUtils spu = SharedPreUtils.getInstance();
-        String searchSource = spu.getString(App.getmContext().getString(R.string.searchSource), null);
+        String searchSource = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.searchSource), null);
         if (searchSource == null) {
             return;
         }
@@ -153,7 +149,7 @@ public class ReadCrawlerUtil {
             sb.append(",");
         }
         sb.deleteCharAt(sb.lastIndexOf(","));
-        spu.putString(App.getmContext().getString(R.string.searchSource), sb.toString());
+        SharedPreUtils.getInstance().putString(App.getmContext().getString(R.string.searchSource), sb.toString());
     }
 
     public static ReadCrawler getReadCrawler(String bookSource) {

@@ -155,7 +155,6 @@ public class LanZousApi {
     }
 
     private static String getKey(String html) {
-        //SharedPreUtils spu = SharedPreUtils.getInstance();
         String lanzousKeyStart = "var pposturl = '";
         String keyName = StringHelper.getSubString(html, "'sign':", ",");
         if (keyName.endsWith("'")) {

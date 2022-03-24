@@ -2,6 +2,7 @@ package xyz.fycz.myreader.ui.fragment
 
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,7 +38,6 @@ class ProxyFragment : BaseFragment() {
     private lateinit var proxyPassword: String
     private var mNoProxySourcesDia: AlertDialog? = null
     private val proxyTypeArr = arrayOf("http", "socks5")
-    private val spu: SharedPreUtils = SharedPreUtils.getInstance()
 
     override fun bindView(inflater: LayoutInflater, container: ViewGroup?): View {
         binding = FragmentProxySettingBinding.inflate(inflater, container, false)
@@ -45,12 +45,13 @@ class ProxyFragment : BaseFragment() {
     }
 
     override fun initData(savedInstanceState: Bundle?) {
-        enableProxy = spu.getBoolean("enableProxy")
-        proxyType = spu.getInt("proxyType")
-        proxyHost = spu.getString("proxyHost")
-        proxyPort = spu.getString("proxyHost")
-        proxyUsername = spu.getString("proxyUsername")
-        proxyPassword = spu.getString("proxyPassword")
+        enableProxy = SharedPreUtils.getInstance().getBoolean("enableProxy")
+        Log.d("ProxyFragment", "enableProxy=$enableProxy")
+        proxyType = SharedPreUtils.getInstance().getInt("proxyType")
+        proxyHost = SharedPreUtils.getInstance().getString("proxyHost")
+        proxyPort = SharedPreUtils.getInstance().getString("proxyPort")
+        proxyUsername = SharedPreUtils.getInstance().getString("proxyUsername")
+        proxyPassword = SharedPreUtils.getInstance().getString("proxyPassword")
     }
 
     override fun initWidget(savedInstanceState: Bundle?) {
@@ -58,16 +59,17 @@ class ProxyFragment : BaseFragment() {
         if (enableProxy) binding.llContent.visibility = View.VISIBLE
         binding.tvProxyType.text = proxyTypeArr[proxyType]
         binding.tvProxyHost.text = proxyHost.ifEmpty { "请输入代理服务器地址" }
-        binding.tvProxyPort.text = proxyHost.ifEmpty { "请输入代理服务器端口" }
-        binding.tvProxyUsername.text = proxyHost.ifEmpty { "请输入代理认证用户名" }
-        binding.tvProxyPassword.text = proxyHost.ifEmpty { "请输入代理认证密码" }
+        binding.tvProxyPort.text = proxyPort.ifEmpty { "请选择代理服务器端口" }
+        binding.tvProxyUsername.text = proxyUsername.ifEmpty { "请输入代理认证用户名" }
+        binding.tvProxyPassword.text = proxyPassword.ifEmpty { "请输入代理认证密码" }
     }
 
     override fun initClick() {
         binding.rlEnableProxy.onClick {
             enableProxy = !enableProxy
             binding.scEnableProxy.isChecked = enableProxy
-            spu.putBoolean("enableProxy", enableProxy)
+            SharedPreUtils.getInstance().putBoolean("enableProxy", enableProxy)
+            Log.d("ProxyFragment", "putBoolean=$enableProxy")
             binding.llContent.visibility = if (enableProxy) View.VISIBLE else View.GONE
         }
 
@@ -90,7 +92,7 @@ class ProxyFragment : BaseFragment() {
             ) { dialog: DialogInterface, _: Int ->
                 proxyHost = tem
                 binding.tvProxyHost.text = proxyHost
-                spu.putString("proxyHost", proxyHost)
+                SharedPreUtils.getInstance().putString("proxyHost", proxyHost)
                 dialog.dismiss()
             }
         }
@@ -100,14 +102,14 @@ class ProxyFragment : BaseFragment() {
             val threadPick = view.findViewById<NumberPicker>(R.id.number_picker)
             threadPick.maxValue = 99999
             threadPick.minValue = 10
-            threadPick.value = proxyPort.toInt()
+            threadPick.value = if (proxyPort.isEmpty()) 1080 else proxyPort.toInt()
             threadPick.setOnScrollListener { _: NumberPicker?, _: Int -> }
             MyAlertDialog.build(context)
                 .setTitle(R.string.proxy_port)
                 .setView(view)
                 .setPositiveButton(R.string.confirm) { _: DialogInterface?, _: Int ->
                     proxyPort = threadPick.value.toString()
-                    spu.putString("proxyPort", proxyPort)
+                    SharedPreUtils.getInstance().putString("proxyPort", proxyPort)
                     binding.tvProxyPort.text = proxyPort
                 }.setNegativeButton(R.string.cancel, null)
                 .show()
@@ -121,7 +123,7 @@ class ProxyFragment : BaseFragment() {
             ) { dialog: DialogInterface, _: Int ->
                 proxyUsername = tem
                 binding.tvProxyUsername.text = proxyUsername
-                spu.putString("proxyUsername", proxyUsername)
+                SharedPreUtils.getInstance().putString("proxyUsername", proxyUsername)
                 dialog.dismiss()
             }
         }
@@ -134,7 +136,7 @@ class ProxyFragment : BaseFragment() {
             ) { dialog: DialogInterface, _: Int ->
                 proxyPassword = tem
                 binding.tvProxyPassword.text = proxyPassword
-                spu.putString("proxyPassword", proxyPassword)
+                SharedPreUtils.getInstance().putString("proxyPassword", proxyPassword)
                 dialog.dismiss()
             }
         }

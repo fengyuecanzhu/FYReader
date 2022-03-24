@@ -570,7 +570,7 @@
     <string name="net_error_10003">数据解析失败</string>
     <!--error string end-->
 
-    <string name="proxy_setting">代理设置</string>
+    <string name="proxy_setting">软件代理设置</string>
     <string name="proxy_setting_tip">设置软件及书源代理</string>
     <string name="proxy_type">代理类型</string>
     <string name="proxy_host">代理服务器地址</string>

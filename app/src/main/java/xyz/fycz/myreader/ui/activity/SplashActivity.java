@@ -48,7 +48,6 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     public static final String TAG = SplashActivity.class.getSimpleName();
     public static int WAIT_INTERVAL = 0;
 
-    private SharedPreUtils spu;
     private int todayAdCount;
     private int adTimes;
     private boolean hasStart = false;
@@ -137,9 +136,8 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     @Override
     protected void initData(Bundle savedInstanceState) {
         startToAd = getIntent().getBooleanExtra(INTENT_TO_AD, false);
-        spu = SharedPreUtils.getInstance();
-        String splashAdCount = spu.getString("splashAdCount");
-        adTimes = spu.getInt("curAdTimes", 3);
+        String splashAdCount = SharedPreUtils.getInstance().getString("splashAdCount");
+        adTimes = SharedPreUtils.getInstance().getInt("curAdTimes", 3);
         String[] splashAdCounts = splashAdCount.split(":");
         String today = DateHelper.getYearMonthDay1();
         if (today.equals(splashAdCounts[0])) {
@@ -374,6 +372,6 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     private void countTodayAd() {
         String today = DateHelper.getYearMonthDay1();
         todayAdCount++;
-        spu.putString("splashAdCount", today + ":" + todayAdCount);
+        SharedPreUtils.getInstance().putString("splashAdCount", today + ":" + todayAdCount);
     }
 }

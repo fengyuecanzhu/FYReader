@@ -1,5 +1,6 @@
 package xyz.fycz.myreader.model.third3.http
 
+import android.util.Log
 import okhttp3.ConnectionSpec
 import okhttp3.Credentials
 import okhttp3.Interceptor
@@ -47,24 +48,31 @@ val okHttpClient: OkHttpClient by lazy {
     builder.build()
 }
 
-val globalProxy by lazy {
-    val spu = SharedPreUtils.getInstance()
-    val type = if (spu.getInt("proxyType") == 0) {
-        "http"
-    } else {
-        "socks5"
+val globalProxy: String
+    get() {
+        val enableProxy = SharedPreUtils.getInstance().getBoolean("enableProxy")
+        if (!enableProxy) {
+            return ""
+        }
+        val type = if (SharedPreUtils.getInstance().getInt("proxyType") == 0) {
+            "http"
+        } else {
+            "socks5"
+        }
+        val host = SharedPreUtils.getInstance().getString("proxyHost")
+        val port = SharedPreUtils.getInstance().getString("proxyPort")
+        val username = SharedPreUtils.getInstance().getString("proxyUsername")
+        val password = SharedPreUtils.getInstance().getString("proxyPassword")
+        return "$type://$host:$port@$username@$password"
     }
-    val host = spu.getString("proxyHost")
-    val port = spu.getString("proxyPort")
-    val username = spu.getString("proxyUsername")
-    val password = spu.getString("proxyPassword")
-    "$type://$host:$port@$username@$password"
-}
 
 /**
  * 缓存代理okHttp
  */
-fun getProxyClient(proxy: String? = globalProxy, noProxy: Boolean = false): OkHttpClient {
+fun getProxyClient(proxy0: String? = null, noProxy: Boolean = false): OkHttpClient {
+    var proxy = proxy0
+    if (proxy.isNullOrEmpty()) proxy = globalProxy
+    Log.d("getProxyClient", "proxy=$proxy")
     if (proxy.isNullOrBlank() || noProxy) {
         return okHttpClient
     }

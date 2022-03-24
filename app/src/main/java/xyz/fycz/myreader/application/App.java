@@ -285,29 +285,28 @@ public class App extends Application {
                 isForceUpdate = Boolean.parseBoolean(contents[1].substring(contents[1].indexOf(":") + 1));
                 downloadLink = contents[2].substring(contents[2].indexOf(":") + 1).trim();
                 updateContent = contents[3].substring(contents[3].indexOf(":") + 1);
-                SharedPreUtils spu = SharedPreUtils.getInstance();
-                spu.putString(getmContext().getString(R.string.lanzousKeyStart), contents[4].substring(contents[4].indexOf(":") + 1));
+                SharedPreUtils.getInstance().putString(getmContext().getString(R.string.lanzousKeyStart), contents[4].substring(contents[4].indexOf(":") + 1));
 
                 String newSplashTime = contents[5].substring(contents[5].indexOf(":") + 1);
-                String oldSplashTime = spu.getString("splashTime");
-                spu.putBoolean("needUdSI", !oldSplashTime.equals(newSplashTime));
-                spu.putString("splashTime", contents[5].substring(contents[5].indexOf(":") + 1));
-                spu.putString("splashImageUrl", contents[6].substring(contents[6].indexOf(":") + 1));
-                spu.putString("splashImageMD5", contents[7].substring(contents[7].indexOf(":") + 1));
+                String oldSplashTime = SharedPreUtils.getInstance().getString("splashTime");
+                SharedPreUtils.getInstance().putBoolean("needUdSI", !oldSplashTime.equals(newSplashTime));
+                SharedPreUtils.getInstance().putString("splashTime", contents[5].substring(contents[5].indexOf(":") + 1));
+                SharedPreUtils.getInstance().putString("splashImageUrl", contents[6].substring(contents[6].indexOf(":") + 1));
+                SharedPreUtils.getInstance().putString("splashImageMD5", contents[7].substring(contents[7].indexOf(":") + 1));
 
                 forceUpdateVersion = Integer.parseInt(contents[8].substring(contents[8].indexOf(":") + 1));
-                spu.putInt("forceUpdateVersion", forceUpdateVersion);
+                SharedPreUtils.getInstance().putInt("forceUpdateVersion", forceUpdateVersion);
 
                 String domain = contents[9].substring(contents[9].indexOf(":") + 1);
-                spu.putString("domain", domain);
+                SharedPreUtils.getInstance().putString("domain", domain);
 
                 int versionCode = getVersionCode();
 
                 isForceUpdate = isForceUpdate && forceUpdateVersion > versionCode;
                 if (!StringHelper.isEmpty(downloadLink)) {
-                    spu.putString(getmContext().getString(R.string.downloadLink), downloadLink);
+                    SharedPreUtils.getInstance().putString(getmContext().getString(R.string.downloadLink), downloadLink);
                 } else {
-                    spu.putString(getmContext().getString(R.string.downloadLink), URLCONST.APP_DIR_URL);
+                    SharedPreUtils.getInstance().putString(getmContext().getString(R.string.downloadLink), URLCONST.APP_DIR_URL);
                 }
                 String[] updateContents = updateContent.split("/");
                 for (String string : updateContents) {

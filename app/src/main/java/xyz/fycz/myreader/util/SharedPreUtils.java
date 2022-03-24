@@ -26,6 +26,7 @@ public class SharedPreUtils {
         };
     }
 
+    //不能
     public static SharedPreUtils getInstance() {
         return getInstance(false);
     }

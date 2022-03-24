@@ -485,9 +485,8 @@ public class SearchBookActivity extends BaseActivity<ActivitySearchBookBinding> 
             mHotKeys.addAll(Arrays.asList(suggestion));
             initSuggestionList();
         } else {
-            SharedPreUtils spu = SharedPreUtils.getInstance();
             Single.create((SingleOnSubscribe<Boolean>) emitter -> {
-                String cookie = spu.getString(getString(R.string.qdCookie), "");
+                String cookie = SharedPreUtils.getInstance().getString(getString(R.string.qdCookie), "");
                 String url = "https://m.qidian.com/majax/search/auto?kw=&";
                 if (cookie.equals("")) {
                     cookie = "_csrfToken=eXRDlZxmRDLvFAmdgzqvwWAASrxxp2WkVlH4ZM7e; newstatisticUUID=1595991935_2026387981";

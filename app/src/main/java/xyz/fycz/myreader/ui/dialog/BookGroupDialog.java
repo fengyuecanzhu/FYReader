@@ -139,9 +139,8 @@ public class BookGroupDialog {
                         mBookGroupService.addBookGroup(bookGroup);
                     } else {
                         mBookGroupService.updateEntity(bookGroup);
-                        SharedPreUtils spu = SharedPreUtils.getInstance();
-                        if (spu.getString(mContext.getString(R.string.curBookGroupName), "").equals(oldName)) {
-                            spu.putString(mContext.getString(R.string.curBookGroupName), newGroupName);
+                        if (SharedPreUtils.getInstance().getString(mContext.getString(R.string.curBookGroupName), "").equals(oldName)) {
+                            SharedPreUtils.getInstance().putString(mContext.getString(R.string.curBookGroupName), newGroupName);
                             if (onGroup != null) onGroup.change();
                         }
                     }
@@ -172,10 +171,9 @@ public class BookGroupDialog {
                     if (sb.length() > 0) {
                         sb.deleteCharAt(sb.lastIndexOf("、"));
                     }
-                    SharedPreUtils spu = SharedPreUtils.getInstance();
-                    if (mBookGroupService.getGroupById(spu.getString(mContext.getString(R.string.curBookGroupId), "")) == null) {
-                        spu.putString(mContext.getString(R.string.curBookGroupId), "");
-                        spu.putString(mContext.getString(R.string.curBookGroupName), "");
+                    if (mBookGroupService.getGroupById(SharedPreUtils.getInstance().getString(mContext.getString(R.string.curBookGroupId), "")) == null) {
+                        SharedPreUtils.getInstance().putString(mContext.getString(R.string.curBookGroupId), "");
+                        SharedPreUtils.getInstance().putString(mContext.getString(R.string.curBookGroupName), "");
                         onGroup.change();
                     }
                     ToastUtils.showSuccess("分组[" + sb.toString() + "]删除成功！");
