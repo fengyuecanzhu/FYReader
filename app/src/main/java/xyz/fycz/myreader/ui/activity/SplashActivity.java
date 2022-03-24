@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -53,7 +54,8 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     private boolean hasStart = false;
     private boolean startToAd = false;
     private static final String INTENT_TO_AD = "startToAd";
-
+    private int timeOut = 10;
+    private Handler handler = new Handler();
 
     //创建子线程
     private Runnable start = () -> {
@@ -71,23 +73,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
         }
     };
 
-    private Thread countTime = new Thread() {
-        @Override
-        public void run() {
-            App.runOnUiThread(() -> binding.tvSkip.setVisibility(View.VISIBLE));
-            for (int i = 0; i < 5; i++) {
-                int time = 5 - i;
-                App.runOnUiThread(() -> binding.tvSkip.setText(getString(R.string.skip_ad, time)));
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            WAIT_INTERVAL = 0;
-            startNormal();
-        }
-    };
+    private Runnable adTimeOutRunnable = () -> adTimeout(--timeOut);
 
     public static void start(Context context) {
         Intent intent = new Intent(context, SplashActivity.class);
@@ -233,11 +219,11 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
                 // 展示成功
                 @Override
                 public void show() {
+                    handler.removeCallbacks(adTimeOutRunnable);
                     SharedPreUtils.getInstance(true).putLong("splashAdTime", System.currentTimeMillis());
                     Log.d(TAG, "广告展示成功");
                     AdUtils.adRecord("splash", "adShow");
                     countTodayAd();
-                    //countTime.start();
                 }
 
                 // 广告被点击
@@ -265,6 +251,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
                     startNormal();
                 }
             });
+            adTimeout(timeOut);
         } catch (Exception e) {
             e.printStackTrace();
             WAIT_INTERVAL = 1500;
@@ -373,5 +360,14 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
         String today = DateHelper.getYearMonthDay1();
         todayAdCount++;
         SharedPreUtils.getInstance().putString("splashAdCount", today + ":" + todayAdCount);
+    }
+
+    private void adTimeout(int time) {
+        if (time == 0) {
+            WAIT_INTERVAL = 0;
+            startNormal();
+        } else {
+            handler.postDelayed(adTimeOutRunnable, 1000);
+        }
     }
 }
