@@ -43,6 +43,7 @@ object Backup {
             "bookSource.json",
             "readRecord.json",
             "searchWord.json",
+            "subscribe.json",
             "config.xml"
         )
     }
@@ -134,6 +135,13 @@ object Backup {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "searchWord.json")
+                        .writeText(json)
+                }
+            }
+            DbManager.getDaoSession().subscribeFileDao.queryBuilder().list().let {
+                if (it.isNotEmpty()) {
+                    val json = GSON.toJson(it)
+                    FileUtils.getFile(backupPath + File.separator + "subscribe.json")
                         .writeText(json)
                 }
             }

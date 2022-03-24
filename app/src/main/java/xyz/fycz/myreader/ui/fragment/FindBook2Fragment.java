@@ -2,7 +2,6 @@ package xyz.fycz.myreader.ui.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import io.reactivex.disposables.Disposable;
-import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.base.LazyFragment;
 import xyz.fycz.myreader.base.adapter.BaseListAdapter;
@@ -30,8 +28,6 @@ import xyz.fycz.myreader.entity.ad.AdBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
-import xyz.fycz.myreader.ui.activity.BookstoreActivity;
-import xyz.fycz.myreader.ui.activity.ReadActivity;
 import xyz.fycz.myreader.ui.adapter.holder.FindBookHolder;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -40,7 +36,6 @@ import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.BookApi;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
-import xyz.fycz.myreader.widget.RefreshLayout;
 
 /**
  * @author fengyue
@@ -180,11 +175,9 @@ public class FindBook2Fragment extends LazyFragment {
                         findBookAdapter.refreshItems(books);
                         binding.srlFindBooks.finishRefresh();
                         if (flow != null) {
-                            int index = findBookAdapter.getItemCount() - books.size() + 2;
+                            int index = findBookAdapter.getItemCount() - books.size() + 5;
                             index = Math.min(findBookAdapter.getItemCount() - 1, index);
                             findBookAdapter.addOther(index, flow);
-                            flow = null;
-                            getFlow();
                         }
                     }
                 } else {
@@ -194,11 +187,9 @@ public class FindBook2Fragment extends LazyFragment {
                         findBookAdapter.addItems(books);
                         binding.srlFindBooks.finishLoadMore();
                         if (flow != null) {
-                            int index = findBookAdapter.getItemCount() - books.size() + 2;
+                            int index = findBookAdapter.getItemCount() - books.size() + 5;
                             index = Math.min(findBookAdapter.getItemCount() - 1, index);
                             findBookAdapter.addOther(index, flow);
-                            flow = null;
-                            getFlow();
                         }
                     }
                 }

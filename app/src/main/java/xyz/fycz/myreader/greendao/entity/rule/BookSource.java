@@ -57,6 +57,8 @@ public class BookSource extends BaseSource implements Parcelable, Cloneable {
     private int weight;
     private boolean enable;
 
+    private boolean noProxy;//不使用代理
+
     @Transient
     private transient ArrayList<String> groupList;
 
@@ -76,12 +78,12 @@ public class BookSource extends BaseSource implements Parcelable, Cloneable {
     @Convert(converter = FindRuleConvert.class, columnType = String.class)
     private FindRule findRule;
 
-    @Generated(hash = 798251066)
+    @Generated(hash = 945434046)
     public BookSource(String sourceUrl, String sourceEName, String sourceName, String sourceGroup,
-            String sourceCharset, String sourceType, String sourceHeaders, String loginUrl,
-            String loginCheckJs, String sourceComment, String concurrentRate, Long lastUpdateTime,
-            int orderNum, int weight, boolean enable, SearchRule searchRule, InfoRule infoRule,
-            TocRule tocRule, ContentRule contentRule, FindRule findRule) {
+            String sourceCharset, String sourceType, String sourceHeaders, String loginUrl, String loginCheckJs,
+            String sourceComment, String concurrentRate, Long lastUpdateTime, int orderNum, int weight,
+            boolean enable, boolean noProxy, SearchRule searchRule, InfoRule infoRule, TocRule tocRule,
+            ContentRule contentRule, FindRule findRule) {
         this.sourceUrl = sourceUrl;
         this.sourceEName = sourceEName;
         this.sourceName = sourceName;
@@ -97,6 +99,7 @@ public class BookSource extends BaseSource implements Parcelable, Cloneable {
         this.orderNum = orderNum;
         this.weight = weight;
         this.enable = enable;
+        this.noProxy = noProxy;
         this.searchRule = searchRule;
         this.infoRule = infoRule;
         this.tocRule = tocRule;
@@ -129,6 +132,7 @@ public class BookSource extends BaseSource implements Parcelable, Cloneable {
         orderNum = in.readInt();
         weight = in.readInt();
         enable = in.readByte() != 0;
+        noProxy = in.readByte() != 0;
         searchRule = in.readParcelable(SearchRule.class.getClassLoader());
         infoRule = in.readParcelable(InfoRule.class.getClassLoader());
         tocRule = in.readParcelable(TocRule.class.getClassLoader());
@@ -158,6 +162,7 @@ public class BookSource extends BaseSource implements Parcelable, Cloneable {
         dest.writeInt(orderNum);
         dest.writeInt(weight);
         dest.writeByte((byte) (enable ? 1 : 0));
+        dest.writeByte((byte) (noProxy ? 1 : 0));
         dest.writeParcelable(searchRule, flags);
         dest.writeParcelable(infoRule, flags);
         dest.writeParcelable(tocRule, flags);
@@ -188,6 +193,7 @@ public class BookSource extends BaseSource implements Parcelable, Cloneable {
         if (o == null || getClass() != o.getClass()) return false;
         BookSource source = (BookSource) o;
         return enable == source.enable &&
+                noProxy == source.noProxy &&
                 stringEquals(sourceUrl, source.sourceUrl) &&
                 stringEquals(sourceEName, source.sourceEName) &&
                 stringEquals(sourceName, source.sourceName) &&
@@ -457,5 +463,13 @@ public class BookSource extends BaseSource implements Parcelable, Cloneable {
     @Override
     public BookSource getSource() {
         return this;
+    }
+
+    public boolean getNoProxy() {
+        return this.noProxy;
+    }
+
+    public void setNoProxy(boolean noProxy) {
+        this.noProxy = noProxy;
     }
 }

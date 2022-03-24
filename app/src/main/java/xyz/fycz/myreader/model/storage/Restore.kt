@@ -140,6 +140,15 @@ object Restore {
                 e.printStackTrace()
             }
             try {
+                val file = FileUtils.getFile(path + File.separator + "subscribe.json")
+                val json = file.readText()
+                GSON.fromJsonArray<SubscribeFile>(json)?.let {
+                    DbManager.getInstance().session.subscribeFileDao.insertOrReplaceInTx(it)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            try {
                 val settingFile = FileUtils.getFile(path + File.separator + "setting.json")
                 val settingJson = settingFile.readText()
                 val readStyleFile = FileUtils.getFile(path + File.separator + "readStyles.json")

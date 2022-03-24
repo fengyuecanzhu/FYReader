@@ -25,6 +25,31 @@
                 android:orientation="vertical">
 
                 <LinearLayout
+                    android:id="@+id/ll_proxy"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/selector_common_bg"
+                    android:orientation="vertical"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/proxy_setting"
+                        android:textColor="@color/textSecondary"
+                        android:textSize="@dimen/text_normal_size" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="5dp"
+                        android:text="@string/proxy_setting_tip"
+                        android:textColor="@color/textAssist" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:id="@+id/ll_webdav"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
@@ -74,6 +99,7 @@
                         android:text="@string/show_user_only"
                         android:textColor="@color/textAssist" />
                 </LinearLayout>
+
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -200,6 +226,7 @@
                         android:clickable="false"
                         android:longClickable="false" />
                 </RelativeLayout>
+
                 <RelativeLayout
                     android:id="@+id/rl_long_press"
                     android:layout_width="match_parent"
@@ -226,6 +253,7 @@
                         android:clickable="false"
                         android:longClickable="false" />
                 </RelativeLayout>
+
                 <RelativeLayout
                     android:id="@+id/rl_content_replace"
                     android:layout_width="match_parent"
@@ -243,6 +271,7 @@
                         android:textSize="@dimen/text_normal_size" />
 
                 </RelativeLayout>
+
                 <RelativeLayout
                     android:id="@+id/rl_read_aloud_volume_turn_page"
                     android:layout_width="match_parent"
@@ -296,6 +325,7 @@
                         android:clickable="false"
                         android:longClickable="false" />
                 </RelativeLayout>
+
                 <RelativeLayout
                     android:id="@+id/rl_adapt_en_type"
                     android:layout_width="match_parent"
@@ -403,10 +433,10 @@
                         android:id="@+id/tv_backup_path"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:paddingTop="5dp"
                         android:text="@string/backup_path"
-                        android:maxLines="1"
-                        android:ellipsize="end"
                         android:textColor="@color/textAssist" />
                 </LinearLayout>
 

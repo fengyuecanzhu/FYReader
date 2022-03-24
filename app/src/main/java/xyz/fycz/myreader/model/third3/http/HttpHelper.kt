@@ -4,6 +4,7 @@ import okhttp3.ConnectionSpec
 import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import xyz.fycz.myreader.util.SharedPreUtils
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.util.concurrent.ConcurrentHashMap
@@ -24,7 +25,7 @@ val okHttpClient: OkHttpClient by lazy {
         .connectTimeout(15, TimeUnit.SECONDS)
         .writeTimeout(15, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
-        .callTimeout(60,TimeUnit.SECONDS)
+        .callTimeout(60, TimeUnit.SECONDS)
         .sslSocketFactory(SSLHelper.unsafeSSLSocketFactory, SSLHelper.unsafeTrustManager)
         .retryOnConnectionFailure(true)
         .hostnameVerifier(SSLHelper.unsafeHostnameVerifier)
@@ -46,17 +47,31 @@ val okHttpClient: OkHttpClient by lazy {
     builder.build()
 }
 
+val globalProxy by lazy {
+    val spu = SharedPreUtils.getInstance()
+    val type = if (spu.getInt("proxyType") == 0) {
+        "http"
+    } else {
+        "socks5"
+    }
+    val host = spu.getString("proxyHost")
+    val port = spu.getString("proxyPort")
+    val username = spu.getString("proxyUsername")
+    val password = spu.getString("proxyPassword")
+    "$type://$host:$port@$username@$password"
+}
+
 /**
  * 缓存代理okHttp
  */
-fun getProxyClient(proxy: String? = null): OkHttpClient {
-    if (proxy.isNullOrBlank()) {
+fun getProxyClient(proxy: String? = globalProxy, noProxy: Boolean = false): OkHttpClient {
+    if (proxy.isNullOrBlank() || noProxy) {
         return okHttpClient
     }
     proxyClientCache[proxy]?.let {
         return it
     }
-    val r = Regex("(http|socks4|socks5)://(.*):(\\d{2,5})(@.*@.*)?")
+    val r = Regex("(http|socks4|socks5)://(.+):(\\d{2,5})(@.*@.*)?")
     val ms = r.findAll(proxy)
     val group = ms.first()
     var username = ""       //代理服务器验证用户名

@@ -357,7 +357,7 @@ class AnalyzeUrl(
         if (this.useWebView && useWebView) {
             strResponse = when (method) {
                 RequestMethod.POST -> {
-                    val body = getProxyClient(proxy).newCallStrResponse(retry) {
+                    val body = getProxyClient(proxy, source?.getNoProxy() == true).newCallStrResponse(retry) {
                         addHeaders(headerMap)
                         url(urlNoQuery)
                         if (fieldMap.isNotEmpty() || body.isNullOrBlank()) {
@@ -384,7 +384,7 @@ class AnalyzeUrl(
                 ).getStrResponse()
             }
         } else {
-            strResponse = getProxyClient(proxy).newCallStrResponse(retry) {
+            strResponse = getProxyClient(proxy, source?.getNoProxy() == true).newCallStrResponse(retry) {
                 addHeaders(headerMap)
                 when (method) {
                     RequestMethod.POST -> {
@@ -421,7 +421,7 @@ class AnalyzeUrl(
         val concurrentRecord = fetchStart()
         setCookie(source?.getKey())
         @Suppress("BlockingMethodInNonBlockingContext")
-        val response = getProxyClient(proxy).newCallResponse(retry) {
+        val response = getProxyClient(proxy, source?.getNoProxy() == true).newCallResponse(retry) {
             addHeaders(headerMap)
             when (method) {
                 RequestMethod.POST -> {
@@ -452,7 +452,7 @@ class AnalyzeUrl(
         val concurrentRecord = fetchStart()
         setCookie(source?.getKey())
         @Suppress("BlockingMethodInNonBlockingContext")
-        val byteArray = getProxyClient(proxy).newCallResponseBody(retry) {
+        val byteArray = getProxyClient(proxy, source?.getNoProxy() == true).newCallResponseBody(retry) {
             addHeaders(headerMap)
             when (method) {
                 RequestMethod.POST -> {
@@ -480,7 +480,7 @@ class AnalyzeUrl(
      * 上传文件
      */
     suspend fun upload(fileName: String, file: Any, contentType: String): StrResponse {
-        return getProxyClient(proxy).newCallStrResponse(retry) {
+        return getProxyClient(proxy, source?.getNoProxy() == true).newCallStrResponse(retry) {
             url(urlNoQuery)
             val bodyMap = GSON.fromJsonObject<HashMap<String, Any>>(body)!!
             bodyMap.forEach { entry ->

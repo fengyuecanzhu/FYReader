@@ -570,6 +570,16 @@
     <string name="net_error_10003">数据解析失败</string>
     <!--error string end-->
 
+    <string name="proxy_setting">代理设置</string>
+    <string name="proxy_setting_tip">设置软件及书源代理</string>
+    <string name="proxy_type">代理类型</string>
+    <string name="proxy_host">代理服务器地址</string>
+    <string name="proxy_port">代理服务器端口</string>
+    <string name="proxy_username">代理认证用户名</string>
+    <string name="proxy_password">代理认证密码</string>
+    <string name="no_proxy_sources">禁用代理的书源</string>
+    <string name="no_proxy_sources_tip">选择需要禁用代理的书源</string>
+    <string name="enable_proxy">启用代理</string>
 
     <string-array name="reset_screen_time">
         <item>跟随系统</item>

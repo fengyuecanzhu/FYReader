@@ -50,6 +50,7 @@ import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.ui.fragment.PrivateBooksFragment;
+import xyz.fycz.myreader.ui.fragment.ProxyFragment;
 import xyz.fycz.myreader.ui.fragment.WebDavFragment;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -91,11 +92,10 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
 
     //选择禁用更新书籍对话框
     private AlertDialog mCloseRefreshDia;
-    //选择禁用更新书源对话框
-    private AlertDialog mDisableSourceDia;
     //选择一键缓存书籍对话框
     private AlertDialog mDownloadAllDia;
 
+    private ProxyFragment mProxyFragment;
     private WebDavFragment mWebDavFragment;
     private PrivateBooksFragment mPrivateBooksFragment;
 
@@ -148,6 +148,9 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
         } else if (curFragment == mPrivateBooksFragment) {
             getSupportActionBar().setTitle(getString(R.string.private_bookcase));
             invalidateOptionsMenu();
+        } else if (curFragment == mProxyFragment) {
+            getSupportActionBar().setTitle(getString(R.string.proxy_setting));
+            invalidateOptionsMenu();
         }
     }
 
@@ -171,7 +174,7 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
     }
 
     private void initMineShowMode() {
-        switch (mineShowMode){
+        switch (mineShowMode) {
             case 1:
                 binding.tvMineShow.setText(getString(R.string.show_cloud_only));
                 break;
@@ -203,7 +206,7 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (curFragment == null) {
+        if (curFragment == null || curFragment != mProxyFragment) {
             menu.findItem(R.id.action_tip).setVisible(false);
         } else {
             menu.findItem(R.id.action_tip).setVisible(true);
@@ -238,6 +241,20 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
     @Override
     protected void initClick() {
         super.initClick();
+        binding.llProxy.setOnClickListener(v -> {
+            binding.svContent.setVisibility(View.GONE);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            if (mProxyFragment == null) {
+                mProxyFragment = new ProxyFragment();
+                ft.add(R.id.ll_content, mProxyFragment);
+            } else {
+                ft.show(mProxyFragment);
+            }
+            ft.commit();
+            curFragment = mProxyFragment;
+            setUpToolbar();
+        });
+
         binding.llWebdav.setOnClickListener(v -> {
             binding.svContent.setVisibility(View.GONE);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -386,48 +403,40 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
         );
 
         binding.llCloseRefresh.setOnClickListener(v -> {
-            App.runOnUiThread(() -> {
-                if (mCloseRefreshDia != null) {
-                    mCloseRefreshDia.show();
-                    return;
+            if (mCloseRefreshDia != null) {
+                mCloseRefreshDia.show();
+                return;
+            }
+            initmBooks();
+            if (mBooks.size() == 0) {
+                ToastUtils.showWarring("当前书架没有支持禁用更新的书籍！");
+                return;
+            }
+            boolean[] isCloseRefresh = new boolean[booksCount];
+            int crBookCount = 0;
+            for (int i = 0; i < booksCount; i++) {
+                Book book = mBooks.get(i);
+                isCloseRefresh[i] = book.getIsCloseUpdate();
+                if (isCloseRefresh[i]) {
+                    crBookCount++;
                 }
+            }
+            mCloseRefreshDia = new MultiChoiceDialog().create(this, "禁用更新的书籍",
+                    mBooksName, isCloseRefresh, crBookCount, (dialog, which) -> {
+                        BookService.getInstance().updateBooks(mBooks);
+                    }, null, new DialogCreator.OnMultiDialogListener() {
+                        @Override
+                        public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
+                            mBooks.get(which).setIsCloseUpdate(isChecked);
+                        }
 
-                initmBooks();
-
-                if (mBooks.size() == 0) {
-                    ToastUtils.showWarring("当前书架没有支持禁用更新的书籍！");
-                    return;
-                }
-
-                boolean[] isCloseRefresh = new boolean[booksCount];
-                int crBookCount = 0;
-
-                for (int i = 0; i < booksCount; i++) {
-                    Book book = mBooks.get(i);
-                    isCloseRefresh[i] = book.getIsCloseUpdate();
-                    if (isCloseRefresh[i]) {
-                        crBookCount++;
-                    }
-                }
-
-                mCloseRefreshDia = new MultiChoiceDialog().create(this, "禁用更新的书籍",
-                        mBooksName, isCloseRefresh, crBookCount, (dialog, which) -> {
-                            BookService.getInstance().updateBooks(mBooks);
-                        }, null, new DialogCreator.OnMultiDialogListener() {
-                            @Override
-                            public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
-                                mBooks.get(which).setIsCloseUpdate(isChecked);
+                        @Override
+                        public void onSelectAll(boolean isSelectAll) {
+                            for (Book book : mBooks) {
+                                book.setIsCloseUpdate(isSelectAll);
                             }
-
-                            @Override
-                            public void onSelectAll(boolean isSelectAll) {
-                                for (Book book : mBooks) {
-                                    book.setIsCloseUpdate(isSelectAll);
-                                }
-                            }
-                        });
-
-            });
+                        }
+                    });
         });
 
         binding.llThreadNum.setOnClickListener(v -> {
@@ -467,50 +476,43 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
 
 
         binding.llDownloadAll.setOnClickListener(v -> {
-            App.runOnUiThread(() -> {
-                if (mDownloadAllDia != null) {
-                    mDownloadAllDia.show();
-                    return;
+            if (mDownloadAllDia != null) {
+                mDownloadAllDia.show();
+                return;
+            }
+            initmBooks();
+            if (mBooks.size() == 0) {
+                ToastUtils.showWarring("当前书架没有支持缓存的书籍！");
+                return;
+            }
+            int booksCount = mBooks.size();
+            CharSequence[] mBooksName = new CharSequence[booksCount];
+            boolean[] isDownloadAll = new boolean[booksCount];
+            int daBookCount = 0;
+            for (int i = 0; i < booksCount; i++) {
+                Book book = mBooks.get(i);
+                mBooksName[i] = book.getName();
+                isDownloadAll[i] = book.getIsDownLoadAll();
+                if (isDownloadAll[i]) {
+                    daBookCount++;
                 }
+            }
+            mDownloadAllDia = new MultiChoiceDialog().create(this, "一键缓存的书籍",
+                    mBooksName, isDownloadAll, daBookCount, (dialog, which) -> {
+                        BookService.getInstance().updateBooks(mBooks);
+                    }, null, new DialogCreator.OnMultiDialogListener() {
+                        @Override
+                        public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
+                            mBooks.get(which).setIsDownLoadAll(isChecked);
+                        }
 
-                initmBooks();
-
-                if (mBooks.size() == 0) {
-                    ToastUtils.showWarring("当前书架没有支持缓存的书籍！");
-                    return;
-                }
-
-                int booksCount = mBooks.size();
-                CharSequence[] mBooksName = new CharSequence[booksCount];
-                boolean[] isDownloadAll = new boolean[booksCount];
-                int daBookCount = 0;
-                for (int i = 0; i < booksCount; i++) {
-                    Book book = mBooks.get(i);
-                    mBooksName[i] = book.getName();
-                    isDownloadAll[i] = book.getIsDownLoadAll();
-                    if (isDownloadAll[i]) {
-                        daBookCount++;
-                    }
-                }
-
-                mDownloadAllDia = new MultiChoiceDialog().create(this, "一键缓存的书籍",
-                        mBooksName, isDownloadAll, daBookCount, (dialog, which) -> {
-                            BookService.getInstance().updateBooks(mBooks);
-                        }, null, new DialogCreator.OnMultiDialogListener() {
-                            @Override
-                            public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
-                                mBooks.get(which).setIsDownLoadAll(isChecked);
+                        @Override
+                        public void onSelectAll(boolean isSelectAll) {
+                            for (Book book : mBooks) {
+                                book.setIsDownLoadAll(isSelectAll);
                             }
-
-                            @Override
-                            public void onSelectAll(boolean isSelectAll) {
-                                for (Book book : mBooks) {
-                                    book.setIsDownLoadAll(isSelectAll);
-                                }
-                            }
-                        });
-
-            });
+                        }
+                    });
         });
 
         binding.ivMatchChapterTip.setOnClickListener(v -> DialogCreator.createTipDialog(this, "智能匹配", getString(R.string.match_chapter_tip)));

@@ -95,8 +95,8 @@ public class BookcaseDetailedAdapter extends BookcaseAdapter {
 
         viewHolder.tvBookAuthor.setText(book.getAuthor());
         viewHolder.tvHistoryChapter.setText(book.getHistoryChapterId());
-        assert book.getNewestChapterTitle() != null;
-        viewHolder.tvNewestChapter.setText(book.getNewestChapterTitle().replace("最近更新 ", ""));
+        if (book.getNewestChapterTitle() != null)
+            viewHolder.tvNewestChapter.setText(book.getNewestChapterTitle());
 
         if (mEditState) {
             viewHolder.tvNoReadNum.setVisibility(View.GONE);

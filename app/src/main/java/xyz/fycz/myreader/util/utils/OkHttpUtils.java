@@ -51,7 +51,11 @@ import static xyz.fycz.myreader.util.help.SSLSocketClient.getHeaderInterceptor;
 public class OkHttpUtils {
 
     public static OkHttpClient getOkHttpClient() {
-        return HttpHelperKt.getOkHttpClient();
+        return getOkHttpClient(false);
+    }
+
+    public static OkHttpClient getOkHttpClient(boolean noProxy) {
+        return HttpHelperKt.getProxyClient(HttpHelperKt.getGlobalProxy(), noProxy);
     }
 
     /**

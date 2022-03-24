@@ -32,6 +32,8 @@ abstract class BaseSource : JsExtensions {
 
     open fun getKey(): String = ""
 
+    open fun getNoProxy(): Boolean = false
+
     /*fun loginUi(): List<RowUi>? {
         return GSON.fromJsonArray(loginUi)
     }*/

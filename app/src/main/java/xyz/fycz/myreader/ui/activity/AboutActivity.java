@@ -116,7 +116,7 @@ public class AboutActivity extends BaseActivity<ActivityAboutBinding> {
             String[] str = new String[1];
             MyAlertDialog.createInputDia(this, getString(R.string.lan_zou_parse),
                     "格式：链接+逗号+密码(没有密码就不用填)", "", true,
-                    100, text -> str[0] = text, (dialog, which) -> {
+                    500, text -> str[0] = text, (dialog, which) -> {
                         LanZouApi.INSTANCE.getFileUrl(str[0])
                                 .compose(RxUtils::toSimpleSingle)
                                 .subscribe(new MyObserver<String>() {

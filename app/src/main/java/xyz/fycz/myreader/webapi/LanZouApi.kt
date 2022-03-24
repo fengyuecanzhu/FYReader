@@ -79,9 +79,9 @@ object LanZouApi {
     ): Coroutine<List<LanZouFile>?> {
         return Coroutine.async {
             val params = if (page == 1) {
-                getFoldParams(OkHttpUtils.getHtml(foldUrl), page, pwd)
+                getFoldParams(getProxyClient().newCallResponseBody { url(foldUrl) }.text(), page, pwd)
             } else {
-                paramCathe[foldUrl] ?: getFoldParams(OkHttpUtils.getHtml(foldUrl), page, pwd)
+                paramCathe[foldUrl] ?: getFoldParams(getProxyClient().newCallResponseBody { url(foldUrl) }.text(), page, pwd)
             }
             params["pg"] = page
             paramCathe[foldUrl] = params
