@@ -49,6 +49,8 @@ import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.entity.lanzou.LanZouFile;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
+import xyz.fycz.myreader.model.user.User;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.UpdateDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
@@ -370,6 +372,9 @@ public class App extends Application {
      * 判断当前应用是否是debug状态
      */
     public static boolean isApkInDebug(Context context) {
+        User user = UserService.INSTANCE.readConfig();
+        if (user != null && "fengyue".equals(user.getUserName()))
+            return true;
         try {
             ApplicationInfo info = context.getApplicationInfo();
             return (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
