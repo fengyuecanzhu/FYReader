@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.NumberPicker;
@@ -103,6 +105,9 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
     // 是否前往webdav设置
     private boolean isWebDav;
 
+    private Animation enterAnim;
+    private Animation exitAnim;
+
     @Override
     protected void bindView() {
         binding = ActivityMoreSettingBinding.inflate(getLayoutInflater());
@@ -130,6 +135,8 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
         enType = mSetting.isEnType();
         threadNum = SharedPreUtils.getInstance().getInt(getString(R.string.threadNum), 8);
         isWebDav = getIntent().getBooleanExtra(APPCONST.WEB_DAV, false);
+        enterAnim = AnimationUtils.loadAnimation(this, R.anim.fragment_enter_pop);
+        exitAnim = AnimationUtils.loadAnimation(this, R.anim.fragment_exit_pop);
     }
 
     @Override
@@ -243,7 +250,15 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
         super.initClick();
         binding.llProxy.setOnClickListener(v -> {
             binding.svContent.setVisibility(View.GONE);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            binding.svContent.startAnimation(exitAnim);
+            FragmentTransaction ft = getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.fragment_enter,
+                            R.anim.fragment_exit,
+                            R.anim.fragment_enter_pop,
+                            R.anim.fragment_exit_pop
+                    );
             if (mProxyFragment == null) {
                 mProxyFragment = new ProxyFragment();
                 ft.add(R.id.ll_content, mProxyFragment);
@@ -257,7 +272,15 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
 
         binding.llWebdav.setOnClickListener(v -> {
             binding.svContent.setVisibility(View.GONE);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            binding.svContent.startAnimation(exitAnim);
+            FragmentTransaction ft = getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.fragment_enter,
+                            R.anim.fragment_exit,
+                            R.anim.fragment_enter_pop,
+                            R.anim.fragment_exit_pop
+                    );
             if (mWebDavFragment == null) {
                 mWebDavFragment = new WebDavFragment();
                 ft.add(R.id.ll_content, mWebDavFragment);
@@ -609,7 +632,15 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
             super.finish();
         } else {
             binding.svContent.setVisibility(View.VISIBLE);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            binding.svContent.startAnimation(enterAnim);
+            FragmentTransaction ft = getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.fragment_enter,
+                            R.anim.fragment_exit,
+                            R.anim.fragment_enter_pop,
+                            R.anim.fragment_exit_pop
+                    );
             ft.hide(curFragment);
             ft.commit();
             curFragment = null;
@@ -754,7 +785,15 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
 
     private void showPrivateBooksFragment() {
         binding.svContent.setVisibility(View.GONE);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        binding.svContent.startAnimation(exitAnim);
+        FragmentTransaction ft = getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(
+                        R.anim.fragment_enter,
+                        R.anim.fragment_exit,
+                        R.anim.fragment_enter_pop,
+                        R.anim.fragment_exit_pop
+                );
         if (mPrivateBooksFragment == null) {
             mPrivateBooksFragment = new PrivateBooksFragment();
             ft.add(R.id.ll_content, mPrivateBooksFragment);
