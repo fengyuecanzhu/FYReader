@@ -46,7 +46,6 @@ class ProxyFragment : BaseFragment() {
 
     override fun initData(savedInstanceState: Bundle?) {
         enableProxy = SharedPreUtils.getInstance().getBoolean("enableProxy")
-        Log.d("ProxyFragment", "enableProxy=$enableProxy")
         proxyType = SharedPreUtils.getInstance().getInt("proxyType")
         proxyHost = SharedPreUtils.getInstance().getString("proxyHost")
         proxyPort = SharedPreUtils.getInstance().getString("proxyPort")
@@ -69,7 +68,6 @@ class ProxyFragment : BaseFragment() {
             enableProxy = !enableProxy
             binding.scEnableProxy.isChecked = enableProxy
             SharedPreUtils.getInstance().putBoolean("enableProxy", enableProxy)
-            Log.d("ProxyFragment", "putBoolean=$enableProxy")
             binding.llContent.visibility = if (enableProxy) View.VISIBLE else View.GONE
         }
 
@@ -79,7 +77,7 @@ class ProxyFragment : BaseFragment() {
                 .setOnMenuItemClickListener { _: BottomMenu?, _: CharSequence?, which: Int ->
                     proxyType = which
                     SharedPreUtils.getInstance().putInt("proxyType", which)
-                    binding.tvProxyType.text = proxyTypeArr[which]
+                    initWidget(null)
                     false
                 }.setCancelButton(R.string.cancel)
         }
@@ -91,8 +89,8 @@ class ProxyFragment : BaseFragment() {
                 { text: String -> tem = text }
             ) { dialog: DialogInterface, _: Int ->
                 proxyHost = tem
-                binding.tvProxyHost.text = proxyHost
                 SharedPreUtils.getInstance().putString("proxyHost", proxyHost)
+                initWidget(null)
                 dialog.dismiss()
             }
         }
@@ -110,7 +108,7 @@ class ProxyFragment : BaseFragment() {
                 .setPositiveButton(R.string.confirm) { _: DialogInterface?, _: Int ->
                     proxyPort = threadPick.value.toString()
                     SharedPreUtils.getInstance().putString("proxyPort", proxyPort)
-                    binding.tvProxyPort.text = proxyPort
+                    initWidget(null)
                 }.setNegativeButton(R.string.cancel, null)
                 .show()
         }
@@ -122,8 +120,8 @@ class ProxyFragment : BaseFragment() {
                 { text: String -> tem = text }
             ) { dialog: DialogInterface, _: Int ->
                 proxyUsername = tem
-                binding.tvProxyUsername.text = proxyUsername
                 SharedPreUtils.getInstance().putString("proxyUsername", proxyUsername)
+                initWidget(null)
                 dialog.dismiss()
             }
         }
@@ -135,8 +133,8 @@ class ProxyFragment : BaseFragment() {
                 { text: String -> tem = text }
             ) { dialog: DialogInterface, _: Int ->
                 proxyPassword = tem
-                binding.tvProxyPassword.text = proxyPassword
                 SharedPreUtils.getInstance().putString("proxyPassword", proxyPassword)
+                initWidget(null)
                 dialog.dismiss()
             }
         }

@@ -140,7 +140,6 @@ public class MyAlertDialog {
                     .show();
         }
         Button posBtn = inputDia.getButton(AlertDialog.BUTTON_POSITIVE);
-        posBtn.setEnabled(false);
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -155,11 +154,6 @@ public class MyAlertDialog {
             @Override
             public void afterTextChanged(Editable s) {
                 String text = editText.getText().toString();
-                if (editText.getText().length() > 0 && editText.getText().length() <= maxLen && !text.equals(initText)) {
-                    posBtn.setEnabled(true);
-                } else {
-                    posBtn.setEnabled(false);
-                }
                 oic.onChange(text);
             }
         });

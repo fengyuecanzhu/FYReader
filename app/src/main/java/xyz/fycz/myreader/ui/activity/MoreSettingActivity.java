@@ -206,7 +206,7 @@ public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (curFragment == null || curFragment != mProxyFragment) {
+        if (curFragment == null || curFragment == mProxyFragment) {
             menu.findItem(R.id.action_tip).setVisible(false);
         } else {
             menu.findItem(R.id.action_tip).setVisible(true);

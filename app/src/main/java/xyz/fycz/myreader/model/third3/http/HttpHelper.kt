@@ -72,7 +72,6 @@ val globalProxy: String
 fun getProxyClient(proxy0: String? = null, noProxy: Boolean = false): OkHttpClient {
     var proxy = proxy0
     if (proxy.isNullOrEmpty()) proxy = globalProxy
-    Log.d("getProxyClient", "proxy=$proxy")
     if (proxy.isNullOrBlank() || noProxy) {
         return okHttpClient
     }
