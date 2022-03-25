@@ -30,7 +30,7 @@ public class URLCONST {
     public static final String THANKS_URL = USER_URL + "/thanks/";
     public static final String AD_URL = USER_URL + "/do/ad";
 
-    public static final String DONATE = "https://gitee.com/fengyuecanzhu/Donate/raw/master";
+    public static final String DONATE = "https://fyreader.coding.net/p/img/d/img/git/raw/master/Donate";
 
     public static final String WX_ZSM = DONATE + "/wx_zsm.png";
     public static final String ZFB_SKM = DONATE + "/zfb_skm.jpg";
