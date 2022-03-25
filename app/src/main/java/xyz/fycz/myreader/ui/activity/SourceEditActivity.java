@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -234,9 +235,11 @@ public class SourceEditActivity extends BaseActivity<ActivitySourceEditBinding> 
                         debugEntity.setUrl(text);
                     }
                 }, (dialog, which) -> {
-                    Intent intent = new Intent(this, SourceDebugActivity.class);
-                    intent.putExtra("debugEntity", debugEntity);
-                    startActivity(intent);
+                    if (!TextUtils.isEmpty(debugEntity.getUrl())) {
+                        Intent intent = new Intent(this, SourceDebugActivity.class);
+                        intent.putExtra("debugEntity", debugEntity);
+                        startActivity(intent);
+                    }
                 });
     }
 

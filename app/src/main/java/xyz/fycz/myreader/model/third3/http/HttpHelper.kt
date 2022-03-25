@@ -78,7 +78,7 @@ fun getProxyClient(proxy0: String? = null, noProxy: Boolean = false): OkHttpClie
     proxyClientCache[proxy]?.let {
         return it
     }
-    val r = Regex("(http|socks4|socks5)://(.+):(\\d{2,5})(@.*@.*)?")
+    val r = Regex("(http|socks4|socks5)://(.*):(\\d{2,5})(@.*@.*)?")
     val ms = r.findAll(proxy)
     val group = ms.first()
     var username = ""       //代理服务器验证用户名

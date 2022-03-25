@@ -32,9 +32,9 @@ public class URLCONST {
 
     public static final String DONATE = "https://fyreader.coding.net/p/img/d/img/git/raw/master/Donate";
 
-    public static final String WX_ZSM = DONATE + "/wx_zsm.png";
+    public static final String WX_ZSM = DONATE + "/wx_zsm.jpg";
     public static final String ZFB_SKM = DONATE + "/zfb_skm.jpg";
-    public static final String QQ_SKM = DONATE + "/qq_skm.png";
+    public static final String QQ_SKM = DONATE + "/qq_skm.jpg";
 
     public static final String QUOTATION = "https://v1.hitokoto.cn/?encode=json&charset=utf-8";
 
