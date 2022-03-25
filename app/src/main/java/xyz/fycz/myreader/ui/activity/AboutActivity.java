@@ -24,6 +24,7 @@ import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityAboutBinding;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -165,7 +166,9 @@ public class AboutActivity extends BaseActivity<ActivityAboutBinding> {
         Observable.create((ObservableOnSubscribe<String>) emitter -> {
             File zipFile = FileUtils.getFile(logZip);
             if (ZipUtils.zipFile(logDir, zipFile)) {
-                emitter.onNext(OkHttpUtils.upload(URLCONST.LOG_UPLOAD_URL, logZip, fileName));
+                emitter.onNext(OkHttpUtils.upload(
+                        URLCONST.LOG_UPLOAD_URL + "?action=log" + UserService.INSTANCE.makeAuth(),
+                        logZip, fileName));
             } else {
                 emitter.onError(new Throwable("日志文件压缩失败"));
             }
