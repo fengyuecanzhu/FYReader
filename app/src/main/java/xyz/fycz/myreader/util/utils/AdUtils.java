@@ -1,6 +1,7 @@
 package xyz.fycz.myreader.util.utils;
 
 import android.app.Activity;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,6 +35,7 @@ import xyz.fycz.myreader.entity.ad.AdBean;
 import xyz.fycz.myreader.entity.ad.AdConfig;
 import xyz.fycz.myreader.model.user.User;
 import xyz.fycz.myreader.model.user.UserService;
+import xyz.fycz.myreader.util.SharedPreAdUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.DateHelper;
@@ -56,8 +60,8 @@ public class AdUtils {
         }
     }
 
-    public static SharedPreUtils getSp() {
-        return SharedPreUtils.getInstance(true);
+    public static SharedPreAdUtils getSp() {
+        return SharedPreAdUtils.getInstance();
     }
 
     public static Single<Boolean> checkHasAd() {
@@ -369,6 +373,22 @@ public class AdUtils {
             e.printStackTrace();
         }
         return rewardLastTime > System.currentTimeMillis();
+    }
+
+    public static void resetPangleId() {
+        String root = App.getmContext().getFilesDir().getParent();
+        String sharePath = root + File.separator + "shared_prefs";
+        String c1 = root + File.separator + "cache216data.dat";
+        String c2 = root + File.separator + "cache216statistics.dat";
+        FileUtils.deleteFile(c1);
+        FileUtils.deleteFile(c2);
+        File shared = new File(sharePath);
+        if (shared.exists() && shared.isDirectory()) {
+            File[] files = shared.listFiles((dir, name) -> !name.startsWith("FYReader"));
+            for (File file :files) {
+                file.delete();
+            }
+        }
     }
 
     public static AdConfig getAdConfig() {

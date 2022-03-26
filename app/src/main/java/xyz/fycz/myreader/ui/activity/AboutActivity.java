@@ -32,6 +32,7 @@ import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.ZipUtils;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
@@ -62,6 +63,7 @@ public class AboutActivity extends BaseActivity<ActivityAboutBinding> {
         super.initWidget();
         binding.il.tvVersionName.setText(String.format("风月读书v%s", App.getStrVersionName()));
         binding.il.rlLanZou.setVisibility(App.isDebug() ? View.VISIBLE : View.GONE);
+        binding.il.rlResetPangle.setVisibility(App.isDebug() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -136,6 +138,7 @@ public class AboutActivity extends BaseActivity<ActivityAboutBinding> {
                                 });
                     });
         });
+        binding.il.rlResetPangle.setOnClickListener(v -> AdUtils.resetPangleId());
     }
 
     void openIntent(String intentName, String address) {

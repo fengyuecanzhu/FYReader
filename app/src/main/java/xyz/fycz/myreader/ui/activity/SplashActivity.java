@@ -35,6 +35,7 @@ import xyz.fycz.myreader.databinding.ActivitySplashBinding;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.IOUtils;
+import xyz.fycz.myreader.util.SharedPreAdUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.DateHelper;
@@ -220,7 +221,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
                 @Override
                 public void show() {
                     handler.removeCallbacks(adTimeOutRunnable);
-                    SharedPreUtils.getInstance(true).putLong("splashAdTime", System.currentTimeMillis());
+                    SharedPreAdUtils.getInstance().putLong("splashAdTime", System.currentTimeMillis());
                     Log.d(TAG, "广告展示成功");
                     AdUtils.adRecord("splash", "adShow");
                     countTodayAd();

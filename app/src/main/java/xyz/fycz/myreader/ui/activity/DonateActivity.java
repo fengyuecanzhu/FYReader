@@ -60,26 +60,7 @@ public class DonateActivity extends BaseActivity<ActivityDonateBinding> {
 
     private void initAd() {
         binding.llAdSupport.setVisibility(View.VISIBLE);
-        /*new DdSdkFlowAd().getFlowViews(DonateActivity.this, 4,  new DdSdkFlowAd.FlowCallback() {
-                // 信息流广告拉取完毕后返回的 views
-                @Override
-                public void getFlowView(View view) {
-                    binding.llAdSupport.addView(view, 2);
-                }
-
-                // 信息流广告展示后调用
-                @Override
-                public void show() {
-                    AdUtils.adRecord("flow","adShow");
-                    Log.d(TAG, "信息流广告展示成功");
-                }
-
-                // 广告拉取失败调用
-                @Override
-                public void error(String msg) {
-                    Log.d(TAG, "广告拉取失败\n" + msg);
-                }
-            });*/
+        AdUtils.getFlowAd(this, 1, view -> binding.llAdSupport.addView(view, 2), null);
     }
 
     @Override

@@ -481,7 +481,7 @@
     <string name="qq_skm">QQ收款码</string>
     <string name="ad_support">广告支持作者</string>
     <string name="ad_support_tip">点击下列广告即可支持作者，建议在WIFI环境下点击</string>
-    <string name="flow_ad_tip">信息流广告(下载的文件可在广告设置中清除)</string>
+    <string name="flow_ad_tip">信息流广告</string>
     <string name="rewarded_video">激励视频</string>
     <string name="watch_rewarded_video">观看激励视频</string>
     <string name="ad_file">广告下载/缓存</string>
@@ -587,6 +587,7 @@
     <string name="no_proxy_sources_tip">选择需要禁用代理的书源</string>
     <string name="enable_proxy">启用代理</string>
     <string name="edit">编辑</string>
+    <string name="reset_pangle">ResetPangleId</string>
 
     <string-array name="reset_screen_time">
         <item>跟随系统</item>

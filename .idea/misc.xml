@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_donate.xml" value="0.264" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_more_setting.xml" value="0.2" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/activity_user_info.xml" value="0.2" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/fragment_private_bookcase.xml" value="0.12132725430597771" />
@@ -13,6 +14,7 @@
         <entry key="..\:/android/FYReader/app/src/main/res/layout/item_find_source.xml" value="0.12132725430597771" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/item_source_edit.xml" value="0.22826086956521738" />
         <entry key="..\:/android/FYReader/app/src/main/res/layout/item_subscribe_source.xml" value="0.2" />
+        <entry key="..\:/android/FYReader/app/src/main/res/layout/layout_about_content.xml" value="0.12132725430597771" />
       </map>
     </option>
   </component>

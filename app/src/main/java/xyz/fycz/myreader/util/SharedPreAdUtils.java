@@ -11,23 +11,23 @@ import java.util.Map;
  * SharedPreferences工具类
  */
 
-public class SharedPreUtils {
-    public static final String SHARED_NAME = "FYReader_pref";
-    private static SharedPreUtils sInstance;
+public class SharedPreAdUtils {
+    public static final String SHARED_NAME = "FYReader_ad_pref";
+    private static SharedPreAdUtils sInstance;
     private SharedPreferences sharedReadable;
     private SharedPreferences.Editor sharedWritable;
 
-    private SharedPreUtils() {
+    private SharedPreAdUtils() {
         sharedReadable = App.getmContext()
                 .getSharedPreferences(SHARED_NAME, Context.MODE_MULTI_PROCESS);
         sharedWritable = sharedReadable.edit();
     }
-    
-    public static SharedPreUtils getInstance() {
+
+    public static SharedPreAdUtils getInstance() {
         if (sInstance == null) {
-            synchronized (SharedPreUtils.class) {
+            synchronized (SharedPreAdUtils.class) {
                 if (sInstance == null) {
-                    sInstance = new SharedPreUtils();
+                    sInstance = new SharedPreAdUtils();
                 }
             }
         }
