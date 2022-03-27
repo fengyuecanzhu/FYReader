@@ -223,7 +223,7 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
             return false;
         }
         for (Chapter chapter : chapters) {
-            if (ChapterService.isChapterCached(chapter.getBookId(), chapter.getTitle())) {
+            if (ChapterService.isChapterCached(chapter)) {
                 bw.write("\t" + chapter.getTitle());
                 bw.newLine();
                 br = new BufferedReader(new FileReader(APPCONST.BOOK_CACHE_PATH + book.getId()

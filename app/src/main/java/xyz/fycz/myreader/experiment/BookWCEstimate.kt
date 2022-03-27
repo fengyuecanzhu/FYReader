@@ -49,13 +49,13 @@ class BookWCEstimate {
         var cachedChapterSize = 0
         for (chapter in chapters) {
             if (cachedChapterSize >= 20) break
-            if (ChapterService.isChapterCached(chapter.bookId, chapter.title)) {
+            if (ChapterService.isChapterCached(chapter)) {
                 cachedChapterSize++
             }
         }
         if ((cachedChapterSize < 20 && chapters.size > 50) || cachedChapterSize == 0) return -2
         chapters.forEach { chapter ->
-            if (ChapterService.isChapterCached(chapter.bookId, chapter.title)) {
+            if (ChapterService.isChapterCached(chapter)) {
                 sum += countChar(
                     File(
                         APPCONST.BOOK_CACHE_PATH + chapter.bookId

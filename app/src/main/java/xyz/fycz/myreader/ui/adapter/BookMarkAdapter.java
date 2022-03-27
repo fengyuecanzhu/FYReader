@@ -62,7 +62,7 @@ public class BookMarkAdapter extends ArrayAdapter<BookMark> {
         final BookMark bookMark = getItem(postion);
         assert bookMark != null;
         viewHolder.tvTitle.setText(String.format("%s[%s]", bookMark.getTitle(), bookMark.getBookMarkReadPosition() + 1));
-        if (ChapterService.isChapterCached(bookMark.getBookId(), bookMark.getTitle())){
+        if (ChapterService.isChapterCached(bookMark)){
             viewHolder.tvTitle.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(), R.drawable.selector_category_load),null,null,null);
         } else {
             viewHolder.tvTitle.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(),R.drawable.selector_category_unload),null,null,null);

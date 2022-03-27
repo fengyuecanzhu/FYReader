@@ -28,7 +28,7 @@ public class CatalogHolder extends ViewHolderImpl<Chapter> {
 
     @Override
     public void onBind(RecyclerView.ViewHolder holder, Chapter data, int pos) {
-        if (ChapterService.isChapterCached(data.getBookId(), data.getTitle()) || data.getEnd() > 0) {
+        if (ChapterService.isChapterCached(data) || data.getEnd() > 0) {
             tvTitle.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(),R.drawable.selector_category_load), null, null, null);
         } else {
             tvTitle.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(),R.drawable.selector_category_unload), null, null, null);

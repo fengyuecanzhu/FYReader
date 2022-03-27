@@ -108,7 +108,7 @@ class SearchWordEngine(
                     chapterTitle = chapter.title,
                     searchWord2List = mutableListOf()
                 )
-                if (!isLocalBook && !ChapterService.isChapterCached(book.id, chapter.title)) {
+                if (!isLocalBook && !ChapterService.isChapterCached(chapter)) {
                     emitter.onNext(searchWord1)
                     return@ObservableOnSubscribe
                 }

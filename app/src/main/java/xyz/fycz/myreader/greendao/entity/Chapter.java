@@ -17,6 +17,7 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.model.third3.analyzeRule.RuleDataInterface;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
@@ -115,11 +116,9 @@ public class Chapter implements RuleDataInterface {
 
     public String getContent() {
         if (end > 0) return end + "";
-        String filePath = APPCONST.BOOK_CACHE_PATH + bookId
-                + File.separator + title + FileUtils.SUFFIX_FY;
-        File file = new File(filePath);
+        File file = ChapterService.getChapterFile(this);
         if (file.exists() && file.length() > 0) {
-            this.content = filePath;
+            this.content = file.getAbsolutePath();
         } else {
             this.content = null;
         }

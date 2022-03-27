@@ -391,7 +391,7 @@ public class LocalPageLoader extends PageLoader {
 
     @Override
     public boolean hasChapterData(Chapter chapter) {
-        return chapter.getEnd() > 0 || ChapterService.isChapterCached(mCollBook.getId(), chapter.getTitle());
+        return chapter.getEnd() > 0 || ChapterService.isChapterCached(chapter);
     }
 
 }

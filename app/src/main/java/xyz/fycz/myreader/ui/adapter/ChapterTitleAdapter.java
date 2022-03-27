@@ -68,7 +68,7 @@ public class ChapterTitleAdapter extends ArrayAdapter<Chapter> {
         final Chapter chapter = getItem(postion);
 //        viewHolder.tvTitle.setText("【" + chapter.getTitle() + "】");
         viewHolder.tvTitle.setText(chapter.getTitle());
-        if (ChapterService.isChapterCached(chapter.getBookId(), chapter.getTitle()) || chapter.getEnd() > 0) {
+        if (ChapterService.isChapterCached(chapter) || chapter.getEnd() > 0) {
             viewHolder.tvTitle.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(),R.drawable.selector_category_load), null, null, null);
         } else {
             viewHolder.tvTitle.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(),R.drawable.selector_category_unload), null, null, null);
