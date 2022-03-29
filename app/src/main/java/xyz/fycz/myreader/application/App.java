@@ -43,6 +43,8 @@ import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.jvm.functions.Function3;
 import kotlinx.coroutines.CoroutineScope;
+import xyz.fycz.dynamic.AppParam;
+import xyz.fycz.dynamic.IAppLoader;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
@@ -60,6 +62,7 @@ import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.util.utils.PluginUtils;
 import xyz.fycz.myreader.webapi.LanZouApi;
 
 
@@ -98,6 +101,7 @@ public class App extends Application {
 //        LLog.init(APPCONST.LOG_DIR);
         initDialogX();
         //AdUtils.initAd();
+        PluginUtils.INSTANCE.init();
     }
 
 
@@ -301,7 +305,8 @@ public class App extends Application {
 
                 String domain = contents[9].substring(contents[9].indexOf(":") + 1);
                 SharedPreUtils.getInstance().putString("domain", domain);
-
+                String pluginConfigUrl = contents[10].substring(contents[10].indexOf(":") + 1);
+                SharedPreUtils.getInstance().putString("pluginConfigUrl", pluginConfigUrl);
                 int versionCode = getVersionCode();
 
                 isForceUpdate = isForceUpdate && forceUpdateVersion > versionCode;

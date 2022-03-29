@@ -44,6 +44,8 @@ public class APPCONST {
             + "book_cache" + File.separator;
     public static String HTML_CACHE_PATH = FileUtils.getCachePath() + File.separator
             + "html_cache" + File.separator;
+    public static String PLUGIN_DIR_PATH = App.getmContext().getFilesDir().getParent()
+            + File.separator + "plugin" + File.separator;
 
     public static long exitTime;
     public static final int exitConfirmTime = 2000;
@@ -143,7 +145,7 @@ public class APPCONST {
 
     public static final String androidId = getAndroidId();
 
-    public static String getAndroidId(){
+    public static String getAndroidId() {
         return Settings.System.getString(App.getmContext().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 }

@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/FYReader.iml" filepath="$PROJECT_DIR$/.idea/modules/FYReader.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/DialogX/FYReader.DialogX.iml" filepath="$PROJECT_DIR$/.idea/modules/DialogX/FYReader.DialogX.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FYReader.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FYReader.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.iml" filepath="$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.iml" />
     </modules>
   </component>
 </project>

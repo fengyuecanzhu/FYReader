@@ -274,6 +274,9 @@ dependencies {
         exclude module: 'support-v4'
         exclude group: 'com.android.support'
     }
+
+    //maple
+    implementation("me.fycz.maple:maple:1.6")
 }
 
 greendao {
