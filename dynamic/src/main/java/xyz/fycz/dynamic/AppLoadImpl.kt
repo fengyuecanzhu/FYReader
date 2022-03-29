@@ -1,5 +1,8 @@
 package xyz.fycz.dynamic
 
+import android.app.AlertDialog
+import android.content.Context
+import android.os.Bundle
 import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodHook
@@ -11,7 +14,7 @@ import me.fycz.maple.MethodReplacement
  */
 class AppLoadImpl : IAppLoader {
     override fun onLoad(appParam: AppParam) {
-        try {
+        /*try {
             MapleUtils.findAndHookMethod(
                 "xyz.fycz.myreader.util.utils.AdUtils",
                 appParam.classLoader,
@@ -34,5 +37,25 @@ class AppLoadImpl : IAppLoader {
             e.printStackTrace()
             MapleUtils.log(e)
         }
+
+        try {
+            MapleUtils.findAndHookMethod(
+                "xyz.fycz.myreader.ui.activity.MainActivity",
+                appParam.classLoader,
+                "onCreate",
+                Bundle::class.java,
+                object : MethodHook() {
+                    override fun afterHookedMethod(param: MapleBridge.MethodHookParam) {
+                        AlertDialog.Builder(param.thisObject as Context)
+                            .setTitle("风月读书插件")
+                            .setMessage("此消息由风月读书插件提供")
+                            .create().show()
+                    }
+                }
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            MapleUtils.log(e)
+        }*/
     }
 }

@@ -9,5 +9,9 @@ data class PluginConfig(
     val versionCode: Int,
     val version: String,
     val url: String,
+    val md5: String,//32位
     val changelog: String
-)
+) {
+    constructor(name: String, versionCode: Int) :
+            this(name, versionCode, "", "", "", "")
+}

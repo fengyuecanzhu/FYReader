@@ -366,6 +366,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     private void adTimeout(int time) {
         if (time == 0) {
             WAIT_INTERVAL = 0;
+            SharedPreAdUtils.getInstance().putLong("splashAdTime", System.currentTimeMillis());
             startNormal();
         } else {
             handler.postDelayed(adTimeOutRunnable, 1000);

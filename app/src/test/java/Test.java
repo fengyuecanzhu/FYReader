@@ -7,6 +7,7 @@ import java.util.List;
 
 import xyz.fycz.myreader.model.sourceAnalyzer.BaseAnalyzer;
 import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.utils.MD5Utils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 
 /**
@@ -114,7 +115,9 @@ public class Test {
         //}
     }
 
-
-
-
+    @org.junit.Test
+    public void md5(){
+        File file = new File("D:\\Java\\AndroidSdk\\build-tools\\29.0.3\\dynamic_v1.0.2.dex");
+        System.out.println(MD5Utils.INSTANCE.getFileMD5s(file, 32));
+    }
 }

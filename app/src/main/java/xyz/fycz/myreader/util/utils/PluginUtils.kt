@@ -17,6 +17,7 @@ import xyz.fycz.myreader.model.third3.http.text
 import xyz.fycz.myreader.util.SharedPreUtils
 import xyz.fycz.myreader.util.ToastUtils
 import java.io.File
+import java.util.*
 
 
 /**
@@ -38,7 +39,7 @@ object PluginUtils {
             config = GSON.fromJsonObject<PluginConfig>(configJson)
             val oldConfig = GSON.fromJsonObject<PluginConfig>(
                 SharedPreUtils.getInstance().getString("pluginConfig")
-            ) ?: PluginConfig("dynamic.dex", 100, "", "", "")
+            ) ?: PluginConfig("dynamic.dex", 100)
             if (config != null) {
                 if (config!!.versionCode > oldConfig.versionCode) {
                     downloadPlugin(config!!)
@@ -46,6 +47,11 @@ object PluginUtils {
                 }
             } else {
                 config = oldConfig
+            }
+            if (config!!.md5.lowercase(Locale.getDefault())
+                != getPluginMD5(config!!)?.lowercase(Locale.getDefault())
+            ) {
+                downloadPlugin(config!!)
             }
         }.onSuccess {
             loadAppLoader(App.getmContext(), config)
@@ -58,6 +64,10 @@ object PluginUtils {
         }
         FileUtils.getFile(APPCONST.PLUGIN_DIR_PATH + config.name)
             .writeBytes(res.byteStream().readBytes())
+    }
+
+    private fun getPluginMD5(config: PluginConfig): String? {
+        return MD5Utils.getFileMD5s(FileUtils.getFile(APPCONST.PLUGIN_DIR_PATH + config.name), 32)
     }
 
     private fun loadAppLoader(context: Context, config: PluginConfig?) {
