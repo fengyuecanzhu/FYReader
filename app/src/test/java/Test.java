@@ -117,7 +117,7 @@ public class Test {
 
     @org.junit.Test
     public void md5(){
-        File file = new File("D:\\Java\\AndroidSdk\\build-tools\\29.0.3\\dynamic_v1.0.2.dex");
+        File file = new File("D:\\Java\\AndroidSdk\\build-tools\\29.0.3\\dynamic-test.dex");
         System.out.println(MD5Utils.INSTANCE.getFileMD5s(file, 32));
     }
 }
