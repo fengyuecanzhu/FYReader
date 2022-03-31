@@ -48,7 +48,7 @@ object PluginUtils {
             } else {
                 config = oldConfig
             }
-            if (config!!.md5.lowercase(Locale.getDefault())
+            if (!App.isDebug() && config!!.md5.lowercase(Locale.getDefault())
                 != getPluginMD5(config!!)?.lowercase(Locale.getDefault())
             ) {
                 downloadPlugin(config!!)

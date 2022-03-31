@@ -28,6 +28,7 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url 'https://artifact.bytedance.com/repository/pangle'}
+        mavenLocal()
     }
     /*gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {
