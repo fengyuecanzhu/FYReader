@@ -182,6 +182,8 @@ public class AdUtils {
 
     public static boolean backSplashAd() {
         if (!adConfig.isUserHasAd()) return false;
+        boolean adTimeout = getSp().getBoolean("adTimeout");
+        if (adTimeout) return false;
         long splashAdTime = getSp().getLong("splashAdTime");
         long backTime = getSp().getLong("backTime");
         long currentTime = System.currentTimeMillis();

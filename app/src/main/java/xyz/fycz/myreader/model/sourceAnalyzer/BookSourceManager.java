@@ -184,6 +184,7 @@ public class BookSourceManager {
      */
     public static List<BookSource> getAllNoLocalSource() {
         return DbManager.getDaoSession().getBookSourceDao().queryBuilder()
+                .where(BookSourceDao.Properties.SourceEName.isNull())
                 .where(BookSourceDao.Properties.SourceType.isNotNull())
                 .orderAsc(BookSourceDao.Properties.OrderNum)
                 .list();

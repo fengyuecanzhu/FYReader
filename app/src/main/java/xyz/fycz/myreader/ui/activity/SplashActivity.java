@@ -55,7 +55,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     private boolean hasStart = false;
     private boolean startToAd = false;
     private static final String INTENT_TO_AD = "startToAd";
-    private int timeOut = 10;
+    private int timeOut = 5;
     private Handler handler = new Handler();
 
     //创建子线程
@@ -225,6 +225,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
                     Log.d(TAG, "广告展示成功");
                     AdUtils.adRecord("splash", "adShow");
                     countTodayAd();
+                    SharedPreAdUtils.getInstance().putBoolean("adTimeOut", false);
                 }
 
                 // 广告被点击
@@ -368,6 +369,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
             WAIT_INTERVAL = 0;
             SharedPreAdUtils.getInstance().putLong("splashAdTime", System.currentTimeMillis());
             startNormal();
+            SharedPreAdUtils.getInstance().putBoolean("adTimeOut", true);
         } else {
             handler.postDelayed(adTimeOutRunnable, 1000);
         }
