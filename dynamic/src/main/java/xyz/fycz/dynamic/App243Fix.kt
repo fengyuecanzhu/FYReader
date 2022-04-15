@@ -49,9 +49,9 @@ object App243Fix {
             MapleUtils.callMethod(obj, "startNormal")
             SharedPreAdUtils.getInstance().putBoolean("adTimeOut", true)
         } else {
-            if (time > 5){
+            /*if (time > 5){
                 MapleUtils.setIntField(obj, "timeOut", 5)
-            }
+            }*/
             val handler = MapleUtils.getObjectField(obj, "handler") as Handler
             val adTimeOutRunnable = MapleUtils.getObjectField(obj, "adTimeOutRunnable") as Runnable
             handler.postDelayed(adTimeOutRunnable, 1000)
