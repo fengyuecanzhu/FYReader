@@ -3,6 +3,10 @@ package xyz.fycz.myreader.util.utils
 import android.content.Context
 import android.util.Log
 import dalvik.system.DexClassLoader
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import xyz.fycz.dynamic.AppParam
 import xyz.fycz.dynamic.IAppLoader
 import xyz.fycz.myreader.application.App
@@ -33,13 +37,14 @@ object PluginUtils {
             SharedPreUtils.getInstance().getString("pluginConfigUrl", DEFAULT_PLUGIN_CONFIG_URL)
         var config: PluginConfig? = null
         Coroutine.async {
+            val oldConfig = GSON.fromJsonObject<PluginConfig>(
+                SharedPreUtils.getInstance().getString("pluginConfig")
+            ) ?: PluginConfig("dynamic.dex", 100)
+            launch { loadAppLoader(App.getmContext(), config) }
             val configJson = getProxyClient().newCallResponseBody {
                 url(pluginConfigUrl)
             }.text()
             config = GSON.fromJsonObject<PluginConfig>(configJson)
-            val oldConfig = GSON.fromJsonObject<PluginConfig>(
-                SharedPreUtils.getInstance().getString("pluginConfig")
-            ) ?: PluginConfig("dynamic.dex", 100)
             if (config != null) {
                 if (config!!.versionCode > oldConfig.versionCode) {
                     downloadPlugin(config!!)
