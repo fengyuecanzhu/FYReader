@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 *.iml
 .gradle
 /local.properties
@@ -8,8 +7,7 @@
 /build
 /captures
 .externalNativeBuild
-=======
->>>>>>> eee131cea39d27218fc7d1c3d641d617d377af42
+keystore
 # Compiled class file
 *.class
 
