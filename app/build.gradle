@@ -275,8 +275,8 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
-    //maple
-    implementation("me.fycz.maple:maple:1.6")
+    //https://github.com/fengyuecanzhu/Maple
+    implementation("me.fycz.maple:maple:1.8")
 }
 
 greendao {
