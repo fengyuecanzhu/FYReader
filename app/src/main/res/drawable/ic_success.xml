@@ -1,3 +1,21 @@
+<!--
+  ~ This file is part of FYReader.
+  ~  FYReader is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  FYReader is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+  ~
+  ~  Copyright (C) 2020 - 2022 fengyuecanzhu
+  -->
+
 <vector android:height="24dp" android:viewportHeight="1024"
     android:viewportWidth="1024" android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
     <path android:fillColor="#FFFFFF" android:pathData="M512,1015.34c-277.91,0 -503.2,-225.29 -503.2,-503.2s225.29,-503.2 503.2,-503.2c277.91,0 503.2,225.29 503.2,503.2s-225.29,503.2 -503.2,503.2zM512,71.85c-243.16,0 -440.3,197.13 -440.3,440.3s197.13,440.3 440.3,440.3 440.3,-197.13 440.3,-440.3 -197.13,-440.3 -440.3,-440.3zM713.04,337.11c8.68,-15.05 3.54,-34.27 -11.51,-42.96s-34.27,-3.54 -42.96,11.51l-201.15,348.36 -112.53,-103.77c-11.86,-12.67 -31.76,-13.33 -44.45,-1.45 -12.68,11.88 -13.31,31.78 -1.43,44.45l143.78,132.62c11.88,12.67 31.78,13.31 44.45,1.43 3.83,-3.58 225.79,-390.19 225.79,-390.19z"/>

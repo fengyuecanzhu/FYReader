@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ *  FYReader is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  FYReader is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *  Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.util.utils;
 
 import androidx.annotation.NonNull;
@@ -14,26 +32,6 @@ import java.net.URL;
 
 import static android.text.TextUtils.isEmpty;
 
-/**
- * <Detect encoding .> Copyright (C) <2009> <Fluck,ACC http://androidos.cc/dev>
- * <p>
- * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- * <p>
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * <p>
- * EncodingDetect.java<br>
- * 自动获取文件的编码
- *
- * @author Billows.Van
- * @version 1.0
- * @since Create on 2010-01-27 11:19:00
- */
 public class EncodingDetect {
 
     public static String getEncodeInHtml(@NonNull byte[] bytes) {
