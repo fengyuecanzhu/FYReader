@@ -49,6 +49,7 @@ import java.util.*
 object PluginUtils {
 
     val TAG = PluginUtils.javaClass.simpleName
+    var hasLoad = false
 
     fun init() {
         val pluginConfigUrl =
@@ -94,6 +95,7 @@ object PluginUtils {
     }
 
     private fun loadAppLoader(context: Context, config: PluginConfig?) {
+        if (hasLoad) return
         config?.let {
             val pluginPath = APPCONST.PLUGIN_DIR_PATH + it.name
             val desFile = File(pluginPath)
@@ -114,6 +116,7 @@ object PluginUtils {
                         appParam.appInfo = context.applicationInfo
                         onLoad(appParam)
                     }
+                    hasLoad = true
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
