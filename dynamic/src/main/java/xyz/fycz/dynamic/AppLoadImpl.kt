@@ -86,30 +86,4 @@ class AppLoadImpl : IAppLoader {
             }
         }
     }
-
-    /*fun noAd(appParam: AppParam) {
-        try {
-            MapleUtils.findAndHookMethod(
-                "xyz.fycz.myreader.util.utils.AdUtils",
-                appParam.classLoader,
-                "checkHasAd",
-                Boolean::class.java,
-                Boolean::class.java,
-                object : MethodReplacement() {
-                    override fun replaceHookedMethod(param: MapleBridge.MethodHookParam): Any? {
-                        val just = MapleUtils.findMethodExact(
-                            "io.reactivex.Single",
-                            appParam.classLoader,
-                            "just",
-                            Any::class.java
-                        )
-                        return just.invoke(null, false)
-                    }
-                }
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            MapleUtils.log(e)
-        }
-    }*/
 }
