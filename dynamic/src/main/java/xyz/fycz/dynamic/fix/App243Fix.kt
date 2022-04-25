@@ -16,7 +16,7 @@
  *  Copyright (C) 2020 - 2022 fengyuecanzhu
  */
 
-package xyz.fycz.dynamic
+package xyz.fycz.dynamic.fix
 
 import android.os.Handler
 import me.fycz.maple.MapleBridge
@@ -35,7 +35,31 @@ import xyz.fycz.myreader.util.utils.AdUtils
  * @author fengyue
  * @date 2022/3/31 9:21
  */
-object App243Fix {
+@AppFix([243], ["修复软件无法打开的问题(超时时间为5s)", "修复DIY书源重复显示订阅书源的问题"], "2022-03-31")
+class App243Fix : AppFixHandle {
+
+    override fun onFix(key: String): BooleanArray {
+        var fx1 = false
+        var fx2 = false
+        try {
+            fixGetAllNoLocalSource()
+            fx1 = true
+            fixResult(key, "getAllNoLocalSource", true)
+        } catch (e: Exception) {
+            MapleUtils.log(e)
+            fixResult(key, "getAllNoLocalSource", false)
+        }
+        try {
+            fixAdTimeout()
+            fx2 = true
+            fixResult(key, "adTimeout", true)
+        } catch (e: Exception) {
+            MapleUtils.log(e)
+            fixResult(key, "adTimeout", false)
+        }
+        return booleanArrayOf(fx1, fx2)
+    }
+
     private fun getAllNoLocalSource(): List<BookSource> {
         return DbManager.getDaoSession().bookSourceDao.queryBuilder()
             .where(BookSourceDao.Properties.SourceEName.isNull)
@@ -45,7 +69,7 @@ object App243Fix {
     }
 
 
-    fun fixGetAllNoLocalSource() {
+    private fun fixGetAllNoLocalSource() {
         MapleUtils.findAndHookMethod(
             BookSourceManager::class.java,
             "getAllNoLocalSource",
@@ -67,7 +91,7 @@ object App243Fix {
             MapleUtils.callMethod(obj, "startNormal")
             SharedPreAdUtils.getInstance().putBoolean("adTimeOut", true)
         } else {
-            if (time > 5){
+            if (time > 5) {
                 MapleUtils.setIntField(obj, "timeOut", 5)
             }
             val handler = MapleUtils.getObjectField(obj, "handler") as Handler
@@ -76,7 +100,7 @@ object App243Fix {
         }
     }
 
-    fun fixAdTimeout() {
+    private fun fixAdTimeout() {
         MapleUtils.findAndHookMethod(
             SplashActivity::class.java,
             "adTimeout",
@@ -90,7 +114,7 @@ object App243Fix {
         MapleUtils.findAndHookMethod(
             SplashActivity::class.java,
             "countTodayAd",
-            object : MethodHook(){
+            object : MethodHook() {
                 override fun afterHookedMethod(param: MapleBridge.MethodHookParam) {
                     SharedPreAdUtils.getInstance().putBoolean("adTimeOut", false)
                 }
@@ -99,9 +123,9 @@ object App243Fix {
         MapleUtils.findAndHookMethod(
             AdUtils::class.java,
             "backSplashAd",
-            object : MethodHook(){
+            object : MethodHook() {
                 override fun beforeHookedMethod(param: MapleBridge.MethodHookParam) {
-                    if (SharedPreAdUtils.getInstance().getBoolean("adTimeOut")){
+                    if (SharedPreAdUtils.getInstance().getBoolean("adTimeOut")) {
                         param.result = false
                     }
                 }

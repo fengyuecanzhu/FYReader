@@ -20,10 +20,15 @@ package xyz.fycz.dynamic
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodHook
+import xyz.fycz.dynamic.fix.App243Fix
+import xyz.fycz.dynamic.fix.App244Fix
+import xyz.fycz.dynamic.fix.AppFix
+import xyz.fycz.dynamic.fix.AppFixHandle
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.ui.activity.MainActivity
 import xyz.fycz.myreader.util.utils.AdUtils
@@ -33,34 +38,41 @@ import xyz.fycz.myreader.util.utils.AdUtils
  * @date 2022/3/29 11:59
  */
 class AppLoadImpl : IAppLoader {
-    private val spuName = "FYReader_plugin"
-    private val spu = App.getmContext().getSharedPreferences(spuName, Context.MODE_PRIVATE)
+
+    companion object {
+        private const val spuName = "FYReader_plugin"
+        val spu: SharedPreferences =
+            App.getmContext().getSharedPreferences(spuName, Context.MODE_PRIVATE)
+    }
+
+    private val fixList = listOf(
+        App243Fix::class.java,
+        App244Fix::class.java
+    )
 
     override fun onLoad(appParam: AppParam) {
-        if (App.getVersionCode() == 243) {
-            val key = "2022-03-31"
-            var fx1 = false
-            var fx2 = false
-            try {
-                App243Fix.fixGetAllNoLocalSource()
-                fx1 = true
-                fixResult(key, "getAllNoLocalSource", true)
-            } catch (e: Exception) {
-                MapleUtils.log(e)
-                fixResult(key, "getAllNoLocalSource", false)
+        val sb = StringBuilder()
+        var index = 1
+        fixList.forEach {
+            val annotation = it.getAnnotation(AppFix::class.java)!!
+            annotation.version.forEach { version ->
+                if (App.getVersionCode() == version) {
+                    val fix = it.newInstance()
+                    val fixResult = fix.onFix(annotation.date)
+                    if (!spu.getBoolean(annotation.date, false)) {
+                        fixResult.forEachIndexed { i, b ->
+                            sb.append("${index++}、${annotation.fixLog[i]}：${if (b) "成功" else "失败"}\n")
+                        }
+                        spu.edit().run {
+                            putBoolean(annotation.date, true)
+                            apply()
+                        }
+                    }
+                }
             }
-            try {
-                App243Fix.fixAdTimeout()
-                fx2 = true
-                fixResult(key, "adTimeout", true)
-            } catch (e: Exception) {
-                MapleUtils.log(e)
-                fixResult(key, "adTimeout", false)
-            }
-            val msg = "$key\n更新内容:\n1、修复软件无法打开的问题(超时时间为5s)：$fx1\n" +
-                    "2、修复DIY书源重复显示订阅书源的问题：$fx2"
-            announce("插件更新", msg, key)
         }
+        if (sb.lastIndexOf("\n") > 0) sb.substring(0, sb.length - 1)
+        announce("插件更新", "2022-04-25更新内容：\n$sb", "fix244")
     }
 
     private fun announce(title: String, msg: String, key: String) {
@@ -91,17 +103,6 @@ class AppLoadImpl : IAppLoader {
         } catch (e: Exception) {
             e.printStackTrace()
             MapleUtils.log(e)
-        }
-    }
-
-    private fun fixResult(key: String, name: String, success: Boolean) {
-        val res = if (success) "Success" else "Failed"
-        if (!spu.getBoolean("$key-$name-$res", false)) {
-            AdUtils.adRecord(name, "fx$res")
-            spu.edit().run {
-                putBoolean("$key-$name-$res", true)
-                apply()
-            }
         }
     }
 }

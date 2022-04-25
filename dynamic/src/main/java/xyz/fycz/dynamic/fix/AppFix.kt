@@ -16,26 +16,14 @@
  *  Copyright (C) 2020 - 2022 fengyuecanzhu
  */
 
-package xyz.fycz.dynamic
-
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import me.fycz.maple.MapleUtils
-
-import org.junit.Test
-import org.junit.runner.RunWith
-
-import xyz.fycz.dynamic.fix.App243Fix
-import xyz.fycz.myreader.application.App
+package xyz.fycz.dynamic.fix
 
 /**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * @author fengyue
+ * @date 2022/4/25 22:05
  */
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
-    @Test
-    fun testFix() {
-        // Context of the app under test.
-    }
-}
+annotation class AppFix(
+    val version: IntArray = [],
+    val fixLog: Array<String> = [],
+    val date: String = ""
+)

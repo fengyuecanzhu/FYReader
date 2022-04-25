@@ -230,9 +230,6 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
 
     public boolean unionChapterCathe(Book book) throws IOException {
         ArrayList<Chapter> chapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
-        BufferedReader br = null;
-        BufferedWriter bw = null;
-        bw = new BufferedWriter(new FileWriter(FileUtils.getFile(APPCONST.TXT_BOOK_DIR + book.getName() + ".txt")));
         if (chapters.size() == 0) {
             return false;
         }
@@ -240,12 +237,20 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
         if (!bookFile.exists()) {
             return false;
         }
+        BufferedReader br = null;
+        BufferedWriter bw = null;
+        String filePath = APPCONST.TXT_BOOK_DIR + book.getName() + (TextUtils.isEmpty(book.getAuthor())
+                ? "" : " 作者：" + book.getAuthor()) + ".txt";
+        bw = new BufferedWriter(new FileWriter(FileUtils.getFile(filePath)));
+        bw.write("《" + book.getName() + "》\n");
+        if (!TextUtils.isEmpty(book.getAuthor())) bw.write("作者：" + book.getAuthor() + "\n");
+        if (!TextUtils.isEmpty(book.getDesc())) bw.write("简介：\n" + book.getDesc() + "\n");
+        bw.newLine();
         for (Chapter chapter : chapters) {
             if (ChapterService.isChapterCached(chapter)) {
                 bw.write("\t" + chapter.getTitle());
                 bw.newLine();
-                br = new BufferedReader(new FileReader(APPCONST.BOOK_CACHE_PATH + book.getId()
-                        + File.separator + chapter.getTitle() + FileUtils.SUFFIX_FY));
+                br = new BufferedReader(new FileReader(ChapterService.getChapterFile(chapter)));
                 String line = null;
                 while ((line = br.readLine()) != null) {
                     bw.write(line);
