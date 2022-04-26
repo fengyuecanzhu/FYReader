@@ -18,7 +18,6 @@
 
 package xyz.fycz.dynamic.fix
 
-import android.text.TextUtils
 import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodReplacement
@@ -34,7 +33,7 @@ import java.io.*
  * @author fengyue
  * @date 2022/4/25 23:00
  */
-@AppFix([243, 244], ["修复书籍无法导出缓存的问题"], "2022-04-25")
+@AppFix([243, 244], ["修复书籍无法导出缓存的问题"], "2022-04-26")
 class App244Fix: AppFixHandle {
     override fun onFix(key: String): BooleanArray {
         var fx = false
@@ -44,7 +43,7 @@ class App244Fix: AppFixHandle {
             fixResult(key, "unionChapterCathe", true)
         } catch (e: Exception) {
             MapleUtils.log(e)
-            fixResult(key, "getAllNoLocalSource", false)
+            fixResult(key, "unionChapterCathe", false)
         }
         return booleanArrayOf(fx)
     }
@@ -77,12 +76,12 @@ class App244Fix: AppFixHandle {
         val filePath =
             APPCONST.TXT_BOOK_DIR + book.name + (if (book.author.isNullOrEmpty()) "" else " 作者：" + book.author) + ".txt"
         bw = BufferedWriter(FileWriter(FileUtils.getFile(filePath)))
-        bw.write("《${book.name}》")
+        bw.write("《${book.name}》\n")
         if (!book.author.isNullOrEmpty()) {
-            bw.write("作者：${book.author}")
+            bw.write("作者：${book.author}\n")
         }
         if (!book.desc.isNullOrEmpty()) {
-            bw.write("简介：${book.desc}")
+            bw.write("简介：\n${book.desc}\n")
         }
         bw.newLine()
         for (chapter in chapters) {

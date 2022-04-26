@@ -22,13 +22,13 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodHook
 import xyz.fycz.dynamic.fix.App243Fix
 import xyz.fycz.dynamic.fix.App244Fix
 import xyz.fycz.dynamic.fix.AppFix
-import xyz.fycz.dynamic.fix.AppFixHandle
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.ui.activity.MainActivity
 import xyz.fycz.myreader.util.utils.AdUtils
@@ -52,27 +52,30 @@ class AppLoadImpl : IAppLoader {
 
     override fun onLoad(appParam: AppParam) {
         val sb = StringBuilder()
-        var index = 1
         fixList.forEach {
             val annotation = it.getAnnotation(AppFix::class.java)!!
-            annotation.version.forEach { version ->
+            for (version in annotation.versions){
                 if (App.getVersionCode() == version) {
                     val fix = it.newInstance()
                     val fixResult = fix.onFix(annotation.date)
                     if (!spu.getBoolean(annotation.date, false)) {
+                        if (sb.isNotEmpty()) sb.append("\n")
+                        sb.append("${annotation.date}\n")
                         fixResult.forEachIndexed { i, b ->
-                            sb.append("${index++}、${annotation.fixLog[i]}：${if (b) "成功" else "失败"}\n")
+                            sb.append("${i+1}、${annotation.fixLog[i]}：${if (b) "成功" else "失败"}\n")
                         }
                         spu.edit().run {
                             putBoolean(annotation.date, true)
                             apply()
                         }
                     }
+                    break
                 }
             }
         }
-        if (sb.lastIndexOf("\n") > 0) sb.substring(0, sb.length - 1)
-        announce("插件更新", "2022-04-25更新内容：\n$sb", "fix244")
+        if (sb.isNotEmpty()) sb.substring(0, sb.length - 1)
+        Log.i(spuName, "更新内容：$sb")
+        announce("插件更新", "更新内容：\n$sb", "fix244")
     }
 
     private fun announce(title: String, msg: String, key: String) {
@@ -95,7 +98,6 @@ class AppLoadImpl : IAppLoader {
                                 putBoolean(key, true)
                                 apply()
                             }
-                            AdUtils.adRecord("plugin", "fxRecord")
                         }
                     }
                 }

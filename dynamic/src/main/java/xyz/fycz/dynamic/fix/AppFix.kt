@@ -23,7 +23,7 @@ package xyz.fycz.dynamic.fix
  * @date 2022/4/25 22:05
  */
 annotation class AppFix(
-    val version: IntArray = [],
+    val versions: IntArray = [],
     val fixLog: Array<String> = [],
     val date: String = ""
 )
