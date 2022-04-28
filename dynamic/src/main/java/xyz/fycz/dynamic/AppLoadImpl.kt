@@ -54,7 +54,7 @@ class AppLoadImpl : IAppLoader {
         val sb = StringBuilder()
         fixList.forEach {
             val annotation = it.getAnnotation(AppFix::class.java)!!
-            for (version in annotation.versions){
+            for (version in annotation.versions) {
                 if (App.getVersionCode() == version) {
                     val fix = it.newInstance()
                     val fixResult = fix.onFix(annotation.date)
@@ -62,7 +62,7 @@ class AppLoadImpl : IAppLoader {
                         if (sb.isNotEmpty()) sb.append("\n")
                         sb.append("${annotation.date}\n")
                         fixResult.forEachIndexed { i, b ->
-                            sb.append("${i+1}、${annotation.fixLog[i]}：${if (b) "成功" else "失败"}\n")
+                            sb.append("${i + 1}、${annotation.fixLog[i]}：${if (b) "成功" else "失败"}\n")
                         }
                         spu.edit().run {
                             putBoolean(annotation.date, true)
@@ -73,9 +73,18 @@ class AppLoadImpl : IAppLoader {
                 }
             }
         }
-        if (sb.isNotEmpty()) sb.substring(0, sb.length - 1)
-        Log.i(spuName, "更新内容：$sb")
-        announce("插件更新", "更新内容：\n$sb", "fix244")
+        if (sb.isNotEmpty()) {
+            if (sb.endsWith("\n")) sb.substring(0, sb.length - 1)
+            val key = "fix244"
+            val hasRead = spu.getBoolean(key, false)
+            if (!hasRead) {
+                announce("插件更新", "更新内容：\n$sb", "fix244")
+                spu.edit().run {
+                    putBoolean(key, true)
+                    apply()
+                }
+            }
+        }
     }
 
     private fun announce(title: String, msg: String, key: String) {
@@ -87,18 +96,11 @@ class AppLoadImpl : IAppLoader {
                 object : MethodHook() {
                     override fun afterHookedMethod(param: MapleBridge.MethodHookParam) {
                         val context = param.thisObject as Context
-                        val hasRead = spu.getBoolean(key, false)
-                        if (!hasRead) {
-                            AlertDialog.Builder(context)
-                                .setTitle(title)
-                                .setMessage(msg)
-                                .setPositiveButton("我知道了", null)
-                                .create().show()
-                            spu.edit().run {
-                                putBoolean(key, true)
-                                apply()
-                            }
-                        }
+                        AlertDialog.Builder(context)
+                            .setTitle(title)
+                            .setMessage(msg)
+                            .setPositiveButton("我知道了", null)
+                            .create().show()
                     }
                 }
             )
