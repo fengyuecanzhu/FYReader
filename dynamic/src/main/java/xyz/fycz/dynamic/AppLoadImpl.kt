@@ -22,7 +22,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodHook
@@ -31,7 +30,6 @@ import xyz.fycz.dynamic.fix.App244Fix
 import xyz.fycz.dynamic.fix.AppFix
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.ui.activity.MainActivity
-import xyz.fycz.myreader.util.utils.AdUtils
 
 /**
  * @author fengyue
@@ -78,7 +76,7 @@ class AppLoadImpl : IAppLoader {
             val key = "fix244"
             val hasRead = spu.getBoolean(key, false)
             if (!hasRead) {
-                announce("插件更新", "更新内容：\n$sb", "fix244")
+                announce("插件更新", "更新内容：\n$sb")
                 spu.edit().run {
                     putBoolean(key, true)
                     apply()
@@ -87,7 +85,7 @@ class AppLoadImpl : IAppLoader {
         }
     }
 
-    private fun announce(title: String, msg: String, key: String) {
+    private fun announce(title: String, msg: String) {
         try {
             MapleUtils.findAndHookMethod(
                 MainActivity::class.java,
@@ -96,11 +94,13 @@ class AppLoadImpl : IAppLoader {
                 object : MethodHook() {
                     override fun afterHookedMethod(param: MapleBridge.MethodHookParam) {
                         val context = param.thisObject as Context
-                        AlertDialog.Builder(context)
-                            .setTitle(title)
-                            .setMessage(msg)
-                            .setPositiveButton("我知道了", null)
-                            .create().show()
+                        App.getHandler().postDelayed({
+                            AlertDialog.Builder(context)
+                                .setTitle(title)
+                                .setMessage(msg)
+                                .setPositiveButton("我知道了", null)
+                                .create().show()
+                        }, 1000)
                     }
                 }
             )

@@ -72,7 +72,7 @@ object PluginUtils {
             } else {
                 config = oldConfig
             }
-            if (!App.isDebug() && config!!.md5.lowercase(Locale.getDefault())
+            if (config!!.md5.lowercase(Locale.getDefault())
                 != getPluginMD5(config!!)?.lowercase(Locale.getDefault())
             ) {
                 downloadPlugin(config!!)
@@ -115,8 +115,8 @@ object PluginUtils {
                         appParam.packageName = context.packageName
                         appParam.appInfo = context.applicationInfo
                         onLoad(appParam)
+                        hasLoad = true
                     }
-                    hasLoad = true
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
