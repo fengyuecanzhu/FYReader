@@ -24,6 +24,8 @@ def releaseTime() {
     return new Date().format("yy.MMddHH", TimeZone.getTimeZone("GMT+08:00"))
 }
 
+def gitCommits = Integer.parseInt('git rev-list HEAD --count'.execute().text.trim())
+
 def getVersionCode() {
     def versionCodeFile = file('version_code.properties')
     if (versionCodeFile.canRead()) {
@@ -119,7 +121,8 @@ android {
             if (keyPropsFile.exists()) {
                 signingConfig signingConfigs.myConifg
             }
-            versionNameSuffix "-debug"
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-" + gitCommits
             ndk {
                 abiFilters "arm64-v8a"
             }
