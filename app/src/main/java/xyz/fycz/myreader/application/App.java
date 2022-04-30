@@ -1,7 +1,24 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.application;
 
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -34,34 +51,37 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
 import io.reactivex.internal.functions.Functions;
 import io.reactivex.plugins.RxJavaPlugins;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
+import kotlin.jvm.functions.Function3;
+import kotlinx.coroutines.CoroutineScope;
+import xyz.fycz.dynamic.AppParam;
+import xyz.fycz.dynamic.IAppLoader;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.entity.lanzou.LanZouFile;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
-import xyz.fycz.myreader.ui.activity.MainActivity;
+import xyz.fycz.myreader.model.user.User;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
-import xyz.fycz.myreader.ui.fragment.BookcaseFragment;
-import xyz.fycz.myreader.util.help.SSLSocketClient;
+import xyz.fycz.myreader.ui.dialog.UpdateDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
-import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.help.SSLSocketClient;
+import xyz.fycz.myreader.util.help.StringHelper;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
-import xyz.fycz.myreader.ui.dialog.UpdateDialog;
+import xyz.fycz.myreader.util.utils.PluginUtils;
+import xyz.fycz.myreader.webapi.LanZouApi;
 
 
 public class App extends Application {
@@ -71,6 +91,7 @@ public class App extends Application {
     private static App application;
     private ExecutorService mFixedThreadPool;
     private static boolean debug;
+    public static boolean isBackground = false;
 
     @Override
     public void onCreate() {
@@ -78,7 +99,6 @@ public class App extends Application {
         application = this;
         debug = isApkInDebug(this);
         CrashHandler.register(this);
-        firstInit();
         SSLSocketClient.trustAllHosts();//信任所有证书
         RxJavaPlugins.setErrorHandler(Functions.emptyConsumer());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -91,7 +111,6 @@ public class App extends Application {
                         .readTimeout(15_000) // set read timeout.
                 ))
                 .commit();
-//        handleSSLHandshake();
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
         }
@@ -99,16 +118,10 @@ public class App extends Application {
         initNightTheme();
 //        LLog.init(APPCONST.LOG_DIR);
         initDialogX();
+        //AdUtils.initAd();
+        PluginUtils.INSTANCE.init();
     }
 
-
-    private void firstInit() {
-        SharedPreUtils sru = SharedPreUtils.getInstance();
-        if (!sru.getBoolean("firstInit")) {
-            BookSourceManager.initDefaultSources();
-            sru.putBoolean("firstInit", true);
-        }
-    }
 
     private void initDialogX() {
         DialogX.init(this);
@@ -150,31 +163,6 @@ public class App extends Application {
         setting.setDayStyle(!isNightMode);
         SysManager.saveSetting(setting);
         App.getApplication().initNightTheme();
-    }
-
-    @SuppressLint("TrulyRandom")
-    public static void handleSSLHandshake() {
-        try {
-            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-
-                @Override
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
-            }};
-
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
-        } catch (Exception ignored) {
-        }
     }
 
 
@@ -321,29 +309,29 @@ public class App extends Application {
                 isForceUpdate = Boolean.parseBoolean(contents[1].substring(contents[1].indexOf(":") + 1));
                 downloadLink = contents[2].substring(contents[2].indexOf(":") + 1).trim();
                 updateContent = contents[3].substring(contents[3].indexOf(":") + 1);
-                SharedPreUtils spu = SharedPreUtils.getInstance();
-                spu.putString(getmContext().getString(R.string.lanzousKeyStart), contents[4].substring(contents[4].indexOf(":") + 1));
+                SharedPreUtils.getInstance().putString(getmContext().getString(R.string.lanzousKeyStart), contents[4].substring(contents[4].indexOf(":") + 1));
 
                 String newSplashTime = contents[5].substring(contents[5].indexOf(":") + 1);
-                String oldSplashTime = spu.getString("splashTime");
-                spu.putBoolean("needUdSI", !oldSplashTime.equals(newSplashTime));
-                spu.putString("splashTime", contents[5].substring(contents[5].indexOf(":") + 1));
-                spu.putString("splashImageUrl", contents[6].substring(contents[6].indexOf(":") + 1));
-                spu.putString("splashImageMD5", contents[7].substring(contents[7].indexOf(":") + 1));
+                String oldSplashTime = SharedPreUtils.getInstance().getString("splashTime");
+                SharedPreUtils.getInstance().putBoolean("needUdSI", !oldSplashTime.equals(newSplashTime));
+                SharedPreUtils.getInstance().putString("splashTime", contents[5].substring(contents[5].indexOf(":") + 1));
+                SharedPreUtils.getInstance().putString("splashImageUrl", contents[6].substring(contents[6].indexOf(":") + 1));
+                SharedPreUtils.getInstance().putString("splashImageMD5", contents[7].substring(contents[7].indexOf(":") + 1));
 
                 forceUpdateVersion = Integer.parseInt(contents[8].substring(contents[8].indexOf(":") + 1));
-                spu.putInt("forceUpdateVersion", forceUpdateVersion);
+                SharedPreUtils.getInstance().putInt("forceUpdateVersion", forceUpdateVersion);
 
                 String domain = contents[9].substring(contents[9].indexOf(":") + 1);
-                spu.putString("domain", domain);
-
+                SharedPreUtils.getInstance().putString("domain", domain);
+                String pluginConfigUrl = contents[10].substring(contents[10].indexOf(":") + 1);
+                SharedPreUtils.getInstance().putString("pluginConfigUrl", pluginConfigUrl);
                 int versionCode = getVersionCode();
 
                 isForceUpdate = isForceUpdate && forceUpdateVersion > versionCode;
                 if (!StringHelper.isEmpty(downloadLink)) {
-                    spu.putString(getmContext().getString(R.string.downloadLink), downloadLink);
+                    SharedPreUtils.getInstance().putString(getmContext().getString(R.string.downloadLink), downloadLink);
                 } else {
-                    spu.putString(getmContext().getString(R.string.downloadLink), URLCONST.APP_DIR_UR);
+                    SharedPreUtils.getInstance().putString(getmContext().getString(R.string.downloadLink), URLCONST.APP_DIR_URL);
                 }
                 String[] updateContents = updateContent.split("/");
                 for (String string : updateContents) {
@@ -395,7 +383,7 @@ public class App extends Application {
     private void goDownload(Activity activity, String url) {
         String downloadLink = url;
         if (url == null || "".equals(url)) {
-            downloadLink = URLCONST.APP_DIR_UR;
+            downloadLink = URLCONST.APP_DIR_URL;
         }
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
@@ -407,6 +395,9 @@ public class App extends Application {
      * 判断当前应用是否是debug状态
      */
     public static boolean isApkInDebug(Context context) {
+        User user = UserService.INSTANCE.readConfig();
+        if (user != null && "fengyue".equals(user.getUserName()))
+            return true;
         try {
             ApplicationInfo info = context.getApplicationInfo();
             return (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
@@ -476,4 +467,5 @@ public class App extends Application {
     public ExecutorService getmFixedThreadPool() {
         return mFixedThreadPool;
     }
+
 }

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of FYReader.
+  ~ FYReader is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ FYReader is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+  ~
+  ~ Copyright (C) 2020 - 2022 fengyuecanzhu
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_tip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorForeground"
+        android:padding="15dp"
+        android:text="@string/remove_ad_tip"
+        android:textColor="@color/textSecondary"
+        android:textSize="@dimen/text_small_size" />
+
+    <LinearLayout
+        android:id="@+id/ll_splash_ad_times"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/selector_common_bg"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingTop="8dp"
+        android:paddingRight="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/remove_ad_reward"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_normal_size" />
+
+        <TextView
+            android:id="@+id/tv_cur_remove_ad_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:text="@string/cur_remove_ad_time"
+            android:textColor="@color/textSecondary" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_reward_video"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/selector_common_bg"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/watch_rewarded_video"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/text_normal_size" />
+
+    </RelativeLayout>
+
+</LinearLayout>

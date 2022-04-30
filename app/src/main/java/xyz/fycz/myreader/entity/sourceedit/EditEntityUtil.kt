@@ -1,8 +1,25 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.entity.sourceedit
 
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.greendao.entity.rule.*
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -34,6 +51,7 @@ object EditEntityUtil {
             )
             add(EditEntity("loginUrl", source?.loginUrl, R.string.login_url, ""))
             add(EditEntity("sourceComment", source?.sourceComment, R.string.comment, "这是您留给使用者的说明"))
+            add(EditEntity("concurrentRate", source?.concurrentRate, R.string.source_concurrent_rate, ""))
         }
         return sourceEntities
     }
@@ -84,7 +102,7 @@ object EditEntityUtil {
             add(EditEntity("url", findRule?.url, R.string.r_find_url))
             add(
                 EditEntity(
-                    "bookList", findRule?.bookList, R.string.r_book_list,
+                    "bookList", findRule?.list, R.string.r_book_list,
                     "对于Matcher解析器：此处填写书籍列表所在区间，仅支持普通函数；" +
                             "\n对于Xpath/JsonPath解析器：此处填写书籍列表规则，仅支持列表函数"
                 )
@@ -155,6 +173,18 @@ object EditEntityUtil {
             )
             add(
                 EditEntity(
+                    "isVip", tocRule?.isVip, R.string.rule_is_vip,
+                    ""
+                )
+            )
+            add(
+                EditEntity(
+                    "updateTime", tocRule?.updateTime, R.string.rule_update_time,
+                    ""
+                )
+            )
+            add(
+                EditEntity(
                     "tocUrlNext", tocRule?.tocUrlNext, R.string.rule_next_toc_url,
                     "填写后获取目录时将会不断地从目录下一页获取章节，直至下一页URL为空时停止，注意：千万不要获取恒存在的URL，否则将出现死循环甚至崩溃"
                 )
@@ -179,6 +209,24 @@ object EditEntityUtil {
                     "填写后正文时将会不断地从下一页获取内容，直至下一页URL为空时停止，注意：千万不要获取恒存在的URL，否则将出现死循环甚至崩溃"
                 )
             )
+            add(
+                EditEntity(
+                    "webJs", contentRule?.webJs, R.string.rule_web_js,
+                    ""
+                )
+            )
+            add(
+                EditEntity(
+                    "sourceRegex", contentRule?.sourceRegex, R.string.rule_source_regex,
+                    ""
+                )
+            )
+            add(
+                EditEntity(
+                    "replaceRegex", contentRule?.replaceRegex, R.string.rule_replace_regex,
+                    ""
+                )
+            )
         }
         return contentEntities
     }
@@ -195,6 +243,7 @@ object EditEntityUtil {
                 "sourceHeaders" -> source.sourceHeaders = it.value
                 "loginUrl" -> source.loginUrl = it.value
                 "sourceComment" -> source.sourceComment = it.value
+                "concurrentRate" -> source.concurrentRate = it.value
             }
         }
         return source
@@ -229,7 +278,7 @@ object EditEntityUtil {
         findEntities.forEach {
             when (it.key) {
                 "url" -> findRule.url = it.value
-                "bookList" -> findRule.bookList = it.value
+                "bookList" -> findRule.list = it.value
                 "name" -> findRule.name = it.value
                 "author" -> findRule.author = it.value
                 "type" -> findRule.type = it.value
@@ -275,6 +324,8 @@ object EditEntityUtil {
                 "chapterBaseUrl" -> tocRule.chapterBaseUrl = it.value
                 "chapterName" -> tocRule.chapterName = it.value
                 "chapterUrl" -> tocRule.chapterUrl = it.value
+                "isVip" -> tocRule.isVip = it.value
+                "updateTime" -> tocRule.updateTime = it.value
                 "tocUrlNext" -> tocRule.tocUrlNext = it.value
             }
         }
@@ -288,6 +339,9 @@ object EditEntityUtil {
                 "content" -> contentRule.content = it.value
                 "contentBaseUrl" -> contentRule.contentBaseUrl = it.value
                 "contentUrlNext" -> contentRule.contentUrlNext = it.value
+                "webJs" -> contentRule.webJs = it.value
+                "sourceRegex" -> contentRule.sourceRegex = it.value
+                "replaceRegex" -> contentRule.replaceRegex = it.value
             }
         }
         return contentRule

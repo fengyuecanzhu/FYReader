@@ -1,18 +1,43 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import androidx.annotation.NonNull;
+
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.signature.ObjectKey;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
+import com.weaction.ddsdk.ad.DdSdkSplashAd;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,29 +47,34 @@ import java.util.List;
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.base.BaseActivity;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySplashBinding;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.IOUtils;
+import xyz.fycz.myreader.util.SharedPreAdUtils;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.DateHelper;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.ImageLoader;
 import xyz.fycz.myreader.util.utils.MD5Utils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.SystemBarUtils;
 
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     /*************Constant**********/
     public static final String TAG = SplashActivity.class.getSimpleName();
     public static int WAIT_INTERVAL = 0;
 
-    private ActivitySplashBinding binding;
-    private SharedPreUtils spu;
     private int todayAdCount;
     private int adTimes;
     private boolean hasStart = false;
+    private boolean startToAd = false;
+    private static final String INTENT_TO_AD = "startToAd";
+    private int timeOut = 5;
+    private Handler handler = new Handler();
 
     //创建子线程
     private Runnable start = () -> {
@@ -62,23 +92,16 @@ public class SplashActivity extends BaseActivity {
         }
     };
 
-    private Thread countTime = new Thread() {
-        @Override
-        public void run() {
-            App.runOnUiThread(() -> binding.tvSkip.setVisibility(View.VISIBLE));
-            for (int i = 0; i < 5; i++) {
-                int time = 5 - i;
-                App.runOnUiThread(() -> binding.tvSkip.setText(getString(R.string.skip_ad, time)));
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            WAIT_INTERVAL = 0;
-            startNormal();
+    private Runnable adTimeOutRunnable = () -> adTimeout(--timeOut);
+
+    public static void start(Context context) {
+        Intent intent = new Intent(context, SplashActivity.class);
+        if (!(context instanceof Activity)) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
-    };
+        intent.putExtra(INTENT_TO_AD, true);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void bindView() {
@@ -90,7 +113,7 @@ public class SplashActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // 避免从桌面启动程序后，会重新实例化入口类的activity
-        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
+        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0 && !startToAd) {
             finish();
             return;
         }
@@ -117,9 +140,9 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initData(Bundle savedInstanceState) {
-        spu = SharedPreUtils.getInstance();
-        String splashAdCount = spu.getString("splashAdCount");
-        adTimes = spu.getInt("curAdTimes", 3);
+        startToAd = getIntent().getBooleanExtra(INTENT_TO_AD, false);
+        String splashAdCount = SharedPreUtils.getInstance().getString("splashAdCount");
+        adTimes = SharedPreUtils.getInstance().getInt("curAdTimes", 3);
         String[] splashAdCounts = splashAdCount.split(":");
         String today = DateHelper.getYearMonthDay1();
         if (today.equals(splashAdCounts[0])) {
@@ -146,34 +169,32 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void start() {
-        startNoAd();
+        //startNoAd();
         /*if (adTimes >= 0 && todayAdCount >= adTimes) {
             startNoAd();
-        } else {
-            App.getHandler().postDelayed(() -> {
+        } else {*/
+            /*App.getHandler().postDelayed(() -> {
                 binding.tvSkip.setVisibility(View.VISIBLE);
-            }, 2000);
-            AdUtils.checkHasAd()
-                    .subscribe(new MySingleObserver<Boolean>() {
-                        @Override
-                        public void onSuccess(@NonNull Boolean aBoolean) {
-                            if (aBoolean) {
-                                AdUtils.initAd();
-                                startWithAd();
-                                binding.ivSplash.setVisibility(View.GONE);
-                                binding.llAd.setVisibility(View.VISIBLE);
-                            } else {
-                                startNoAd();
-                            }
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
+            }, 2000);*/
+        AdUtils.checkHasAd()
+                .subscribe(new MySingleObserver<Boolean>() {
+                    @Override
+                    public void onSuccess(@NonNull Boolean aBoolean) {
+                        if (aBoolean) {
+                            startWithAd();
+                            binding.ivSplash.setVisibility(View.GONE);
+                            binding.llAd.setVisibility(View.VISIBLE);
+                        } else {
                             startNoAd();
                         }
-                    });
-        }*/
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        startNoAd();
+                    }
+                });
+        //}
     }
 
     private void startNoAd() {
@@ -188,6 +209,10 @@ public class SplashActivity extends BaseActivity {
 
     private void startNormal() {
         if (!App.isDestroy(this)) {
+            if (startToAd) {
+                finish();
+                return;
+            }
             if (BookGroupService.getInstance().curGroupIsPrivate()) {
                 App.runOnUiThread(() -> {
                     MyAlertDialog.showPrivateVerifyDia(SplashActivity.this, needGoTo -> {
@@ -208,15 +233,17 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void startWithAd() {
-        /*try {
+        try {
             new DdSdkSplashAd().show(binding.flAd, this, new DdSdkSplashAd.CountdownCallback() {
                 // 展示成功
                 @Override
                 public void show() {
+                    handler.removeCallbacks(adTimeOutRunnable);
+                    SharedPreAdUtils.getInstance().putLong("splashAdTime", System.currentTimeMillis());
                     Log.d(TAG, "广告展示成功");
                     AdUtils.adRecord("splash", "adShow");
                     countTodayAd();
-                    countTime.start();
+                    SharedPreAdUtils.getInstance().putBoolean("adTimeOut", false);
                 }
 
                 // 广告被点击
@@ -244,11 +271,12 @@ public class SplashActivity extends BaseActivity {
                     startNormal();
                 }
             });
+            adTimeout(timeOut);
         } catch (Exception e) {
             e.printStackTrace();
             WAIT_INTERVAL = 1500;
             startNormal();
-        }*/
+        }
     }
 
 
@@ -326,6 +354,11 @@ public class SplashActivity extends BaseActivity {
     private void requestPermission() {
         //获取读取和写入SD卡的权限
         XXPermissions.with(this)
+                /*.permission(new String[]{Permission.READ_PHONE_STATE,
+                        Permission.WRITE_EXTERNAL_STORAGE,
+                        Permission.READ_EXTERNAL_STORAGE,
+                        Permission.ACCESS_FINE_LOCATION,
+                        Permission.ACCESS_COARSE_LOCATION})*/
                 .permission(APPCONST.STORAGE_PERMISSIONS)
                 .request(new OnPermissionCallback() {
                     @Override
@@ -335,7 +368,8 @@ public class SplashActivity extends BaseActivity {
 
                     @Override
                     public void onDenied(List<String> permissions, boolean never) {
-                        ToastUtils.showWarring("储存权限被拒绝，部分功能可能无法正常运行！");
+                        if (permissions.contains(Permission.WRITE_EXTERNAL_STORAGE))
+                            ToastUtils.showWarring("储存权限被拒绝，部分功能可能无法正常运行！");
                         start();
                     }
                 });
@@ -345,6 +379,17 @@ public class SplashActivity extends BaseActivity {
     private void countTodayAd() {
         String today = DateHelper.getYearMonthDay1();
         todayAdCount++;
-        spu.putString("splashAdCount", today + ":" + todayAdCount);
+        SharedPreUtils.getInstance().putString("splashAdCount", today + ":" + todayAdCount);
+    }
+
+    private void adTimeout(int time) {
+        if (time == 0) {
+            WAIT_INTERVAL = 0;
+            SharedPreAdUtils.getInstance().putLong("splashAdTime", System.currentTimeMillis());
+            startNormal();
+            SharedPreAdUtils.getInstance().putBoolean("adTimeOut", true);
+        } else {
+            handler.postDelayed(adTimeOutRunnable, 1000);
+        }
     }
 }

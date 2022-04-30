@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
 import android.graphics.Bitmap;
@@ -19,7 +37,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityRegisterBinding;
 import xyz.fycz.myreader.model.user.Result;
 import xyz.fycz.myreader.model.user.User;
-import xyz.fycz.myreader.model.user.UserService2;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.CodeUtil;
@@ -31,9 +49,7 @@ import xyz.fycz.myreader.util.utils.StringUtils;
  * @author fengyue
  * @date 2020/9/18 22:37
  */
-public class RegisterActivity extends BaseActivity {
-
-    private ActivityRegisterBinding binding;
+public class RegisterActivity extends BaseActivity<ActivityRegisterBinding> {
 
     private String code;
     private String username = "";
@@ -153,7 +169,7 @@ public class RegisterActivity extends BaseActivity {
             }
             dialog.show();
             dialog.setmMessage("正在发送");
-            UserService2.INSTANCE.sendEmail(email, "reg", keyc).subscribe(new MySingleObserver<Result>() {
+            UserService.INSTANCE.sendEmail(email, "reg", keyc).subscribe(new MySingleObserver<Result>() {
                 @Override
                 public void onSubscribe(Disposable d) {
                     addDisposable(d);
@@ -202,7 +218,7 @@ public class RegisterActivity extends BaseActivity {
                 dialog.show();
                 dialog.setmMessage("正在注册");
                 User user = new User(username, CyptoUtils.encode(APPCONST.KEY, password), email);
-                UserService2.INSTANCE.register(user, emailCode, keyc).subscribe(new MySingleObserver<Result>() {
+                UserService.INSTANCE.register(user, emailCode, keyc).subscribe(new MySingleObserver<Result>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         addDisposable(d);
@@ -212,7 +228,7 @@ public class RegisterActivity extends BaseActivity {
                     @Override
                     public void onSuccess(@NonNull Result result) {
                         if (result.getCode() == 101) {
-                            UserService2.INSTANCE.writeUsername(user.getUserName());
+                            UserService.INSTANCE.writeUsername(user.getUserName());
                             ToastUtils.showSuccess(result.getResult().toString());
                             finish();
                         } else {

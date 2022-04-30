@@ -1,6 +1,25 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.common;
 
 import android.os.Environment;
+import android.provider.Settings;
 
 import com.google.gson.reflect.TypeToken;
 import com.hjq.permissions.Permission;
@@ -43,6 +62,8 @@ public class APPCONST {
             + "book_cache" + File.separator;
     public static String HTML_CACHE_PATH = FileUtils.getCachePath() + File.separator
             + "html_cache" + File.separator;
+    public static String PLUGIN_DIR_PATH = App.getmContext().getFilesDir().getParent()
+            + File.separator + "plugin" + File.separator;
 
     public static long exitTime;
     public static final int exitConfirmTime = 2000;
@@ -51,6 +72,7 @@ public class APPCONST {
     public static final String XPATH = "Xpath";
     public static final String JSON_PATH = "JsonPath";
     public static final String THIRD_SOURCE = "ThirdSource";
+    public static final String THIRD_3_SOURCE = "Third3Source";
 
     public static final String DATA_KEY = "data_key";
     public static final String FIND_CRAWLER = "findCrawler";
@@ -100,6 +122,10 @@ public class APPCONST {
     public static final int REQUEST_GROUP_MANAGER = 1014;
     public static final int REQUEST_SEARCH_WORD = 1015;
     public static final int REQUEST_AUTH_EMAIL = 1016;
+    public static final int REQUEST_SETTING = 1017;
+    public static final int REQUEST_SUBSCRIBE = 1018;
+    public static final int REQUEST_LOGOUT = 1019;
+    public static final int REQUEST_RESET_PWD = 1020;
 
     public static final int REQUEST_READ = 1;
 
@@ -110,7 +136,7 @@ public class APPCONST {
     //设置版本号
     public static final int SETTING_VERSION = 11;
 
-    public static final int SOURCE_VERSION = 7;
+    public static final int SOURCE_VERSION = 8;
 
     public static final String FORMAT_FILE_DATE = "yyyy-MM-dd";
 
@@ -125,6 +151,7 @@ public class APPCONST {
     }.getType();
 
     public static final Pattern JS_PATTERN = Pattern.compile("(<js>[\\w\\W]*?</js>|@js:[\\w\\W]*$)", Pattern.CASE_INSENSITIVE);
+    public static final Pattern JS_PATTERN_3 = Pattern.compile("<js>([\\w\\W]*?)</js>|@js:([\\w\\W]*)", Pattern.CASE_INSENSITIVE);
     public static final Pattern EXP_PATTERN = Pattern.compile("\\{\\{([\\w\\W]*?)\\}\\}");
 //    public static final Pattern IMG_PATTERN = Pattern.compile("<img .*?src.*?=.*?\"(.*?(?:,\\{.*\\})?)\".*?>", Pattern.CASE_INSENSITIVE);
 
@@ -132,4 +159,11 @@ public class APPCONST {
 
     public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4168.3 Safari/537.36";
 
+    public static final String UA_NAME = "User-Agent";
+
+    public static final String androidId = getAndroidId();
+
+    public static String getAndroidId() {
+        return Settings.System.getString(App.getmContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
 }

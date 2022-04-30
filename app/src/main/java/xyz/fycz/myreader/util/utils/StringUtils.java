@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.util.utils;
 
 
@@ -635,4 +653,83 @@ public class StringUtils {
         if (end < len) ++end;
         return ((start > 0) || (end < len)) ? s.substring(start, end) : s;
     }
+
+    public static String byteToHexString(byte[] bytes) {
+        if (bytes == null) return "";
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            int hex = 0xff & b;
+            if (hex < 16) {
+                sb.append('0');
+            }
+            sb.append(Integer.toHexString(hex));
+        }
+        return sb.toString();
+    }
+
+    public static byte[] hexStringToByte(String hexString) {
+        String hexStr = hexString.replace(" ", "");
+        int len = hexStr.length();
+        byte[] bytes = new byte[len / 2];
+        int i = 0;
+        while (i < len) {
+            // 两位一组，表示一个字节,把这样表示的16进制字符串，还原成一个字节
+            bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) +
+                    Character.digit(hexString.charAt(i+1), 16));
+            i += 2;
+        }
+        return bytes;
+    }
+
+    /**
+     * 对字符串处理:将指定位置到指定位置的字符以星号代替
+     *
+     * @param content 传入的字符串
+     * @param begin 开始位置
+     * @param end 结束位置
+     * @return
+     */
+    public static String getStarString(String content, int begin, int end) {
+        if (begin >= content.length() || begin < 0) {
+            return content;
+        }
+        if (end >= content.length() || end < 0) {
+            return content;
+        }
+        if (begin >= end) {
+            return content;
+        }
+        StringBuilder starStr = new StringBuilder();
+        for (int i = begin; i < end; i++) {
+            starStr.append("*");
+        }
+        return content.substring(0, begin) + starStr + content.substring(end, content.length());
+    }
+
+    /**
+     * 对字符加星号处理：除前面几位和后面几位外，其他的字符以星号代替
+     *
+     * @param content 传入的字符串
+     * @param frontNum 保留前面字符的位数
+     * @param endNum 保留后面字符的位数
+     * @return 带星号的字符串
+     */
+    public static String getStarString2(String content, int frontNum, int endNum) {
+        if (frontNum >= content.length() || frontNum < 0) {
+            return content;
+        }
+        if (endNum >= content.length() || endNum < 0) {
+            return content;
+        }
+        if (frontNum + endNum >= content.length()) {
+            return content;
+        }
+        StringBuilder starStr = new StringBuilder();
+        for (int i = 0; i < (content.length() - frontNum - endNum); i++) {
+            starStr.append("*");
+        }
+        return content.substring(0, frontNum) + starStr
+                + content.substring(content.length() - endNum, content.length());
+    }
+
 }

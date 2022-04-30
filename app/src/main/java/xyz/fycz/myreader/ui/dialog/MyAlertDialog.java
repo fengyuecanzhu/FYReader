@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.dialog;
 
 import android.app.Activity;
@@ -140,7 +158,6 @@ public class MyAlertDialog {
                     .show();
         }
         Button posBtn = inputDia.getButton(AlertDialog.BUTTON_POSITIVE);
-        posBtn.setEnabled(false);
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -155,11 +172,6 @@ public class MyAlertDialog {
             @Override
             public void afterTextChanged(Editable s) {
                 String text = editText.getText().toString();
-                if (editText.getText().length() > 0 && editText.getText().length() <= maxLen && !text.equals(initText)) {
-                    posBtn.setEnabled(true);
-                } else {
-                    posBtn.setEnabled(false);
-                }
                 oic.onChange(text);
             }
         });

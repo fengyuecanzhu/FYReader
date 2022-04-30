@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.webapi.crawler.read;
 
 import android.text.Html;
@@ -20,8 +38,8 @@ import xyz.fycz.myreader.webapi.crawler.base.BookInfoCrawler;
 
 
 public class XS7ReadCrawler2 extends BaseReadCrawler implements BookInfoCrawler {
-    public static final String NAME_SPACE = "https://www.xs7.co";
-    public static final String NOVEL_SEARCH = "https://www.xs7.co/modules/article/search.php?searchkey={key}&submit=%CB%D1%CB%F7";
+    public static final String NAME_SPACE = "https://www.xs7.la";
+    public static final String NOVEL_SEARCH = "https://www.xs7.la/modules/article/search.php?searchkey={key}&submit=%CB%D1%CB%F7";
     public static final String CHARSET = "GBK";
     public static final String SEARCH_CHARSET = "GBK";
 

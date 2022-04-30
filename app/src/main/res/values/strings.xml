@@ -1,3 +1,21 @@
+<!--
+  ~ This file is part of FYReader.
+  ~ FYReader is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ FYReader is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+  ~
+  ~ Copyright (C) 2020 - 2022 fengyuecanzhu
+  -->
+
 <resources>
     <string name="app_name">风月读书</string>
     <string name="app_name_debug">风月读书.debug</string>
@@ -95,7 +113,7 @@
     <string name="et_email">请输入邮箱</string>
     <string name="et_rp_captcha">请输入验证码</string>
     <string name="et_email_captcha">请输入邮箱验证码</string>
-    <string name="et_account_tip">请输入用户名</string>
+    <string name="et_account_tip">请输入用户名/邮箱</string>
     <string name="text_register">注册</string>
     <string name="text_agreement_tip">我已阅读并同意《<a href="https://shimo.im/docs/RgkDpd3D3Gp6t3rD">用户服务协议</a>》</string>
 
@@ -104,7 +122,6 @@
     <string name="update_log">更新日志</string>
     <string name="git_hub">GitHub</string>
     <string name="share_log">分享崩溃日志</string>
-    <string name="email">邮箱：fy@fycz.xyz</string>
     <string name="this_github_url">https://github.com/fengyuecanzhu/FYReader</string>
     <string name="update">检查更新</string>
     <string name="thanks">致谢名单</string>
@@ -246,9 +263,9 @@
     <string name="set_timer">定时</string>
     <string name="read_aloud_pause">朗读暂停</string>
     <string name="read_aloud_timer">正在朗读(还剩%d分钟)</string>
-    <string name="read_aloud_timerlong">"正在朗读(还剩%d小时%d分)"</string>
+    <string name="read_aloud_timerlong" formatted="false">"正在朗读(还剩%d小时%d分)"</string>
     <string name="read_aloud_timerremaining">%d分钟</string>
-    <string name="read_aloud_timerremaininglong">"%d小时%d分"</string>
+    <string name="read_aloud_timerremaininglong" formatted="false">"%d小时%d分"</string>
     <string name="read_aloud_timerstop">"计时已取消"</string>
     <string name="show_status">显示状态栏</string>
     <string name="always_next">全屏点击翻下页</string>
@@ -378,6 +395,7 @@
     <string name="sort_url">分类Url</string>
     <string name="login_url">登录URL</string>
     <string name="comment">书源说明</string>
+    <string name="source_concurrent_rate">并发率</string>
     <string name="r_search_url">搜索地址</string>
     <string name="r_search_charset">搜索字符编码</string>
     <string name="r_find_url">发现地址规则</string>
@@ -433,7 +451,10 @@
     <string name="check">校验</string>
     <string name="new_source">新建书源</string>
     <string name="import_source">导入书源</string>
+    <string name="subscribe_source">书源订阅</string>
+    <string name="add_subscribe">添加订阅</string>
     <string name="source_tip">书源说明</string>
+    <string name="subscribe_source_tip">订阅书源说明</string>
     <string name="cancle_select_all">取消全选</string>
     <string name="delete_ban_source">删除禁用书源</string>
     <string name="reverse_source">反转书源可用性</string>
@@ -447,13 +468,14 @@
     <string name="share_all">分享所有</string>
     <string name="parse_result">解析结果</string>
     <string name="source_code">网页源码</string>
+    <string name="debug_log">调试日志</string>
     <string name="re_request">重新请求</string>
     <string name="debug_search">测试搜索配置</string>
     <string name="debug_info">测试书籍详情</string>
     <string name="debug_toc">测试目录列表</string>
     <string name="debug_content">测试章节内容</string>
     <string name="debug">测试</string>
-    <string name="debug_desc">书源名称：%s\n书源URL：%s\n测试URL：%s</string>
+    <string name="debug_desc" formatted="false">书源名称：%s\n书源URL：%s\n测试URL：%s</string>
     <string name="enable_source">启用书源</string>
     <string name="parser">解析器</string>
     <string name="all_source">所有书源</string>
@@ -461,7 +483,11 @@
     <string name="ad_setting">广告设置</string>
     <string name="splash_ad">开屏广告</string>
     <string name="splash_ad_times">每日广告显示次数</string>
-    <string name="splash_cur_ad_times">当前次数:%s，今日已显示次数:%s</string>
+    <string name="remove_ad_reward">免广告奖励</string>
+    <string name="remove_ad">去除广告</string>
+    <string name="cur_remove_ad_time">当前免除广告时长：%s</string>
+    <string name="remove_ad_tip">去除广告规则\n1、观看激励视频即可去除应用内所有广告(包括开屏)\n2、每次观看完成可获得%d小时的免广告时间，最多可累计%d小时\n3、每日最多有%d次获得免广告时长的机会</string>
+    <string name="splash_cur_ad_times" formatted="false">当前次数:%s，今日已显示次数:%s</string>
     <string name="ad">广告总开关</string>
     <string name="book_detail_ad">详情页广告</string>
     <string name="book_detail_ad_sc">详情页广告开关</string>
@@ -473,8 +499,9 @@
     <string name="qq_skm">QQ收款码</string>
     <string name="ad_support">广告支持作者</string>
     <string name="ad_support_tip">点击下列广告即可支持作者，建议在WIFI环境下点击</string>
-    <string name="flow_ad_tip">信息流广告(下载的文件可在广告设置中清除)</string>
+    <string name="flow_ad_tip">信息流广告</string>
     <string name="rewarded_video">激励视频</string>
+    <string name="watch_rewarded_video">观看激励视频</string>
     <string name="ad_file">广告下载/缓存</string>
     <string name="delete_ad_file">清除广告文件</string>
     <string name="cover_path">封面地址</string>
@@ -524,7 +551,61 @@
     <string name="clear_search">清除搜索记录</string>
     <string name="fold">收起</string>
     <string name="unfold">展开</string>
+    <string name="copy_source">拷贝书源</string>
+    <string name="lan_zou_parse">蓝奏云直链解析</string>
+    <string name="mine_show_mode">我的界面显示方式</string>
+    <string name="show_user_only">仅显示用户</string>
+    <string name="show_cloud_only">仅显示云服务</string>
+    <string name="show_user_cloud">显示用户及云服务</string>
+    <string name="hide_user_cloud">隐藏用户及云服务</string>
+    <string name="subscribe_source_detail_tip">1、由于作者没时间维护内置书源导致大部分内置书源已经没法使用，故推出订阅书源
+    \n\n2、订阅书源全部搜集自网络，将会每月更新一次\n\n3、订阅书源目前处于测试阶段，如出现bug，请前往<a href="https://qun.qq.com/qqweb/qunpro/share?_wv=3&amp;_wwv=128&amp;inviteCode=2aP6ZQ&amp;from=246610&amp;biz=ka">QQ频道</a>或QQ群(1085028304)进行反馈</string>
+    <string name="userinfo">个人中心</string>
+    <string name="username">用户名</string>
+    <string name="email">邮箱</string>
+    <string name="rest_pwd">重置密码</string>
+    <string name="last_web_back_time">上次同步时间</string>
+    <string name="no_ad_time">免广告到期时间</string>
+    <string name="no_ad_device">免广告设备绑定</string>
+    <string name="basic_service">基础服务</string>
+    <string name="no_ad_service">免广告服务</string>
+    <string name="cammy_enter">兑换码输入</string>
+    <string name="cammy_get_method">兑换码获取方式</string>
+    <string name="cammy_tip">
+        1、从2022/04开始，每月将在<a href="https://qun.qq.com/qqweb/qunpro/share?_wv=3&amp;_wwv=128&amp;inviteCode=2aP6ZQ&amp;from=246610&amp;biz=ka">QQ频道</a>发放(当月有效)；
+        \n\n2、反馈bug或提出有效建议；
+        \n\n3、捐赠获取(带截图私聊作者，之前捐赠的用户也一样)
+    </string>
+    <string name="logout">退出登录</string>
 
+
+    <!--error string start-->
+    <string name="error_no_source">没有书源</string>
+    <string name="error_get_book_info">书籍信息获取失败</string>
+    <string name="error_get_content">内容获取失败</string>
+    <string name="error_get_chapter_list">目录获取失败</string>
+    <string name="error_get_web_content">访问网站失败:%s</string>
+    <string name="error_read_file">文件读取失败</string>
+    <string name="error_load_toc">加载目录失败</string>
+    <string name="error_get_data">获取数据失败！</string>
+    <string name="error_load_msg">加载失败\n%s</string>
+    <string name="net_error_10001">没有网络</string>
+    <string name="net_error_10002">网络连接超时</string>
+    <string name="net_error_10003">数据解析失败</string>
+    <!--error string end-->
+
+    <string name="proxy_setting">软件代理设置</string>
+    <string name="proxy_setting_tip">设置软件及书源代理</string>
+    <string name="proxy_type">代理类型</string>
+    <string name="proxy_host">代理服务器地址</string>
+    <string name="proxy_port">代理服务器端口</string>
+    <string name="proxy_username">代理认证用户名</string>
+    <string name="proxy_password">代理认证密码</string>
+    <string name="no_proxy_sources">禁用代理的书源</string>
+    <string name="no_proxy_sources_tip">选择需要禁用代理的书源</string>
+    <string name="enable_proxy">启用代理</string>
+    <string name="edit">编辑</string>
+    <string name="reset_pangle">ResetPangleId</string>
 
     <string-array name="reset_screen_time">
         <item>跟随系统</item>
@@ -607,11 +688,19 @@
         <item>Matcher</item>
         <item>Xpath</item>
         <item>JsonPath</item>
-        <item>第三方</item>
+        <item>第三方-2.0</item>
+        <item>第三方-3.0</item>
     </string-array>
 
     <string-array name="select_folder">
         <item>默认路径</item>
         <item>系统文件夹选择器</item>
+    </string-array>
+
+    <string-array name="mine_show">
+        <item>@string/show_user_only</item>
+        <item>@string/show_cloud_only</item>
+        <item>@string/show_user_cloud</item>
+        <item>@string/hide_user_cloud</item>
     </string-array>
 </resources>

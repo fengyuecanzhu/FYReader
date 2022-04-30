@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.webapi;
 
 import org.jetbrains.annotations.NotNull;
@@ -133,7 +151,7 @@ public class LanZousApi {
             HashMap<String, String> headers = new HashMap<>();
             headers.put("Referer", referer);
 
-            String html = OkHttpUtils.getHtml(URLCONST.LAN_ZOUS_URL + "/ajaxm.php", requestBody,
+            String html = OkHttpUtils.getHtml(URLCONST.LAN_ZOU_URL + "/ajaxm.php", requestBody,
                     "UTF-8", headers);
             emitter.onSuccess(getUrl2(html));
         }).compose(RxUtils::toSimpleSingle).subscribe(new MySingleObserver<String>() {
@@ -151,11 +169,10 @@ public class LanZousApi {
 
     private static String getUrl1(String html) {
         Document doc = Jsoup.parse(html);
-        return URLCONST.LAN_ZOUS_URL + doc.getElementsByClass("ifr2").attr("src");
+        return URLCONST.LAN_ZOU_URL + doc.getElementsByClass("ifr2").attr("src");
     }
 
     private static String getKey(String html) {
-        //SharedPreUtils spu = SharedPreUtils.getInstance();
         String lanzousKeyStart = "var pposturl = '";
         String keyName = StringHelper.getSubString(html, "'sign':", ",");
         if (keyName.endsWith("'")) {

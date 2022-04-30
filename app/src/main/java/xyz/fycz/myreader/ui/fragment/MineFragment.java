@@ -1,8 +1,27 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.fragment;
 
 import static android.app.Activity.RESULT_OK;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +32,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -45,21 +66,24 @@ import xyz.fycz.myreader.model.storage.Restore;
 import xyz.fycz.myreader.model.storage.WebDavHelp;
 import xyz.fycz.myreader.model.user.Result;
 import xyz.fycz.myreader.model.user.User;
-import xyz.fycz.myreader.model.user.UserService2;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.activity.AboutActivity;
 import xyz.fycz.myreader.ui.activity.AdSettingActivity;
 import xyz.fycz.myreader.ui.activity.BookSourceActivity;
 import xyz.fycz.myreader.ui.activity.DonateActivity;
-import xyz.fycz.myreader.ui.activity.FeedbackActivity;
 import xyz.fycz.myreader.ui.activity.LoginActivity;
 import xyz.fycz.myreader.ui.activity.MainActivity;
 import xyz.fycz.myreader.ui.activity.MoreSettingActivity;
 import xyz.fycz.myreader.ui.activity.ReadRecordActivity;
+import xyz.fycz.myreader.ui.activity.RemoveAdActivity;
+import xyz.fycz.myreader.ui.activity.UserInfoActivity;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
+import xyz.fycz.myreader.util.utils.RxUtils;
 
 /**
  * @author fengyue
@@ -109,7 +133,7 @@ public class MineFragment extends BaseFragment {
     @Override
     protected void initData(Bundle savedInstanceState) {
         super.initData(savedInstanceState);
-        user = UserService2.INSTANCE.readConfig();
+        user = UserService.INSTANCE.readConfig();
         isLogin = user != null && !TextUtils.isEmpty(user.getUserName());
         mSetting = SysManager.getSetting();
         webSynMenu = new String[]{
@@ -137,6 +161,45 @@ public class MineFragment extends BaseFragment {
             binding.tvUser.setText(user.getUserName());
         }
         binding.tvThemeModeSelect.setText(themeModeArr[themeMode]);
+        initShowMode();
+        AdUtils.checkHasAd(true, true).compose(RxUtils::toSimpleSingle)
+                .subscribe(new MySingleObserver<Boolean>() {
+                    @Override
+                    public void onSuccess(@NonNull Boolean aBoolean) {
+                        if (aBoolean && AdUtils.getAdConfig().getRemoveAdTime() > 0){
+                            binding.mineRlRemoveAd.setVisibility(View.VISIBLE);
+                        }else {
+                            binding.mineRlRemoveAd.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        binding.mineRlRemoveAd.setVisibility(View.GONE);
+                    }
+                });
+    }
+
+    private void initShowMode() {
+        int showMode = SharedPreUtils.getInstance().getInt("mineShowMode", 0);
+        switch (showMode){
+            case 1:
+                binding.mineLlUser.setVisibility(View.GONE);
+                binding.mineLlCloud.setVisibility(View.VISIBLE);
+                break;
+            case 2:
+                binding.mineLlUser.setVisibility(View.VISIBLE);
+                binding.mineLlCloud.setVisibility(View.VISIBLE);
+                break;
+            case 3:
+                binding.mineLlUser.setVisibility(View.GONE);
+                binding.mineLlCloud.setVisibility(View.GONE);
+                break;
+            default:
+                binding.mineLlUser.setVisibility(View.VISIBLE);
+                binding.mineLlCloud.setVisibility(View.GONE);
+                break;
+        }
     }
 
     @Override
@@ -144,19 +207,8 @@ public class MineFragment extends BaseFragment {
         super.initClick();
         binding.mineRlUser.setOnClickListener(v -> {
             if (isLogin) {
-                DialogCreator.createCommonDialog(getActivity(), "退出登录", "确定要退出登录吗？"
-                        , true, (dialog, which) -> {
-                            File file = App.getApplication().getFileStreamPath("userConfig.fy");
-                            if (file.delete()) {
-                                ToastUtils.showSuccess("退出成功");
-                                isLogin = false;
-                                mHandler.sendEmptyMessage(1);
-                                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                                getActivity().startActivityForResult(intent, APPCONST.REQUEST_LOGIN);
-                            } else {
-                                ToastUtils.showError("退出失败(Error：file.delete())");
-                            }
-                        }, (dialog, which) -> dialog.dismiss());
+                Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+                startActivityForResult(intent, APPCONST.REQUEST_LOGOUT);
             } else {
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 getActivity().startActivityForResult(intent, APPCONST.REQUEST_LOGIN);
@@ -313,9 +365,10 @@ public class MineFragment extends BaseFragment {
         binding.mineRlReadRecord.setOnClickListener(v -> {
             startActivity(new Intent(getContext(), ReadRecordActivity.class));
         });
+
         binding.mineRlSetting.setOnClickListener(v -> {
-            Intent settingIntent = new Intent(getActivity(), MoreSettingActivity.class);
-            startActivity(settingIntent);
+            Intent intent = new Intent(getActivity(), MoreSettingActivity.class);
+            startActivityForResult(intent, APPCONST.REQUEST_SETTING);
         });
         binding.mineRlThemeMode.setOnClickListener(v -> {
             /*if (themeModeDia != null) {
@@ -382,7 +435,7 @@ public class MineFragment extends BaseFragment {
                     }).setCancelButton(R.string.cancel);
         });
 
-        binding.mineRlAdSetting.setOnClickListener(v -> startActivity(new Intent(getActivity(), AdSettingActivity.class)));
+        binding.mineRlRemoveAd.setOnClickListener(v -> startActivity(new Intent(getActivity(), RemoveAdActivity.class)));
 
         binding.mineRlAbout.setOnClickListener(v -> {
             Intent aboutIntent = new Intent(getActivity(), AboutActivity.class);
@@ -502,7 +555,7 @@ public class MineFragment extends BaseFragment {
         String synTime = spb.getString(getString(R.string.synTime));
         if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
             dialog.show();
-            UserService2.INSTANCE.webBackup(user).subscribe(new MySingleObserver<Result>() {
+            UserService.INSTANCE.webBackup(user).subscribe(new MySingleObserver<Result>() {
                 @Override
                 public void onSubscribe(Disposable d) {
                     addDisposable(d);
@@ -548,17 +601,8 @@ public class MineFragment extends BaseFragment {
         DialogCreator.createCommonDialog(getContext(), "确认同步吗?", "将书架从网络同步至本地会覆盖原有书架！", true,
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
-                        /*if (UserService.webRestore()) {
-                            mHandler.sendMessage(mHandler.obtainMessage(7));
-//                                    DialogCreator.createTipDialog(mMainActivity,
-//                                            "恢复成功！\n注意：本功能属于实验功能，书架恢复后，书籍初次加载时可能加载失败，返回重新加载即可！");、
-                            mSetting = SysManager.getSetting();
-                            ToastUtils.showSuccess("成功将书架从网络同步至本地！");
-                        } else {
-                            DialogCreator.createTipDialog(getContext(), "未找到同步文件，同步失败！");
-                        }*/
                     dialog.show();
-                    UserService2.INSTANCE.webRestore(user).subscribe(new MySingleObserver<Result>() {
+                    UserService.INSTANCE.webRestore(user).subscribe(new MySingleObserver<Result>() {
                         @Override
                         public void onSubscribe(Disposable d) {
                             addDisposable(d);
@@ -598,12 +642,26 @@ public class MineFragment extends BaseFragment {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case APPCONST.REQUEST_LOGIN:
-                    assert data != null;
+                    if (data == null) {
+                        return;
+                    }
                     isLogin = data.getBooleanExtra("isLogin", false);
-                    user = UserService2.INSTANCE.readConfig();
+                    user = UserService.INSTANCE.readConfig();
                     if (isLogin && user != null) {
                         binding.tvUser.setText(user.getUserName());
                     }
+                    break;
+                case APPCONST.REQUEST_SETTING:
+                    if (data == null) {
+                        return;
+                    }
+                    if (data.getBooleanExtra(APPCONST.RESULT_NEED_REFRESH, false)){
+                        initShowMode();
+                    }
+                    break;
+                case APPCONST.REQUEST_LOGOUT:
+                    isLogin = false;
+                    mHandler.sendEmptyMessage(1);
                     break;
             }
         }

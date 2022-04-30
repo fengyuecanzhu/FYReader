@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.greendao.entity.rule;
 
 import android.os.Parcel;
@@ -5,6 +23,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 
@@ -24,6 +43,7 @@ import xyz.fycz.myreader.greendao.convert.FindRuleConvert;
 import xyz.fycz.myreader.greendao.convert.InfoRuleConvert;
 import xyz.fycz.myreader.greendao.convert.SearchRuleConvert;
 import xyz.fycz.myreader.greendao.convert.TocRuleConvert;
+import xyz.fycz.myreader.model.third3.BaseSource;
 
 import static xyz.fycz.myreader.util.utils.StringUtils.stringEquals;
 
@@ -32,7 +52,7 @@ import static xyz.fycz.myreader.util.utils.StringUtils.stringEquals;
  * @date 2021/2/8 17:37
  */
 @Entity
-public class BookSource implements Parcelable, Cloneable {
+public class BookSource extends BaseSource implements Parcelable, Cloneable {
     //基本信息
     @Id
     private String sourceUrl;
@@ -43,7 +63,9 @@ public class BookSource implements Parcelable, Cloneable {
     private String sourceType;
     private String sourceHeaders;
     private String loginUrl;
+    private String loginCheckJs;
     private String sourceComment;
+    private String concurrentRate;
     private Long lastUpdateTime;
 
     @OrderBy
@@ -52,6 +74,8 @@ public class BookSource implements Parcelable, Cloneable {
     @NotNull
     private int weight;
     private boolean enable;
+
+    private boolean noProxy;//不使用代理
 
     @Transient
     private transient ArrayList<String> groupList;
@@ -72,12 +96,12 @@ public class BookSource implements Parcelable, Cloneable {
     @Convert(converter = FindRuleConvert.class, columnType = String.class)
     private FindRule findRule;
 
-    @Generated(hash = 277037260)
+    @Generated(hash = 945434046)
     public BookSource(String sourceUrl, String sourceEName, String sourceName, String sourceGroup,
-            String sourceCharset, String sourceType, String sourceHeaders, String loginUrl,
-            String sourceComment, Long lastUpdateTime, int orderNum, int weight, boolean enable,
-            SearchRule searchRule, InfoRule infoRule, TocRule tocRule, ContentRule contentRule,
-            FindRule findRule) {
+            String sourceCharset, String sourceType, String sourceHeaders, String loginUrl, String loginCheckJs,
+            String sourceComment, String concurrentRate, Long lastUpdateTime, int orderNum, int weight,
+            boolean enable, boolean noProxy, SearchRule searchRule, InfoRule infoRule, TocRule tocRule,
+            ContentRule contentRule, FindRule findRule) {
         this.sourceUrl = sourceUrl;
         this.sourceEName = sourceEName;
         this.sourceName = sourceName;
@@ -86,11 +110,14 @@ public class BookSource implements Parcelable, Cloneable {
         this.sourceType = sourceType;
         this.sourceHeaders = sourceHeaders;
         this.loginUrl = loginUrl;
+        this.loginCheckJs = loginCheckJs;
         this.sourceComment = sourceComment;
+        this.concurrentRate = concurrentRate;
         this.lastUpdateTime = lastUpdateTime;
         this.orderNum = orderNum;
         this.weight = weight;
         this.enable = enable;
+        this.noProxy = noProxy;
         this.searchRule = searchRule;
         this.infoRule = infoRule;
         this.tocRule = tocRule;
@@ -112,7 +139,9 @@ public class BookSource implements Parcelable, Cloneable {
         sourceType = in.readString();
         sourceHeaders = in.readString();
         loginUrl = in.readString();
+        loginCheckJs = in.readString();
         sourceComment = in.readString();
+        concurrentRate = in.readString();
         if (in.readByte() == 0) {
             lastUpdateTime = null;
         } else {
@@ -121,6 +150,7 @@ public class BookSource implements Parcelable, Cloneable {
         orderNum = in.readInt();
         weight = in.readInt();
         enable = in.readByte() != 0;
+        noProxy = in.readByte() != 0;
         searchRule = in.readParcelable(SearchRule.class.getClassLoader());
         infoRule = in.readParcelable(InfoRule.class.getClassLoader());
         tocRule = in.readParcelable(TocRule.class.getClassLoader());
@@ -138,7 +168,9 @@ public class BookSource implements Parcelable, Cloneable {
         dest.writeString(sourceType);
         dest.writeString(sourceHeaders);
         dest.writeString(loginUrl);
+        dest.writeString(loginCheckJs);
         dest.writeString(sourceComment);
+        dest.writeString(concurrentRate);
         if (lastUpdateTime == null) {
             dest.writeByte((byte) 0);
         } else {
@@ -148,6 +180,7 @@ public class BookSource implements Parcelable, Cloneable {
         dest.writeInt(orderNum);
         dest.writeInt(weight);
         dest.writeByte((byte) (enable ? 1 : 0));
+        dest.writeByte((byte) (noProxy ? 1 : 0));
         dest.writeParcelable(searchRule, flags);
         dest.writeParcelable(infoRule, flags);
         dest.writeParcelable(tocRule, flags);
@@ -178,6 +211,7 @@ public class BookSource implements Parcelable, Cloneable {
         if (o == null || getClass() != o.getClass()) return false;
         BookSource source = (BookSource) o;
         return enable == source.enable &&
+                noProxy == source.noProxy &&
                 stringEquals(sourceUrl, source.sourceUrl) &&
                 stringEquals(sourceEName, source.sourceEName) &&
                 stringEquals(sourceName, source.sourceName) &&
@@ -186,7 +220,9 @@ public class BookSource implements Parcelable, Cloneable {
                 stringEquals(sourceType, source.sourceType) &&
                 stringEquals(sourceHeaders, source.sourceHeaders) &&
                 stringEquals(loginUrl, source.loginUrl) &&
+                stringEquals(loginCheckJs, source.loginCheckJs) &&
                 stringEquals(sourceComment, source.sourceComment) &&
+                stringEquals(concurrentRate, source.concurrentRate) &&
                 Objects.equals(searchRule, source.searchRule) &&
                 Objects.equals(infoRule, source.infoRule) &&
                 Objects.equals(tocRule, source.tocRule) &&
@@ -395,5 +431,63 @@ public class BookSource implements Parcelable, Cloneable {
 
     public void setLoginUrl(String loginUrl) {
         this.loginUrl = loginUrl;
+    }
+
+    public String getLoginCheckJs() {
+        return loginCheckJs;
+    }
+
+    public void setLoginCheckJs(String loginCheckJs) {
+        this.loginCheckJs = loginCheckJs;
+    }
+
+    public String getConcurrentRate() {
+        return this.concurrentRate;
+    }
+
+    public void setConcurrentRate(String concurrentRate) {
+        this.concurrentRate = concurrentRate;
+    }
+
+    @Nullable
+    @Override
+    public String getConcurrentRateKt() {
+        return concurrentRate;
+    }
+
+    @Nullable
+    @Override
+    public String getLoginUrlKt() {
+        return loginUrl;
+    }
+
+    @Override
+    public String getHeader() {
+        return sourceHeaders;
+    }
+
+    @NonNull
+    @Override
+    public String getTag() {
+        return sourceName;
+    }
+
+    @NonNull
+    @Override
+    public String getKey() {
+        return sourceUrl;
+    }
+
+    @Override
+    public BookSource getSource() {
+        return this;
+    }
+
+    public boolean getNoProxy() {
+        return this.noProxy;
+    }
+
+    public void setNoProxy(boolean noProxy) {
+        this.noProxy = noProxy;
     }
 }

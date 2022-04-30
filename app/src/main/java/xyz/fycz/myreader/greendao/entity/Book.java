@@ -1,8 +1,28 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.greendao.entity;
 
 
 import android.text.TextUtils;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
@@ -13,7 +33,10 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import xyz.fycz.myreader.greendao.service.BookService;
+import xyz.fycz.myreader.model.third3.analyzeRule.RuleDataInterface;
 import xyz.fycz.myreader.util.SharedPreUtils;
+import xyz.fycz.myreader.util.help.StringHelper;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -23,7 +46,7 @@ import java.util.Objects;
 import static xyz.fycz.myreader.common.APPCONST.MAP_STRING;
 
 @Entity
-public class Book implements Serializable {
+public class Book implements Serializable, RuleDataInterface {
     @Transient
     private static final long serialVersionUID = 1L;
 
@@ -87,11 +110,11 @@ public class Book implements Serializable {
 
     @Generated(hash = 1472063028)
     public Book(String id, String name, String chapterUrl, String infoUrl, String imgUrl, String desc, String author,
-            String type, String updateDate, String wordCount, String status, String newestChapterId,
-            String newestChapterTitle, String historyChapterId, int histtoryChapterNum, int sortCode, int noReadNum,
-            int chapterTotalNum, int lastReadPosition, String source, boolean isCloseUpdate, boolean isDownLoadAll,
-            String groupId, int groupSort, boolean reSeg, String tag, Boolean replaceEnable, long lastReadTime,
-            String variable) {
+                String type, String updateDate, String wordCount, String status, String newestChapterId,
+                String newestChapterTitle, String historyChapterId, int histtoryChapterNum, int sortCode, int noReadNum,
+                int chapterTotalNum, int lastReadPosition, String source, boolean isCloseUpdate, boolean isDownLoadAll,
+                String groupId, int groupSort, boolean reSeg, String tag, Boolean replaceEnable, long lastReadTime,
+                String variable) {
         this.id = id;
         this.name = name;
         this.chapterUrl = chapterUrl;
@@ -301,8 +324,11 @@ public class Book implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
+        boolean flag = chapterUrl == null ?
+                (infoUrl == null || infoUrl.equals(book.infoUrl)) :
+                chapterUrl.equals(book.chapterUrl);
         return name.equals(book.name) &&
-                chapterUrl.equals(book.chapterUrl) &&
+                flag && author != null &&
                 author.equals(book.author) &&
                 source.equals(book.source);
     }
@@ -378,19 +404,27 @@ public class Book implements Serializable {
         this.status = status;
     }
 
-    public void putVariable(String key, String value) {
+    public void putVariable(@NonNull String key, String value) {
         if (variableMap == null) {
             variableMap = new HashMap<>();
         }
         variableMap.put(key, value);
-        variable = new Gson().toJson(variableMap);
+        variable = GsonExtensionsKt.getGSON().toJson(variableMap);
     }
 
+    @NonNull
     public Map<String, String> getVariableMap() {
         if (variableMap == null && !TextUtils.isEmpty(variable)) {
-            variableMap = new Gson().fromJson(variable, MAP_STRING);
+            variableMap = GsonExtensionsKt.getGSON().fromJson(variable, MAP_STRING);
+        }
+        if (variableMap == null) {
+            variableMap = new HashMap<>();
         }
         return variableMap;
+    }
+
+    public void setVariableMap(Map<String, String> variableMap) {
+        this.variableMap = variableMap;
     }
 
 
@@ -398,9 +432,12 @@ public class Book implements Serializable {
         return this.variable;
     }
 
-
     public void setVariable(String variable) {
         this.variable = variable;
+    }
+
+    public Map<String, String> getCatheMap() {
+        return catheMap;
     }
 
     public void putCathe(String key, String value) {
@@ -410,14 +447,18 @@ public class Book implements Serializable {
         catheMap.put(key, value);
     }
 
-    public String getCathe(String key){
-        if (catheMap == null){
+    public String getCathe(String key) {
+        if (catheMap == null) {
             return "";
         }
         return catheMap.get(key);
     }
 
-    public void clearCathe(){
+    public void setCatheMap(Map<String, String> catheMap) {
+        this.catheMap = catheMap;
+    }
+
+    public void clearCathe() {
         if (catheMap != null) {
             catheMap.clear();
         }
@@ -430,4 +471,46 @@ public class Book implements Serializable {
     public void setReSeg(boolean reSeg) {
         this.reSeg = reSeg;
     }
+
+    @Nullable
+    @Override
+    public String getVariable(@NonNull String key) {
+        return getVariableMap().get(key);
+    }
+
+    public Book changeSource(Book newBook) {
+        Book bookTem = (Book) clone();
+        bookTem.clearCathe();
+        bookTem.setChapterUrl(newBook.getChapterUrl());
+        bookTem.setInfoUrl(newBook.getInfoUrl());
+        bookTem.setSource(newBook.getSource());
+        if (!StringHelper.isEmpty(newBook.getImgUrl())) {
+            bookTem.setImgUrl(newBook.getImgUrl());
+        }
+        if (!StringHelper.isEmpty(newBook.getType())) {
+            bookTem.setType(newBook.getType());
+        }
+        if (!StringHelper.isEmpty(newBook.getDesc())) {
+            bookTem.setDesc(newBook.getDesc());
+        }
+        if (!StringHelper.isEmpty(newBook.getUpdateDate())) {
+            bookTem.setUpdateDate(newBook.getUpdateDate());
+        }
+        if (!StringHelper.isEmpty(newBook.getWordCount())) {
+            bookTem.setWordCount(newBook.getWordCount());
+        }
+        if (!StringHelper.isEmpty(newBook.getStatus())) {
+            bookTem.setStatus(newBook.getStatus());
+        }
+        if (!StringHelper.isEmpty(newBook.getVariable())) {
+            bookTem.setVariable(newBook.getVariable());
+            bookTem.setVariableMap(newBook.getVariableMap());
+        }
+        if (newBook.getCatheMap() != null) {
+            bookTem.setCatheMap(newBook.getCatheMap());
+        }
+        return bookTem;
+    }
+
+    public void setReverseToc(boolean reverseToc){}
 }

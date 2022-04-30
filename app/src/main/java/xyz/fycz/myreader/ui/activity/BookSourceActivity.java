@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
 import android.app.Activity;
@@ -23,14 +41,14 @@ import xyz.fycz.myreader.base.BaseTabActivity;
 import xyz.fycz.myreader.databinding.ActivityBooksourceBinding;
 import xyz.fycz.myreader.ui.fragment.DIYSourceFragment;
 import xyz.fycz.myreader.ui.fragment.LocalSourceFragment;
+import xyz.fycz.myreader.ui.fragment.SubscribeSourceFragment;
 
 /**
  * @author fengyue
  * @date 2021/2/10 9:14
  */
-public class BookSourceActivity extends BaseTabActivity {
+public class BookSourceActivity extends BaseTabActivity<ActivityBooksourceBinding> {
 
-    private ActivityBooksourceBinding binding;
     private SearchView searchView;
 
     @Override
@@ -42,13 +60,13 @@ public class BookSourceActivity extends BaseTabActivity {
 
     @Override
     protected List<Fragment> createTabFragments() {
-        return Arrays.asList(new LocalSourceFragment(this),
+        return Arrays.asList(new SubscribeSourceFragment(this),
                 new DIYSourceFragment(this));
     }
 
     @Override
     protected List<String> createTabTitles() {
-        return Arrays.asList("内置书源", "DIY书源");
+        return Arrays.asList("订阅书源", "DIY书源");
     }
 
     @Override
@@ -73,7 +91,7 @@ public class BookSourceActivity extends BaseTabActivity {
                         List<Fragment> fragments = getSupportFragmentManager().getFragments();
                         switch (tab.getPosition()) {
                             case 0:
-                                ((LocalSourceFragment) fragments.get(0)).startSearch("");
+                                ((SubscribeSourceFragment) fragments.get(0)).startSearch("");
                                 break;
                             case 1:
                                 ((DIYSourceFragment) fragments.get(1)).startSearch("");
@@ -112,7 +130,7 @@ public class BookSourceActivity extends BaseTabActivity {
                 List<Fragment> fragments = getSupportFragmentManager().getFragments();
                 switch (binding.tabVp.getCurrentItem()) {
                     case 0:
-                        ((LocalSourceFragment) fragments.get(0)).startSearch(newText);
+                        ((SubscribeSourceFragment) fragments.get(0)).startSearch(newText);
                         break;
                     case 1:
                         ((DIYSourceFragment) fragments.get(1)).startSearch(newText);

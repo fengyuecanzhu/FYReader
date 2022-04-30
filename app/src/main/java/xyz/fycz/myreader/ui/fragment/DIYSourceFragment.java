@@ -1,11 +1,27 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -19,18 +35,12 @@ import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.hjq.permissions.OnPermissionCallback;
-import com.hjq.permissions.XXPermissions;
 import com.kongzue.dialogx.dialogs.BottomMenu;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -52,13 +62,11 @@ import xyz.fycz.myreader.ui.activity.BookSourceActivity;
 import xyz.fycz.myreader.ui.activity.SourceEditActivity;
 import xyz.fycz.myreader.ui.adapter.BookSourceAdapter;
 import xyz.fycz.myreader.ui.adapter.helper.ItemTouchCallback;
-import xyz.fycz.myreader.ui.adapter.helper.OnStartDragListener;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.ShareUtils;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.util.UriFileUtil;
 import xyz.fycz.myreader.util.utils.ClipBoardUtil;
 import xyz.fycz.myreader.util.utils.DocumentUtil;
 import xyz.fycz.myreader.util.utils.FileUtils;
@@ -70,7 +78,6 @@ import xyz.fycz.myreader.widget.swipemenu.SwipeMenuLayout;
 
 import static android.app.Activity.RESULT_OK;
 import static android.text.TextUtils.isEmpty;
-import static xyz.fycz.myreader.util.UriFileUtil.getPath;
 
 /**
  * @author fengyue
@@ -234,7 +241,7 @@ public class DIYSourceFragment extends BaseFragment {
             }
         });
         dialog.show();
-        Observable<List<BookSource>> observable = BookSourceManager.importSource(text);
+        Observable<List<BookSource>> observable = BookSourceManager.importSource(text, "");
         if (observable != null) {
             observable.subscribe(new MyObserver<List<BookSource>>() {
                 @Override
@@ -257,7 +264,7 @@ public class DIYSourceFragment extends BaseFragment {
 
                 @Override
                 public void onError(Throwable e) {
-                    ToastUtils.showError("书源格式错误，请导入正确的书源");
+                    ToastUtils.showError("书源格式错误，请导入正确的书源\n" + e.getLocalizedMessage());
                     dialog.dismiss();
                 }
             });
@@ -364,7 +371,7 @@ public class DIYSourceFragment extends BaseFragment {
      */
     public void showSourceGroupMenu(View view) {
         PopupMenu popupMenu = new PopupMenu(sourceActivity, view, Gravity.END);
-        List<String> groupList = BookSourceManager.getNoLocalGroupList();
+        List<String> groupList = BookSourceManager.getGroupList(false);
         popupMenu.getMenu().add(0, 0, 0, "所有书源");
         for (int i = 0; i < groupList.size(); i++) {
             popupMenu.getMenu().add(0, 0, i + 1, groupList.get(i));

@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
 import android.annotation.SuppressLint;
@@ -8,6 +26,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +38,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
+import com.weaction.ddsdk.ad.DdSdkFlowAd;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,6 +60,7 @@ import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityBookDetailBinding;
+import xyz.fycz.myreader.entity.ad.AdBean;
 import xyz.fycz.myreader.experiment.BookWCEstimate;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.Chapter;
@@ -53,8 +74,10 @@ import xyz.fycz.myreader.ui.dialog.BookGroupDialog;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
+import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.BlurTransformation;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
@@ -68,9 +91,8 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
  * @author fengyue
  * @date 2020/8/17 11:39
  */
-public class BookDetailedActivity extends BaseActivity {
+public class BookDetailedActivity extends BaseActivity<ActivityBookDetailBinding> {
 
-    private ActivityBookDetailBinding binding;
     private static final String TAG = BookDetailedActivity.class.getSimpleName();
 
     private Book mBook;
@@ -88,6 +110,7 @@ public class BookDetailedActivity extends BaseActivity {
     private List<String> tagList = new ArrayList<>();
     private Disposable chaptersDis;
     private Disposable wcDis;
+    private AdBean adBean;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -128,10 +151,12 @@ public class BookDetailedActivity extends BaseActivity {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         aBooks = mSourceDialog.getaBooks();
         Intent intent = new Intent();
-        if (aBooks != null) {
-            aBooks.set(mSourceDialog.getSourceIndex(), mBook);
+        if (aBooks != null && aBooks.size() > 0) {
+            int sourceIndex = mSourceDialog.getSourceIndex();
+            if (mSourceDialog.hasCurBookSource())
+                aBooks.set(sourceIndex, mBook);
             BitIntentDataManager.getInstance().putData(intent, aBooks);
-            intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
+            intent.putExtra(APPCONST.SOURCE_INDEX, sourceIndex);
         } else {
             BitIntentDataManager.getInstance().putData(intent, mBook);
         }
@@ -252,7 +277,26 @@ public class BookDetailedActivity extends BaseActivity {
         }
         mSourceDialog.setABooks(aBooks);
         mSourceDialog.setSourceIndex(sourceIndex);
+        adBean = AdUtils.getAdConfig().getDetail();
+        initAd();
     }
+
+    private void initAd() {
+        AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
+            @Override
+            public void onSuccess(@NonNull Boolean aBoolean) {
+                if (aBoolean && AdUtils.adTime("detail", adBean)) {
+                    if (adBean.getStatus() == 1) {
+                        AdUtils.getFlowAd(BookDetailedActivity.this, 1,
+                                view -> binding.ic.getRoot().addView(view, 2), "detail");
+                    } else if (adBean.getStatus() == 2) {
+                        AdUtils.showInterAd(BookDetailedActivity.this, "detail");
+                    }
+                }
+            }
+        });
+    }
+
 
     @Override
     protected void initClick() {
@@ -293,29 +337,7 @@ public class BookDetailedActivity extends BaseActivity {
 
         //换源对话框
         mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
-            Book bookTem = (Book) mBook.clone();
-            bookTem.clearCathe();
-            bookTem.setChapterUrl(bean.getChapterUrl());
-            bookTem.setInfoUrl(bean.getInfoUrl());
-            bookTem.setSource(bean.getSource());
-            if (!StringHelper.isEmpty(bean.getImgUrl())) {
-                bookTem.setImgUrl(bean.getImgUrl());
-            }
-            if (!StringHelper.isEmpty(bean.getType())) {
-                bookTem.setType(bean.getType());
-            }
-            if (!StringHelper.isEmpty(bean.getDesc())) {
-                bookTem.setDesc(bean.getDesc());
-            }
-            if (!StringHelper.isEmpty(bean.getUpdateDate())) {
-                bookTem.setUpdateDate(bean.getUpdateDate());
-            }
-            if (!StringHelper.isEmpty(bean.getWordCount())) {
-                bookTem.setWordCount(bean.getWordCount());
-            }
-            if (!StringHelper.isEmpty(bean.getStatus())) {
-                bookTem.setStatus(bean.getStatus());
-            }
+            Book bookTem = mBook.changeSource(bean);
             if (isCollected) {
                 mBookService.updateBook(mBook, bookTem);
             }
@@ -533,10 +555,12 @@ public class BookDetailedActivity extends BaseActivity {
         }
         Intent intent = new Intent(this, ReadActivity.class);
         aBooks = mSourceDialog.getaBooks();
-        if (aBooks != null) {
-            aBooks.set(mSourceDialog.getSourceIndex(), mBook);
+        if (aBooks != null && aBooks.size() > 0) {
+            int sourceIndex = mSourceDialog.getSourceIndex();
+            if (mSourceDialog.hasCurBookSource())
+                aBooks.set(sourceIndex, mBook);
             BitIntentDataManager.getInstance().putData(intent, aBooks);
-            intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
+            intent.putExtra(APPCONST.SOURCE_INDEX, sourceIndex);
         } else {
             BitIntentDataManager.getInstance().putData(intent, mBook);
         }
@@ -629,7 +653,7 @@ public class BookDetailedActivity extends BaseActivity {
                 break;
             case R.id.action_edit_source:
                 BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
-                if (!TextUtils.isEmpty(source.getSourceEName())) {
+                if (TextUtils.isEmpty(source.getSourceType())) {
                     ToastUtils.showWarring("内置书源无法编辑！");
                 } else {
                     Intent sourceIntent = new Intent(this, SourceEditActivity.class);

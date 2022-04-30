@@ -1,8 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of FYReader.
+  ~ FYReader is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ FYReader is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+  ~
+  ~ Copyright (C) 2020 - 2022 fengyuecanzhu
+  -->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="xyz.fycz.myreader">
 
+    <!--必要权限，解决安全风险漏洞，发送和注册广播事件需要调用带有传递权限的接口-->
+    <permission android:name="${applicationId}.openadsdk.permission.TT_PANGOLIN"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="${applicationId}.openadsdk.permission.TT_PANGOLIN" />
     <!-- ********************************permission************************************ -->
     <!-- 读取手机状态和身份 -->
     <!--    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>-->
@@ -38,6 +61,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
+    <uses-sdk tools:overrideLibrary="me.fycz.maple"/>
     <application
         android:name=".application.App"
         android:allowBackup="true"
@@ -122,6 +146,11 @@
         <activity android:name=".ui.activity.GroupManagerActivity" />
         <activity android:name=".ui.activity.SearchWordActivity" />
         <activity android:name=".ui.activity.AuthEmailActivity" />
+        <activity android:name=".ui.activity.RestartActivity" />
+        <activity android:name=".ui.activity.CrashActivity" />
+        <activity android:name=".ui.activity.SourceSubscribeActivity" />
+        <activity android:name=".ui.activity.RemoveAdActivity" />
+        <activity android:name=".ui.activity.UserInfoActivity" />
 
         <receiver android:name=".util.notification.NotificationClickReceiver" />
         <receiver android:name=".ui.presenter.BookcasePresenter$cancelDownloadReceiver" />

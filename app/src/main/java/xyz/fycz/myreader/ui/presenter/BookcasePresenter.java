@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.presenter;
 
 import static xyz.fycz.myreader.application.App.checkVersionByServer;
@@ -56,7 +74,7 @@ import xyz.fycz.myreader.greendao.service.BookGroupService;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.greendao.service.ChapterService;
 import xyz.fycz.myreader.model.user.Result;
-import xyz.fycz.myreader.model.user.UserService2;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.activity.FileSystemActivity;
 import xyz.fycz.myreader.ui.activity.GroupManagerActivity;
 import xyz.fycz.myreader.ui.activity.MainActivity;
@@ -175,7 +193,7 @@ public class BookcasePresenter implements BasePresenter {
 
         getData();
 
-        if (mSetting.isAutoSyn() && UserService2.INSTANCE.isLogin()) {
+        if (mSetting.isAutoSyn() && UserService.INSTANCE.isLogin()) {
             synBookcaseToWeb(true);
         }
 
@@ -986,7 +1004,7 @@ public class BookcasePresenter implements BasePresenter {
         SharedPreUtils spb = SharedPreUtils.getInstance();
         String synTime = spb.getString(mMainActivity.getString(R.string.synTime));
         if (!nowTimeStr.equals(synTime) || !isAutoSyn) {
-            UserService2.INSTANCE.webBackup(UserService2.INSTANCE.readConfig()).subscribe(new MySingleObserver<Result>() {
+            UserService.INSTANCE.webBackup(UserService.INSTANCE.readConfig()).subscribe(new MySingleObserver<Result>() {
                 @Override
                 public void onSubscribe(Disposable d) {
                     mMainActivity.addDisposable(d);

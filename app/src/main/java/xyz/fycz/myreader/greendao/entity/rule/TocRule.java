@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.greendao.entity.rule;
 
 import android.os.Parcel;
@@ -22,6 +40,9 @@ public class TocRule implements Parcelable {
     private String chapterName;
     private String chapterUrl;
     private String tocUrlNext;
+    private String isVip;
+    private String isPay;
+    private String updateTime;
 
     protected TocRule(Parcel in) {
         chapterList = in.readString();
@@ -29,6 +50,9 @@ public class TocRule implements Parcelable {
         chapterName = in.readString();
         chapterUrl = in.readString();
         tocUrlNext = in.readString();
+        isVip = in.readString();
+        isPay = in.readString();
+        updateTime = in.readString();
     }
 
     @Override
@@ -38,6 +62,9 @@ public class TocRule implements Parcelable {
         dest.writeString(chapterName);
         dest.writeString(chapterUrl);
         dest.writeString(tocUrlNext);
+        dest.writeString(isVip);
+        dest.writeString(isPay);
+        dest.writeString(updateTime);
     }
 
     @Override
@@ -67,7 +94,10 @@ public class TocRule implements Parcelable {
                 stringEquals(chapterBaseUrl, tocRule.chapterBaseUrl) &&
                 stringEquals(chapterName, tocRule.chapterName) &&
                 stringEquals(chapterUrl, tocRule.chapterUrl) &&
-                stringEquals(tocUrlNext, tocRule.tocUrlNext);
+                stringEquals(tocUrlNext, tocRule.tocUrlNext) &&
+                stringEquals(isVip, tocRule.isVip) &&
+                stringEquals(isPay, tocRule.isPay) &&
+                stringEquals(updateTime, tocRule.updateTime);
     }
 
     public String getChapterList() {
@@ -108,6 +138,30 @@ public class TocRule implements Parcelable {
 
     public void setTocUrlNext(String tocUrlNext) {
         this.tocUrlNext = tocUrlNext;
+    }
+
+    public String getIsVip() {
+        return isVip;
+    }
+
+    public void setIsVip(String isVip) {
+        this.isVip = isVip;
+    }
+
+    public String getIsPay() {
+        return isPay;
+    }
+
+    public void setIsPay(String isPay) {
+        this.isPay = isPay;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 
     public TocRule() {

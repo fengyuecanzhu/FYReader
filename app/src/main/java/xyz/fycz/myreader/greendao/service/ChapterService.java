@@ -1,8 +1,27 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.greendao.service;
 
 import android.database.Cursor;
 
 import xyz.fycz.myreader.common.APPCONST;
+import xyz.fycz.myreader.greendao.entity.BookMark;
 import xyz.fycz.myreader.greendao.entity.Chapter;
 import xyz.fycz.myreader.greendao.gen.ChapterDao;
 import xyz.fycz.myreader.util.IOUtils;
@@ -19,15 +38,16 @@ public class ChapterService extends BaseService {
     private static volatile ChapterService sInstance;
 
     public static ChapterService getInstance() {
-        if (sInstance == null){
-            synchronized (ChapterService.class){
-                if (sInstance == null){
+        if (sInstance == null) {
+            synchronized (ChapterService.class) {
+                if (sInstance == null) {
                     sInstance = new ChapterService();
                 }
             }
         }
         return sInstance;
     }
+
     private List<Chapter> findChapters(String sql, String[] selectionArgs) {
         ArrayList<Chapter> chapters = new ArrayList<>();
         try {
@@ -40,9 +60,12 @@ public class ChapterService extends BaseService {
                 chapter.setNumber(cursor.getInt(2));
                 chapter.setTitle(cursor.getString(3));
                 chapter.setUrl(cursor.getString(4));
-                chapter.setContent(cursor.getString(5));
-                chapter.setStart(cursor.getInt(6));
-                chapter.setEnd(cursor.getInt(7));
+                chapter.setIsVip(cursor.getInt(5) != 0);
+                chapter.setIsPay(cursor.getInt(6) != 0);
+                chapter.setUpdateTime(cursor.getString(7));
+                chapter.setContent(cursor.getString(8));
+                chapter.setStart(cursor.getInt(9));
+                chapter.setEnd(cursor.getInt(10));
                 chapters.add(chapter);
             }
         } catch (Exception e) {
@@ -185,11 +208,11 @@ public class ChapterService extends BaseService {
             return;
         }
 
-        File file = getBookFile(chapter.getBookId(), chapter.getTitle());
+        File file = getChapterFileExisted(chapter);
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
-            bw.write(content.replace(chapter.getTitle(), ""));
+            bw.write(content);
             bw.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -204,25 +227,25 @@ public class ChapterService extends BaseService {
      * @param chapter
      */
     public void deleteChapterCacheFile(Chapter chapter) {
-        File file = getBookFile(chapter.getBookId(), chapter.getTitle());
-        file.delete();
+        File file = getChapterFile(chapter);
+        if (file.exists()) file.delete();
     }
 
     /**
      * 获取缓存章节内容
+     *
      * @param chapter
      * @return
      */
-    public String getChapterCatheContent(Chapter chapter){
-        File file = new File(APPCONST.BOOK_CACHE_PATH + chapter.getBookId()
-                + File.separator + chapter.getTitle() + FileUtils.SUFFIX_FY);
+    public String getChapterCatheContent(Chapter chapter) {
+        File file = getChapterFile(chapter);
         if (!file.exists()) return null;
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(file));
             StringBuilder s = new StringBuilder();
             String line = null;
-            while ((line = br.readLine()) != null){
+            while ((line = br.readLine()) != null) {
                 s.append(line);
                 s.append("\n");
             }
@@ -230,7 +253,7 @@ public class ChapterService extends BaseService {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
-        }finally {
+        } finally {
             IOUtils.close(br);
         }
     }
@@ -275,13 +298,20 @@ public class ChapterService extends BaseService {
      * 根据文件名判断是否被缓存过 (因为可能数据库显示被缓存过，但是文件中却没有的情况，所以需要根据文件判断是否被缓存
      * 过)
      *
-     * @param folderName : bookId
-     * @param fileName:  chapterName
+     * @param chapter : chapter
      * @return
      */
-    public static boolean isChapterCached(String folderName, String fileName) {
-        File file = new File(APPCONST.BOOK_CACHE_PATH + folderName
-                + File.separator + fileName + FileUtils.SUFFIX_FY);
+    public static boolean isChapterCached(Chapter chapter) {
+        File file = getChapterFile(chapter);
+        return file.exists();
+    }
+
+    public static boolean isChapterCached(BookMark bookMark) {
+        Chapter chapter = new Chapter();
+        chapter.setBookId(bookMark.getBookId());
+        chapter.setNumber(bookMark.getBookMarkChapterNum());
+        chapter.setTitle(bookMark.getTitle());
+        File file = getChapterFile(chapter);
         return file.exists();
     }
 
@@ -321,6 +351,26 @@ public class ChapterService extends BaseService {
     public static File getBookFile(String folderName, String fileName) {
         return FileUtils.getFile(APPCONST.BOOK_CACHE_PATH + folderName
                 + File.separator + fileName + FileUtils.SUFFIX_FY);
+    }
+
+    public static File getChapterFile(Chapter chapter) {
+        File file = new File(APPCONST.BOOK_CACHE_PATH + chapter.getBookId()
+                + File.separator + chapter.getNumber() + "、" + chapter.getTitle() + FileUtils.SUFFIX_FY);
+        if (!file.exists()) {
+            file = new File(APPCONST.BOOK_CACHE_PATH + chapter.getBookId()
+                    + File.separator + chapter.getTitle() + FileUtils.SUFFIX_FY);
+        }
+        return file;
+    }
+
+    public static File getChapterFileExisted(Chapter chapter) {
+        File file = new File(APPCONST.BOOK_CACHE_PATH + chapter.getBookId()
+                + File.separator + chapter.getTitle() + FileUtils.SUFFIX_FY);
+        if (!file.exists()) {
+            file = FileUtils.getFile(APPCONST.BOOK_CACHE_PATH + chapter.getBookId()
+                    + File.separator + chapter.getNumber() + "、" + chapter.getTitle() + FileUtils.SUFFIX_FY);
+        }
+        return file;
     }
 
 }

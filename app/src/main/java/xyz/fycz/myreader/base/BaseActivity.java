@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.base;
 
 import android.annotation.SuppressLint;
@@ -5,6 +23,7 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -26,20 +45,25 @@ import xyz.fycz.myreader.application.App;
 import xyz.fycz.myreader.application.CrashHandler;
 import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.ui.activity.SplashActivity;
 import xyz.fycz.myreader.util.StatusBarUtil;
+import xyz.fycz.myreader.util.utils.AdUtils;
 
 /**
  * @author fengyue
  * @date 2020/8/12 20:02
  */
-public abstract class BaseActivity extends SwipeBackActivity {
+public abstract class BaseActivity<VB> extends SwipeBackActivity {
     private static final int INVALID_VAL = -1;
+
+    protected VB binding;
 
     protected static final String INTENT = "intent";
 
     protected CompositeDisposable mDisposable;
 
     protected Toolbar mToolbar;
+
 
     /****************************abstract area*************************************/
     /**
@@ -147,6 +171,33 @@ public abstract class BaseActivity extends SwipeBackActivity {
         if (mToolbar != null) {
             supportActionBar(mToolbar);
             setUpToolbar(mToolbar);
+        }
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        AdUtils.backTime();
+        ActivityManage.mResumeActivityCount--;
+        if (ActivityManage.mResumeActivityCount <= 0
+                && !App.isBackground){
+            App.isBackground = true;
+            Log.d("FYReader", "onActivityStarted: 应用进入后台");
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ActivityManage.mResumeActivityCount++;
+        if (ActivityManage.mResumeActivityCount == 1 &&
+                App.isBackground) {
+            App.isBackground = false;
+            Log.d("FYReader", "onActivityStarted: 应用进入前台");
+            if (!(this instanceof SplashActivity) && AdUtils.backSplashAd()) {
+                SplashActivity.start(this);
+            }
         }
     }
 

@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.webapi.crawler;
 
 
@@ -16,6 +34,7 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.read.FYReadCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.JsonPathCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.MatcherCrawler;
+import xyz.fycz.myreader.webapi.crawler.source.Third3Crawler;
 import xyz.fycz.myreader.webapi.crawler.source.ThirdCrawler;
 import xyz.fycz.myreader.webapi.crawler.source.XpathCrawler;
 
@@ -27,6 +46,7 @@ import java.util.ResourceBundle;
 
 import static xyz.fycz.myreader.common.APPCONST.JSON_PATH;
 import static xyz.fycz.myreader.common.APPCONST.MATCHER;
+import static xyz.fycz.myreader.common.APPCONST.THIRD_3_SOURCE;
 import static xyz.fycz.myreader.common.APPCONST.THIRD_SOURCE;
 import static xyz.fycz.myreader.common.APPCONST.XPATH;
 
@@ -39,21 +59,20 @@ public class ReadCrawlerUtil {
     }
 
     public static ArrayList<ReadCrawler> getReadCrawlers() {
-        SharedPreUtils spu = SharedPreUtils.getInstance();
-        String searchSource = spu.getString(App.getmContext().getString(R.string.searchSource), null);
+        String searchSource = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.searchSource), null);
         ArrayList<ReadCrawler> readCrawlers = new ArrayList<>();
         if (searchSource == null) {
             StringBuilder sb = new StringBuilder();
             for (LocalBookSource bookSource : LocalBookSource.values()) {
                 if (bookSource.equals(LocalBookSource.fynovel) || bookSource.equals(LocalBookSource.local))
                     continue;
-                sb.append(bookSource.toString());
+                sb.append(bookSource);
                 sb.append(",");
                 readCrawlers.add(getReadCrawler(bookSource.toString()));
             }
             sb.deleteCharAt(sb.lastIndexOf(","));
             searchSource = sb.toString();
-            spu.putString(App.getmContext().getString(R.string.searchSource), searchSource);
+            SharedPreUtils.getInstance().putString(App.getmContext().getString(R.string.searchSource), searchSource);
         } else if (!"".equals(searchSource)) {
             String[] sources = searchSource.split(",");
             for (String source : sources) {
@@ -74,8 +93,7 @@ public class ReadCrawlerUtil {
     }
 
     public static HashMap<CharSequence, Boolean> getDisableSources() {
-        SharedPreUtils spu = SharedPreUtils.getInstance();
-        String searchSource = spu.getString(App.getmContext().getString(R.string.searchSource), null);
+        String searchSource = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.searchSource), null);
         HashMap<CharSequence, Boolean> mSources = new LinkedHashMap<>();
         if (searchSource == null) {
             for (LocalBookSource bookSource : LocalBookSource.values()) {
@@ -114,8 +132,7 @@ public class ReadCrawlerUtil {
     }
 
     public synchronized static void addReadCrawler(LocalBookSource... bookSources) {
-        SharedPreUtils spu = SharedPreUtils.getInstance();
-        String searchSource = spu.getString(App.getmContext().getString(R.string.searchSource));
+        String searchSource = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.searchSource));
         if ("".equals(searchSource)) {
             resetReadCrawlers();
             return;
@@ -129,8 +146,7 @@ public class ReadCrawlerUtil {
     }
 
     public synchronized static void removeReadCrawler(String... bookSources) {
-        SharedPreUtils spu = SharedPreUtils.getInstance();
-        String searchSource = spu.getString(App.getmContext().getString(R.string.searchSource), null);
+        String searchSource = SharedPreUtils.getInstance().getString(App.getmContext().getString(R.string.searchSource), null);
         if (searchSource == null) {
             return;
         }
@@ -151,7 +167,7 @@ public class ReadCrawlerUtil {
             sb.append(",");
         }
         sb.deleteCharAt(sb.lastIndexOf(","));
-        spu.putString(App.getmContext().getString(R.string.searchSource), sb.toString());
+        SharedPreUtils.getInstance().putString(App.getmContext().getString(R.string.searchSource), sb.toString());
     }
 
     public static ReadCrawler getReadCrawler(String bookSource) {
@@ -178,11 +194,11 @@ public class ReadCrawlerUtil {
     public static ReadCrawler getReadCrawler(BookSource source) {
         return getReadCrawler(source, false);
     }
+
     public static ReadCrawler getReadCrawler(BookSource source, boolean isInfo) {
         try {
-            if (StringHelper.isEmpty(source.getSourceEName())) {
+            if (!StringHelper.isEmpty(source.getSourceType())) {
                 BaseSourceCrawler crawler;
-                if (source.getSourceType() == null) source.setSourceType(MATCHER);
                 switch (source.getSourceType()) {
                     case MATCHER:
                     default:
@@ -196,6 +212,8 @@ public class ReadCrawlerUtil {
                         break;
                     case THIRD_SOURCE:
                         return new ThirdCrawler(source);
+                    case THIRD_3_SOURCE:
+                        return new Third3Crawler(source);
                 }
                 if (source.getSearchRule().isRelatedWithInfo() || isInfo) {
                     return crawler;
@@ -203,6 +221,11 @@ public class ReadCrawlerUtil {
                     return new BaseSourceCrawlerNoInfo(crawler);
                 }
             } else {
+                if (THIRD_3_SOURCE.equals(source.getSourceType())) {
+                    return new Third3Crawler(source);
+                } else if (THIRD_SOURCE.equals(source.getSourceType())) {
+                    return new ThirdCrawler(source);
+                }
                 Class clz = Class.forName(source.getSourceUrl());
                 return (ReadCrawler) clz.newInstance();
             }

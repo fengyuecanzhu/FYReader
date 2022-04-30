@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.webapi.crawler.source.find;
 
 import android.text.TextUtils;
@@ -8,10 +26,9 @@ import java.util.List;
 import javax.script.SimpleBindings;
 
 import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
 import xyz.fycz.myreader.entity.FindKind;
 import xyz.fycz.myreader.entity.StrResponse;
-import xyz.fycz.myreader.entity.thirdsource.ExploreKind;
+import xyz.fycz.myreader.entity.thirdsource.source3.ExploreKind3;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.entity.rule.FindRule;
@@ -57,9 +74,9 @@ public class ThirdFindCrawler extends BaseFindCrawler {
         return Observable.create(emitter -> {
             try {
                 if (StringUtils.isJsonArray(findRuleBean.getUrl())) {
-                    List<ExploreKind> kinds = GsonUtils.parseJArray(findRuleBean.getUrl(), ExploreKind.class);
+                    List<ExploreKind3> kinds = GsonUtils.parseJArray(findRuleBean.getUrl(), ExploreKind3.class);
                     StringBuilder sb = new StringBuilder();
-                    for (ExploreKind kind : kinds){
+                    for (ExploreKind3 kind : kinds){
                         String url = kind.getUrl() == null ? "" : kind.getUrl();
                         sb.append(kind.getTitle()).append("::").append(url).append("\n");
                     }

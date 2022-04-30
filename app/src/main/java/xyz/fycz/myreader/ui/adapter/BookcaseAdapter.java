@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.adapter;
 
 import android.app.Activity;
@@ -212,9 +230,6 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
 
     public boolean unionChapterCathe(Book book) throws IOException {
         ArrayList<Chapter> chapters = (ArrayList<Chapter>) mChapterService.findBookAllChapterByBookId(book.getId());
-        BufferedReader br = null;
-        BufferedWriter bw = null;
-        bw = new BufferedWriter(new FileWriter(FileUtils.getFile(APPCONST.TXT_BOOK_DIR + book.getName() + ".txt")));
         if (chapters.size() == 0) {
             return false;
         }
@@ -222,12 +237,20 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
         if (!bookFile.exists()) {
             return false;
         }
+        BufferedReader br = null;
+        BufferedWriter bw = null;
+        String filePath = APPCONST.TXT_BOOK_DIR + book.getName() + (TextUtils.isEmpty(book.getAuthor())
+                ? "" : " 作者：" + book.getAuthor()) + ".txt";
+        bw = new BufferedWriter(new FileWriter(FileUtils.getFile(filePath)));
+        bw.write("《" + book.getName() + "》\n");
+        if (!TextUtils.isEmpty(book.getAuthor())) bw.write("作者：" + book.getAuthor() + "\n");
+        if (!TextUtils.isEmpty(book.getDesc())) bw.write("简介：\n" + book.getDesc() + "\n");
+        bw.newLine();
         for (Chapter chapter : chapters) {
-            if (ChapterService.isChapterCached(chapter.getBookId(), chapter.getTitle())) {
+            if (ChapterService.isChapterCached(chapter)) {
                 bw.write("\t" + chapter.getTitle());
                 bw.newLine();
-                br = new BufferedReader(new FileReader(APPCONST.BOOK_CACHE_PATH + book.getId()
-                        + File.separator + chapter.getTitle() + FileUtils.SUFFIX_FY));
+                br = new BufferedReader(new FileReader(ChapterService.getChapterFile(chapter)));
                 String line = null;
                 while ((line = br.readLine()) != null) {
                     bw.write(line);
@@ -488,28 +511,7 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
                 this.dialog.dismiss();
                 SourceExchangeDialog dialog = new SourceExchangeDialog((Activity) mContext, mBook);
                 dialog.setOnSourceChangeListener((bean, pos) -> {
-                    Book bookTem = (Book) mBook.clone();
-                    bookTem.setChapterUrl(bean.getChapterUrl());
-                    bookTem.setInfoUrl(bean.getInfoUrl());
-                    if (!StringHelper.isEmpty(bean.getImgUrl())) {
-                        bookTem.setImgUrl(bean.getImgUrl());
-                    }
-                    if (!StringHelper.isEmpty(bean.getType())) {
-                        bookTem.setType(bean.getType());
-                    }
-                    if (!StringHelper.isEmpty(bean.getDesc())) {
-                        bookTem.setDesc(bean.getDesc());
-                    }
-                    if (!StringHelper.isEmpty(bean.getUpdateDate())) {
-                        bookTem.setUpdateDate(bean.getUpdateDate());
-                    }
-                    if (!StringHelper.isEmpty(bean.getWordCount())) {
-                        bookTem.setWordCount(bean.getWordCount());
-                    }
-                    if (!StringHelper.isEmpty(bean.getStatus())) {
-                        bookTem.setStatus(bean.getStatus());
-                    }
-                    bookTem.setSource(bean.getSource());
+                    Book bookTem = mBook.changeSource(bean);
                     mBookService.updateBook(mBook, bookTem);
                     mBook = bookTem;
                     list.set(this.pos, mBook);
@@ -534,7 +536,7 @@ public abstract class BookcaseAdapter extends RecyclerView.Adapter<BookcaseAdapt
             });
             tvEditSource.setOnClickListener(v -> {
                 BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
-                if (!TextUtils.isEmpty(source.getSourceEName())) {
+                if (TextUtils.isEmpty(source.getSourceType())) {
                     ToastUtils.showWarring("内置书源无法编辑！");
                 } else {
                     Intent sourceIntent = new Intent(mContext, SourceEditActivity.class);

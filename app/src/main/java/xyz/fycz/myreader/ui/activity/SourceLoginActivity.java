@@ -1,5 +1,24 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
@@ -23,8 +42,7 @@ import xyz.fycz.myreader.util.ToastUtils;
  * @author fengyue
  * @date 2021/5/15 10:43
  */
-public class SourceLoginActivity extends BaseActivity {
-    private ActivitySourceLoginBinding binding;
+public class SourceLoginActivity extends BaseActivity<ActivitySourceLoginBinding> {
     private BookSource bookSource;
     private boolean checking = false;
 
@@ -54,12 +72,16 @@ public class SourceLoginActivity extends BaseActivity {
     }
 
     @Override
+    @SuppressLint("SetJavaScriptEnabled")
     protected void initWidget() {
         WebSettings settings = binding.webView.getSettings();
         settings.setSupportZoom(true);
         settings.setBuiltInZoomControls(true);
         settings.setDefaultTextEncodingName("UTF-8");
-        //settings.setUserAgentString(APPCONST.DEFAULT_USER_AGENT);
+        settings.setLoadWithOverviewMode(true);
+        if (bookSource.getHeaderMap(false).containsKey(APPCONST.UA_NAME)){
+            settings.setUserAgentString(bookSource.getHeaderMap(false).get(APPCONST.UA_NAME));
+        }
         settings.setJavaScriptEnabled(true);
         CookieManager cookieManager = CookieManager.getInstance();
         binding.webView.setWebViewClient(new WebViewClient() {

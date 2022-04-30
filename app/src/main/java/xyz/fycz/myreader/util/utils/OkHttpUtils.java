@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.util.utils;
 
 import android.annotation.SuppressLint;
@@ -41,6 +59,8 @@ import xyz.fycz.myreader.entity.StrResponse;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.CookieStore;
 import xyz.fycz.myreader.model.third2.analyzeRule.AnalyzeUrl;
+import xyz.fycz.myreader.model.third3.http.HttpHelperKt;
+import xyz.fycz.myreader.model.user.UserService;
 
 import static xyz.fycz.myreader.util.help.SSLSocketClient.createSSLSocketFactory;
 import static xyz.fycz.myreader.util.help.SSLSocketClient.createTrustAllManager;
@@ -48,22 +68,12 @@ import static xyz.fycz.myreader.util.help.SSLSocketClient.getHeaderInterceptor;
 
 public class OkHttpUtils {
 
-    public static OkHttpClient mClient;
+    public static OkHttpClient getOkHttpClient() {
+        return getOkHttpClient(false);
+    }
 
-    public static synchronized OkHttpClient getOkHttpClient() {
-        if (mClient == null) {
-            OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.connectTimeout(5, TimeUnit.SECONDS)
-                    .readTimeout(10, TimeUnit.SECONDS)
-                    .writeTimeout(10, TimeUnit.SECONDS)
-                    .sslSocketFactory(createSSLSocketFactory(), createTrustAllManager())
-                    .hostnameVerifier((hostname, session) -> true)
-                    .protocols(Collections.singletonList(Protocol.HTTP_1_1))
-                    .addInterceptor(getHeaderInterceptor());
-            mClient = builder
-                    .build();
-        }
-        return mClient;
+    public static OkHttpClient getOkHttpClient(boolean noProxy) {
+        return HttpHelperKt.getProxyClient(HttpHelperKt.getGlobalProxy(), noProxy);
     }
 
     /**
@@ -346,7 +356,7 @@ public class OkHttpUtils {
                 .build();
 
         Request request = new Request.Builder()
-                .header("Authorization", "Client-ID " + UUID.randomUUID())
+                .header("Authorization", "Client-ID " + UserService.INSTANCE.getUUID())
                 .url(url)
                 .post(requestBody)
                 .build();

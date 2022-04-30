@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 import org.seimicrawler.xpath.JXDocument;
 
 import java.io.File;
@@ -7,6 +25,7 @@ import java.util.List;
 
 import xyz.fycz.myreader.model.sourceAnalyzer.BaseAnalyzer;
 import xyz.fycz.myreader.util.utils.FileUtils;
+import xyz.fycz.myreader.util.utils.MD5Utils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 
 /**
@@ -114,7 +133,9 @@ public class Test {
         //}
     }
 
-
-
-
+    @org.junit.Test
+    public void md5(){
+        File file = new File("D:\\Java\\AndroidSdk\\build-tools\\29.0.3\\dynamic_v1.0.4.dex");
+        System.out.println(MD5Utils.INSTANCE.getFileMD5s(file, 32));
+    }
 }

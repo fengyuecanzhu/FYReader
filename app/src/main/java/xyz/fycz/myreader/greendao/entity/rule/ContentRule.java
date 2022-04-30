@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.greendao.entity.rule;
 
 import android.os.Parcel;
@@ -19,11 +37,17 @@ public class ContentRule implements Parcelable {
     private String content;
     private String contentBaseUrl;
     private String contentUrlNext;
+    private String webJs;
+    private String sourceRegex;
+    private String replaceRegex;
 
     protected ContentRule(Parcel in) {
         content = in.readString();
         contentBaseUrl = in.readString();
         contentUrlNext = in.readString();
+        webJs = in.readString();
+        sourceRegex = in.readString();
+        replaceRegex = in.readString();
     }
 
     @Override
@@ -31,6 +55,9 @@ public class ContentRule implements Parcelable {
         dest.writeString(content);
         dest.writeString(contentBaseUrl);
         dest.writeString(contentUrlNext);
+        dest.writeString(webJs);
+        dest.writeString(sourceRegex);
+        dest.writeString(replaceRegex);
     }
 
     @Override
@@ -58,7 +85,10 @@ public class ContentRule implements Parcelable {
         ContentRule that = (ContentRule) o;
         return  stringEquals(content, that.content) &&
                 stringEquals(contentBaseUrl, that.contentBaseUrl) &&
-                stringEquals(contentUrlNext, that.contentUrlNext);
+                stringEquals(contentUrlNext, that.contentUrlNext) &&
+                stringEquals(webJs, that.webJs) &&
+                stringEquals(sourceRegex, that.sourceRegex) &&
+                stringEquals(replaceRegex, that.replaceRegex);
     }
 
 
@@ -89,5 +119,27 @@ public class ContentRule implements Parcelable {
         this.contentUrlNext = contentUrlNext;
     }
 
+    public String getWebJs() {
+        return webJs;
+    }
 
+    public void setWebJs(String webJs) {
+        this.webJs = webJs;
+    }
+
+    public String getSourceRegex() {
+        return sourceRegex;
+    }
+
+    public void setSourceRegex(String sourceRegex) {
+        this.sourceRegex = sourceRegex;
+    }
+
+    public String getReplaceRegex() {
+        return replaceRegex;
+    }
+
+    public void setReplaceRegex(String replaceRegex) {
+        this.replaceRegex = replaceRegex;
+    }
 }

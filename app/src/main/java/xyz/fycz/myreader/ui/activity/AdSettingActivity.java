@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
 import android.content.DialogInterface;
@@ -27,11 +45,9 @@ import xyz.fycz.myreader.util.utils.FileUtils;
  * @author fengyue
  * @date 2021/4/23 12:51
  */
-public class AdSettingActivity extends BaseActivity {
+public class AdSettingActivity extends BaseActivity<ActivityAdSettingBinding> {
 
-    private ActivityAdSettingBinding binding;
     private LoadingDialog loadingDialog;
-    private SharedPreUtils spu;
     private int curAdTimes;
     private int curAdCount;
     private boolean bookDetailAd;
@@ -52,9 +68,8 @@ public class AdSettingActivity extends BaseActivity {
 
     @Override
     protected void initData(Bundle savedInstanceState) {
-        spu = SharedPreUtils.getInstance();
-        curAdTimes = spu.getInt("curAdTimes", 3);
-        String splashAdCount = spu.getString("splashAdCount");
+        curAdTimes = SharedPreUtils.getInstance().getInt("curAdTimes", 3);
+        String splashAdCount = SharedPreUtils.getInstance().getString("splashAdCount");
         String[] splashAdCounts = splashAdCount.split(":");
         String today = DateHelper.getYearMonthDay1();
         if (today.equals(splashAdCounts[0])){
@@ -62,7 +77,7 @@ public class AdSettingActivity extends BaseActivity {
         }else {
             curAdCount = 0;
         }
-        bookDetailAd = spu.getBoolean("bookDetailAd", false);
+        bookDetailAd = SharedPreUtils.getInstance().getBoolean("bookDetailAd", false);
     }
 
     @Override
@@ -136,7 +151,7 @@ public class AdSettingActivity extends BaseActivity {
                             .setTitle(getString(R.string.splash_ad_times))
                             .setSingleChoiceItems(adTimes, checked, (dialog, which) -> {
                                 curAdTimes = ints[which];
-                                spu.putInt("curAdTimes", curAdTimes);
+                                SharedPreUtils.getInstance().putInt("curAdTimes", curAdTimes);
                                 binding.tvSplashCurAdTimes.setText(getString(R.string.splash_cur_ad_times, adTimes[which],  curAdCount + "次"));
                                 dialog.dismiss();
                             }).setNegativeButton("取消", null).show();*/
@@ -144,7 +159,7 @@ public class AdSettingActivity extends BaseActivity {
                             .setSelection(checked)
                             .setOnMenuItemClickListener((dialog, text, which) -> {
                                 curAdTimes = ints[which];
-                                spu.putInt("curAdTimes", curAdTimes);
+                                SharedPreUtils.getInstance().putInt("curAdTimes", curAdTimes);
                                 binding.tvSplashCurAdTimes.setText(getString(R.string.splash_cur_ad_times, adTimes[which],  curAdCount + "次"));
                                 return false;
                             }).setCancelButton(R.string.cancel);
@@ -158,7 +173,7 @@ public class AdSettingActivity extends BaseActivity {
         });
         binding.rlBookDetailAd.setOnClickListener(v -> {
             bookDetailAd = !bookDetailAd;
-            spu.putBoolean("bookDetailAd", bookDetailAd);
+            SharedPreUtils.getInstance().putBoolean("bookDetailAd", bookDetailAd);
             binding.scBookDetailAd.setChecked(bookDetailAd);
         });
         binding.rlDeleteAdFile.setOnClickListener(v -> {

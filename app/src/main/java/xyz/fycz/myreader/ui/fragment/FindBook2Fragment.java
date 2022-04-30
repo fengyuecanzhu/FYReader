@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.fragment;
 
 import android.content.Intent;
@@ -15,27 +33,27 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import io.reactivex.disposables.Disposable;
-import xyz.fycz.myreader.base.BaseFragment;
 import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.base.LazyFragment;
 import xyz.fycz.myreader.base.adapter.BaseListAdapter;
 import xyz.fycz.myreader.base.adapter.IViewHolder;
 import xyz.fycz.myreader.base.observer.MyObserver;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentFindBook2Binding;
 import xyz.fycz.myreader.entity.FindKind;
+import xyz.fycz.myreader.entity.ad.AdBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.service.BookService;
 import xyz.fycz.myreader.ui.activity.BookDetailedActivity;
-import xyz.fycz.myreader.ui.activity.BookstoreActivity;
 import xyz.fycz.myreader.ui.adapter.holder.FindBookHolder;
 import xyz.fycz.myreader.ui.dialog.SourceExchangeDialog;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.BookApi;
 import xyz.fycz.myreader.webapi.crawler.base.FindCrawler;
-import xyz.fycz.myreader.widget.RefreshLayout;
 
 /**
  * @author fengyue
@@ -51,6 +69,8 @@ public class FindBook2Fragment extends LazyFragment {
 
     private static final String KIND = "kind";
     private static final String FIND_CRAWLER = "findCrawler";
+    private AdBean adBean;
+    private View flow;
 
     public FindBook2Fragment() {
     }
@@ -78,6 +98,7 @@ public class FindBook2Fragment extends LazyFragment {
         outState.putString(APPCONST.DATA_KEY, dataKey);
         super.onSaveInstanceState(outState);
     }
+
     @Override
     public void lazyInit() {
         initData();
@@ -92,6 +113,8 @@ public class FindBook2Fragment extends LazyFragment {
     }
 
     protected void initData() {
+        adBean = AdUtils.getAdConfig().getFind();
+        getFlow();
         findBookAdapter = new BaseListAdapter<Book>() {
             @Override
             protected IViewHolder<Book> createViewHolder(int viewType) {
@@ -102,6 +125,19 @@ public class FindBook2Fragment extends LazyFragment {
         binding.rvFindBooks.setAdapter(findBookAdapter);
         page = 1;
         loadBooks();
+    }
+
+    private void getFlow() {
+        AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
+            @Override
+            public void onSuccess(@NonNull Boolean aBoolean) {
+                if (aBoolean && AdUtils.adTime("find", adBean)) {
+                    if (adBean.getStatus() > 0) {
+                        AdUtils.getFlowAd(getActivity(), 1, view -> flow = view, "find");
+                    }
+                }
+            }
+        });
     }
 
     protected void initWidget() {
@@ -156,6 +192,11 @@ public class FindBook2Fragment extends LazyFragment {
                     } else {
                         findBookAdapter.refreshItems(books);
                         binding.srlFindBooks.finishRefresh();
+                        if (flow != null) {
+                            int index = findBookAdapter.getItemCount() - books.size() + 5;
+                            index = Math.min(findBookAdapter.getItemCount() - 1, index);
+                            findBookAdapter.addOther(index, flow);
+                        }
                     }
                 } else {
                     if (books.size() == 0) {
@@ -163,6 +204,11 @@ public class FindBook2Fragment extends LazyFragment {
                     } else {
                         findBookAdapter.addItems(books);
                         binding.srlFindBooks.finishLoadMore();
+                        if (flow != null) {
+                            int index = findBookAdapter.getItemCount() - books.size() + 5;
+                            index = Math.min(findBookAdapter.getItemCount() - 1, index);
+                            findBookAdapter.addOther(index, flow);
+                        }
                     }
                 }
                 page++;
@@ -176,7 +222,7 @@ public class FindBook2Fragment extends LazyFragment {
                     binding.loading.showError();
                     binding.srlFindBooks.finishRefresh();
                 } else {
-                    if (e.getMessage()!= null && e.getMessage().contains("没有下一页")) {
+                    if (e.getMessage() != null && e.getMessage().contains("没有下一页")) {
                         binding.srlFindBooks.finishLoadMoreWithNoMoreData();
                     } else {
                         ToastUtils.showError("数据加载失败\n" + e.getLocalizedMessage());

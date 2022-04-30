@@ -1,8 +1,30 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -30,15 +52,14 @@ import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.webapi.crawler.source.MatcherCrawler;
 
 /**
  * @author fengyue
  * @date 2021/2/9 10:54
  */
-public class SourceEditActivity extends BaseActivity {
-    private ActivitySourceEditBinding binding;
-
+public class SourceEditActivity extends BaseActivity<ActivitySourceEditBinding> {
     private BookSource source;
     private List<EditEntity> sourceEntities;
     private List<EditEntity> searchEntities;
@@ -120,6 +141,9 @@ public class SourceEditActivity extends BaseActivity {
             case APPCONST.THIRD_SOURCE:
                 sourceType = 3;
                 break;
+            case APPCONST.THIRD_3_SOURCE:
+                sourceType = 4;
+                break;
         }
         binding.sSourceType.setSelection(sourceType);
     }
@@ -179,9 +203,26 @@ public class SourceEditActivity extends BaseActivity {
             } else {
                 ToastUtils.showWarring("当前书源没有配置登录地址");
             }
+        } else if (item.getItemId() == R.id.action_copy_source) {
+            ClipboardManager mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            //数据
+            ClipData mClipData = ClipData.newPlainText("Label",
+                    GsonExtensionsKt.getGSON().toJson(getSource()));
+            //把数据设置到剪切板上
+            mClipboardManager.setPrimaryClip(mClipData);
+            ToastUtils.showSuccess("拷贝成功");
         } else if (item.getItemId() == R.id.action_clear_cookie) {
             DbManager.getDaoSession().getCookieBeanDao().deleteByKey(getSource().getSourceUrl());
             ToastUtils.showSuccess("Cookie清除成功");
+        } else if (item.getItemId() == R.id.action_delete) {
+            if (BookSourceManager.isBookSourceExist(source)) {
+                BookSourceManager.removeBookSource(source);
+                setResult(Activity.RESULT_OK);
+                ToastUtils.showSuccess("书源删除成功");
+                finish();
+            } else {
+                ToastUtils.showWarring("当前书源暂未保存，无法删除");
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -212,9 +253,11 @@ public class SourceEditActivity extends BaseActivity {
                         debugEntity.setUrl(text);
                     }
                 }, (dialog, which) -> {
-                    Intent intent = new Intent(this, SourceDebugActivity.class);
-                    intent.putExtra("debugEntity", debugEntity);
-                    startActivity(intent);
+                    if (!TextUtils.isEmpty(debugEntity.getUrl())) {
+                        Intent intent = new Intent(this, SourceDebugActivity.class);
+                        intent.putExtra("debugEntity", debugEntity);
+                        startActivity(intent);
+                    }
                 });
     }
 
@@ -285,6 +328,9 @@ public class SourceEditActivity extends BaseActivity {
                 break;
             case 3:
                 sourceType = APPCONST.THIRD_SOURCE;
+                break;
+            case 4:
+                sourceType = APPCONST.THIRD_3_SOURCE;
                 break;
         }
         source.setSourceType(sourceType);

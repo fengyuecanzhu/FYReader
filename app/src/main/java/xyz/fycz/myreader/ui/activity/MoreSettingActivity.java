@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
 import android.app.Activity;
@@ -11,6 +29,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.NumberPicker;
@@ -50,6 +70,7 @@ import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
 import xyz.fycz.myreader.ui.fragment.PrivateBooksFragment;
+import xyz.fycz.myreader.ui.fragment.ProxyFragment;
 import xyz.fycz.myreader.ui.fragment.WebDavFragment;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
@@ -63,14 +84,13 @@ import static xyz.fycz.myreader.common.APPCONST.BOOK_CACHE_PATH;
  * 阅读界面的更多设置
  */
 
-public class MoreSettingActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
-
-    private ActivityMoreSettingBinding binding;
+public class MoreSettingActivity extends BaseActivity<ActivityMoreSettingBinding> implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private boolean needRefresh;
     private boolean upMenu;
 
     private Setting mSetting;
+    private int mineShowMode;
     private boolean isVolumeTurnPage;
     private int resetScreenTime;
     private int sortStyle;
@@ -92,17 +112,19 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
 
     //选择禁用更新书籍对话框
     private AlertDialog mCloseRefreshDia;
-    //选择禁用更新书源对话框
-    private AlertDialog mDisableSourceDia;
     //选择一键缓存书籍对话框
     private AlertDialog mDownloadAllDia;
 
+    private ProxyFragment mProxyFragment;
     private WebDavFragment mWebDavFragment;
     private PrivateBooksFragment mPrivateBooksFragment;
 
     private BaseFragment curFragment;
     // 是否前往webdav设置
     private boolean isWebDav;
+
+    private Animation enterAnim;
+    private Animation exitAnim;
 
     @Override
     protected void bindView() {
@@ -115,6 +137,7 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
         super.initData(savedInstanceState);
         needRefresh = false;
         mSetting = SysManager.getSetting();
+        mineShowMode = SharedPreUtils.getInstance().getInt("mineShowMode", 0);
         isVolumeTurnPage = mSetting.isVolumeTurnPage();
         alwaysNext = mSetting.isAlwaysNext();
         resetScreenTime = mSetting.getResetScreen();
@@ -130,6 +153,8 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
         enType = mSetting.isEnType();
         threadNum = SharedPreUtils.getInstance().getInt(getString(R.string.threadNum), 8);
         isWebDav = getIntent().getBooleanExtra(APPCONST.WEB_DAV, false);
+        enterAnim = AnimationUtils.loadAnimation(this, R.anim.fragment_enter_pop);
+        exitAnim = AnimationUtils.loadAnimation(this, R.anim.fragment_exit_pop);
     }
 
     @Override
@@ -148,6 +173,9 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
         } else if (curFragment == mPrivateBooksFragment) {
             getSupportActionBar().setTitle(getString(R.string.private_bookcase));
             invalidateOptionsMenu();
+        } else if (curFragment == mProxyFragment) {
+            getSupportActionBar().setTitle(getString(R.string.proxy_setting));
+            invalidateOptionsMenu();
         }
     }
 
@@ -155,6 +183,7 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
     protected void initWidget() {
         super.initWidget();
         initSwitchStatus();
+        initMineShowMode();
         if (sortStyle == 1) {
             binding.tvBookSort.setText(getString(R.string.time_sort));
         } else if (sortStyle == 2) {
@@ -167,6 +196,23 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
             binding.rlMatchChapterSuitability.setVisibility(View.GONE);
         }
         binding.tvThreadNum.setText(getString(R.string.cur_thread_num, threadNum));
+    }
+
+    private void initMineShowMode() {
+        switch (mineShowMode) {
+            case 1:
+                binding.tvMineShow.setText(getString(R.string.show_cloud_only));
+                break;
+            case 2:
+                binding.tvMineShow.setText(getString(R.string.show_user_cloud));
+                break;
+            case 3:
+                binding.tvMineShow.setText(getString(R.string.hide_user_cloud));
+                break;
+            default:
+                binding.tvMineShow.setText(getString(R.string.show_user_only));
+                break;
+        }
     }
 
     @Override
@@ -185,7 +231,7 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (curFragment == null) {
+        if (curFragment == null || curFragment == mProxyFragment) {
             menu.findItem(R.id.action_tip).setVisible(false);
         } else {
             menu.findItem(R.id.action_tip).setVisible(true);
@@ -220,9 +266,39 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
     @Override
     protected void initClick() {
         super.initClick();
+        binding.llProxy.setOnClickListener(v -> {
+            binding.svContent.setVisibility(View.GONE);
+            binding.svContent.startAnimation(exitAnim);
+            FragmentTransaction ft = getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.fragment_enter,
+                            R.anim.fragment_exit,
+                            R.anim.fragment_enter_pop,
+                            R.anim.fragment_exit_pop
+                    );
+            if (mProxyFragment == null) {
+                mProxyFragment = new ProxyFragment();
+                ft.add(R.id.ll_content, mProxyFragment);
+            } else {
+                ft.show(mProxyFragment);
+            }
+            ft.commit();
+            curFragment = mProxyFragment;
+            setUpToolbar();
+        });
+
         binding.llWebdav.setOnClickListener(v -> {
             binding.svContent.setVisibility(View.GONE);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            binding.svContent.startAnimation(exitAnim);
+            FragmentTransaction ft = getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.fragment_enter,
+                            R.anim.fragment_exit,
+                            R.anim.fragment_enter_pop,
+                            R.anim.fragment_exit_pop
+                    );
             if (mWebDavFragment == null) {
                 mWebDavFragment = new WebDavFragment();
                 ft.add(R.id.ll_content, mWebDavFragment);
@@ -232,6 +308,18 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
             ft.commit();
             curFragment = mWebDavFragment;
             setUpToolbar();
+        });
+
+        binding.llMineShow.setOnClickListener(v -> {
+            BottomMenu.show(getString(R.string.mine_show_mode), getResources().getStringArray(R.array.mine_show))
+                    .setSelection(mineShowMode)
+                    .setOnMenuItemClickListener((dialog, text, which) -> {
+                        mineShowMode = which;
+                        SharedPreUtils.getInstance().putInt("mineShowMode", mineShowMode);
+                        initMineShowMode();
+                        needRefresh = true;
+                        return false;
+                    }).setCancelButton(R.string.cancel);
         });
 
         binding.rlVolume.setOnClickListener(
@@ -356,48 +444,40 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
         );
 
         binding.llCloseRefresh.setOnClickListener(v -> {
-            App.runOnUiThread(() -> {
-                if (mCloseRefreshDia != null) {
-                    mCloseRefreshDia.show();
-                    return;
+            if (mCloseRefreshDia != null) {
+                mCloseRefreshDia.show();
+                return;
+            }
+            initmBooks();
+            if (mBooks.size() == 0) {
+                ToastUtils.showWarring("当前书架没有支持禁用更新的书籍！");
+                return;
+            }
+            boolean[] isCloseRefresh = new boolean[booksCount];
+            int crBookCount = 0;
+            for (int i = 0; i < booksCount; i++) {
+                Book book = mBooks.get(i);
+                isCloseRefresh[i] = book.getIsCloseUpdate();
+                if (isCloseRefresh[i]) {
+                    crBookCount++;
                 }
+            }
+            mCloseRefreshDia = new MultiChoiceDialog().create(this, "禁用更新的书籍",
+                    mBooksName, isCloseRefresh, crBookCount, (dialog, which) -> {
+                        BookService.getInstance().updateBooks(mBooks);
+                    }, null, new DialogCreator.OnMultiDialogListener() {
+                        @Override
+                        public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
+                            mBooks.get(which).setIsCloseUpdate(isChecked);
+                        }
 
-                initmBooks();
-
-                if (mBooks.size() == 0) {
-                    ToastUtils.showWarring("当前书架没有支持禁用更新的书籍！");
-                    return;
-                }
-
-                boolean[] isCloseRefresh = new boolean[booksCount];
-                int crBookCount = 0;
-
-                for (int i = 0; i < booksCount; i++) {
-                    Book book = mBooks.get(i);
-                    isCloseRefresh[i] = book.getIsCloseUpdate();
-                    if (isCloseRefresh[i]) {
-                        crBookCount++;
-                    }
-                }
-
-                mCloseRefreshDia = new MultiChoiceDialog().create(this, "禁用更新的书籍",
-                        mBooksName, isCloseRefresh, crBookCount, (dialog, which) -> {
-                            BookService.getInstance().updateBooks(mBooks);
-                        }, null, new DialogCreator.OnMultiDialogListener() {
-                            @Override
-                            public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
-                                mBooks.get(which).setIsCloseUpdate(isChecked);
+                        @Override
+                        public void onSelectAll(boolean isSelectAll) {
+                            for (Book book : mBooks) {
+                                book.setIsCloseUpdate(isSelectAll);
                             }
-
-                            @Override
-                            public void onSelectAll(boolean isSelectAll) {
-                                for (Book book : mBooks) {
-                                    book.setIsCloseUpdate(isSelectAll);
-                                }
-                            }
-                        });
-
-            });
+                        }
+                    });
         });
 
         binding.llThreadNum.setOnClickListener(v -> {
@@ -437,50 +517,43 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
 
 
         binding.llDownloadAll.setOnClickListener(v -> {
-            App.runOnUiThread(() -> {
-                if (mDownloadAllDia != null) {
-                    mDownloadAllDia.show();
-                    return;
+            if (mDownloadAllDia != null) {
+                mDownloadAllDia.show();
+                return;
+            }
+            initmBooks();
+            if (mBooks.size() == 0) {
+                ToastUtils.showWarring("当前书架没有支持缓存的书籍！");
+                return;
+            }
+            int booksCount = mBooks.size();
+            CharSequence[] mBooksName = new CharSequence[booksCount];
+            boolean[] isDownloadAll = new boolean[booksCount];
+            int daBookCount = 0;
+            for (int i = 0; i < booksCount; i++) {
+                Book book = mBooks.get(i);
+                mBooksName[i] = book.getName();
+                isDownloadAll[i] = book.getIsDownLoadAll();
+                if (isDownloadAll[i]) {
+                    daBookCount++;
                 }
+            }
+            mDownloadAllDia = new MultiChoiceDialog().create(this, "一键缓存的书籍",
+                    mBooksName, isDownloadAll, daBookCount, (dialog, which) -> {
+                        BookService.getInstance().updateBooks(mBooks);
+                    }, null, new DialogCreator.OnMultiDialogListener() {
+                        @Override
+                        public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
+                            mBooks.get(which).setIsDownLoadAll(isChecked);
+                        }
 
-                initmBooks();
-
-                if (mBooks.size() == 0) {
-                    ToastUtils.showWarring("当前书架没有支持缓存的书籍！");
-                    return;
-                }
-
-                int booksCount = mBooks.size();
-                CharSequence[] mBooksName = new CharSequence[booksCount];
-                boolean[] isDownloadAll = new boolean[booksCount];
-                int daBookCount = 0;
-                for (int i = 0; i < booksCount; i++) {
-                    Book book = mBooks.get(i);
-                    mBooksName[i] = book.getName();
-                    isDownloadAll[i] = book.getIsDownLoadAll();
-                    if (isDownloadAll[i]) {
-                        daBookCount++;
-                    }
-                }
-
-                mDownloadAllDia = new MultiChoiceDialog().create(this, "一键缓存的书籍",
-                        mBooksName, isDownloadAll, daBookCount, (dialog, which) -> {
-                            BookService.getInstance().updateBooks(mBooks);
-                        }, null, new DialogCreator.OnMultiDialogListener() {
-                            @Override
-                            public void onItemClick(DialogInterface dialog, int which, boolean isChecked) {
-                                mBooks.get(which).setIsDownLoadAll(isChecked);
+                        @Override
+                        public void onSelectAll(boolean isSelectAll) {
+                            for (Book book : mBooks) {
+                                book.setIsDownLoadAll(isSelectAll);
                             }
-
-                            @Override
-                            public void onSelectAll(boolean isSelectAll) {
-                                for (Book book : mBooks) {
-                                    book.setIsDownLoadAll(isSelectAll);
-                                }
-                            }
-                        });
-
-            });
+                        }
+                    });
         });
 
         binding.ivMatchChapterTip.setOnClickListener(v -> DialogCreator.createTipDialog(this, "智能匹配", getString(R.string.match_chapter_tip)));
@@ -577,7 +650,15 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
             super.finish();
         } else {
             binding.svContent.setVisibility(View.VISIBLE);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            binding.svContent.startAnimation(enterAnim);
+            FragmentTransaction ft = getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.fragment_enter,
+                            R.anim.fragment_exit,
+                            R.anim.fragment_enter_pop,
+                            R.anim.fragment_exit_pop
+                    );
             ft.hide(curFragment);
             ft.commit();
             curFragment = null;
@@ -722,7 +803,15 @@ public class MoreSettingActivity extends BaseActivity implements SharedPreferenc
 
     private void showPrivateBooksFragment() {
         binding.svContent.setVisibility(View.GONE);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        binding.svContent.startAnimation(exitAnim);
+        FragmentTransaction ft = getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(
+                        R.anim.fragment_enter,
+                        R.anim.fragment_exit,
+                        R.anim.fragment_enter_pop,
+                        R.anim.fragment_exit_pop
+                );
         if (mPrivateBooksFragment == null) {
             mPrivateBooksFragment = new PrivateBooksFragment();
             ft.add(R.id.ll_content, mPrivateBooksFragment);

@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
 import android.app.Activity;
@@ -24,12 +42,13 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivityLoginBinding;
 import xyz.fycz.myreader.model.user.Result;
 import xyz.fycz.myreader.model.user.User;
-import xyz.fycz.myreader.model.user.UserService2;
+import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
 import xyz.fycz.myreader.util.CodeUtil;
 import xyz.fycz.myreader.util.CyptoUtils;
 import xyz.fycz.myreader.util.ToastUtils;
+import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
 import xyz.fycz.myreader.util.utils.StringUtils;
 
@@ -37,9 +56,8 @@ import xyz.fycz.myreader.util.utils.StringUtils;
  * @author fengyue
  * @date 2020/9/18 22:27
  */
-public class LoginActivity extends BaseActivity implements TextWatcher {
+public class LoginActivity extends BaseActivity<ActivityLoginBinding> implements TextWatcher {
 
-    private ActivityLoginBinding binding;
     private String code;
     private Disposable loginDisp;
     private LoadingDialog dialog;
@@ -72,7 +90,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
     protected void initWidget() {
         super.initWidget();
         createCaptcha();
-        String username = UserService2.INSTANCE.readUsername();
+        String username = UserService.INSTANCE.readUsername();
         binding.etUser.getEditText().setText(username);
         binding.etUser.getEditText().requestFocus(username.length());
         //监听内容改变 -> 控制按钮的点击状态
@@ -100,7 +118,7 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
             String loginPwd = binding.etPassword.getEditText().getText().toString();
             user = new User(loginName, CyptoUtils.encode(APPCONST.KEY, loginPwd));
             dialog.show();
-            UserService2.INSTANCE.login(user).subscribe(new MySingleObserver<Result>() {
+            UserService.INSTANCE.login(user).subscribe(new MySingleObserver<Result>() {
                 @Override
                 public void onSubscribe(Disposable d) {
                     addDisposable(d);
@@ -112,6 +130,12 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
                     if (result.getCode() == 102) {
                         loginSuccess();
                         ToastUtils.showSuccess(result.getResult().toString());
+                    } else if (result.getCode() == 109) {
+                        user.setUserName(GsonExtensionsKt.getGSON()
+                                .fromJson(result.getResult().toString(), User.class)
+                                .getUserName());
+                        loginSuccess();
+                        ToastUtils.showSuccess("登录成功");
                     } else if (result.getCode() == 301) {
                         Intent intent = new Intent(LoginActivity.this, AuthEmailActivity.class);
                         BitIntentDataManager.getInstance().putData(intent, user);
@@ -147,8 +171,8 @@ public class LoginActivity extends BaseActivity implements TextWatcher {
     }
 
     private void loginSuccess() {
-        UserService2.INSTANCE.writeConfig(user);
-        UserService2.INSTANCE.writeUsername(user.getUserName());
+        UserService.INSTANCE.writeConfig(user);
+        UserService.INSTANCE.writeUsername(user.getUserName());
         Intent intent = new Intent();
         intent.putExtra("isLogin", true);
         setResult(Activity.RESULT_OK, intent);

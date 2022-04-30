@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.dialog;
 
 import android.content.Context;
@@ -139,9 +157,8 @@ public class BookGroupDialog {
                         mBookGroupService.addBookGroup(bookGroup);
                     } else {
                         mBookGroupService.updateEntity(bookGroup);
-                        SharedPreUtils spu = SharedPreUtils.getInstance();
-                        if (spu.getString(mContext.getString(R.string.curBookGroupName), "").equals(oldName)) {
-                            spu.putString(mContext.getString(R.string.curBookGroupName), newGroupName);
+                        if (SharedPreUtils.getInstance().getString(mContext.getString(R.string.curBookGroupName), "").equals(oldName)) {
+                            SharedPreUtils.getInstance().putString(mContext.getString(R.string.curBookGroupName), newGroupName);
                             if (onGroup != null) onGroup.change();
                         }
                     }
@@ -172,10 +189,9 @@ public class BookGroupDialog {
                     if (sb.length() > 0) {
                         sb.deleteCharAt(sb.lastIndexOf("、"));
                     }
-                    SharedPreUtils spu = SharedPreUtils.getInstance();
-                    if (mBookGroupService.getGroupById(spu.getString(mContext.getString(R.string.curBookGroupId), "")) == null) {
-                        spu.putString(mContext.getString(R.string.curBookGroupId), "");
-                        spu.putString(mContext.getString(R.string.curBookGroupName), "");
+                    if (mBookGroupService.getGroupById(SharedPreUtils.getInstance().getString(mContext.getString(R.string.curBookGroupId), "")) == null) {
+                        SharedPreUtils.getInstance().putString(mContext.getString(R.string.curBookGroupId), "");
+                        SharedPreUtils.getInstance().putString(mContext.getString(R.string.curBookGroupName), "");
                         onGroup.change();
                     }
                     ToastUtils.showSuccess("分组[" + sb.toString() + "]删除成功！");

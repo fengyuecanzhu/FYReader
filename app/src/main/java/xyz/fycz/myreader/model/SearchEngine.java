@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.model;
 
 
@@ -45,11 +63,12 @@ public class SearchEngine {
     private int searchSiteIndex;
     private int searchSuccessNum;
     private int searchFinishNum;
+    private boolean isFinish;
 
     private OnSearchListener searchListener;
 
     public SearchEngine() {
-        threadsNum = SharedPreUtils.getInstance().getInt(App.getmContext().getString(R.string.threadNum), 8);
+        threadsNum = SharedPreUtils.getInstance().getInt(App.getmContext().getString(R.string.threadNum), 16);
     }
 
     public void setOnSearchListener(OnSearchListener searchListener) {
@@ -70,6 +89,7 @@ public class SearchEngine {
     public void stopSearch() {
         if (compositeDisposable != null) compositeDisposable.dispose();
         compositeDisposable = new CompositeDisposable();
+        isFinish = true;
         searchListener.loadMoreFinish(true);
     }
 
@@ -109,6 +129,7 @@ public class SearchEngine {
         searchSuccessNum = 0;
         searchSiteIndex = -1;
         searchFinishNum = 0;
+        isFinish = false;
         for (int i = 0; i < Math.min(mSourceList.size(), threadsNum); i++) {
             searchOnEngine(keyword);
         }
@@ -130,6 +151,7 @@ public class SearchEngine {
         searchSuccessNum = 0;
         searchSiteIndex = -1;
         searchFinishNum = 0;
+        isFinish = false;
         for (int i = 0; i < Math.min(mSourceList.size(), threadsNum); i++) {
             searchOnEngine(title, author);
         }
@@ -139,6 +161,7 @@ public class SearchEngine {
         searchSiteIndex++;
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
+            //BookApi.search(keyword, crawler, executorService)
             BookApi.search(keyword, crawler)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
@@ -170,8 +193,9 @@ public class SearchEngine {
 
                         }
                     });
-        } else {
+        } else if (!isFinish){
             if (searchFinishNum == mSourceList.size()) {
+                isFinish = true;
                 if (searchSuccessNum == 0) {
                     searchListener.searchBookError(new Throwable("未搜索到内容"));
                 }
@@ -186,6 +210,7 @@ public class SearchEngine {
         if (searchSiteIndex < mSourceList.size()) {
             ReadCrawler crawler = mSourceList.get(searchSiteIndex);
             String searchKey = title;
+            //BookApi.search(searchKey, crawler, executorService)
             BookApi.search(searchKey, crawler)
                     .subscribeOn(scheduler)
                     .observeOn(AndroidSchedulers.mainThread())
@@ -220,13 +245,13 @@ public class SearchEngine {
 
                         }
                     });
-        } else {
+        } else if (!isFinish){
             if (searchFinishNum >= mSourceList.size()) {
+                isFinish = true;
                 if (searchSuccessNum == 0) {
                     searchListener.searchBookError(new Throwable("未搜索到内容"));
                 }
                 searchListener.loadMoreFinish(true);
-
             }
         }
 

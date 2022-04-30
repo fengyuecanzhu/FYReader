@@ -1,10 +1,35 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.widget.Toolbar;
+
+import com.weaction.ddsdk.ad.DdSdkFlowAd;
+import com.weaction.ddsdk.ad.DdSdkInterAd;
+import com.weaction.ddsdk.ad.DdSdkRewardAd;
+
+import java.util.List;
 
 import io.reactivex.annotations.NonNull;
 import xyz.fycz.myreader.R;
@@ -22,9 +47,8 @@ import xyz.fycz.myreader.util.utils.AdUtils;
  * @author fengyue
  * @date 2021/4/23 21:23
  */
-public class DonateActivity extends BaseActivity {
+public class DonateActivity extends BaseActivity<ActivityDonateBinding> {
 
-    private ActivityDonateBinding binding;
     private static final String TAG = DonateActivity.class.getSimpleName();
 
     @Override
@@ -42,17 +66,20 @@ public class DonateActivity extends BaseActivity {
 
     @Override
     protected void initWidget() {
-        /*AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
+        AdUtils.checkHasAd(true, false).subscribe(new MySingleObserver<Boolean>() {
             @Override
             public void onSuccess(@NonNull Boolean aBoolean) {
                 if (aBoolean) {
-                    AdUtils.initAd();
                     initAd();
                 }
             }
-        });*/
+        });
     }
 
+    private void initAd() {
+        binding.llAdSupport.setVisibility(View.VISIBLE);
+        AdUtils.getFlowAd(this, 1, view -> binding.llAdSupport.addView(view, 2), null);
+    }
 
     @Override
     protected void initClick() {
@@ -62,8 +89,11 @@ public class DonateActivity extends BaseActivity {
         binding.rlThanks.setOnClickListener(v ->
                 MyAlertDialog.showFullWebViewDia(this, URLCONST.THANKS_URL,
                         false, null));
-    }
 
+        binding.llRewardedVideo.setOnClickListener(v -> AdUtils.showRewardVideoAd(this, null));
+
+        binding.llInterAd.setOnClickListener(v -> AdUtils.showInterAd(this, null));
+    }
 
     private void goDonate(String address) {
         try {

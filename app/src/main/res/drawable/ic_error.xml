@@ -1,3 +1,21 @@
+<!--
+  ~ This file is part of FYReader.
+  ~ FYReader is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ FYReader is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+  ~
+  ~ Copyright (C) 2020 - 2022 fengyuecanzhu
+  -->
+
 <vector android:height="24dp" android:viewportHeight="1024"
     android:viewportWidth="1024" android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
     <path android:fillColor="#FFFFFF" android:pathData="M512,64c247.42,0 448,200.58 448,448s-200.58,448 -448,448S64,759.42 64,512 264.58,64 512,64zM512,128C299.93,128 128,299.93 128,512s171.93,384 384,384 384,-171.93 384,-384S724.07,128 512,128zM684.42,299.31l45.27,45.25L562.24,512l167.45,167.45 -45.27,45.25 -167.45,-167.45 -167.42,167.47 -45.27,-45.27L471.72,512l-167.45,-167.45 45.27,-45.25 167.42,167.42 167.47,-167.42z"/>

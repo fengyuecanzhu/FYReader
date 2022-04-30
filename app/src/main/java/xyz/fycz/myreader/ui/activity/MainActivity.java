@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
 import android.content.Intent;
@@ -38,6 +56,7 @@ import xyz.fycz.myreader.entity.SharedBook;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.BookGroup;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.model.storage.BackupRestoreUi;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MyAlertDialog;
@@ -49,6 +68,7 @@ import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.GsonExtensionsKt;
+import xyz.fycz.myreader.webapi.LanZouApi;
 import xyz.fycz.myreader.widget.NoScrollViewPager;
 
 import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT;
@@ -57,10 +77,8 @@ import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CU
  * @author fengyue
  * @date 2020/9/13 13:03
  */
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity<ActivityMainBinding> {
     public static final String TAG = MainActivity.class.getSimpleName();
-
-    private ActivityMainBinding binding;
 
     private List<Fragment> mFragments = new ArrayList<>();
     private String[] titles;
@@ -229,7 +247,22 @@ public class MainActivity extends BaseActivity {
             ToastUtils.showError(e.getLocalizedMessage());
             e.printStackTrace();
         }
+        firstInit();
+        LanZouApi.INSTANCE.checkSubscribeUpdate(this);
         AdUtils.adRecord("Usage", "usTimes");
+    }
+
+    private void firstInit() {
+        SharedPreUtils sru = SharedPreUtils.getInstance();
+        if (!sru.getBoolean("firstInit")) {
+            BookSourceManager.initDefaultSources();
+            DialogCreator.createCommonDialog(this, "首次使用书源订阅提醒",
+                    "感谢您选择风月读书，当前应用没有任何书源，" +
+                            "建议前往书源订阅界面获取书源(也可自行前往书源管理导入书源)，是否前往订阅书源？",
+                    false, (dialog, which) -> startActivity(new Intent(this, SourceSubscribeActivity.class)),
+                    null);
+            sru.putBoolean("firstInit", true);
+        }
     }
 
     private void reLoadFragment() {

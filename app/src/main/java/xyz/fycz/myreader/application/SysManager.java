@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.application;
 
 import android.util.Log;
@@ -7,12 +25,16 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.entity.Setting;
 import xyz.fycz.myreader.enums.BookcaseStyle;
 import xyz.fycz.myreader.enums.LocalBookSource;
+import xyz.fycz.myreader.greendao.entity.rule.BookSource;
 import xyz.fycz.myreader.greendao.service.BookGroupService;
+import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.util.CacheHelper;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
 
 import static xyz.fycz.myreader.application.App.getVersionCode;
+
+import java.util.List;
 
 
 public class SysManager {
@@ -137,7 +159,12 @@ public class SysManager {
             case 6:
                 SharedPreUtils.getInstance().putString(App.getmContext().getString(R.string.searchSource), "");
                 Log.d("SourceVersion", "" + 5);
-                break;
+            case 7:
+                List<BookSource> sources = BookSourceManager.getAllLocalSource();
+                for (BookSource source : sources){
+                    source.setEnable(false);
+                }
+                BookSourceManager.addBookSource(sources);
         }
         setting.setSourceVersion(APPCONST.SOURCE_VERSION);
         saveSetting(setting);

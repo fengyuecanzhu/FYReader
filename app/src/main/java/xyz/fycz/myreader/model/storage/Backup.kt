@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.model.storage
 
 import android.content.Context
@@ -43,6 +61,7 @@ object Backup {
             "bookSource.json",
             "readRecord.json",
             "searchWord.json",
+            "subscribe.json",
             "config.xml"
         )
     }
@@ -134,6 +153,13 @@ object Backup {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "searchWord.json")
+                        .writeText(json)
+                }
+            }
+            DbManager.getDaoSession().subscribeFileDao.queryBuilder().list().let {
+                if (it.isNotEmpty()) {
+                    val json = GSON.toJson(it)
+                    FileUtils.getFile(backupPath + File.separator + "subscribe.json")
                         .writeText(json)
                 }
             }

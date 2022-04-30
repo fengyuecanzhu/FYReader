@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
 import android.content.Context;
@@ -46,6 +64,7 @@ import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.ActivitySearchBookBinding;
 import xyz.fycz.myreader.entity.SearchBookBean;
 import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.entity.ad.AdBean;
 import xyz.fycz.myreader.greendao.entity.Book;
 import xyz.fycz.myreader.greendao.entity.SearchHistory;
 import xyz.fycz.myreader.greendao.entity.rule.BookSource;
@@ -55,13 +74,12 @@ import xyz.fycz.myreader.model.SearchEngine;
 import xyz.fycz.myreader.model.mulvalmap.ConMVMap;
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager;
 import xyz.fycz.myreader.ui.adapter.SearchAdapter;
-import xyz.fycz.myreader.ui.adapter.SearchBookAdapter;
-import xyz.fycz.myreader.ui.adapter.SearchHistoryAdapter;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.MultiChoiceDialog;
 import xyz.fycz.myreader.util.SharedPreUtils;
 import xyz.fycz.myreader.util.ToastUtils;
 import xyz.fycz.myreader.util.help.StringHelper;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil;
@@ -72,9 +90,7 @@ import xyz.fycz.myreader.widget.TagGroup;
  * @author fengyue
  * @date 2020/9/18 21:58
  */
-public class SearchBookActivity extends BaseActivity {
-
-    private ActivitySearchBookBinding binding;
+public class SearchBookActivity extends BaseActivity<ActivitySearchBookBinding> {
 
     private SearchAdapter mSearchBookAdapter;
     private String searchKey;//搜索关键字
@@ -115,6 +131,7 @@ public class SearchBookActivity extends BaseActivity {
     private boolean foldSuggest;
     private boolean foldHistory;
     private boolean needReGetHistory;
+    private AdBean adBean;
 
     @Override
     protected void bindView() {
@@ -278,6 +295,25 @@ public class SearchBookActivity extends BaseActivity {
             SharedPreUtils.getInstance().putBoolean("foldHistory", foldHistory);
         });
         initHistoryList();
+        adBean = AdUtils.getAdConfig().getSearch();
+        initAd();
+    }
+
+    private void initAd() {
+        AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
+            @Override
+            public void onSuccess(@NonNull Boolean aBoolean) {
+                if (aBoolean && AdUtils.adTime("search", adBean)) {
+                    if (adBean.getStatus() == 1) {
+                        AdUtils.getFlowAd(SearchBookActivity.this, 1, view -> {
+                            binding.getRoot().addView(view, 6);
+                        }, "search");
+                    } else if (adBean.getStatus() == 2) {
+                        AdUtils.showInterAd(SearchBookActivity.this, "search");
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -396,17 +432,19 @@ public class SearchBookActivity extends BaseActivity {
         if (menu == null) return;
         String searchGroup = SharedPreUtils.getInstance().getString("searchGroup");
         menu.removeGroup(R.id.source_group);
-        MenuItem item = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.all_source);
-        MenuItem localItem = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.local_source);
-        if ("".equals(searchGroup)) {
-            item.setChecked(true);
-        } else if (getString(R.string.local_source).equals(searchGroup)) {
-            localItem.setChecked(true);
-        }
-        List<String> groupList = BookSourceManager.getEnableNoLocalGroupList();
+        MenuItem first = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, R.string.all_source);
+        boolean hasChecked = false;
+        List<String> groupList = BookSourceManager.getEnableGroupList();
+        MenuItem item;
         for (String groupName : groupList) {
             item = menu.add(R.id.source_group, Menu.NONE, Menu.NONE, groupName);
-            if (groupName.equals(searchGroup)) item.setChecked(true);
+            if (groupName.equals(searchGroup)) {
+                item.setChecked(true);
+                hasChecked = true;
+            }
+        }
+        if (!hasChecked || "".equals(searchGroup)) {
+            first.setChecked(true);
         }
         menu.setGroupCheckable(R.id.source_group, true, true);
     }
@@ -465,9 +503,8 @@ public class SearchBookActivity extends BaseActivity {
             mHotKeys.addAll(Arrays.asList(suggestion));
             initSuggestionList();
         } else {
-            SharedPreUtils spu = SharedPreUtils.getInstance();
             Single.create((SingleOnSubscribe<Boolean>) emitter -> {
-                String cookie = spu.getString(getString(R.string.qdCookie), "");
+                String cookie = SharedPreUtils.getInstance().getString(getString(R.string.qdCookie), "");
                 String url = "https://m.qidian.com/majax/search/auto?kw=&";
                 if (cookie.equals("")) {
                     cookie = "_csrfToken=eXRDlZxmRDLvFAmdgzqvwWAASrxxp2WkVlH4ZM7e; newstatisticUUID=1595991935_2026387981";

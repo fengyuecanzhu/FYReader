@@ -1,3 +1,21 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.ui.activity;
 
 import android.annotation.SuppressLint;
@@ -13,6 +31,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -60,10 +79,12 @@ import xyz.fycz.myreader.application.SysManager;
 import xyz.fycz.myreader.base.BaseActivity;
 import xyz.fycz.myreader.base.BitIntentDataManager;
 import xyz.fycz.myreader.base.observer.MyObserver;
+import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityReadBinding;
 import xyz.fycz.myreader.entity.Setting;
+import xyz.fycz.myreader.entity.ad.AdBean;
 import xyz.fycz.myreader.enums.Font;
 import xyz.fycz.myreader.enums.LocalBookSource;
 import xyz.fycz.myreader.greendao.DbManager;
@@ -100,6 +121,7 @@ import xyz.fycz.myreader.util.help.DateHelper;
 import xyz.fycz.myreader.util.help.StringHelper;
 import xyz.fycz.myreader.util.notification.NotificationClickReceiver;
 import xyz.fycz.myreader.util.notification.NotificationUtil;
+import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.ColorUtil;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.NetworkUtils;
@@ -123,11 +145,8 @@ import static xyz.fycz.myreader.util.UriFileUtil.getPath;
  * @author fengyue
  * @date 2020/10/21 16:46
  */
-public class ReadActivity extends BaseActivity implements ColorPickerDialogListener, View.OnTouchListener {
+public class ReadActivity extends BaseActivity<ActivityReadBinding> implements ColorPickerDialogListener, View.OnTouchListener {
     private static final String TAG = ReadActivity.class.getSimpleName();
-
-    /*****************************View***********************************/
-    private ActivityReadBinding binding;
 
     /***************************variable*****************************/
     private Book mBook;
@@ -246,10 +265,12 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         aBooks = mSourceDialog.getaBooks();
         Intent intent = new Intent();
-        if (aBooks != null) {
-            aBooks.set(mSourceDialog.getSourceIndex(), mBook);
+        if (aBooks != null && aBooks.size() > 0) {
+            int sourceIndex = mSourceDialog.getSourceIndex();
+            if (mSourceDialog.hasCurBookSource())
+                aBooks.set(sourceIndex, mBook);
             BitIntentDataManager.getInstance().putData(intent, aBooks);
-            intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
+            intent.putExtra(APPCONST.SOURCE_INDEX, sourceIndex);
         } else {
             BitIntentDataManager.getInstance().putData(intent, mBook);
         }
@@ -419,7 +440,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
                             pagePos = pos;
                             saveLastChapterReadPosition();
                         }
-                        mHandler.post(()->{
+                        mHandler.post(() -> {
                             screenOffTimerStart();
                             initMenu();
                         });
@@ -471,20 +492,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         initBottomMenuClick();
 
         mSourceDialog.setOnSourceChangeListener((bean, pos) -> {
-            Book bookTem = (Book) mBook.clone();
-            bookTem.clearCathe();
-            bookTem.setInfoUrl(bean.getInfoUrl());
-            bookTem.setChapterUrl(bean.getChapterUrl());
-            bookTem.setSource(bean.getSource());
-            if (!StringHelper.isEmpty(bean.getImgUrl())) {
-                bookTem.setImgUrl(bean.getImgUrl());
-            }
-            if (!StringHelper.isEmpty(bean.getType())) {
-                bookTem.setType(bean.getType());
-            }
-            if (!StringHelper.isEmpty(bean.getDesc())) {
-                bookTem.setDesc(bean.getDesc());
-            }
+            Book bookTem = mBook.changeSource(bean);
             mBookService.updateBook(mBook, bookTem);
             mBook = bookTem;
             aBooks = mSourceDialog.getaBooks();
@@ -589,6 +597,22 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
         //保存最近阅读时间
         mBook.setLastReadTime(DateHelper.getLongDate());
         init();
+
+        initAd();
+    }
+
+    private void initAd() {
+        AdUtils.checkHasAd().subscribe(new MySingleObserver<Boolean>() {
+            @Override
+            public void onSuccess(@NonNull Boolean aBoolean) {
+                AdBean adBean = AdUtils.getAdConfig().getRead();
+                if (aBoolean && AdUtils.adTime("read", adBean)) {
+                    if (adBean.getStatus() > 0) {
+                        AdUtils.showInterAd(ReadActivity.this, "read");
+                    }
+                }
+            }
+        });
     }
 
 
@@ -774,7 +798,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
             download();
         } else if (itemId == R.id.action_edit_source) {
             BookSource source = BookSourceManager.getBookSourceByStr(mBook.getSource());
-            if (!TextUtils.isEmpty(source.getSourceEName())) {
+            if (TextUtils.isEmpty(source.getSourceType())) {
                 ToastUtils.showWarring("内置书源无法编辑！");
             } else {
                 Intent sourceIntent = new Intent(this, SourceEditActivity.class);
@@ -1076,7 +1100,7 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
      * 保存最后阅读章节的进度
      */
     public void saveLastChapterReadPosition() {
-        if (!StringHelper.isEmpty(mBook.getId()) && mPageLoader.getPageStatus() == PageLoader.STATUS_FINISH) {
+        if (mBook != null && !StringHelper.isEmpty(mBook.getId()) && mPageLoader.getPageStatus() == PageLoader.STATUS_FINISH) {
             mBook.setLastReadPosition(pagePos);
             mBook.setHisttoryChapterNum(chapterPos);
             mBookService.updateEntity(mBook);
@@ -1395,28 +1419,32 @@ public class ReadActivity extends BaseActivity implements ColorPickerDialogListe
     private void changeNightAndDaySetting(boolean isNight) {
         mSetting.setDayStyle(!isNight);
         SysManager.saveSetting(mSetting);
-        toggleMenu(true);
-        mHandler.postDelayed(() -> {
-            Intent intent = new Intent(this, ReadActivity.class);
-            if (aBooks != null) {
-                intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
-                BitIntentDataManager.getInstance().putData(intent, aBooks);
-            } else {
-                BitIntentDataManager.getInstance().putData(intent, mBook);
-            }
-            if (!isCollected) {
-                intent.putExtra("isCollected", false);
-            }
-            exit();
+        if (Build.VERSION.SDK_INT >= 31) {
+            toggleMenu(true);
+            mHandler.postDelayed(() -> {
+                Intent intent = new Intent(this, ReadActivity.class);
+                if (aBooks != null) {
+                    intent.putExtra(APPCONST.SOURCE_INDEX, mSourceDialog.getSourceIndex());
+                    BitIntentDataManager.getInstance().putData(intent, aBooks);
+                } else {
+                    BitIntentDataManager.getInstance().putData(intent, mBook);
+                }
+                if (!isCollected) {
+                    intent.putExtra("isCollected", false);
+                }
+                exit();
+                App.getApplication().setNightTheme(isNight);
+                startActivity(intent);
+            }, mBottomOutAnim.getDuration());
+        } else {
             App.getApplication().setNightTheme(isNight);
-            startActivity(intent);
-        }, mBottomOutAnim.getDuration());
-        /*mHandler.postDelayed(() -> {
-            AppCompatActivity activity = ActivityManage.getByClass(this.getClass());
-            if (activity != null) {
-                BaseDialog.initActivityContext(activity);
-            }
-        }, 1000);*/
+            mHandler.postDelayed(() -> {
+                AppCompatActivity activity = ActivityManage.getByClass(this.getClass());
+                if (activity != null) {
+                    BaseDialog.initActivityContext(activity);
+                }
+            }, 1000);
+        }
         //mPageLoader.setPageStyle(!isCurDayStyle);
     }
 

@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of FYReader.
+  ~ FYReader is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ FYReader is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+  ~
+  ~ Copyright (C) 2020 - 2022 fengyuecanzhu
+  -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -14,6 +32,7 @@
         android:background="@color/colorForeground"
         android:padding="10dp"
         android:textColor="@color/textSecondary"
+        android:maxLines="6"
         android:textSize="13sp" />
 
     <com.google.android.material.tabs.TabLayout
@@ -37,27 +56,27 @@
     </com.google.android.material.tabs.TabLayout>
 
     <RelativeLayout
-        android:background="#474949"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#474949">
 
         <xyz.fycz.myreader.widget.codeview.CodeView
             android:id="@+id/rv_parse_result"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"
+            android:visibility="visible"
             app:cv_font_size="10"
-            app:cv_zoom_enable="true"
-            android:visibility="visible" />
+            app:cv_zoom_enable="true" />
 
         <xyz.fycz.myreader.widget.codeview.CodeView
             android:id="@+id/rv_source_code"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"
+            android:visibility="gone"
             app:cv_font_size="10"
-            app:cv_zoom_enable="true"
-            android:visibility="gone" />
+            app:cv_zoom_enable="true" />
     </RelativeLayout>
 
 

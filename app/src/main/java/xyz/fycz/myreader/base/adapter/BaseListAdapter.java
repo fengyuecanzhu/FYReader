@@ -1,11 +1,31 @@
+/*
+ * This file is part of FYReader.
+ * FYReader is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FYReader is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FYReader.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2020 - 2022 fengyuecanzhu
+ */
+
 package xyz.fycz.myreader.base.adapter;
 
-import android.os.Handler;
+import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -20,17 +40,34 @@ import java.util.List;
 public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
 
     private static final String TAG = "BaseListAdapter";
+    protected static final int TYPE_OTHER = Integer.MIN_VALUE;
     /*common statement*/
     protected List<T> mList = new ArrayList<>();
+    protected SparseArray<View> otherViews = new SparseArray<>();
+    protected SparseIntArray otherViewPos = new SparseIntArray();
     protected OnItemClickListener mClickListener;
     protected OnItemLongClickListener mLongClickListener;
 
     /************************abstract area************************/
     protected abstract IViewHolder<T> createViewHolder(int viewType);
 
+
     /*************************rewrite logic area***************************************/
+
+    @Override
+    public int getItemViewType(int position) {
+        int key = otherViewPos.indexOfKey(position);
+        if (key >= 0) {
+            return otherViewPos.valueAt(key);
+        }
+        return super.getItemViewType(position);
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType < TYPE_OTHER + getOtherCount()) {
+            return new OtherViewHolder(otherViews.get(viewType));
+        }
         IViewHolder<T> viewHolder = createViewHolder(viewType);
 
         View view = viewHolder.createItemView(parent);
@@ -41,6 +78,7 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof OtherViewHolder) return;
         //防止别人直接使用RecyclerView.ViewHolder调用该方法
         if (!(holder instanceof BaseViewHolder))
             throw new IllegalArgumentException("The ViewHolder item must extend BaseViewHolder");
@@ -76,6 +114,10 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
         return mList.size();
     }
 
+    public int getOtherCount() {
+        return otherViews.size();
+    }
+
     @Override
     public Filter getFilter() {
         return null;
@@ -109,6 +151,13 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
         notifyItemInserted(index);
     }
 
+    public synchronized void addOther(int index, View view) {
+        int type = TYPE_OTHER + getOtherCount();
+        otherViews.put(type, view);
+        otherViewPos.put(index, type);
+        notifyItemInserted(index);
+    }
+
     public synchronized void addItems(List<T> values) {
         int oldSize = getItemSize();
         if (mList.addAll(values)) {
@@ -122,7 +171,7 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
 
     public synchronized void removeItem(T value) {
         int pos = mList.indexOf(value);
-        if (mList.remove(value)){
+        if (mList.remove(value)) {
             notifyItemRemoved(pos);
             if (pos != mList.size())
                 notifyItemRangeChanged(pos, mList.size() - pos);
@@ -135,9 +184,9 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
         }
     }
 
-    public synchronized void swapItem(int oldPos, int newPos){
+    public synchronized void swapItem(int oldPos, int newPos) {
         int size = getItemSize();
-        if (oldPos >= 0 && oldPos < size && newPos >=0 && newPos < size){
+        if (oldPos >= 0 && oldPos < size && newPos >= 0 && newPos < size) {
             Collections.swap(mList, oldPos, newPos);
             notifyItemMoved(oldPos, newPos);
         }
@@ -173,5 +222,12 @@ public abstract class BaseListAdapter<T> extends RecyclerView.Adapter<RecyclerVi
 
     public interface OnItemLongClickListener {
         boolean onItemLongClick(View view, int pos);
+    }
+
+    static class OtherViewHolder extends RecyclerView.ViewHolder {
+
+        public OtherViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
     }
 }
