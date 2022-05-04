@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "开始编译打包"
           chmod +x gradlew
-          if [[ ${{ steps.config.outputs.create_release }} == 'true' ] -o [ ${{ steps.config.outputs.build_release }} == 'true' ]];then
+          if [ ${{ steps.config.outputs.create_release }} == 'true' -o ${{ steps.config.outputs.build_release }} == 'true' ];then
              echo "进行release构建"
              ./gradlew assembleRelease --parallel
           else
@@ -62,7 +62,7 @@ jobs:
         id: get_path
         run: |
           path="$GITHUB_WORKSPACE/app/build/outputs/apk/release"
-          if [[ ${{ steps.config.outputs.create_release }} != 'true' ] -a [ ${{ steps.config.outputs.build_release }} != 'true' ]];then
+          if [ ${{ steps.config.outputs.create_release }} != 'true' -a ${{ steps.config.outputs.build_release }} != 'true' ];then
             path="$GITHUB_WORKSPACE/app/build/outputs/apk/debug"
           fi
           files=$(ls $path)
