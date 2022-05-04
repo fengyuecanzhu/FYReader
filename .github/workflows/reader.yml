@@ -31,13 +31,15 @@ jobs:
           one=$(expr ${version} % 10)
           versionN=v$hun.$ten.$one
 
-          echo ::set-output name=need_create_release::"$NEED_CREATE_RELEASE"
+          echo ::set-output name=create_release::"$CREATE_RELEASE"
+          echo ::set-output name=build_release::"$BUILD_RELEASE"
           echo ::set-output name=version_name::"$versionN"
 
-          echo need_create_release=$NEED_CREATE_RELEASE
+          echo create_release=$CREATE_RELEASE
+          echo build_release=$BUILD_RELEASE
           echo version_name=$versionN
 
-          if [[ $NEED_CREATE_RELEASE == 'true' ]];then
+          if [[ $CREATE_RELEASE == 'true' ]];then
              echo ::set-output name=lanzou_folder_id::"1608604"
              echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00ngso7e"
           else
@@ -49,7 +51,7 @@ jobs:
         run: |
           echo "开始编译打包"
           chmod +x gradlew
-          if [[ ${{ steps.config.outputs.need_create_release }} == 'true' ]];then
+          if [[ ${{ steps.config.outputs.create_release }} == 'true' ] -o [ ${{ steps.config.outputs.build_release }} == 'true' ]];then
              echo "进行release构建"
              ./gradlew assembleRelease --parallel
           else
@@ -60,7 +62,7 @@ jobs:
         id: get_path
         run: |
           path="$GITHUB_WORKSPACE/app/build/outputs/apk/release"
-          if [[ ${{ steps.config.outputs.need_create_release }} != 'true' ]];then
+          if [[ ${{ steps.config.outputs.create_release }} != 'true' ] -a [ ${{ steps.config.outputs.build_release }} != 'true' ]];then
             path="$GITHUB_WORKSPACE/app/build/outputs/apk/debug"
           fi
           files=$(ls $path)
@@ -86,7 +88,7 @@ jobs:
           echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: ${{ steps.config.outputs.lanzou_share_url }}"
       - name: Create Release
         id: create_release
-        if: ${{ steps.config.outputs.need_create_release == 'true' }}
+        if: ${{ steps.config.outputs.create_release == 'true' }}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -98,7 +100,7 @@ jobs:
           draft: false
       - name: Upload Release Asset
         id: upload_release_asset
-        if: ${{ steps.config.outputs.need_create_release == 'true' && steps.create_release.outputs.upload_url }}
+        if: ${{ steps.config.outputs.create_release == 'true' && steps.create_release.outputs.upload_url }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
