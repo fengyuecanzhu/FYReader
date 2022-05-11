@@ -244,6 +244,9 @@ public class ReadCrawlerUtil {
         List<BookSource> sources = TextUtils.isEmpty(group) ?
                 BookSourceManager.getEnabledBookSource() :
                 BookSourceManager.getEnableSourceByGroup(group);
+        if (sources.size() == 0){
+            sources = BookSourceManager.getEnabledBookSource();
+        }
         for (BookSource source : sources) {
             crawlers.add(getReadCrawler(source));
         }

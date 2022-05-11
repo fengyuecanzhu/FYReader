@@ -27,6 +27,7 @@ import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodHook
 import xyz.fycz.dynamic.fix.App243Fix
 import xyz.fycz.dynamic.fix.App244Fix
+import xyz.fycz.dynamic.fix.App244Fix2
 import xyz.fycz.dynamic.fix.AppFix
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.ui.activity.MainActivity
@@ -45,7 +46,8 @@ class AppLoadImpl : IAppLoader {
 
     private val fixList = listOf(
         App243Fix::class.java,
-        App244Fix::class.java
+        App244Fix::class.java,
+        App244Fix2::class.java,
     )
 
     override fun onLoad(appParam: AppParam) {
