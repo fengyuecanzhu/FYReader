@@ -18,13 +18,10 @@
 
 package xyz.fycz.dynamic.fix
 
-import android.text.TextUtils
 import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodReplacement
-import xyz.fycz.myreader.greendao.entity.Book
 import xyz.fycz.myreader.model.sourceAnalyzer.BookSourceManager
-import xyz.fycz.myreader.ui.adapter.BookcaseAdapter
 import xyz.fycz.myreader.webapi.crawler.ReadCrawlerUtil
 import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler
 
