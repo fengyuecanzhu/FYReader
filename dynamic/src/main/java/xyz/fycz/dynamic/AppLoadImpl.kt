@@ -22,6 +22,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import com.kongzue.dialogx.dialogs.BottomDialog
 import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodHook
@@ -95,13 +96,8 @@ class AppLoadImpl : IAppLoader {
                 Bundle::class.java,
                 object : MethodHook() {
                     override fun afterHookedMethod(param: MapleBridge.MethodHookParam) {
-                        val context = param.thisObject as Context
                         App.getHandler().postDelayed({
-                            AlertDialog.Builder(context)
-                                .setTitle(title)
-                                .setMessage(msg)
-                                .setPositiveButton("我知道了", null)
-                                .create().show()
+                            BottomDialog.show(title, msg).cancelButton = "知道了"
                         }, 1000)
                     }
                 }

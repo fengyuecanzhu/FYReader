@@ -392,6 +392,10 @@ public class ReadActivity extends BaseActivity<ActivityReadBinding> implements C
 
             @Override
             public void onLongPress() {
+                if (mSetting.getPageMode() == PageMode.SCROLL){
+                    ToastUtils.showWarring("滚动模式暂不支持长按复制");
+                    return;
+                }
                 if (!binding.readPvContent.isRunning()) {
                     selectTextCursorShow();
                     showAction();
@@ -2062,7 +2066,6 @@ public class ReadActivity extends BaseActivity<ActivityReadBinding> implements C
                                             break;
                                     }
                                     url = url.replace("{key}", selectString);
-                                    Log.d("SEARCH_URL", url);
                                     try {
                                         Uri uri = Uri.parse(url);
                                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);

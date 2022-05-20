@@ -55,4 +55,5 @@ dependencies {
     compileOnly("me.fycz.maple:maple:1.7")
     compileOnly 'org.greenrobot:greendao:3.3.0'
     compileOnly project(":app")
+    compileOnly project(":DialogX")
 }
