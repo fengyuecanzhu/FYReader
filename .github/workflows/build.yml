@@ -37,7 +37,7 @@ jobs:
           echo need_create_release=$NEED_CREATE_RELEASE
           echo version_name=$versionN
 
-          if [[ $NEED_CREATE_RELEASE == 'true' ]];then
+          if [ $NEED_CREATE_RELEASE == 'true' -a ${{ github.ref }} == 'refs/heads/master' ];then
              echo ::set-output name=lanzou_folder_id::"1608604"
              echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00ngso7e"
           else
