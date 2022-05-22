@@ -53,6 +53,12 @@ object CookieStore : CookieManager {
         return cookieBean?.cookie ?: ""
     }
 
+    fun getKey(url: String, key: String): String {
+        val cookie = getCookie(url)
+        val cookieMap = cookieToMap(cookie)
+        return cookieMap[key] ?: ""
+    }
+
     override fun removeCookie(url: String) {
         DbManager.getDaoSession().cookieBeanDao.deleteByKey(NetworkUtils.getSubDomain(url))
     }

@@ -22,11 +22,13 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import com.kongzue.dialogx.dialogs.BottomDialog
 import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodHook
 import xyz.fycz.dynamic.fix.App243Fix
 import xyz.fycz.dynamic.fix.App244Fix
+import xyz.fycz.dynamic.fix.App244Fix2
 import xyz.fycz.dynamic.fix.AppFix
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.ui.activity.MainActivity
@@ -45,7 +47,8 @@ class AppLoadImpl : IAppLoader {
 
     private val fixList = listOf(
         App243Fix::class.java,
-        App244Fix::class.java
+        App244Fix::class.java,
+        App244Fix2::class.java,
     )
 
     override fun onLoad(appParam: AppParam) {
@@ -73,7 +76,7 @@ class AppLoadImpl : IAppLoader {
         }
         if (sb.isNotEmpty()) {
             if (sb.endsWith("\n")) sb.substring(0, sb.length - 1)
-            val key = "fix244"
+            val key = "fix244-2"
             val hasRead = spu.getBoolean(key, false)
             if (!hasRead) {
                 announce("插件更新", "更新内容：\n$sb")
@@ -93,13 +96,8 @@ class AppLoadImpl : IAppLoader {
                 Bundle::class.java,
                 object : MethodHook() {
                     override fun afterHookedMethod(param: MapleBridge.MethodHookParam) {
-                        val context = param.thisObject as Context
                         App.getHandler().postDelayed({
-                            AlertDialog.Builder(context)
-                                .setTitle(title)
-                                .setMessage(msg)
-                                .setPositiveButton("我知道了", null)
-                                .create().show()
+                            BottomDialog.show(title, msg).cancelButton = "知道了"
                         }, 1000)
                     }
                 }

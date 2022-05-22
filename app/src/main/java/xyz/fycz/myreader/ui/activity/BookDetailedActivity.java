@@ -386,7 +386,13 @@ public class BookDetailedActivity extends BaseActivity<ActivityBookDetailBinding
      * @return
      */
     private boolean isBookCollected() {
-        Book book = mBookService.findBookByAuthorAndName(mBook.getName(), mBook.getAuthor());
+        Book book = null;
+        if (!TextUtils.isEmpty(mBook.getId())){
+            book = mBookService.getBookById(mBook.getId());
+        }
+        if (book == null) {
+            book = mBookService.findBookByAuthorAndName(mBook.getName(), mBook.getAuthor());
+        }
         if (book == null) {
             return false;
         } else {

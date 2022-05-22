@@ -105,8 +105,6 @@ public class SearchBookActivity extends BaseActivity<ActivitySearchBookBinding> 
 
     private SearchHistoryService mSearchHistoryService;
 
-    private int allThreadCount;
-
     private SearchEngine searchEngine;
 
     private Setting mSetting;
@@ -751,8 +749,7 @@ public class SearchBookActivity extends BaseActivity<ActivitySearchBookBinding> 
         initSearchList();
         List<ReadCrawler> readCrawlers = ReadCrawlerUtil
                 .getEnableReadCrawlers(SharedPreUtils.getInstance().getString("searchGroup"));
-        allThreadCount = readCrawlers.size();
-        if (allThreadCount == 0) {
+        if (readCrawlers.size() == 0) {
             ToastUtils.showWarring("当前书源已全部禁用，无法搜索！");
             binding.rpb.setIsAutoLoading(false);
             return;
@@ -760,8 +757,28 @@ public class SearchBookActivity extends BaseActivity<ActivitySearchBookBinding> 
         /*for (ReadCrawler readCrawler : readCrawlers) {
             searchBookByCrawler(readCrawler, readCrawler.getSearchCharset());
         }*/
-        searchEngine.initSearchEngine(readCrawlers);
-        searchEngine.search(searchKey);
+        if (readCrawlers.size() > 2000 && !SharedPreUtils.getInstance().getBoolean("searchBookWarning")) {
+            DialogCreator.createThreeButtonDialog(this, "书源过多警告",
+                    "当前搜索书源数量超过2000(建议1000以内)，继续搜索可能会导致软件异常(如搜索时前往阅读页返回后将会导致卡死黑屏)，确定要继续搜索吗？",
+                    true, "继续搜索并不再提示", "书源管理", "继续搜索",
+                    (dialog, which) -> {
+                        SharedPreUtils.getInstance().putBoolean("searchBookWarning", true);
+                        searchEngine.initSearchEngine(readCrawlers);
+                        searchEngine.search(searchKey);
+                    }, (dialog, which) -> {
+                        startActivityForResult(new Intent(this, BookSourceActivity.class),
+                                APPCONST.REQUEST_BOOK_SOURCE);
+                    },
+                    (dialog, which) -> {
+                        searchEngine.initSearchEngine(readCrawlers);
+                        searchEngine.search(searchKey);
+                    }
+            );
+        } else {
+            searchEngine.initSearchEngine(readCrawlers);
+            searchEngine.search(searchKey);
+        }
+
     }
 
     /**

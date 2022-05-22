@@ -62,6 +62,7 @@ object Backup {
             "readRecord.json",
             "searchWord.json",
             "subscribe.json",
+            "cookie.json",
             "config.xml"
         )
     }
@@ -160,6 +161,13 @@ object Backup {
                 if (it.isNotEmpty()) {
                     val json = GSON.toJson(it)
                     FileUtils.getFile(backupPath + File.separator + "subscribe.json")
+                        .writeText(json)
+                }
+            }
+            DbManager.getDaoSession().cookieBeanDao.queryBuilder().list().let {
+                if (it.isNotEmpty()) {
+                    val json = GSON.toJson(it)
+                    FileUtils.getFile(backupPath + File.separator + "cookie.json")
                         .writeText(json)
                 }
             }

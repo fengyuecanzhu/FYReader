@@ -31,13 +31,13 @@ jobs:
           one=$(expr ${version} % 10)
           versionN=v$hun.$ten.$one
 
-          echo ::set-output name=need_create_release::"$NEED_CREATE_RELEASE"
+          echo ::set-output name=need_create_release::"$CREATE_RELEASE"
           echo ::set-output name=version_name::"$versionN"
 
-          echo need_create_release=$NEED_CREATE_RELEASE
+          echo need_create_release=$CREATE_RELEASE
           echo version_name=$versionN
 
-          if [[ $NEED_CREATE_RELEASE == 'true' ]];then
+          if [ $NEED_CREATE_RELEASE == 'true' -a ${{ github.ref }} == 'refs/heads/master' ];then
              echo ::set-output name=lanzou_folder_id::"1608604"
              echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00ngso7e"
           else
@@ -86,7 +86,7 @@ jobs:
           echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: ${{ steps.config.outputs.lanzou_share_url }}"
       - name: Create Release
         id: create_release
-        if: ${{ steps.config.outputs.need_create_release == 'true' }}
+        if: ${{ steps.config.outputs.need_create_release == 'true' && github.ref == 'refs/heads/master' }}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -4,8 +4,17 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/FYReader.iml" filepath="$PROJECT_DIR$/.idea/modules/FYReader.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/DialogX/FYReader.DialogX.iml" filepath="$PROJECT_DIR$/.idea/modules/DialogX/FYReader.DialogX.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DialogX/FYReader.DialogX.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/DialogX/FYReader.DialogX.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DialogX/FYReader.DialogX.main.iml" filepath="$PROJECT_DIR$/.idea/modules/DialogX/FYReader.DialogX.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DialogX/FYReader.DialogX.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/DialogX/FYReader.DialogX.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FYReader.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FYReader.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FYReader.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FYReader.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FYReader.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FYReader.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FYReader.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FYReader.app.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.iml" filepath="$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.main.iml" filepath="$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.unitTest.iml" />
     </modules>
   </component>
 </project>
