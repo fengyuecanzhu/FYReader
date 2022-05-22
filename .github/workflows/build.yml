@@ -31,7 +31,7 @@ jobs:
           one=$(expr ${version} % 10)
           versionN=v$hun.$ten.$one
 
-          echo ::set-output name=need_create_release::"$NEED_CREATE_RELEASE"
+          echo ::set-output name=need_create_release::"$CREATE_RELEASE"
           echo ::set-output name=version_name::"$versionN"
 
           echo need_create_release=$CREATE_RELEASE
