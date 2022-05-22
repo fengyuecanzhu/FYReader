@@ -140,6 +140,7 @@ import xyz.fycz.myreader.widget.page.TxtChar;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static xyz.fycz.myreader.util.UriFileUtil.getPath;
+import static xyz.fycz.myreader.widget.page.PageMode.SCROLL;
 
 /**
  * @author fengyue
@@ -392,7 +393,7 @@ public class ReadActivity extends BaseActivity<ActivityReadBinding> implements C
 
             @Override
             public void onLongPress() {
-                if (mSetting.getPageMode() == PageMode.SCROLL){
+                if (mSetting.getPageMode() == SCROLL){
                     ToastUtils.showWarring("滚动模式暂不支持长按复制");
                     return;
                 }
@@ -515,7 +516,7 @@ public class ReadActivity extends BaseActivity<ActivityReadBinding> implements C
         });
 
         binding.readTvListenBook.setOnClickListener(v -> {
-            if (mSetting.getPageMode() == PageMode.SCROLL) {
+            if (mSetting.getPageMode() == SCROLL) {
                 ToastUtils.showWarring("朗读暂不支持滚动翻页模式!");
                 return;
             }
@@ -1274,6 +1275,10 @@ public class ReadActivity extends BaseActivity<ActivityReadBinding> implements C
             @Override
             public void onPageModeChange() {
                 mPageLoader.setPageMode(mSetting.getPageMode());
+                if (mSetting.getPageMode().equals(SCROLL)){
+                    DialogCreator.createTipDialog(ReadActivity.this,
+                            "滚动模式存在大量问题，不建议使用；且作者本人不使用此模式，大概率不会进行修复/优化，也不接受此模式的问题反馈");
+                }
             }
 
             @Override
