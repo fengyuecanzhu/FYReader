@@ -26,10 +26,7 @@ import com.kongzue.dialogx.dialogs.BottomDialog
 import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodHook
-import xyz.fycz.dynamic.fix.App243Fix
-import xyz.fycz.dynamic.fix.App244Fix
-import xyz.fycz.dynamic.fix.App244Fix2
-import xyz.fycz.dynamic.fix.AppFix
+import xyz.fycz.dynamic.fix.*
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.ui.activity.MainActivity
 
@@ -49,6 +46,7 @@ class AppLoadImpl : IAppLoader {
         App243Fix::class.java,
         App244Fix::class.java,
         App244Fix2::class.java,
+        App245Fix::class.java,
     )
 
     override fun onLoad(appParam: AppParam) {

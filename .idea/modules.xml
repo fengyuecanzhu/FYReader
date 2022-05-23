@@ -15,6 +15,10 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.main.iml" filepath="$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user/FYReader.user.iml" filepath="$PROJECT_DIR$/.idea/modules/user/FYReader.user.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user/FYReader.user.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/user/FYReader.user.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user/FYReader.user.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user/FYReader.user.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user/FYReader.user.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/user/FYReader.user.unitTest.iml" />
     </modules>
   </component>
 </project>

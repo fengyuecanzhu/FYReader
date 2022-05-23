@@ -6,6 +6,7 @@
 .DS_Store
 /build
 /captures
+/user
 .externalNativeBuild
 keystore
 # Compiled class file
