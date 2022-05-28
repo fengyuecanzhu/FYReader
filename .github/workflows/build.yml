@@ -25,11 +25,7 @@ jobs:
           echo "读取配置"
           source ${{ github.workspace }}/app/version_code.properties
           version=$VERSION_CODE
-          hun=$(expr ${version} / 100)
-          ten=$(expr ${version} / 10)
-          ten=$(expr ${ten} % 10)
-          one=$(expr ${version} % 10)
-          versionN=v$hun.$ten.$one
+          versionN=v${version:0:1}.${version:1:1}.${version:2:1}
 
           echo ::set-output name=need_create_release::"$CREATE_RELEASE"
           echo ::set-output name=version_name::"$versionN"
@@ -37,7 +33,7 @@ jobs:
           echo need_create_release=$CREATE_RELEASE
           echo version_name=$versionN
 
-          if [ $NEED_CREATE_RELEASE == 'true' -a ${{ github.ref }} == 'refs/heads/master' ];then
+          if [ $CREATE_RELEASE == 'true' -a ${{ github.ref }} == 'refs/heads/master' ];then
              echo ::set-output name=lanzou_folder_id::"1608604"
              echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00ngso7e"
           else

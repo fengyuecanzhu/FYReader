@@ -266,6 +266,7 @@ object UserService {
             App.getApplication().packageName,
             AppInfoUtils.SHA1
         ) + "&appVersion=" + App.getVersionCode() +
-                "&deviceId=" + getUUID() + "&isDebug=" + App.isDebug()
+                "&isDebug=" + App.isDebug() +
+                "&deviceId=" + getUUID()
     }
 }

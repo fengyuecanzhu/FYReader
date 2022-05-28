@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -52,11 +53,12 @@ class SearchAdapter(
     val keyword: String
 ) : DiffRecyclerAdapter<SearchBookBean, ItemSearchBookBinding>(context) {
     private val mBooks: ConMVMap<SearchBookBean, Book> = ConMVMap()
-    private lateinit var mList: List<SearchBookBean>
+    private var mList: MutableList<SearchBookBean> = ArrayList()
     private val tagList: MutableList<String> = ArrayList()
     private val handler = Handler(Looper.getMainLooper())
     private var postTime = 0L
     private val sendRunnable = Runnable { upAdapter() }
+    var isStop = false
 
     override val diffItemCallback: DiffUtil.ItemCallback<SearchBookBean>
         get() = object : DiffUtil.ItemCallback<SearchBookBean>() {
@@ -300,7 +302,7 @@ class SearchAdapter(
     }
 
     fun addAll(newDataS: List<SearchBookBean>, keyWord: String?) {
-        val copyDataS: MutableList<SearchBookBean> = ArrayList(getItems())
+        val copyData: MutableList<SearchBookBean> = ArrayList(mList)
         val filterDataS: MutableList<SearchBookBean> = ArrayList()
         when (SysManager.getSetting().searchFilter) {
             0 -> filterDataS.addAll(newDataS)
@@ -328,16 +330,16 @@ class SearchAdapter(
         }
         if (filterDataS.size > 0) {
             val searchBookBeansAdd: MutableList<SearchBookBean> = ArrayList()
-            if (copyDataS.size == 0) {
-                copyDataS.addAll(filterDataS)
+            if (mList.size == 0) {
+                mList.addAll(filterDataS)
             } else {
                 //存在
                 for (temp in filterDataS) {
                     var hasSame = false
                     var i = 0
-                    val size = copyDataS.size
+                    val size = copyData.size
                     while (i < size) {
-                        val searchBook = copyDataS[i]
+                        val searchBook = copyData[i]
                         if (TextUtils.equals(temp.name, searchBook.name)
                             && TextUtils.equals(temp.author, searchBook.author)
                         ) {
@@ -353,30 +355,30 @@ class SearchAdapter(
                 //添加
                 for (temp in searchBookBeansAdd) {
                     if (TextUtils.equals(keyWord, temp.name)) {
-                        for (i in copyDataS.indices) {
-                            val searchBook = copyDataS[i]
+                        for (i in copyData.indices) {
+                            val searchBook = copyData[i]
                             if (!TextUtils.equals(keyWord, searchBook.name)) {
-                                copyDataS.add(i, temp)
+                                mList.add(i, temp)
                                 break
                             }
                         }
                     } else if (TextUtils.equals(keyWord, temp.author)) {
-                        for (i in copyDataS.indices) {
-                            val searchBook = copyDataS[i]
+                        for (i in copyData.indices) {
+                            val searchBook = copyData[i]
                             if (!TextUtils.equals(keyWord, searchBook.name) &&
                                 !TextUtils.equals(keyWord, searchBook.author)
                             ) {
-                                copyDataS.add(i, temp)
+                                mList.add(i, temp)
                                 break
                             }
                         }
                     } else {
-                        copyDataS.add(temp)
+                        mList.add(temp)
                     }
                 }
             }
-            mList = copyDataS
-            upAdapter()
+            if (!isStop)
+                upAdapter()
         }
     }
 
@@ -385,7 +387,7 @@ class SearchAdapter(
         if (System.currentTimeMillis() >= postTime + 500) {
             handler.removeCallbacks(sendRunnable)
             postTime = System.currentTimeMillis()
-            setItems(mList)
+            setItems(ArrayList(mList))
         } else {
             handler.removeCallbacks(sendRunnable)
             handler.postDelayed(sendRunnable, 500 - System.currentTimeMillis() + postTime)
