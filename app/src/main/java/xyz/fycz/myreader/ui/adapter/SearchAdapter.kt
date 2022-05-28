@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -386,7 +387,7 @@ class SearchAdapter(
         if (System.currentTimeMillis() >= postTime + 500) {
             handler.removeCallbacks(sendRunnable)
             postTime = System.currentTimeMillis()
-            setItems(mList)
+            setItems(ArrayList(mList))
         } else {
             handler.removeCallbacks(sendRunnable)
             handler.postDelayed(sendRunnable, 500 - System.currentTimeMillis() + postTime)
