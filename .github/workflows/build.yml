@@ -80,19 +80,19 @@ jobs:
           tag_name: ${{ steps.config.outputs.version_name }}
           name: FYReader_${{ steps.config.outputs.version_name }}
           files: |
-           ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-arm64-v8a.apk
-           ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-armeabi-v7a.apk
-           ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86_64.apk
-           ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86.apk
-           ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-universal.apk
+            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-arm64-v8a.apk
+            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-armeabi-v7a.apk
+            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86_64.apk
+            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86.apk
+            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-universal.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Artifact arm64-v8a
-      uses: actions/upload-artifact@v3
-      with:
-        name: app-arm64-v8a
-        path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-arm64-v8a.apk
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-arm64-v8a
+          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-arm64-v8a.apk
 
       - name: Upload Artifact armeabi-v7a
         uses: actions/upload-artifact@v3
