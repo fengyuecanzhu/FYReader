@@ -26,7 +26,7 @@ def releaseTime() {
 
 def commitId = 'git rev-parse --short HEAD'.execute().text.trim()
 
-def getVersionCode() {
+def getVersionC() {
     def versionCodeFile = file('version_code.properties')
     if (versionCodeFile.canRead()) {
         Properties properties = new Properties()
@@ -44,30 +44,9 @@ def getVersionCode() {
     }
 }
 
-def getVersionCodeNotIncrease() {
-    def versionCodeFile = file('version_code.properties')
-    if (versionCodeFile.canRead()) {
-        Properties properties = new Properties()
-        properties.load(new FileInputStream(versionCodeFile))
-        def versionCode = properties['VERSION_CODE'].toInteger()//读取version_code.properties文件存放的版本号。
-        return versionCode
-    } else {
-        throw new FileNotFoundException("无法读取version_code.properties文件！")
-    }
-}
-
 def name = "风月读书"
-def version = getVersionCode()
-
-def getVersionName(){
-    def version = getVersionCodeNotIncrease()
-    def hun = (version / 100).toInteger()
-    def ten = (version / 10).toInteger() % 10
-    def one = version % 10
-    return hun + "." + ten + "." + one
-}
-
-def versionN = getVersionName()
+def versionC = getVersionC()
+def versionN = versionC.toString().join(".")
 
 // 读取keystore.properties
 def keyProps = new Properties()
@@ -84,7 +63,7 @@ android {
         applicationId "xyz.fycz.myreader"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode version
+        versionCode versionC
         versionName versionN
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }

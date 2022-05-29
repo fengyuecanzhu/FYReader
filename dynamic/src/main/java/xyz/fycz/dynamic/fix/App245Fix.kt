@@ -65,7 +65,7 @@ class App245Fix : AppFixHandle {
         ) + "&appVersion=" + App.getVersionCode()
         auth = try {
             EncoderUtils.encryptAES2Base64(
-                auth.toByteArray(), DO_FILTER_KEY,
+                auth.toByteArray(), "79qdunN8534y44T3".toByteArray(),
                 "AES/ECB/PKCS5Padding"
             )?.let { String(it) }.toString()
         } catch (e: Exception) {
@@ -75,7 +75,4 @@ class App245Fix : AppFixHandle {
                 "&deviceId=" + UserService.getUUID() +
                 "&isDebug=" + App.isDebug()
     }
-
-    val DO_FILTER_KEY = "79qdunN8534y44T3".toByteArray()
-
 }
