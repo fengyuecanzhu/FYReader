@@ -32,16 +32,9 @@ def getVersionC() {
     if (versionCodeFile.canRead()) {
         Properties properties = new Properties()
         properties.load(new FileInputStream(versionCodeFile))
-        def versionCode = properties['VERSION_CODE'].toInteger()//读取version_code.properties文件存放的版本号。
-        def runTasks = gradle.startParameter.taskNames
-        def task = ':app:assembleRelease'
-        if (task in runTasks) {
-            properties['VERSION_CODE'] = (++versionCode).toString()
-            properties.store(versionCodeFile.newWriter(), null)
-        }
-        return versionCode
+        return properties['VERSION_CODE'].toInteger()
     } else {
-        throw new FileNotFoundException("无法读取version_code.properties文件！")
+        return 200
     }
 }
 
@@ -112,16 +105,12 @@ android {
             versionNameSuffix "-" + commitId
         }
         android.applicationVariants.all { variant ->
-            def buildType = variant.buildType.name
             variant.outputs.each { output ->
                 def abi = output.getFilter(OutputFile.ABI)
                 if (abi == null) {
                     abi = "universal"
                 }
                 def fileName = "${name}v${defaultConfig.versionName}-${abi}.apk"
-                if (buildType == "debug"){
-                    fileName = "${name}v${defaultConfig.versionName}-${abi}-${commitId}.apk"
-                }
                 output.outputFileName = fileName
             }
         }

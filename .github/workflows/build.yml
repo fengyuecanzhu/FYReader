@@ -1,4 +1,4 @@
-name: Auto build and delay
+name: build
 
 on:
   push:
@@ -60,15 +60,15 @@ jobs:
             path="$GITHUB_WORKSPACE/app/build/outputs/apk/debug"
           fi
           echo ::set-output name=file_path::"$path"
-      - name: Upload App To Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: FYReader-apk
-          path: ${{ steps.get_path.outputs.file_path }}
-      - name: Upload App To Lanzou
+      - name: Upload Lanzou
         run: |
           echo "上传APP至蓝奏云"
-          python3 $GITHUB_WORKSPACE/keystore/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}" "${{ steps.config.outputs.version_name }}"
+          tag_name=${{ steps.config.outputs.version_name }}
+          if [[ ${{ steps.config.outputs.need_create_release }} != 'true' ]];then
+            gitHead=$(git rev-parse --short HEAD)
+            tag_name=${{ steps.config.outputs.version_name }}-$gitHead
+          fi
+          python3 $GITHUB_WORKSPACE/keystore/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}" "$tag_name"
           echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: ${{ steps.config.outputs.lanzou_share_url }}"
       - name: Release
         if: ${{ steps.config.outputs.need_create_release == 'true' && github.ref == 'refs/heads/master' }}
@@ -80,10 +80,40 @@ jobs:
           tag_name: ${{ steps.config.outputs.version_name }}
           name: FYReader_${{ steps.config.outputs.version_name }}
           files: |
-           app/build/outputs/apk/release/风月读书${{ steps.config.outputs.version_name }}-arm64-v8a.apk
-           app/build/outputs/apk/release/风月读书${{ steps.config.outputs.version_name }}-armeabi-v7a.apk
-           app/build/outputs/apk/release/风月读书${{ steps.config.outputs.version_name }}-x86_64.apk
-           app/build/outputs/apk/release/风月读书${{ steps.config.outputs.version_name }}-x86.apk
-           app/build/outputs/apk/release/风月读书${{ steps.config.outputs.version_name }}-universal.apk
+           ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-arm64-v8a.apk
+           ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-armeabi-v7a.apk
+           ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86_64.apk
+           ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86.apk
+           ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-universal.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Artifact arm64-v8a
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-arm64-v8a
+        path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-arm64-v8a.apk
+
+      - name: Upload Artifact armeabi-v7a
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-armeabi-v7a
+          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-armeabi-v7a.apk
+
+      - name: Upload Artifact universal
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-universal
+          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-universal.apk
+
+      - name: Upload Artifact x86_64
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-x86_64
+          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86_64.apk
+
+      - name: Upload Artifact x86
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-x86
+          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86.apk
