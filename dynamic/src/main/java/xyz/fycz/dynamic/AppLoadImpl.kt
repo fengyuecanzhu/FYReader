@@ -18,7 +18,6 @@
 
 package xyz.fycz.dynamic
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -74,7 +73,7 @@ class AppLoadImpl : IAppLoader {
         }
         if (sb.isNotEmpty()) {
             if (sb.endsWith("\n")) sb.substring(0, sb.length - 1)
-            val key = "fix244-2"
+            val key = "fix245"
             val hasRead = spu.getBoolean(key, false)
             if (!hasRead) {
                 announce("插件更新", "更新内容：\n$sb")

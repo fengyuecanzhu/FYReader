@@ -21,6 +21,7 @@ import org.seimicrawler.xpath.JXDocument;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import xyz.fycz.myreader.model.sourceAnalyzer.BaseAnalyzer;
@@ -135,7 +136,7 @@ public class Test {
 
     @org.junit.Test
     public void md5(){
-        File file = new File("D:\\Java\\AndroidSdk\\build-tools\\29.0.3\\dynamic_v1.0.5.dex");
+        File file = new File("D:\\Java\\AndroidSdk\\build-tools\\29.0.3\\dynamic_v1.0.6.dex");
         System.out.println(MD5Utils.INSTANCE.getFileMD5s(file, 32));
     }
 }

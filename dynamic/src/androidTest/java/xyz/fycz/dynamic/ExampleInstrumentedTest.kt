@@ -18,14 +18,14 @@
 
 package xyz.fycz.dynamic
 
+import android.util.Base64
+import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import me.fycz.maple.MapleUtils
+
 
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import xyz.fycz.dynamic.fix.App243Fix
-import xyz.fycz.myreader.application.App
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -37,5 +37,6 @@ class ExampleInstrumentedTest {
     @Test
     fun testFix() {
         // Context of the app under test.
+        Log.d("asdas", Base64.encodeToString("asdasd".toByteArray(), Base64.NO_WRAP))
     }
 }

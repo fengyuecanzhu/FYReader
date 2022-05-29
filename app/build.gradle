@@ -46,7 +46,7 @@ def getVersionC() {
 
 def name = "风月读书"
 def versionC = getVersionC()
-def versionN = versionC.toString().join(".")
+def versionN = versionC.toString().join("", ".")
 
 // 读取keystore.properties
 def keyProps = new Properties()
