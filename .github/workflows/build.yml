@@ -59,47 +59,31 @@ jobs:
           if [[ ${{ steps.config.outputs.need_create_release }} != 'true' ]];then
             path="$GITHUB_WORKSPACE/app/build/outputs/apk/debug"
           fi
-          files=$(ls $path)
-          for f in $files
-          do
-           if [[ $f == *"apk" ]]; then
-            file=$f
-            echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 文件:$file"
-            break
-           fi
-          done
-          echo ::set-output name=file_name::"$file"
-          echo ::set-output name=file_path::"$path/$file"
+          echo ::set-output name=file_path::"$path"
       - name: Upload App To Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: FYReader-apk
           path: ${{ steps.get_path.outputs.file_path }}
       - name: Upload App To Lanzou
         run: |
           echo "上传APP至蓝奏云"
-          python3 $GITHUB_WORKSPACE/keystore/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}"
+          python3 $GITHUB_WORKSPACE/keystore/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}" "${{ steps.config.outputs.version_name }}"
           echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: ${{ steps.config.outputs.lanzou_share_url }}"
-      - name: Create Release
-        id: create_release
+      - name: Release
         if: ${{ steps.config.outputs.need_create_release == 'true' && github.ref == 'refs/heads/master' }}
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TZ: Asia/Shanghai
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.config.outputs.version_name }}
-          release_name: FYReader_${{ steps.config.outputs.version_name }}
-          body_path: ${{ github.workspace }}/app/release.md
+          body_path: ./app/release.md
+          prerelease: false
           draft: false
-      - name: Upload Release Asset
-        id: upload_release_asset
-        if: ${{ steps.config.outputs.need_create_release == 'true' && steps.create_release.outputs.upload_url }}
-        uses: actions/upload-release-asset@v1
+          tag_name: ${{ steps.config.outputs.version_name }}
+          name: FYReader_${{ steps.config.outputs.version_name }}
+          files: |
+           app/build/outputs/apk/release/风月读书${{ steps.config.outputs.version_name }}-arm64-v8a.apk
+           app/build/outputs/apk/release/风月读书${{ steps.config.outputs.version_name }}-armeabi-v7a.apk
+           app/build/outputs/apk/release/风月读书${{ steps.config.outputs.version_name }}-x86_64.apk
+           app/build/outputs/apk/release/风月读书${{ steps.config.outputs.version_name }}-x86.apk
+           app/build/outputs/apk/release/风月读书${{ steps.config.outputs.version_name }}-universal.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.get_path.outputs.file_path }}
-          asset_name: FYReader_${{ steps.config.outputs.version_name }}.apk
-          asset_content_type: application/vnd.android.package-archive
