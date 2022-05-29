@@ -69,7 +69,7 @@ jobs:
             tag_name=${{ steps.config.outputs.version_name }}-$gitHead
           fi
           python3 $GITHUB_WORKSPACE/keystore/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}" "$tag_name"
-          echo "[$(date -u -d '+8 hour' '+%Y.%m.%d %H:%M:%S')] 分享链接: ${{ steps.config.outputs.lanzou_share_url }}"
+      # 发布正式版
       - name: Release
         if: ${{ steps.config.outputs.need_create_release == 'true' && github.ref == 'refs/heads/master' }}
         uses: softprops/action-gh-release@v1
@@ -87,7 +87,7 @@ jobs:
             ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-universal.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      # 上传Artifact
       - name: Upload Artifact arm64-v8a
         uses: actions/upload-artifact@v3
         with:
