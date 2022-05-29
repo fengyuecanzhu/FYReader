@@ -64,7 +64,7 @@ jobs:
         run: |
           echo "上传APP至蓝奏云"
           tag_name=${{ steps.config.outputs.version_name }}
-          if [[ ${{ steps.config.outputs.need_create_release }} != 'true' ]];then
+          if [ ${{ steps.config.outputs.need_create_release }} != 'true' -o ${{ github.ref }} != 'refs/heads/master' ];then
             gitHead=$(git rev-parse --short HEAD)
             tag_name=${{ steps.config.outputs.version_name }}-$gitHead
           fi
