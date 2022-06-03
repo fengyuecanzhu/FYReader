@@ -38,7 +38,7 @@ import xyz.fycz.myreader.util.utils.ScreenUtils
  * @author fengyue
  * @date 2022/6/3 15:34
  */
-@AppFix([], ["设置-缓存设置新增清除广告文件"], "2022-06-03")
+@AppFix([], ["[设置-缓存设置]新增清除广告文件"], "2022-06-03")
 class App246Fix : AppFixHandle {
 
     override fun onFix(key: String): BooleanArray {
