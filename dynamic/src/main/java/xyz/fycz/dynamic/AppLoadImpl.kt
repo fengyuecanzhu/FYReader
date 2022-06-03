@@ -45,29 +45,21 @@ class AppLoadImpl : IAppLoader {
         App243Fix::class.java,
         App244Fix::class.java,
         App244Fix2::class.java,
-        App245Fix::class.java,
+        App246Fix::class.java,
     )
 
     override fun onLoad(appParam: AppParam) {
         val sb = StringBuilder()
         fixList.forEach {
             val annotation = it.getAnnotation(AppFix::class.java)!!
-            for (version in annotation.versions) {
-                if (App.getVersionCode() == version) {
-                    val fix = it.newInstance()
-                    val fixResult = fix.onFix(annotation.date)
-                    if (!spu.getBoolean(annotation.date, false)) {
-                        if (sb.isNotEmpty()) sb.append("\n")
-                        sb.append("${annotation.date}\n")
-                        fixResult.forEachIndexed { i, b ->
-                            sb.append("${i + 1}、${annotation.fixLog[i]}：${if (b) "成功" else "失败"}\n")
-                        }
-                        spu.edit().run {
-                            putBoolean(annotation.date, true)
-                            apply()
-                        }
+            if (annotation.versions.isEmpty()) {
+                fix(sb, annotation, it)
+            } else {
+                for (version in annotation.versions) {
+                    if (App.getVersionCode() == version) {
+                        fix(sb, annotation, it)
+                        break
                     }
-                    break
                 }
             }
         }
@@ -81,6 +73,26 @@ class AppLoadImpl : IAppLoader {
                     putBoolean(key, true)
                     apply()
                 }
+            }
+        }
+    }
+
+    private fun fix(
+        sb: StringBuilder,
+        annotation: AppFix,
+        fixClz: Class<out AppFixHandle>
+    ) {
+        val fix = fixClz.newInstance()
+        val fixResult = fix.onFix(annotation.date)
+        if (!spu.getBoolean(annotation.date, false)) {
+            if (sb.isNotEmpty()) sb.append("\n")
+            sb.append("${annotation.date}\n")
+            fixResult.forEachIndexed { i, b ->
+                sb.append("${i + 1}、${annotation.fixLog[i]}：${if (b) "成功" else "失败"}\n")
+            }
+            spu.edit().run {
+                putBoolean(annotation.date, true)
+                apply()
             }
         }
     }
