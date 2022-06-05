@@ -19,8 +19,6 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'stringfog'
-    id 'top.niunaijun.blackobfuscator'
 }
 
 android {
@@ -49,32 +47,6 @@ android {
     }
 }
 
-stringfog {
-    // 必要：加解密库的实现类路径，需和上面配置的加解密算法库一致。
-    implementation 'com.github.megatronking.stringfog.xor.StringFogImpl'
-    // 可选：加密开关，默认开启。
-    enable false
-    // 可选：指定需加密的代码包路径，可配置多个，未指定将默认全部加密。
-    fogPackages = ['xyz.fycz.dynamic']
-    // 可选：指定密钥生成器，默认使用长度2的随机密钥（每个字符串均有随机密钥）,
-    // 也可以指定一个固定的密钥：HardCodeKeyGenerator("This is a key")
-
-    // 可选：调试信息打印开关，默认关闭。
-    debug true
-}
-
-// 加入混淆配置
-BlackObfuscator {
-    // 是否启用
-    enabled false
-    // 混淆深度
-    depth 5
-    // 需要混淆的包或者类(匹配前面一段)
-    obfClass = ["xyz.fycz.dynamic"]
-    // blackClass中的包或者类不会进行混淆(匹配前面一段)
-    blackClass = []
-}
-
 dependencies {
     compileOnly("androidx.core:core-ktx:$kotlin_version")
     testImplementation 'junit:junit:4.13.2'
@@ -84,5 +56,4 @@ dependencies {
     compileOnly 'org.greenrobot:greendao:3.3.0'
     compileOnly project(":app")
     compileOnly project(":DialogX")
-    api 'com.github.megatronking.stringfog:xor:3.0.0'
 }

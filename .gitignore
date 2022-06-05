@@ -7,6 +7,7 @@
 /build
 /captures
 /user
+/plugin
 .externalNativeBuild
 keystore
 # Compiled class file
