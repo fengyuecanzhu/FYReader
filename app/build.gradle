@@ -279,7 +279,7 @@ dependencies {
     }
 
     //https://github.com/fengyuecanzhu/Maple
-    implementation("me.fycz.maple:maple:1.8")
+    implementation("me.fycz.maple:maple:1.9")
 }
 
 greendao {

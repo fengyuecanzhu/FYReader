@@ -7,7 +7,6 @@
 /build
 /captures
 /user
-/plugin
 .externalNativeBuild
 keystore
 # Compiled class file
@@ -30,10 +29,3 @@ keystore
 *.zip
 *.tar.gz
 *.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-<<<<<<< HEAD
->>>>>>> 2c33f0b33a0411efd93a4810de5061a473835ff5
-=======
->>>>>>> eee131cea39d27218fc7d1c3d641d617d377af42
