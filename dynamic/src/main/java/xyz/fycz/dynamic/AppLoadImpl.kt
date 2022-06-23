@@ -46,6 +46,7 @@ class AppLoadImpl : IAppLoader {
         App244Fix::class.java,
         App244Fix2::class.java,
         App246Fix::class.java,
+        App246Fix2::class.java,
         AppSubSourceFix::class.java,
     )
 
@@ -66,7 +67,7 @@ class AppLoadImpl : IAppLoader {
         }
         if (sb.isNotEmpty()) {
             if (sb.endsWith("\n")) sb.substring(0, sb.length - 1)
-            val key = "fix2022-06-21"
+            val key = "fix2022-06-23"
             val hasRead = spu.getBoolean(key, false)
             if (!hasRead) {
                 announce("插件更新", "更新内容：\n$sb")

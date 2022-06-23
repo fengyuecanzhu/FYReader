@@ -16,9 +16,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.main.iml" filepath="$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/dynamic/FYReader.dynamic.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/plugin/FYReader.plugin.iml" filepath="$PROJECT_DIR$/.idea/modules/plugin/FYReader.plugin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/plugin/FYReader.plugin.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/plugin/FYReader.plugin.androidTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/plugin/FYReader.plugin.main.iml" filepath="$PROJECT_DIR$/.idea/modules/plugin/FYReader.plugin.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/plugin/FYReader.plugin.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/plugin/FYReader.plugin.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/user/FYReader.user.iml" filepath="$PROJECT_DIR$/.idea/modules/user/FYReader.user.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/user/FYReader.user.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/user/FYReader.user.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/user/FYReader.user.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user/FYReader.user.main.iml" />

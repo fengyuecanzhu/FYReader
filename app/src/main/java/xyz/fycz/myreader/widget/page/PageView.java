@@ -491,9 +491,10 @@ public class PageView extends View {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mPageAnim.abortAnim();
-        mPageAnim.clear();
-
+        if (mPageAnim != null) {
+            mPageAnim.abortAnim();
+            mPageAnim.clear();
+        }
         mPageLoader = null;
         mPageAnim = null;
     }
