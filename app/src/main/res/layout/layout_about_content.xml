@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ This file is part of FYReader.
   ~ FYReader is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -54,6 +53,37 @@
                 tools:text="风月读书" />
 
         </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_plugin"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_common_bg"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:id="@+id/tv_plugin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/plugin_version"
+                android:textColor="@color/textPrimary"
+                android:textSize="@dimen/text_normal_size" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@drawable/ic_right_arrow"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
 
 
         <RelativeLayout
@@ -355,6 +385,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="10dp" />
+
         <RelativeLayout
             android:id="@+id/rl_lan_zou"
             android:layout_width="match_parent"
@@ -380,6 +411,7 @@
                 app:srcCompat="@drawable/ic_right_arrow"
                 app:tint="@color/textSecondary" />
         </RelativeLayout>
+
         <RelativeLayout
             android:id="@+id/rl_reset_pangle"
             android:layout_width="match_parent"

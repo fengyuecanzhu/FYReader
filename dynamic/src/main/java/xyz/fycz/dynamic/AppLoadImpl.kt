@@ -39,7 +39,9 @@ class AppLoadImpl : IAppLoader {
         private const val spuName = "FYReader_plugin"
         val spu: SharedPreferences =
             App.getmContext().getSharedPreferences(spuName, Context.MODE_PRIVATE)
+        val allFixInfoSb = StringBuilder()
     }
+
 
     private val fixList = listOf(
         App243Fix::class.java,
@@ -48,6 +50,7 @@ class AppLoadImpl : IAppLoader {
         App246Fix::class.java,
         App246Fix2::class.java,
         AppSubSourceFix::class.java,
+        App246Fix3::class.java,
     )
 
     override fun onLoad(appParam: AppParam) {
@@ -67,7 +70,7 @@ class AppLoadImpl : IAppLoader {
         }
         if (sb.isNotEmpty()) {
             if (sb.endsWith("\n")) sb.substring(0, sb.length - 1)
-            val key = "fix2022-06-23"
+            val key = "fix2022-06-28"
             val hasRead = spu.getBoolean(key, false)
             if (!hasRead) {
                 announce("插件更新", "更新内容：\n$sb")
@@ -86,6 +89,13 @@ class AppLoadImpl : IAppLoader {
     ) {
         val fix = fixClz.newInstance()
         val fixResult = fix.onFix(annotation.date)
+        //所有修复结果信息
+        if (allFixInfoSb.isNotEmpty()) allFixInfoSb.append("\n")
+        allFixInfoSb.append("${annotation.date}\n")
+        fixResult.forEachIndexed { i, b ->
+            allFixInfoSb.append("${i + 1}、${annotation.fixLog[i]}：${if (b) "成功" else "失败"}\n")
+        }
+        //需要提示的修复结果信息
         if (!spu.getBoolean(annotation.date, false)) {
             if (sb.isNotEmpty()) sb.append("\n")
             sb.append("${annotation.date}\n")

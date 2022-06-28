@@ -23,6 +23,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -42,6 +43,7 @@ import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.databinding.ActivityAboutBinding;
+import xyz.fycz.myreader.entity.PluginConfig;
 import xyz.fycz.myreader.model.user.UserService;
 import xyz.fycz.myreader.ui.dialog.DialogCreator;
 import xyz.fycz.myreader.ui.dialog.LoadingDialog;
@@ -53,6 +55,7 @@ import xyz.fycz.myreader.util.ZipUtils;
 import xyz.fycz.myreader.util.utils.AdUtils;
 import xyz.fycz.myreader.util.utils.FileUtils;
 import xyz.fycz.myreader.util.utils.OkHttpUtils;
+import xyz.fycz.myreader.util.utils.PluginUtils;
 import xyz.fycz.myreader.util.utils.RxUtils;
 import xyz.fycz.myreader.webapi.LanZouApi;
 
@@ -61,6 +64,8 @@ import xyz.fycz.myreader.webapi.LanZouApi;
  * @date 2020/9/18 22:21
  */
 public class AboutActivity extends BaseActivity<ActivityAboutBinding> {
+
+    private PluginConfig pluginConfig;
 
     @Override
     protected void bindView() {
@@ -75,11 +80,21 @@ public class AboutActivity extends BaseActivity<ActivityAboutBinding> {
         getSupportActionBar().setTitle("关于");
     }
 
+    @Override
+    protected void initData(Bundle savedInstanceState) {
+        super.initData(savedInstanceState);
+        pluginConfig = PluginUtils.INSTANCE.getConfig();
+    }
 
     @Override
     protected void initWidget() {
         super.initWidget();
         binding.il.tvVersionName.setText(String.format("风月读书v%s", App.getStrVersionName()));
+        binding.il.tvPlugin.setText(PluginUtils.INSTANCE.getLoadSuccess() ?
+                getString(R.string.plugin_version,
+                        pluginConfig != null ? pluginConfig.getVersion() : "插件加载失败")
+                : "插件加载失败"
+        );
         binding.il.rlLanZou.setVisibility(App.isDebug() ? View.VISIBLE : View.GONE);
         binding.il.rlResetPangle.setVisibility(App.isDebug() ? View.VISIBLE : View.GONE);
     }
@@ -87,6 +102,21 @@ public class AboutActivity extends BaseActivity<ActivityAboutBinding> {
     @Override
     protected void initClick() {
         super.initClick();
+
+        binding.il.rlPlugin.setOnClickListener(v -> {
+            String tip = "";
+            if (pluginConfig == null) {
+                tip = "插件配置读取失败";
+            } else {
+                if (PluginUtils.INSTANCE.getLoadSuccess()) {
+                    tip = PluginUtils.INSTANCE.getPluginLoadInfo();
+                } else {
+                    tip = PluginUtils.INSTANCE.getErrorMsg();
+                }
+            }
+            DialogCreator.createTipDialog(this, binding.il.tvPlugin.getText().toString(), tip);
+        });
+
         ClipboardManager mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         binding.il.rlUpdate.setOnClickListener(v -> App.checkVersionByServer(this, true));
         binding.il.rlUpdateLog.setOnClickListener(v -> DialogCreator.createAssetTipDialog(this, "更新日志", "updatelog.fy"));

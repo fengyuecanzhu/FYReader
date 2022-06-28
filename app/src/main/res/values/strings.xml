@@ -123,6 +123,7 @@
     <string name="git_hub">GitHub</string>
     <string name="share_log">分享崩溃日志</string>
     <string name="this_github_url">https://github.com/fengyuecanzhu/FYReader</string>
+    <string name="plugin_version">插件版本：%s</string>
     <string name="update">检查更新</string>
     <string name="thanks">致谢名单</string>
     <string name="join_qq_channel">加入QQ频道</string>

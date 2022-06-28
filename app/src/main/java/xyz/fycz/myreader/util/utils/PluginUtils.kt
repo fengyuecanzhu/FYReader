@@ -21,10 +21,8 @@ package xyz.fycz.myreader.util.utils
 import android.content.Context
 import android.util.Log
 import dalvik.system.DexClassLoader
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import me.fycz.maple.MapleUtils
 import xyz.fycz.dynamic.AppParam
 import xyz.fycz.dynamic.IAppLoader
 import xyz.fycz.myreader.application.App
@@ -33,11 +31,9 @@ import xyz.fycz.myreader.common.URLCONST.DEFAULT_PLUGIN_CONFIG_URL
 import xyz.fycz.myreader.entity.PluginConfig
 import xyz.fycz.myreader.model.third3.Coroutine
 import xyz.fycz.myreader.model.third3.http.getProxyClient
-import xyz.fycz.myreader.model.third3.http.newCallResponse
 import xyz.fycz.myreader.model.third3.http.newCallResponseBody
 import xyz.fycz.myreader.model.third3.http.text
 import xyz.fycz.myreader.util.SharedPreUtils
-import xyz.fycz.myreader.util.ToastUtils
 import java.io.File
 import java.util.*
 
@@ -49,12 +45,15 @@ import java.util.*
 object PluginUtils {
 
     val TAG = PluginUtils.javaClass.simpleName
+    private var appLoader: IAppLoader? = null
+    var config: PluginConfig? = null
     var hasLoad = false
+    var loadSuccess = false
+    var errorMsg = ""
 
     fun init() {
         val pluginConfigUrl =
             SharedPreUtils.getInstance().getString("pluginConfigUrl", DEFAULT_PLUGIN_CONFIG_URL)
-        var config: PluginConfig? = null
         Coroutine.async {
             val oldConfig = GSON.fromJsonObject<PluginConfig>(
                 SharedPreUtils.getInstance().getString("pluginConfig")
@@ -108,7 +107,7 @@ object PluginUtils {
                 )
                 try {
                     val libClazz = dexClassLoader.loadClass("xyz.fycz.dynamic.AppLoadImpl")
-                    val appLoader = libClazz.newInstance() as IAppLoader?
+                    appLoader = libClazz.newInstance() as IAppLoader?
                     appLoader?.run {
                         val appParam = AppParam()
                         appParam.classLoader = context.classLoader
@@ -116,13 +115,27 @@ object PluginUtils {
                         appParam.appInfo = context.applicationInfo
                         onLoad(appParam)
                         hasLoad = true
+                        loadSuccess = true
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    errorMsg = e.stackTraceToString()
                 }
             } else {
+                errorMsg = pluginPath + "文件不存在"
                 Log.d(TAG, pluginPath + "文件不存在")
             }
+        }
+    }
+
+    fun getPluginLoadInfo(): String {
+        return try {
+            (MapleUtils.getStaticObjectField(
+                appLoader?.javaClass,
+                "pluginLoadInfo"
+            ) as StringBuilder).toString()
+        } catch (e: Exception) {
+            ""
         }
     }
 }

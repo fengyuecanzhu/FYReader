@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.get
 import androidx.viewbinding.ViewBinding
 import me.fycz.maple.MapleBridge
@@ -38,7 +39,7 @@ import xyz.fycz.myreader.util.utils.ScreenUtils
  * @author fengyue
  * @date 2022/6/3 15:34
  */
-@AppFix([], ["[设置-缓存设置]新增清除广告文件"], "2022-06-03")
+@AppFix([243, 244, 245, 246], ["[设置-缓存设置]新增清除广告文件"], "2022-06-03")
 class App246Fix : AppFixHandle {
 
     override fun onFix(key: String): BooleanArray {
@@ -62,7 +63,10 @@ class App246Fix : AppFixHandle {
                     val binding =
                         MapleUtils.getObjectField(param.thisObject, "binding") as ViewBinding
                     val rootLayout =
-                        binding.root.findViewById<ScrollView>(R.id.sv_content)[0] as ViewGroup
+                        (MapleUtils.getObjectField(
+                            binding,
+                            "svContent"
+                        ) as ScrollView)[0] as ViewGroup
                     addDeleteAdFileView(rootLayout, rootLayout.childCount)
                 }
             }
@@ -83,7 +87,8 @@ class App246Fix : AppFixHandle {
             ScreenUtils.dpToPx(20),
             0
         )
-        rlDeleteAdFile.background = resources.getDrawable(R.drawable.selector_common_bg)
+        rlDeleteAdFile.background =
+            ContextCompat.getDrawable(context, R.drawable.selector_common_bg)
         rlDeleteAdFile.id = R.id.rl_delete_ad_file
         val textview = TextView(context)
         val textViewParams = RelativeLayout.LayoutParams(
