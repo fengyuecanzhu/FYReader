@@ -31,15 +31,10 @@ import xyz.fycz.myreader.webapi.LanZouApi
 @AppFix([243, 244, 245, 246], ["修复书源订阅失败的问题"], "2022-06-30")
 class App246Fix4: AppFixHandle {
     override fun onFix(key: String): BooleanArray {
-        val result = try {
-            fxLanZouApi()
-            true
-        } catch (e: Exception) {
-            MapleUtils.log(e)
-            false
-        }
-        fixResult(key, "lanZouApi", result)
-        return booleanArrayOf(result)
+        return handleFix(
+            key,
+            "lanZouApi" to { fxLanZouApi() },
+        )
     }
 
     private fun fxLanZouApi() {

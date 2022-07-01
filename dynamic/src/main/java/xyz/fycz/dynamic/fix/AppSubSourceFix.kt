@@ -29,17 +29,12 @@ import xyz.fycz.myreader.webapi.LanZouApi
  * @date 2022/6/21 18:30
  */
 @AppFix([], ["更新订阅书源链接，仅支持v2.4.3版本及以上版本"], "2022-06-21")
-class AppSubSourceFix : AppFixHandle{
+class AppSubSourceFix : AppFixHandle {
     override fun onFix(key: String): BooleanArray {
-        val result = try {
-            fxSubSource()
-            true
-        } catch (e: Exception) {
-            MapleUtils.log(e)
-            false
-        }
-        fixResult(key, "subSource", result)
-        return booleanArrayOf(result)
+        return handleFix(
+            key,
+            "subSource" to { fxSubSource() },
+        )
     }
 
     private fun fxSubSource() {
@@ -49,9 +44,9 @@ class AppSubSourceFix : AppFixHandle{
             String::class.java,
             Int::class.java,
             String::class.java,
-            object : MethodHook(){
+            object : MethodHook() {
                 override fun beforeHookedMethod(param: MapleBridge.MethodHookParam) {
-                    if (param.args[0] == URLCONST.SUB_SOURCE_URL){
+                    if (param.args[0] == URLCONST.SUB_SOURCE_URL) {
                         param.args[0] = "https://fycz.lanzoum.com/b00pucrch"
                         param.args[2] = "b0ox"
                     }

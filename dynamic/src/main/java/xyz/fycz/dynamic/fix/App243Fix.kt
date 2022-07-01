@@ -39,25 +39,11 @@ import xyz.fycz.myreader.util.utils.AdUtils
 class App243Fix : AppFixHandle {
 
     override fun onFix(key: String): BooleanArray {
-        var fx1 = false
-        var fx2 = false
-        try {
-            fixGetAllNoLocalSource()
-            fx1 = true
-            fixResult(key, "getAllNoLocalSource", true)
-        } catch (e: Exception) {
-            MapleUtils.log(e)
-            fixResult(key, "getAllNoLocalSource", false)
-        }
-        try {
-            fixAdTimeout()
-            fx2 = true
-            fixResult(key, "adTimeout", true)
-        } catch (e: Exception) {
-            MapleUtils.log(e)
-            fixResult(key, "adTimeout", false)
-        }
-        return booleanArrayOf(fx1, fx2)
+        return handleFix(
+            key,
+            "getAllNoLocalSource" to { fixGetAllNoLocalSource() },
+            "adTimeout" to { fixAdTimeout() },
+        )
     }
 
     private fun getAllNoLocalSource(): List<BookSource> {

@@ -33,8 +33,24 @@ import xyz.fycz.myreader.util.utils.AdUtils
  * @date 2022/4/25 21:49
  */
 interface AppFixHandle {
-    
+
     fun onFix(key: String): BooleanArray
+
+    fun handleFix(key: String, vararg fix: Pair<String, () -> Unit>): BooleanArray {
+        val results = mutableListOf<Boolean>()
+        fix.forEach {
+            val result = try {
+                it.second()
+                true
+            } catch (e: Exception) {
+                MapleUtils.log(e)
+                false
+            }
+            results.add(result)
+            fixResult(key, it.first, result)
+        }
+        return results.toBooleanArray()
+    }
 
     fun fixResult(key: String, name: String, success: Boolean) {
         val res = if (success) "Success" else "Failed"

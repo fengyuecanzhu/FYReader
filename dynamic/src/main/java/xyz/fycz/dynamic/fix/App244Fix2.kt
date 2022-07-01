@@ -32,16 +32,10 @@ import xyz.fycz.myreader.webapi.crawler.base.ReadCrawler
 @AppFix([243, 244], ["修复搜索时当前分组不存在时无法搜索的问题"], "2022-05-11")
 class App244Fix2 : AppFixHandle{
     override fun onFix(key: String): BooleanArray {
-        var fx = false
-        try {
-            fixGetEnableReadCrawlers()
-            fx = true
-            fixResult(key, "getEnableReadCrawlers", true)
-        } catch (e: Exception) {
-            MapleUtils.log(e)
-            fixResult(key, "getEnableReadCrawlers", false)
-        }
-        return booleanArrayOf(fx)
+        return handleFix(
+            key,
+            "getEnableReadCrawlers" to { fixGetEnableReadCrawlers() },
+        )
     }
 
     private fun fixGetEnableReadCrawlers() {

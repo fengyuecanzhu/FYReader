@@ -48,10 +48,11 @@ class AppLoadImpl : IAppLoader {
         App244Fix::class.java,
         App244Fix2::class.java,
         App246Fix::class.java,
-        //AppSubSourceFix::class.java,
+        AppSubSourceFix::class.java,
         App246Fix2::class.java,
         App246Fix3::class.java,
         App246Fix4::class.java,
+        App246Fix5::class.java,
     )
 
     override fun onLoad(appParam: AppParam) {

@@ -36,16 +36,10 @@ import java.io.*
 @AppFix([243, 244], ["修复书籍无法导出缓存的问题"], "2022-04-26")
 class App244Fix: AppFixHandle {
     override fun onFix(key: String): BooleanArray {
-        var fx = false
-        try {
-            fixUnionChapterCathe()
-            fx = true
-            fixResult(key, "unionChapterCathe", true)
-        } catch (e: Exception) {
-            MapleUtils.log(e)
-            fixResult(key, "unionChapterCathe", false)
-        }
-        return booleanArrayOf(fx)
+        return handleFix(
+            key,
+            "unionChapterCathe" to { fixUnionChapterCathe() },
+        )
     }
 
     private fun fixUnionChapterCathe() {

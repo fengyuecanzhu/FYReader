@@ -176,7 +176,7 @@ public class OkHttpUtils {
         return response.body().byteStream();
     }
 
-    public static String getUpdateInfo() throws IOException, JSONException {
+    public static String getUpdateInfo() throws IOException {
         String key = "ryvwiq";
         if (App.isDebug()) {
             key = "sgak2h";
@@ -197,15 +197,26 @@ public class OkHttpUtils {
         if (body == null) {
             return "";
         } else {
-            String bodyStr = new String(body.bytes(), StandardCharsets.UTF_8);
-            JSONObject jsonObj = new JSONObject(bodyStr);
-            jsonObj = jsonObj.getJSONObject("data");
-            String content = jsonObj.getString("content");
-            Document doc = Jsoup.parse(content);
-            content = doc.text();
-            Log.d("Http -> UpdateInfo", content);
-            return content;
+            try {
+                String bodyStr = new String(body.bytes(), StandardCharsets.UTF_8);
+                JSONObject jsonObj = new JSONObject(bodyStr);
+                jsonObj = jsonObj.getJSONObject("data");
+                String content = jsonObj.getString("content");
+                Document doc = Jsoup.parse(content);
+                content = doc.text();
+                Log.d("Http -> UpdateInfo", content);
+                return content;
+            }catch (JSONException e){
+                e.printStackTrace();
+                return "";
+            }
         }
+    }
+
+    public static String getBakUpdateInfo() throws IOException {
+        return OkHttpUtils.getHtml("https://fyreader.coding.net/p/img/d/FYReader-Update/git/raw/master/" +
+                (App.isDebug() ? "debug" : "release") +
+                "/content.txt");
     }
 
     public static Observable<StrResponse> getStrResponse(AnalyzeUrl analyzeUrl) {

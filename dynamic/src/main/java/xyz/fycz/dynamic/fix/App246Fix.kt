@@ -43,15 +43,10 @@ import xyz.fycz.myreader.util.utils.ScreenUtils
 class App246Fix : AppFixHandle {
 
     override fun onFix(key: String): BooleanArray {
-        val result = try {
-            fxAdFile()
-            true
-        } catch (e: Exception) {
-            MapleUtils.log(e)
-            false
-        }
-        fixResult(key, "adFile", result)
-        return booleanArrayOf(result)
+        return handleFix(
+            key,
+            "adFile" to { fxAdFile() },
+        )
     }
 
     fun fxAdFile() {

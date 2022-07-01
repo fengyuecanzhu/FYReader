@@ -30,15 +30,10 @@ import xyz.fycz.myreader.widget.page.PageView
 @AppFix([], ["修复阅读界面概率性闪退的问题"], "2022-06-23")
 class App246Fix2 : AppFixHandle {
     override fun onFix(key: String): BooleanArray {
-        val result = try {
-            fxPageView()
-            true
-        } catch (e: Exception) {
-            MapleUtils.log(e)
-            false
-        }
-        fixResult(key, "pageView", result)
-        return booleanArrayOf(result)
+        return handleFix(
+            key,
+            "pageView" to { fxPageView() },
+        )
     }
 
     private fun fxPageView() {

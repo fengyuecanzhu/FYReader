@@ -282,15 +282,9 @@ public class App extends Application {
     public static void checkVersionByServer(final AppCompatActivity activity, final boolean isManualCheck) {
         App.getApplication().newThread(() -> {
             try {
-                String url = "https://shimo.im/docs/cqkgjPRRydYYhQKt/read";
-                if (debug) {
-                    url = "https://shimo.im/docs/zfzpda7MUGskOC9v/read";
-                }
-                String html = OkHttpUtils.getHtml(url);
-                Document doc = Jsoup.parse(html);
-                String content = doc.getElementsByClass("ql-editor").text();
+                String content = OkHttpUtils.getUpdateInfo();
                 if (StringHelper.isEmpty(content)) {
-                    content = OkHttpUtils.getUpdateInfo();
+                    content = OkHttpUtils.getBakUpdateInfo();
                     if (StringHelper.isEmpty(content)) {
                         if (isManualCheck || NetworkUtils.isNetWorkAvailable()) {
                             ToastUtils.showError("检查更新失败！");

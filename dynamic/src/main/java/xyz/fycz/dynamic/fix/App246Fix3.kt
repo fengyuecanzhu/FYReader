@@ -51,15 +51,10 @@ import xyz.fycz.myreader.util.utils.fromJsonObject
 class App246Fix3 : AppFixHandle {
 
     override fun onFix(key: String): BooleanArray {
-        val result = try {
-            fxPluginView()
-            true
-        } catch (e: Exception) {
-            MapleUtils.log(e)
-            false
-        }
-        fixResult(key, "pluginView", result)
-        return booleanArrayOf(result)
+        return handleFix(
+            key,
+            "pluginView" to { fxPluginView() },
+        )
     }
 
     private fun fxPluginView() {
