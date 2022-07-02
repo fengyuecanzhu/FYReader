@@ -19,31 +19,40 @@
 package xyz.fycz.dynamic.fix
 
 import android.util.Log
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewbinding.ViewBinding
+import io.reactivex.Observable
 import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodReplacement
 import xyz.fycz.myreader.R
 import xyz.fycz.myreader.application.App
 import xyz.fycz.myreader.application.SysManager
+import xyz.fycz.myreader.base.observer.MyObserver
 import xyz.fycz.myreader.common.URLCONST
+import xyz.fycz.myreader.ui.dialog.UpdateDialog
 import xyz.fycz.myreader.util.SharedPreUtils
 import xyz.fycz.myreader.util.ToastUtils
 import xyz.fycz.myreader.util.help.StringHelper
 import xyz.fycz.myreader.util.utils.NetworkUtils
 import xyz.fycz.myreader.util.utils.OkHttpUtils
+import xyz.fycz.myreader.util.utils.RxUtils
+import xyz.fycz.myreader.webapi.LanZouApi.getFileUrl
+import xyz.fycz.myreader.widget.BarPercentView
 import java.io.IOException
 
 /**
  * @author fengyue
  * @date 2022/7/1 15:45
  */
-@AppFix([243, 244, 245, 246], ["修复检查更新失败的问题"], "2022-07-01")
+@AppFix([243, 244, 245, 246], ["修复检查更新失败的问题", "修复获取更新链接失败的问题"], "2022-07-02")
 class App246Fix5 : AppFixHandle {
     override fun onFix(key: String): BooleanArray {
         return handleFix(
             key,
             "checkUpdateUrl" to { fxCheckUpdateUrl() },
+            "downloadLanzou" to { fxDownloadLanzou() },
         )
     }
 
@@ -145,6 +154,47 @@ class App246Fix5 : AppFixHandle {
                 }
             }
         }
+    }
+
+    private fun fxDownloadLanzou() {
+        MapleUtils.findAndHookMethod(
+            UpdateDialog::class.java,
+            "downloadWithLanzous",
+            String::class.java,
+            object : MethodReplacement() {
+                override fun replaceHookedMethod(param: MapleBridge.MethodHookParam) {
+                    val updateDialog = param.thisObject as UpdateDialog
+                    val binding = MapleUtils.getObjectField(updateDialog, "binding")
+                            as ViewBinding
+                    val tvProgress = MapleUtils.getObjectField(binding, "tvProgress")
+                            as TextView
+                    val barPercentView = MapleUtils.getObjectField(binding, "barPercentView")
+                            as BarPercentView
+                    tvProgress.text = "正在获取下载链接..."
+                    barPercentView.setPercentage(0F)
+                    val apkUrl = param.args[0] as String
+                    getFileUrl(apkUrl)
+                        .compose { RxUtils.toSimpleSingle(it) }
+                        .subscribe(object : MyObserver<String>() {
+                            override fun onNext(directUrl: String) {
+                                MapleUtils.callMethod(
+                                    updateDialog,
+                                    "downloadApkNormal",
+                                    arrayOf(String::class.java),
+                                    directUrl
+                                )
+                            }
+
+                            override fun onError(e: Throwable) {
+                                MapleUtils.callMethod(
+                                    updateDialog,
+                                    "error"
+                                )
+                            }
+                        })
+                }
+            }
+        )
     }
 
     @Throws(IOException::class)

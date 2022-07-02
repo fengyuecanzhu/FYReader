@@ -18,10 +18,8 @@
 
 package xyz.fycz.myreader.ui.dialog;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,14 +35,12 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.hjq.permissions.OnPermissionCallback;
-import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadLargeFileListener;
@@ -60,11 +56,12 @@ import java.util.List;
 
 import xyz.fycz.myreader.R;
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.common.APPCONST;
 import xyz.fycz.myreader.databinding.FragmentUpdateBinding;
 import xyz.fycz.myreader.util.ToastUtils;
-import xyz.fycz.myreader.webapi.LanZousApi;
-import xyz.fycz.myreader.webapi.ResultCallback;
+import xyz.fycz.myreader.util.utils.RxUtils;
+import xyz.fycz.myreader.webapi.LanZouApi;
 
 
 public class UpdateDialog extends Fragment {
@@ -290,13 +287,13 @@ public class UpdateDialog extends Fragment {
                 .setListener(new FileDownloadLargeFileListener() {
                     @Override
                     protected void pending(BaseDownloadTask task, long soFarBytes, long totalBytes) {
-                        if (debug) Log.e("downloadApk", "pending-------");
+                        if (debug) Log.d("downloadApk", "pending-------");
                     }
 
                     @Override
                     protected void progress(BaseDownloadTask task, long soFarBytes, long totalBytes) {
                         float percent = 1f * soFarBytes / totalBytes * 100;
-                        if (debug) Log.e("downloadApk", "progress-------" + percent);
+                        if (debug) Log.d("downloadApk", "progress-------" + percent);
                         if (percent >= 3) {
                             binding.barPercentView.setPercentage(percent);
                             binding.tvProgress.setText((int) percent + "%");
@@ -305,12 +302,12 @@ public class UpdateDialog extends Fragment {
 
                     @Override
                     protected void paused(BaseDownloadTask task, long soFarBytes, long totalBytes) {
-                        if (debug) Log.e("downloadApk", "paused-------");
+                        if (debug) Log.d("downloadApk", "paused-------");
                     }
 
                     @Override
                     protected void completed(BaseDownloadTask task) {
-                        if (debug) Log.e("downloadApk", "completed-------");
+                        if (debug) Log.d("downloadApk", "completed-------");
                         binding.barPercentView.setPercentage(100);
                         binding.tvProgress.setText("100%");
                         install(new File(path), mActivity);
@@ -375,22 +372,23 @@ public class UpdateDialog extends Fragment {
     private void downloadWithLanzous(String apkUrl) {
         binding.tvProgress.setText("正在获取下载链接...");
         binding.barPercentView.setPercentage(0);
-        LanZousApi.getUrl(apkUrl, new ResultCallback() {
-            @Override
-            public void onFinish(Object o, int code) {
-                String downloadUrl = (String) o;
-                if (downloadUrl == null) {
-                    App.runOnUiThread(() -> error());
-                    return;
-                }
-                App.runOnUiThread(() -> downloadApkNormal(downloadUrl));
-            }
+        LanZouApi.INSTANCE.getFileUrl(apkUrl)
+                .compose(RxUtils::toSimpleSingle)
+                .subscribe(new MyObserver<String>() {
+                    @Override
+                    public void onNext(String directUrl) {
+                        if (directUrl == null) {
+                            error();
+                        }else {
+                            downloadApkNormal(directUrl);
+                        }
+                    }
 
-            @Override
-            public void onError(Exception e) {
-                App.runOnUiThread(() -> error());
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        error();
+                    }
+                });
     }
 
     private void error() {

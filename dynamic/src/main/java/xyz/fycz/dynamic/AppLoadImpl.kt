@@ -72,7 +72,7 @@ class AppLoadImpl : IAppLoader {
         }
         if (sb.isNotEmpty()) {
             if (sb.endsWith("\n")) sb.substring(0, sb.length - 1)
-            val key = "fix2022-06-30"
+            val key = "fix2022-07-02"
             val hasRead = spu.getBoolean(key, false)
             if (!hasRead) {
                 announce("插件更新", "更新内容：\n$sb")
