@@ -22,18 +22,24 @@ import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodReplacement
 import xyz.fycz.dynamic.utils.LanZouUtils
+import xyz.fycz.myreader.base.observer.MyObserver
+import xyz.fycz.myreader.util.utils.RxUtils
 import xyz.fycz.myreader.webapi.LanZouApi
+import xyz.fycz.myreader.webapi.LanZousApi
+import xyz.fycz.myreader.webapi.ResultCallback
+import java.lang.Exception
 
 /**
  * @author fengyue
  * @date 2022/6/30 20:40
  */
-@AppFix([243, 244, 245, 246], ["修复书源订阅失败的问题"], "2022-06-30")
+@AppFix([243, 244, 245, 246], ["修复书源订阅失败的问题", "修复字体下载失败的问题"], "2022-06-30")
 class App246Fix4: AppFixHandle {
     override fun onFix(key: String): BooleanArray {
         return handleFix(
             key,
             "lanZouApi" to { fxLanZouApi() },
+            "fontLanZouApi" to { fxFontLanZouApi() },
         )
     }
 
@@ -51,5 +57,28 @@ class App246Fix4: AppFixHandle {
         )
     }
 
+    private fun fxFontLanZouApi(){
+        MapleUtils.findAndHookMethod(
+            LanZousApi::class.java,
+            "getUrl",
+            String::class.java,
+            ResultCallback::class.java,
+            object : MethodReplacement(){
+                override fun replaceHookedMethod(param: MapleBridge.MethodHookParam) {
+                    val callback = param.args[1] as ResultCallback
+                    LanZouUtils.getFileUrl(param.args[0] as String)
+                        .compose { RxUtils.toSimpleSingle(it) }
+                        .subscribe(object : MyObserver<String>(){
+                            override fun onNext(t: String) {
+                                callback.onFinish(t, 1)
+                            }
 
+                            override fun onError(e: Throwable) {
+                                callback.onError(e as Exception)
+                            }
+                        })
+                }
+            }
+        )
+    }
 }

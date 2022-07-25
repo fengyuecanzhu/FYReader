@@ -18,6 +18,7 @@
 
 package xyz.fycz.dynamic.utils
 
+import android.util.Log
 import io.reactivex.Observable
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -46,11 +47,15 @@ object LanZouUtils {
      */
     fun getFileUrl(url: String, password: String = ""): Observable<String> {
         return Observable.create {
-            val html = OkHttpUtils.getHtml(url)
+            var html = OkHttpUtils.getHtml(url)
             val url2 = if (password.isEmpty()) {
                 val url1 = getUrl1(html)
-                val data = StringUtils.getSubString(OkHttpUtils.getHtml(url1), "},", "},")
-                val key = getKeyValueByKey(data, "sign") + "&" + getKeyValueByKey(data, "websignkey")
+                html = OkHttpUtils.getHtml(url1)
+                val data = getDataString(html)
+                Log.d("LanZouUtils", "data:$data")
+                val key = getKeyValueByKey(html, data, "sign") +
+                        "&" + getKeyValueByKey(html, data, "websignkey")
+                Log.d("LanZouUtils", "key:$key")
                 getUrl2(key, url1)
             } else {
                 getUrl2(StringHelper.getSubString(html, "sign=", "&"), url, password)
@@ -69,8 +74,8 @@ object LanZouUtils {
         return URLCONST.LAN_ZOU_URL + doc.getElementsByTag("iframe").attr("src")
     }
 
-    fun getKeyValueByKey(html: String, key: String): String {
-        val keyName = StringHelper.getSubString(html, "'$key':", ",")
+    fun getKeyValueByKey(html: String, data: String, key: String): String {
+        val keyName = StringHelper.getSubString(data, "'$key':", ",")
         return if (keyName.endsWith("'")) {
             key + "=" + keyName.replace("'", "")
         } else {
@@ -134,5 +139,11 @@ object LanZouUtils {
         val redirectUrl = conn.getHeaderField("Location")
         conn.disconnect()
         return redirectUrl
+    }
+
+    fun getDataString(html: String): String {
+        val start = html.lastIndexOf("data :") + "data :".length
+        val end = html.indexOf("},", start) + 1
+        return html.substring(start, end)
     }
 }
