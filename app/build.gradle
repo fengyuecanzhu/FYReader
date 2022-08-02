@@ -78,14 +78,14 @@ android {
         viewBinding true
     }
 
-    splits {
+    /*splits {
         abi {
             reset()
             enable true
             universalApk true  // If true, also generate a universal APK
             include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
-    }
+    }*/
 
     buildTypes {
         release {
@@ -93,6 +93,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             if (keyPropsFile.exists()) {
                 signingConfig signingConfigs.myConifg
+            }
+            ndk {
+                abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
             }
         }
         debug {
@@ -103,16 +106,22 @@ android {
             }
             applicationIdSuffix ".debug"
             versionNameSuffix "-" + commitId
+            ndk {
+                abiFilters "arm64-v8a"
+            }
         }
         android.applicationVariants.all { variant ->
-            variant.outputs.each { output ->
+            variant.outputs.all {
+                outputFileName = "${name}v${defaultConfig.versionName}.apk"
+            }
+            /*variant.outputs.each { output ->
                 def abi = output.getFilter(OutputFile.ABI)
                 if (abi == null) {
                     abi = "universal"
                 }
                 def fileName = "${name}v${defaultConfig.versionName}-${abi}.apk"
                 output.outputFileName = fileName
-            }
+            }*/
         }
     }
     sourceSets.main {

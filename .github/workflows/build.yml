@@ -80,40 +80,12 @@ jobs:
           tag_name: ${{ steps.config.outputs.version_name }}
           name: FYReader_${{ steps.config.outputs.version_name }}
           files: |
-            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-arm64-v8a.apk
-            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-armeabi-v7a.apk
-            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86_64.apk
-            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86.apk
-            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-universal.apk
+            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # 上传Artifact
-      - name: Upload Artifact arm64-v8a
+      - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: app-arm64-v8a
-          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-arm64-v8a.apk
-
-      - name: Upload Artifact armeabi-v7a
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-armeabi-v7a
-          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-armeabi-v7a.apk
-
-      - name: Upload Artifact universal
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-universal
-          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-universal.apk
-
-      - name: Upload Artifact x86_64
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-x86_64
-          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86_64.apk
-
-      - name: Upload Artifact x86
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-x86
-          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}-x86.apk
+          name: app
+          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}.apk
