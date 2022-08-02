@@ -393,7 +393,7 @@ public class ReadActivity extends BaseActivity<ActivityReadBinding> implements C
 
             @Override
             public void onLongPress() {
-                if (mSetting.getPageMode() == SCROLL){
+                if (mSetting.getPageMode() == SCROLL) {
                     ToastUtils.showWarring("滚动模式暂不支持长按复制");
                     return;
                 }
@@ -417,6 +417,9 @@ public class ReadActivity extends BaseActivity<ActivityReadBinding> implements C
                         mChapters = chapters;
                         mBook.setNoReadNum(0);
                         mBook.setChapterTotalNum(chapters.size());
+                        if (mBook.getHisttoryChapterNum() > chapters.size() - 1) {
+                            mBook.setHisttoryChapterNum(chapters.size() - 1);
+                        }
                         mBook.setNewestChapterTitle(chapters.get(chapters.size() - 1).getTitle());
                         if (hasChangeSource) {
                             boolean flag = mBookService.matchHistoryChapterPos(mBook, mChapters);
@@ -1275,7 +1278,7 @@ public class ReadActivity extends BaseActivity<ActivityReadBinding> implements C
             @Override
             public void onPageModeChange() {
                 mPageLoader.setPageMode(mSetting.getPageMode());
-                if (mSetting.getPageMode().equals(SCROLL)){
+                if (mSetting.getPageMode().equals(SCROLL)) {
                     DialogCreator.createTipDialog(ReadActivity.this,
                             "滚动模式存在大量问题，不建议使用；且作者本人不使用此模式，大概率不会进行修复/优化，也不接受此模式的问题反馈");
                 }
@@ -1590,22 +1593,22 @@ public class ReadActivity extends BaseActivity<ActivityReadBinding> implements C
                             selectedIndex = which;
                         }
                     }).setCancelButton("确定", (baseDialog, v) -> {
-                switch (selectedIndex) {
-                    case 0:
-                        addDownload(mPageLoader.getChapterPos(), mPageLoader.getChapterPos() + 50);
-                        break;
-                    case 1:
-                        addDownload(mPageLoader.getChapterPos() - 50, mPageLoader.getChapterPos() + 50);
-                        break;
-                    case 2:
-                        addDownload(mPageLoader.getChapterPos(), mChapters.size());
-                        break;
-                    case 3:
-                        addDownload(0, mChapters.size());
-                        break;
-                }
-                return false;
-            });
+                        switch (selectedIndex) {
+                            case 0:
+                                addDownload(mPageLoader.getChapterPos(), mPageLoader.getChapterPos() + 50);
+                                break;
+                            case 1:
+                                addDownload(mPageLoader.getChapterPos() - 50, mPageLoader.getChapterPos() + 50);
+                                break;
+                            case 2:
+                                addDownload(mPageLoader.getChapterPos(), mChapters.size());
+                                break;
+                            case 3:
+                                addDownload(0, mChapters.size());
+                                break;
+                        }
+                        return false;
+                    });
         });
     }
 
