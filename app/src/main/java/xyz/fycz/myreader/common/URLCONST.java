@@ -56,7 +56,7 @@ public class URLCONST {
 
     public static final String QUOTATION = "https://v1.hitokoto.cn/?encode=json&charset=utf-8";
 
-    public static final String DEFAULT_PLUGIN_CONFIG_URL = "https://fyreader.coding.net/p/img/d/Plugin/git/raw/master/release/config_FYReader.json";
+    public static final String DEFAULT_PLUGIN_CONFIG_URL = "https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/Plugin/release/config_FYReader.json";
 
     public static String getDefaultDomain() {
         return SharedPreUtils.getInstance().getString("domain", "fycz.me");
