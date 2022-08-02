@@ -200,7 +200,7 @@ class App246Fix5 : AppFixHandle {
     @Throws(IOException::class)
     fun getBakUpdateInfo(): String {
         return OkHttpUtils.getHtml(
-            "https://fyreader.coding.net/p/img/d/FYReader-Update/git/raw/master/" +
+            "https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/FYReader-Update/" +
                     (if (App.isDebug()) "debug" else "release") +
                     "/content.txt"
         )

@@ -214,7 +214,7 @@ public class OkHttpUtils {
     }
 
     public static String getBakUpdateInfo() throws IOException {
-        return OkHttpUtils.getHtml("https://fyreader.coding.net/p/img/d/FYReader-Update/git/raw/master/" +
+        return OkHttpUtils.getHtml("https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/FYReader-Update/" +
                 (App.isDebug() ? "debug" : "release") +
                 "/content.txt");
     }
