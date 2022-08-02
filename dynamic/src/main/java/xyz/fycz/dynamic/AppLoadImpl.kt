@@ -27,7 +27,11 @@ import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodHook
 import xyz.fycz.dynamic.fix.*
 import xyz.fycz.myreader.application.App
+import xyz.fycz.myreader.entity.PluginConfig
 import xyz.fycz.myreader.ui.activity.MainActivity
+import xyz.fycz.myreader.util.SharedPreUtils
+import xyz.fycz.myreader.util.utils.GSON
+import xyz.fycz.myreader.util.utils.fromJsonObject
 
 /**
  * @author fengyue
@@ -132,6 +136,9 @@ class AppLoadImpl : IAppLoader {
     }
 
     fun getPluginLoadInfo(): String {
-        return allFixInfoSb.toString()
+        val pluginConfig = GSON.fromJsonObject<PluginConfig>(
+            SharedPreUtils.getInstance().getString("pluginConfig")
+        ) ?: PluginConfig("dynamic.dex", 100)
+        return "当前版本更新日志：\n${pluginConfig.changelog}\n\n插件加载结果：\n" + allFixInfoSb.toString()
     }
 }

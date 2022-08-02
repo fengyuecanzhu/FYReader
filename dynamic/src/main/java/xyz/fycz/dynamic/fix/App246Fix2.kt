@@ -27,7 +27,7 @@ import xyz.fycz.myreader.widget.page.PageView
  * @author fengyue
  * @date 2022/6/23 20:51
  */
-@AppFix([], ["修复阅读界面概率性闪退的问题"], "2022-06-23")
+@AppFix([243, 244, 245, 246], ["修复阅读界面概率性闪退的问题"], "2022-06-23")
 class App246Fix2 : AppFixHandle {
     override fun onFix(key: String): BooleanArray {
         return handleFix(
