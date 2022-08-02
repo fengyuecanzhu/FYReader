@@ -88,4 +88,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: app
-          path: ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}.apk
+          path: ${{ steps.get_path.outputs.file_path }}/风月读书*.apk

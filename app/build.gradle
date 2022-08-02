@@ -111,8 +111,13 @@ android {
             }
         }
         android.applicationVariants.all { variant ->
+            def buildType = variant.buildType.name
+            def fileName = "${name}v${defaultConfig.versionName}.apk"
+            if (buildType == "debug"){
+                fileName = "${name}v${defaultConfig.versionName}-${commitId}.apk"
+            }
             variant.outputs.all {
-                outputFileName = "${name}v${defaultConfig.versionName}.apk"
+                outputFileName = fileName
             }
             /*variant.outputs.each { output ->
                 def abi = output.getFilter(OutputFile.ABI)
