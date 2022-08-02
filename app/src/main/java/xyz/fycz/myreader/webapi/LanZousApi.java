@@ -32,6 +32,7 @@ import io.reactivex.SingleOnSubscribe;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import xyz.fycz.myreader.application.App;
+import xyz.fycz.myreader.base.observer.MyObserver;
 import xyz.fycz.myreader.base.observer.MySingleObserver;
 import xyz.fycz.myreader.common.URLCONST;
 import xyz.fycz.myreader.util.help.StringHelper;
@@ -51,40 +52,23 @@ public class LanZousApi {
      * @param callback
      */
     public static void getUrl(final String lanZouUrl, final ResultCallback callback) {
-        LanZousApi.getUrl1(lanZouUrl, new ResultCallback() {
-            @Override
-            public void onFinish(final Object o, int code) {
-                LanZousApi.getKey((String) o, new ResultCallback() {
-                    final String referer = (String) o;
+        getUrl(lanZouUrl, "", callback);
+    }
 
+    public static void getUrl(final String lanZouUrl, String password, final ResultCallback callback) {
+        LanZouApi.INSTANCE.getFileUrl(lanZouUrl, "")
+                .compose(RxUtils::toSimpleSingle)
+                .subscribe(new MyObserver<String>() {
                     @Override
-                    public void onFinish(Object o, int code) {
-                        LanZousApi.getUrl2((String) o, new ResultCallback() {
-                            @Override
-                            public void onFinish(Object o, int code) {
-                                LanZousApi.getRedirectUrl((String) o, callback);
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                callback.onError(e);
-                            }
-                        }, referer);
+                    public void onNext(String s) {
+                        callback.onFinish(s, 1);
                     }
 
                     @Override
-                    public void onError(Exception e) {
-                        callback.onError(e);
+                    public void onError(Throwable e) {
+                        callback.onError((Exception) e);
                     }
                 });
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
-            }
-        });
-
     }
 
 
