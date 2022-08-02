@@ -130,4 +130,8 @@ class AppLoadImpl : IAppLoader {
             MapleUtils.log(e)
         }
     }
+
+    fun getPluginLoadInfo(): String {
+        return allFixInfoSb.toString()
+    }
 }

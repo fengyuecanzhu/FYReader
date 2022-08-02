@@ -130,10 +130,7 @@ object PluginUtils {
 
     fun getPluginLoadInfo(): String {
         return try {
-            (MapleUtils.getStaticObjectField(
-                appLoader?.javaClass,
-                "pluginLoadInfo"
-            ) as StringBuilder).toString()
+            MapleUtils.callMethod(appLoader, "getPluginLoadInfo") as String
         } catch (e: Exception) {
             ""
         }
