@@ -68,7 +68,7 @@ jobs:
             gitHead=$(git rev-parse --short HEAD)
             tag_name=${{ steps.config.outputs.version_name }}-$gitHead
           fi
-          python3 $GITHUB_WORKSPACE/keystore/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}" "${{ steps.config.outputs.lanzou_folder_id }}" "$tag_name"
+          python3 $GITHUB_WORKSPACE/keystore/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}/风月读书$tag_name.apk" "${{ steps.config.outputs.lanzou_folder_id }}" "$tag_name"
       # 发布正式版
       - name: Release
         if: ${{ steps.config.outputs.need_create_release == 'true' && github.ref == 'refs/heads/master' }}
